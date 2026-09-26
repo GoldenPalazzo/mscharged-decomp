@@ -8,7 +8,7 @@
 #include "Game/DB/StatsTracker.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feFinderFind_impl.h"
-#include "Game/FE/feInlineHasher.inl"
+#include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"

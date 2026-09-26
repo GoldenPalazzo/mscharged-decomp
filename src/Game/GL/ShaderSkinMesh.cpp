@@ -230,8 +230,9 @@ void ShaderSkinMesh::PrepareToRender()
         glModel* newModel = (glModel*)glFrameAlloc(sizeof(glModel), GLM_Header);
         softwareModel = newModel;
         memcpy(newModel, pModel, sizeof(glModel));
+        glModelPacket* pPackets;
         unsigned long numPackets = newModel->numPackets;
-        glModelPacket* pPackets = (glModelPacket*)glFrameAlloc(
+        pPackets = (glModelPacket*)glFrameAlloc(
             numPackets * sizeof(glModelPacket), GLM_Header);
         memcpy(pPackets, newModel->packets, numPackets * sizeof(glModelPacket));
         glSetModelPackets(newModel, pPackets, numPackets);

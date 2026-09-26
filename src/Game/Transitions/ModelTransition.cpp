@@ -263,44 +263,6 @@ void ModeledScreenTransition::Render(GLView* view)
 static inline void ClearOutline(
     Vector<nlVector3, DefaultAllocator>& outline);
 
-static inline void ReserveOutline(
-    Vector<nlVector3, DefaultAllocator>& outline, int capacity)
-{
-    if (outline.mCapacity < capacity)
-    {
-        Vector<nlVector3, DefaultAllocator> other(capacity, 0);
-        for (int i = 0; i < outline.mSize; i++)
-        {
-            other.mData[i] = outline.mData[i];
-        }
-        other.mSize = outline.mSize;
-        outline.Swap(other);
-    }
-}
-
-static inline void InsertOutline(
-    Vector<nlVector3, DefaultAllocator>& outline, nlVector3* at,
-    const nlVector3* begin, const nlVector3* end)
-{
-    int size = end - begin;
-    int offset = at - outline.mData;
-    ReserveOutline(outline, outline.mSize + size);
-    at = outline.mData + offset;
-    nlVector3* t = outline.mData + outline.mSize - 1;
-    while (t >= at)
-    {
-        *(t + size) = *t;
-        t--;
-    }
-    while (begin != end)
-    {
-        *at = *begin;
-        begin++;
-        at++;
-    }
-    outline.mSize += size;
-}
-
 void ModeledScreenTransition::RenderOutline() const
 {
     Vector<nlVector3, DefaultAllocator> outline;
@@ -308,7 +270,7 @@ void ModeledScreenTransition::RenderOutline() const
     outline.mData = NULL;
     outline.mSize = 0;
     outline.mCapacity = 0;
-    ReserveOutline(outline, 8);
+    outline.reserve(8);
 
     for (int i = 0; (u32)i < m_nModels; i++)
     {
@@ -329,14 +291,12 @@ void ModeledScreenTransition::RenderOutline() const
             const nlVector3* positions
                 = (const nlVector3*)positionStream->address;
             const u16* indices = packet.indexBuffer;
-            for (int iVertex = 0;
-                iVertex < (int)packet.numVertices; iVertex++)
+            for (u32 iVertex = 0;
+                iVertex < packet.numVertices; indices++, iVertex++)
             {
-                current = positions[*indices++];
-                nlMultPosVectorMatrix(current, current,
+                nlMultPosVectorMatrix(current, positions[*indices],
                     m_pPoseAccumulator->GetNodeMatrix(m_pModelMap[i]));
-                InsertOutline(outline, outline.mData + outline.mSize,
-                    &current, &current + 1);
+                outline.push_back(current);
             }
 
             ShuffleIntoOutline(outline);
@@ -350,22 +310,12 @@ void ModeledScreenTransition::RenderOutline() const
 
             for (int k = 0; k < outline.mSize; k++)
             {
-                *mesh.colour++ = *(const u32*)&m_OutlineColour;
-                float z = outline.mData[k].z;
-                float y = outline.mData[k].y;
-                float x = outline.mData[k].x;
-                *mesh.position++ = x;
-                *mesh.position++ = y;
-                *mesh.position++ = z;
+                mesh.Colour(m_OutlineColour);
+                mesh.Vertex(outline.mData[k]);
             }
 
-            *mesh.colour++ = *(const u32*)&m_OutlineColour;
-            float z = outline.mData[0].z;
-            float y = outline.mData[0].y;
-            float x = outline.mData[0].x;
-            *mesh.position++ = x;
-            *mesh.position++ = y;
-            *mesh.position++ = z;
+            mesh.Colour(m_OutlineColour);
+            mesh.Vertex(outline.mData[0]);
 
             if (mesh.End())
             {

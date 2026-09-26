@@ -327,10 +327,11 @@ extern "C" void fn_800C60C4(DesireSteering* desire,
     if (desire->m_fTotalWeight >= 0.0f)
     {
         desire->m_fTotalWeight += fWeight;
+        nlVec3Set(desire->m_v3DesiredPos,
+            fWeight * v3Position.x + desire->m_v3DesiredPos.x,
+            fWeight * v3Position.y + desire->m_v3DesiredPos.y,
+            0.0f);
         desire->m_fUrgency += fUrgency * fWeight;
-        desire->m_v3DesiredPos.x += v3Position.x * fWeight;
-        desire->m_v3DesiredPos.y += v3Position.y * fWeight;
-        desire->m_v3DesiredPos.z = 0.0f;
     }
 }
 

@@ -585,7 +585,7 @@ int NetworkInputRecording::GetNetworkInputPlaybackExtraUpdates()
     return mPlaybackReady ? g_numPacketPlaybackTurbo : 0;
 }
 
-void NetworkInputRecording::WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u16 eventCount, u32 value)
+void NetworkInputRecording::WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 value)
 {
     NetworkRecordedFrameHeader header;
     header.mChecksum = checksum;

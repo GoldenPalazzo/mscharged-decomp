@@ -485,4 +485,5 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     }
 }
 
-#include "Game/FE/feFinder_impl.h"
+#include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feFinderDefault_impl.h"

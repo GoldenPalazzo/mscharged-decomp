@@ -2094,11 +2094,12 @@ extern "C" void fn_801BD144(cCharacter* pCharacter)
 
 extern "C" void fn_801BD1C0(cFielder* pFielder)
 {
-    int eCharacterClass = pFielder->mUnidentified024.m_eCharacterClass;
-
-    if (eCharacterClass == 7 || eCharacterClass == 9 || eCharacterClass == 1
-        || eCharacterClass == 3 || eCharacterClass == 11
-        || eCharacterClass == 12)
+    if (pFielder->GetCharacterClass() == 7
+        || pFielder->GetCharacterClass() == 9
+        || pFielder->GetCharacterClass() == 1
+        || pFielder->GetCharacterClass() == 3
+        || pFielder->GetCharacterClass() == 11
+        || pFielder->GetCharacterClass() == 12)
     {
         pFielder->muInvincibleStatus |= 1;
     }
@@ -2109,7 +2110,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         if (pAnimController->m_fTime
             < 15.0f / (float)pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pFielder->mUnidentified024.m_eCharacterClass == 11)
+            if (pFielder->GetCharacterClass() == 11)
             {
                 const char* groupName = "petey_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2126,7 +2127,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
                     pController->SetUpdateCallback(update2);
                 }
             }
-            else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
+            else if (pFielder->GetCharacterClass() == 12)
             {
                 const char* groupName = "birdo_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2146,8 +2147,8 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         }
     }
 
-    if (pFielder->mUnidentified024.m_eCharacterClass == 13 || pFielder->mUnidentified024.m_eCharacterClass == 7
-        || pFielder->mUnidentified024.m_eCharacterClass == 9)
+    if (pFielder->GetCharacterClass() == 13 || pFielder->GetCharacterClass() == 7
+        || pFielder->GetCharacterClass() == 9)
     {
         pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
     }

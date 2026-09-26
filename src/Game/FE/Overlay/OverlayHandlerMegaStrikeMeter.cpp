@@ -4,7 +4,8 @@
 #include "NL/nlMath.h"
 
 #include "Game/BaseGameSceneManager.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
 #include "NL/nlTask.h"

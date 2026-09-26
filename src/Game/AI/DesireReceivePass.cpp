@@ -1077,6 +1077,181 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     return result;
 }
 
+void DesireReceivePass::fn_800C1A08()
+{
+    nlVector3 v3BallPosition;
+    if (mbOneTouchShot)
+    {
+        v3BallPosition = m_pFielder->m_pTeam
+                             ->GetOtherNet()->m_v3NetLocation;
+
+        nlVector3 v3ToTarget;
+        nlVec3Sub(v3ToTarget, v3BallPosition,
+            m_pFielder->mUnidentified024.m_v3Position);
+        mEstimated.aFacingTargetDirection =
+            nlVector3ToAngle(v3ToTarget);
+        mEstimated.aFacingDirection =
+            m_pFielder->mUnidentified024.m_aActualFacingDirection;
+    }
+    else
+    {
+        v3BallPosition = g_pBall->m_v3Position;
+        if (fn_800C0E74())
+        {
+            unsigned short aFacingDirection =
+                m_pFielder->mUnidentified024.m_aActualFacingDirection;
+            mEstimated.aFacingDirection = aFacingDirection;
+            mEstimated.aFacingTargetDirection = aFacingDirection;
+        }
+        else
+        {
+            mEstimated.aFacingTargetDirection =
+                mEstimated.aFacingDirection;
+        }
+    }
+
+    const LooseBallContactAnimInfo* pBestBallContactAnimInfo =
+        fn_800C2048(v3BallPosition,
+            m_pFielder->mUnidentified024.m_v3Position,
+            mEstimated.v3BallContactPos,
+            mEstimated.aFacingTargetDirection, meReceiveAnimType);
+
+    if ((meReceiveAnimType & 4) && mbOneTouchPass
+        && mpOneTouchPassTarget != 0)
+    {
+        nlVector3 v3ToTarget;
+        nlVec3Sub(v3ToTarget, mpOneTouchPassTarget->mUnidentified024.m_v3Position,
+            m_pFielder->mUnidentified024.m_v3Position);
+        mEstimated.aFacingTargetDirection =
+            nlVector3ToAngle(v3ToTarget);
+    }
+
+    switch (pBestBallContactAnimInfo->nAnimID)
+    {
+    case 0x35:
+    case 0x39:
+    case 0x3D:
+    case 0x41:
+    case 0x45:
+        mEstimated.aFacingTargetDirection += 0x4000;
+        break;
+    case 0x36:
+    case 0x3A:
+    case 0x3E:
+    case 0x42:
+    case 0x46:
+        mEstimated.aFacingTargetDirection -= 0x4000;
+        break;
+    case 0x37:
+    case 0x3B:
+    case 0x43:
+    case 0x47:
+    case 0x49:
+        mEstimated.aFacingTargetDirection += 0x8000;
+        break;
+    case 0x3F:
+        mEstimated.aFacingTargetDirection += 0x8000;
+        break;
+    }
+
+    mEstimated.mUnidentifiedAnimInfo = pBestBallContactAnimInfo;
+    mEstimated.nReceivePassAnim = pBestBallContactAnimInfo->nAnimID;
+
+    cSAnim* pBestContactAnim = m_pFielder->m_pAnimInventory
+                                   ->GetAnim(mEstimated.nReceivePassAnim);
+    unsigned short aDesiredFacingDirection =
+        mEstimated.aFacingTargetDirection;
+    mEstimated.fReceivePassAnimTime =
+        GetNormalizedContactTime(
+            pBestContactAnim, pBestBallContactAnimInfo->fAnimContactFrame);
+
+    nlVector3 v3ContactOffsetWorld;
+    nlVector3 v3ContactOffsetLocal;
+    m_pFielder->GetJointPositionFuture(
+        &v3ContactOffsetLocal, pBestBallContactAnimInfo->nAnimID,
+        m_pFielder->m_nBallJointIndex,
+        GetNormalizedContactTime(
+            m_pFielder->m_pAnimInventory
+                ->GetAnim(pBestBallContactAnimInfo->nAnimID),
+            pBestBallContactAnimInfo->fAnimContactFrame),
+        true, true, false, true);
+
+    float fSin;
+    float fCos;
+    nlSinCos(&fSin, &fCos, aDesiredFacingDirection);
+
+    nlVec3Set(v3ContactOffsetWorld,
+        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin,
+        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin,
+        v3ContactOffsetLocal.z);
+
+    nlVec3Sub(mEstimated.v3AnimStartPos,
+        mEstimated.v3BallContactPos, v3ContactOffsetWorld);
+    mEstimated.v3AnimStartPos.z = 0.0f;
+    mEstimated.v3BallContactPos.z = v3ContactOffsetWorld.z;
+    mEstimated.fAnimStartOffset =
+        nlSqrt(v3ContactOffsetWorld.GetLengthSq3D(), true);
+
+    unsigned int nNumKeys = pBestContactAnim->m_nNumKeys;
+    float fAnimDuration = (float)nNumKeys / 30.0f;
+    float fAnimContactTime = pBestBallContactAnimInfo->fAnimContactFrame
+        / (float)nNumKeys;
+    mEstimated.fAnimStartTime = mEstimated.fBallContactTime
+        - fAnimContactTime * fAnimDuration;
+}
+
+bool DesireReceivePass::StartPickupAnimation()
+{
+    nlVector2 v2Delta = {
+        mEstimated.v3AnimStartPos.x
+            - m_pFielder->mUnidentified024.m_v3Position.x,
+        mEstimated.v3AnimStartPos.y
+            - m_pFielder->mUnidentified024.m_v3Position.y,
+    };
+    float fDistance = nlSqrt(nlVec2LengthSquared(v2Delta), true);
+    float fRadius = m_pFielder->mUnidentified320->GetRadius();
+    if (fDistance - fRadius
+        > mEstimated.fAnimStartOffset + lbl_806DC1C0)
+    {
+        tDebugPrintManager::Print(DC_AI,
+            "DesireReceivePass::StartPickupAnimation - position is outside max threshold !\n");
+        return false;
+    }
+
+    short sFacingDelta = (short)(mEstimated.aFacingTargetDirection
+        - m_pFielder->mUnidentified024.m_aActualFacingDirection);
+    if (mbOneTouchShot && !mbOneTouchShotLate)
+    {
+        m_pFielder->InitActionOneTimer(
+            mEstimated.nReceivePassAnim, mEstimated.v3AnimStartPos,
+            mEstimated.fReceivePassAnimTime, mbOneTouchVolley,
+            sFacingDelta);
+    }
+    else
+    {
+        m_pFielder->InitActionReceivePass(
+            mEstimated.nReceivePassAnim, mEstimated.v3AnimStartPos,
+            sFacingDelta, mEstimated.fReceivePassAnimTime);
+    }
+
+    float fAnimTime =
+        mEstimated.mUnidentifiedAnimInfo->fAnimContactFrame
+        / lbl_806E403C;
+    float fTimeToIntercept =
+        g_pBall->m_tPassTargetTimer.GetSeconds();
+    if (fTimeToIntercept < FixedUpdateTask::GetPhysicsUpdateTick())
+    {
+        fTimeToIntercept = FixedUpdateTask::GetPhysicsUpdateTick();
+    }
+
+    float fPlaybackSpeed = nlMinEquals(
+        nlMaxEquals(fAnimTime / fTimeToIntercept, lbl_806DC1D0),
+        lbl_806DC1D4);
+    m_pFielder->m_pCurrentAnimController
+        ->m_fPlaybackSpeedScale = fPlaybackSpeed;
+    return true;
+}
+
 const LooseBallContactAnimInfo* DesireReceivePass::fn_800C1FA4(
     int receiveAnimType, int& nNumAnims)
 {
@@ -1213,179 +1388,6 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
         return pReachableAnimInfo;
     }
     return pBestAnimInfo;
-}
-
-void DesireReceivePass::fn_800C1A08()
-{
-    nlVector3 v3BallPosition;
-    if (mbOneTouchShot)
-    {
-        v3BallPosition = m_pFielder->m_pTeam
-                             ->GetOtherNet()->m_v3NetLocation;
-
-        nlVector3 v3ToTarget;
-        nlVec3Sub(v3ToTarget, v3BallPosition,
-            m_pFielder->mUnidentified024.m_v3Position);
-        mEstimated.aFacingTargetDirection =
-            nlVector3ToAngle(v3ToTarget);
-        mEstimated.aFacingDirection =
-            m_pFielder->mUnidentified024.m_aActualFacingDirection;
-    }
-    else
-    {
-        v3BallPosition = g_pBall->m_v3Position;
-        if (fn_800C0E74())
-        {
-            unsigned short aFacingDirection =
-                m_pFielder->mUnidentified024.m_aActualFacingDirection;
-            mEstimated.aFacingDirection = aFacingDirection;
-            mEstimated.aFacingTargetDirection = aFacingDirection;
-        }
-        else
-        {
-            mEstimated.aFacingTargetDirection =
-                mEstimated.aFacingDirection;
-        }
-    }
-
-    const LooseBallContactAnimInfo* pBestBallContactAnimInfo =
-        fn_800C2048(v3BallPosition,
-            m_pFielder->mUnidentified024.m_v3Position,
-            mEstimated.v3BallContactPos,
-            mEstimated.aFacingTargetDirection, meReceiveAnimType);
-
-    if ((meReceiveAnimType & 4) && mbOneTouchPass
-        && mpOneTouchPassTarget != 0)
-    {
-        nlVector3 v3ToTarget;
-        nlVec3Sub(v3ToTarget, mpOneTouchPassTarget->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
-        mEstimated.aFacingTargetDirection =
-            nlVector3ToAngle(v3ToTarget);
-    }
-
-    switch (pBestBallContactAnimInfo->nAnimID)
-    {
-    case 0x35:
-    case 0x39:
-    case 0x3D:
-    case 0x41:
-    case 0x45:
-        mEstimated.aFacingTargetDirection += 0x4000;
-        break;
-    case 0x36:
-    case 0x3A:
-    case 0x3E:
-    case 0x42:
-    case 0x46:
-        mEstimated.aFacingTargetDirection -= 0x4000;
-        break;
-    case 0x37:
-    case 0x3B:
-    case 0x43:
-    case 0x47:
-    case 0x49:
-        mEstimated.aFacingTargetDirection += 0x8000;
-        break;
-    case 0x3F:
-        mEstimated.aFacingTargetDirection += 0x8000;
-        break;
-    }
-
-    mEstimated.mUnidentifiedAnimInfo = pBestBallContactAnimInfo;
-    mEstimated.nReceivePassAnim = pBestBallContactAnimInfo->nAnimID;
-
-    cSAnim* pBestContactAnim = m_pFielder->m_pAnimInventory
-                                   ->GetAnim(mEstimated.nReceivePassAnim);
-    unsigned short aDesiredFacingDirection =
-        mEstimated.aFacingTargetDirection;
-    mEstimated.fReceivePassAnimTime =
-        pBestBallContactAnimInfo->fAnimContactFrame
-        / (float)pBestContactAnim->m_nNumKeys;
-
-    nlVector3 v3ContactOffsetWorld;
-    nlVector3 v3ContactOffsetLocal;
-    m_pFielder->GetJointPositionFuture(
-        &v3ContactOffsetLocal, pBestBallContactAnimInfo->nAnimID,
-        m_pFielder->m_nBallJointIndex,
-        pBestBallContactAnimInfo->fAnimContactFrame
-            / (float)m_pFielder->m_pAnimInventory
-                  ->GetAnim(pBestBallContactAnimInfo->nAnimID)->m_nNumKeys,
-        true, true, false, true);
-
-    float fSin;
-    float fCos;
-    nlSinCos(&fSin, &fCos, aDesiredFacingDirection);
-
-    nlVec3Set(v3ContactOffsetWorld,
-        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin,
-        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin,
-        v3ContactOffsetLocal.z);
-
-    nlVec3Sub(mEstimated.v3AnimStartPos,
-        mEstimated.v3BallContactPos, v3ContactOffsetWorld);
-    mEstimated.v3AnimStartPos.z = 0.0f;
-    mEstimated.v3BallContactPos.z = v3ContactOffsetWorld.z;
-    mEstimated.fAnimStartOffset =
-        nlSqrt(v3ContactOffsetWorld.GetLengthSq3D(), true);
-
-    float fAnimDuration = pBestContactAnim->GetDuration();
-    float fAnimContactTime = pBestBallContactAnimInfo->fAnimContactFrame
-        / (float)pBestContactAnim->m_nNumKeys;
-    mEstimated.fAnimStartTime = mEstimated.fBallContactTime
-        - fAnimContactTime * fAnimDuration;
-}
-
-bool DesireReceivePass::StartPickupAnimation()
-{
-    nlVector2 v2Delta = {
-        mEstimated.v3AnimStartPos.x
-            - m_pFielder->mUnidentified024.m_v3Position.x,
-        mEstimated.v3AnimStartPos.y
-            - m_pFielder->mUnidentified024.m_v3Position.y,
-    };
-    float fDistance = nlSqrt(nlVec2LengthSquared(v2Delta), true);
-    float fRadius = m_pFielder->mUnidentified320->GetRadius();
-    if (fDistance - fRadius
-        > mEstimated.fAnimStartOffset + lbl_806DC1C0)
-    {
-        tDebugPrintManager::Print(DC_AI,
-            "DesireReceivePass::StartPickupAnimation - position is outside max threshold !\n");
-        return false;
-    }
-
-    short sFacingDelta = (short)(mEstimated.aFacingTargetDirection
-        - m_pFielder->mUnidentified024.m_aActualFacingDirection);
-    if (mbOneTouchShot && !mbOneTouchShotLate)
-    {
-        m_pFielder->InitActionOneTimer(
-            mEstimated.nReceivePassAnim, mEstimated.v3AnimStartPos,
-            mEstimated.fReceivePassAnimTime, mbOneTouchVolley,
-            sFacingDelta);
-    }
-    else
-    {
-        m_pFielder->InitActionReceivePass(
-            mEstimated.nReceivePassAnim, mEstimated.v3AnimStartPos,
-            sFacingDelta, mEstimated.fReceivePassAnimTime);
-    }
-
-    float fAnimTime =
-        mEstimated.mUnidentifiedAnimInfo->fAnimContactFrame
-        / lbl_806E403C;
-    float fTimeToIntercept =
-        g_pBall->m_tPassTargetTimer.GetSeconds();
-    if (fTimeToIntercept < FixedUpdateTask::GetPhysicsUpdateTick())
-    {
-        fTimeToIntercept = FixedUpdateTask::GetPhysicsUpdateTick();
-    }
-
-    float fPlaybackSpeed = nlMinEquals(
-        nlMaxEquals(fAnimTime / fTimeToIntercept, lbl_806DC1D0),
-        lbl_806DC1D4);
-    m_pFielder->m_pCurrentAnimController
-        ->m_fPlaybackSpeedScale = fPlaybackSpeed;
-    return true;
 }
 
 void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFindPosition,

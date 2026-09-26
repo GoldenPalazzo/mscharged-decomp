@@ -625,22 +625,23 @@ void ScriptedScreenTransition::Render(GLView* view)
         normalizedTime = 0.0f;
     }
 
-    float finalTime;
+    float easedTime;
     switch (m_eTimeLine)
     {
     case TIME_ACCEL:
-        finalTime = normalizedTime * normalizedTime;
+        easedTime = normalizedTime * normalizedTime;
         break;
     case TIME_DECEL:
-        finalTime = nlSqrt(normalizedTime, true);
+        easedTime = nlSqrt(normalizedTime, true);
         break;
     case TIME_LINEAR:
-        finalTime = normalizedTime;
+        easedTime = normalizedTime;
         break;
     default:
-        finalTime = normalizedTime;
+        easedTime = normalizedTime;
         break;
     }
+    float finalTime = easedTime;
 
     glSetDefaultState(false);
     glSetCurrentTexture(m_nTexture, GLTT_Diffuse);
