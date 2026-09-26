@@ -1,4 +1,5 @@
 #include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
+#include "Game/AI/FielderActions.h"
 
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlMath.h"
@@ -10,7 +11,6 @@
 #include "Game/FE/feScene.h"
 #include "NL/nlTask.h"
 
-extern "C" float fn_800499EC(cFielder*, int);
 
 static const char* sNumberSlides[10] = {
     "01",

@@ -462,18 +462,26 @@ int FriendManager::GetFriendInvitationResponse()
 void FriendManager::Update(float dt)
 {
     mUpdateTime += dt;
-    if (!mFriendListChanged || g_pNetworkSessionBase->GetSessionState() != 2)
+    if (!mFriendListChanged)
+    {
+        return;
+    }
+    if (g_pNetworkSessionBase->GetSessionState() != 2)
     {
         return;
     }
 
     bool matchmaking = false;
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-    if (lobby != 0 && (lobby->mMatchmakingThreadRunning || lobby->mState != 0))
+    if (lobby != 0 && lobby->IsMatchmaking())
     {
         matchmaking = true;
     }
-    bool invitationScene = GameSceneManager::Instance()->IsOnStack(static_cast<SceneList>(0x2F));
+    bool invitationScene = false;
+    if (GameSceneManager::Instance()->IsOnStack(static_cast<SceneList>(0x2F)))
+    {
+        invitationScene = true;
+    }
     if (matchmaking && !invitationScene)
     {
         return;

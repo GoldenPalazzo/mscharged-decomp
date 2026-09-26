@@ -31,9 +31,9 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/BaseGameSceneManager.h"
 
 
-extern BaseGameSceneManager* g_pOverlayManager;
 
 class TU8021CBD0Scene : public BaseSceneHandler
 {

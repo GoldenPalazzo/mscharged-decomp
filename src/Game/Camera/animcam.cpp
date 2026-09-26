@@ -1,4 +1,5 @@
 #include "Game/Camera/animcam.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
@@ -27,7 +28,6 @@ struct UnidentifiedCameraDisplayState
 };
 
 UnidentifiedCameraDisplayState* GetPresentation();
-extern "C" float fn_800F2410(float fFOV);
 
 struct UnidentifiedSimulationTimeProvider
 {

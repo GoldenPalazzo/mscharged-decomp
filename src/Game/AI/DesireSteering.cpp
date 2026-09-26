@@ -1,4 +1,5 @@
 #include "Game/AI/DesireSteering.h"
+#include "Game/AI/AvoidController.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"
@@ -20,31 +21,17 @@
 #include <math.h>
 #include <stddef.h>
 
-extern "C" void fn_8000F178(AvoidController*);
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" float fn_8002BFB8(PlayerTweaks*);
-extern "C" float fn_8002C254(const PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" void fn_8003C7B0(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
-extern "C" cTeam* fn_800D6670(cFielder*);
-extern "C" cFielder* fn_800D6734(cFielder*);
-extern "C" float fn_800D6A90(cFielder*);
-extern "C" float fn_800D8C84(cFielder*);
-extern "C" float fn_800DC19C(cFielder*, cBall*);
 extern "C" float fn_800DED80(cFielder*);
-extern "C" float fn_800DFD74(cTeam*);
 
 extern float lbl_806DC230;
-extern bool lbl_806E0C50;
-extern bool lbl_806E0C51;
-extern bool lbl_806E0C52;
 extern bool lbl_806E0E58;
 
 static nlVector2 sSteeringSpeedScalePoints[] = {

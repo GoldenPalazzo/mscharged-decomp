@@ -16,9 +16,9 @@
 #include "NL/gl/glState.h"
 #include "NL/nlConfig.h"
 #include "NL/nlString.h"
+#include "Game/Task/GameRenderTask.h"
+#include "Game/main.h"
 
-extern bool g_e3_Build;
-extern bool g_bRenderWorld;
 extern "C" unsigned char SCGetSoundMode();
 extern "C" void THPSimpleSetVolume(int, int);
 extern "C" char* strstr(const char*, const char*);

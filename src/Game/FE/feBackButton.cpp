@@ -14,9 +14,9 @@
 #include "NL/nlString.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/BaseGameSceneManager.h"
 
 
-extern BaseGameSceneManager* g_pOverlayManager;
 
 /**
  * Offset/Address/Size: 0x0 | 0x8022EF84 | size: 0x84

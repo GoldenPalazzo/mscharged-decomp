@@ -7,7 +7,7 @@
 #include <stddef.h>
 
 #include "Game/AI/DesireUpdate.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIPad.h"
@@ -88,7 +88,6 @@ static const LooseBallContactAnimInfo lbl_804DC310[2] = {
 };
 
 extern "C" void fn_8003BA94(cFielder*, float);
-extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
     float*, unsigned short, const LooseBallContactAnimInfo*);
@@ -100,18 +99,9 @@ extern "C" void fn_80016DF8(
 extern "C" void fn_801B75C8(cFielder*, int, int, int, int);
 extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
-extern "C" void fn_80098098(cFielder*);
-extern "C" bool fn_80036A58(cFielder*, unsigned short*);
-extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" void fn_8003C268(cFielder*, float, float);
 extern "C" void fn_80316968(void*);
-extern "C" cFielder* fn_80096F54(cPlayer*, bool);
 extern "C" void fn_8005C650(cGame*);
-extern "C" float fn_8002CFC4(PlayerTweaks*);
-extern "C" float fn_8002C730(PlayerTweaks*);
-extern "C" float fn_8002C6E8(PlayerTweaks*);
-extern "C" float fn_8002C678(PlayerTweaks*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800C33C8(
@@ -166,7 +156,6 @@ static TweakFloatBinding lbl_8056DAC8("sfSpeedAdjustChargeLevel3",
 static TweakFloatBinding lbl_8056DAE8("sfSpeedAdjustChargeLevelMax",
     "Game/Gameplay/Charging/Pass", &lbl_806DC1F0, true);
 
-extern float g_fSimulationTick;
 
 static inline float GetNormalizedContactTime(
     const cSAnim* anim, float contactFrame)
@@ -791,8 +780,8 @@ void DesireReceivePass::fn_800C0F14()
     float fDuration = 0.5f + g_pBall->m_tPassTargetTimer.GetSeconds();
     const UnidentifiedStateTransition& transition =
         !mUnidentified070.UnidentifiedIsUnset() ? mUnidentified070 : mUnidentified068;
-    UnidentifiedFielderInput* input = mUnidentified018->mUnidentified064;
-    input->fn_8030FA10(input->fn_8030F9B4(transition.mUnidentifiedHash, 1), fDuration);
+    AIContext* input = mUnidentified018->mAIContext;
+    input->SetTimer(input->GetTimerKey(transition.mUnidentifiedHash, 1), fDuration);
 }
 
 bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)

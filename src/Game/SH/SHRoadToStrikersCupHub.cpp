@@ -33,8 +33,6 @@
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-extern "C" void fn_802088B4();
-extern "C" void fn_80207060(bool);
 extern "C" void fn_80207724(int);
 
 RoadToStrikersCupHubScene::RoadToStrikersCupHubScene()

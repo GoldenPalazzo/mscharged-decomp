@@ -303,10 +303,8 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
         angle90 = (u16)(int)(10430.378f * ((float)nSegment * segmentFactor)) + 0x4000;
         y0 = 0.5f * (one * nlSin((u16)angle90));
 
-        angle = (int)(10430.378f * ((float)nSegment * segmentFactor));
-        x1 = 0.5f * (z0 * nlSin((u16)angle));
-        angle90 = (u16)(int)(10430.378f * ((float)nSegment * segmentFactor)) + 0x4000;
-        y1 = 0.5f * (z0 * nlSin((u16)angle90));
+        x1 = 0.5f * (z0 * nlSin((u16)(int)(10430.378f * ((float)nSegment * segmentFactor))));
+        y1 = 0.5f * (z0 * nlSin((u16)((u16)(int)(10430.378f * ((float)nSegment * segmentFactor)) + 0x4000)));
 
         vNormal.x = x0;
         vNormal.y = y0;

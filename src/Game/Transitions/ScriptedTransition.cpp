@@ -658,14 +658,14 @@ void ScriptedScreenTransition::Render(GLView* view)
     poly.Attach(view, 0, NULL);
 }
 
-bool ScriptedScreenTransition::UnidentifiedVirtual30()
+bool ScriptedScreenTransition::ConsumeScreenGrabRequest()
 {
-    bool unknown = false;
+    bool screenGrabRequested = false;
     for (int i = 0; i < m_nModifiers; i++)
     {
-        unknown |= m_pModifiers[i]->UnidentifiedVirtual18();
+        screenGrabRequested |= m_pModifiers[i]->UnidentifiedVirtual18();
     }
-    return unknown;
+    return screenGrabRequested;
 }
 
 void ScriptedScreenTransition::Cancel()

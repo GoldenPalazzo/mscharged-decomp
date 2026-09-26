@@ -5,6 +5,7 @@
 
 #include "Game/NetworkSession.h"
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/globalpad.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlFile.h"
@@ -38,7 +39,7 @@ int g_numPacketPlaybackTurbo;
 NetworkInputRecording* gNetworkInputRecording;
 
 static TweakIntBinding sPacketPlaybackTurboTweak(
-    "g_numPacketPlaybackTurbo", "Network", &g_numPacketPlaybackTurbo);
+    "g_numPacketPlaybackTurbo", "Network", &g_numPacketPlaybackTurbo, true);
 
 NetworkPeerChannel* NetworkPeer::GetNetworkPeerChannel(int channel)
 {

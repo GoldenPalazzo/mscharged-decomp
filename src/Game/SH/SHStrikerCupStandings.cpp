@@ -28,10 +28,7 @@
 
 class SHNavigation;
 
-extern "C" void fn_80208950(TLComponentInstance*, unsigned short*, unsigned long);
 extern "C" void fn_80207724(int);
-extern "C" void fn_802088B4();
-extern "C" void fn_80207060(bool);
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)

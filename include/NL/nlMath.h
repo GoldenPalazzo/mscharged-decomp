@@ -589,5 +589,7 @@ void nlPolarToCartesian(float& x, float& y, unsigned short angle, float radius);
 void nlCartesianToPolar(nlPolar& out, float x, float y);
 
 void fn_802B549C(nlQuaternion& out, unsigned short angle);
+extern "C" void fn_802B5370(
+    nlQuaternion& out, const nlVector3& rotationAxis, unsigned short angle);
 
 #endif
