@@ -855,7 +855,7 @@ config.libs = [
             Object(Matching, "Game/Render/WarbleOwner.cpp"),
             Object(NonMatching, "Game/Render/tu_801B43F8.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/tu_801B532C.cpp"),
-            Object(Matching, "Game/Render/tu_8027944C.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Render/StadiumPhysicsObject.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Render/tu_80279AC8.cpp"),
             Object(Matching, "Game/Render/PlanarShadowDrawable.cpp"),
             Object(Matching, "Game/Render/ChargeShadowDrawable.cpp"),

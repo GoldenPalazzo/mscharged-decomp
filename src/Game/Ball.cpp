@@ -1360,7 +1360,7 @@ extern "C" void fn_800154FC(cBall* pBall, float fParam)
     {
         pBall->mfChargeValue = fMaxCharge;
     }
-    else if (fValue < 0.0f)
+    else if (pBall->mfChargeValue < 0.0f)
     {
         pBall->mfChargeValue = 0.0f;
     }
@@ -3236,24 +3236,21 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     {
         return;
     }
-    if (g_pBall->m_pPhysicsBall->GetPosition().z < 0.207f)
-    {
-        int nBallState = g_pBall->meBallState;
-        if (nBallState < 6)
-        {
-            if (nBallState == 2)
-            {
-                return;
-            }
-        }
-        else if (nBallState < 9)
-        {
-            return;
-        }
-    }
-    else
+    if (!(g_pBall->m_pPhysicsBall->GetPosition().z < 0.207f))
     {
         return;
+    }
+
+    int nBallState = g_pBall->meBallState;
+    switch (nBallState)
+    {
+    case 2:
+    case 6:
+    case 7:
+    case 8:
+        return;
+    default:
+        break;
     }
 
     int nPatchType = pPatch->m_Type;
