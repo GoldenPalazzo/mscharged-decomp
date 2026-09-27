@@ -174,7 +174,7 @@ void UnidentifiedAudioScriptRuntime::Unidentified78C0(float deltaTime)
     UnidentifiedAudioScriptUpdate update;
     update.mDeltaTime = deltaTime;
     update.mCount = 0;
-    mBindings.Walk(Function2<bool, const u32&, AudioEffectBinding*>(
+    mBindings.Walk(Function<bool(const u32&, AudioEffectBinding*)>(
         Bind<bool>(fn_802F7CFC, Placeholder<0>(), Placeholder<1>(), &update)));
     for (u32 i = 0; i < update.mCount; ++i)
         mBindings.Remove(update.mKeys[i]);

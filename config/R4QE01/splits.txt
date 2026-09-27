@@ -3108,12 +3108,20 @@ NL/nlTask.cpp:
 	.sdata2     start:0x806E60B8 end:0x806E60C0
 
 NL/math.cpp:
-	.text       start:0x802B51D8 end:0x802B6234
-	.sdata2     start:0x806E60C0 end:0x806E6108
+	.text       start:0x802B51D8 end:0x802B5CC0
+	.sdata2     start:0x806E60C0 end:0x806E60E8
+
+NL/plane.cpp:
+	.text       start:0x802B5CC0 end:0x802B5DF4
+	.sdata2     start:0x806E60E8 end:0x806E60F0
+
+NL/polar.cpp:
+	.text       start:0x802B5DF4 end:0x802B5FD8
+	.sdata2     start:0x806E60F0 end:0x806E60F8
 
 NL/utility.cpp:
-	.text       start:0x802B6234 end:0x802B6568
-	.sdata2     start:0x806E6108 end:0x806E6128
+	.text       start:0x802B5FD8 end:0x802B6568
+	.sdata2     start:0x806E60F8 end:0x806E6128
 
 NL/tu_802B6568.cpp:
 	.text       start:0x802B6568 end:0x802B66D8

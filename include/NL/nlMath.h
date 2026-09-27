@@ -377,6 +377,8 @@ public:
     };
 }; // total size: 0x10
 
+void nlMakePlaneFromPointNormal(nlVector4& out, const nlVector2& point, const nlVector2& normal);
+void nlMakePlaneFromPointNormal(nlVector4& out, const nlVector3& point, const nlVector3& normal);
 void nlProjectPointOntoPlane(nlVector3& out, const nlVector3& point, const nlVector4& plane);
 
 inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
@@ -386,6 +388,8 @@ inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
     v0.z = _z;
     v0.w = _w;
 }
+
+float nlPlaneDot(const nlVector2& point, const nlVector4& plane);
 
 inline float nlPlaneDot(const nlVector4& plane, const nlVector3& v)
 {
@@ -573,7 +577,7 @@ nlMatrix4& nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in);
 nlMatrix4& nlMakeRotTransMatrix(nlMatrix4& out, const nlVector3& v3ForwardVector,
     const nlVector3& v3UpVector, const nlVector3& v3AlternateUpVector,
     const nlVector3& v3Translation);
-void nlMakeRotationMatrixAxisAngle(
+nlMatrix4& nlMakeRotationMatrixAxisAngle(
     nlMatrix4& out, const nlVector3& v3RotationAxis, float ang_rad);
 void GetRotationBetweenVectors(
     nlQuaternion& quat, const nlVector3& v3Vec1, const nlVector3& v3Vec2);

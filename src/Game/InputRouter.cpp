@@ -408,7 +408,7 @@ void NetworkInputRouter::OnInputCaptured()
     mCurrentMessage.SetNetworkInputMessageCongested(mWasCongested);
     mWasCongested = false;
 
-    if (mQueueCursor > mQueueLimit && (frame & 1) != 0)
+    if (mQueueLimit < mQueueCursor && (frame & 1) != 0)
     {
         mUnidentified290 = true;
         --mQueueCursor;

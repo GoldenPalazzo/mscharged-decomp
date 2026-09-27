@@ -329,7 +329,7 @@ void NetworkSession::SendGameStartToEveryone()
 }
 
 void NetworkSession::SendDraftToEveryone(
-    int count, NetworkDraftMachineInfo* entries, bool unused, u8 flag)
+    int count, NetworkDraftMachineInfo* entries, bool unused, bool flag)
 {
     NetMessageDraft message;
     message.mMachineCount = count;
