@@ -700,7 +700,7 @@ config.libs = [
             Object(Matching, "Game/FE/feOnlinePlayerRow.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/fePackage.cpp"),
             Object(Matching, "Game/FE/fePageControls.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/FE/fePointer.cpp"),
+            Object(Matching, "Game/FE/fePointer.cpp"),
             Object(Matching, "Game/FE/fePointerButton.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FE/fePointerManager.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/FE/fePopupMenu.cpp", extra_cflags=["-ipa file", "-sym on"]),
