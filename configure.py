@@ -1025,7 +1025,7 @@ config.libs = [
             Object(Matching, "NL/gl/gl.cpp"),
             Object(Matching, "NL/gl/glDraw2.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/gl/glDraw3.cpp"),
-            Object(NonMatching, "NL/gl/glDrawSyncLog.cpp"),
+            Object(Matching, "NL/gl/glDrawSyncLog.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/gl/glFont.cpp"),
             Object(NonMatching, "NL/gl/glLoadModel.cpp", extra_cflags=["-inline nobottomup"]),
             Object(Matching, "NL/gl/glMaterialParameters.cpp"),
