@@ -1034,7 +1034,7 @@ config.libs = [
             Object(Matching, "NL/gl/glMemoryInit.cpp"),
             Object(Matching, "NL/gl/glModel.cpp"),
             Object(Matching, "NL/gl/glMultiTextureModelWriter.cpp"),
-            Object(NonMatching, "NL/gl/glPlat.cpp"),
+            Object(Matching, "NL/gl/glPlat.cpp"),
             Object(Matching, "NL/gl/glRenderList.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
             Object(Matching, "NL/gl/glState.cpp"),
