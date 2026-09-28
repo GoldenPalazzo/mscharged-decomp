@@ -544,7 +544,6 @@ void NetworkInputRouter::OnInputReady()
     }
     else
     {
-        int playerCount;
         int machineCount = mSession->GetNumMachines();
         for (s8 machine = 0; machine < machineCount; ++machine)
         {
@@ -600,7 +599,7 @@ void NetworkInputRouter::OnInputReady()
                     serializer.mBuffer, serializedLength);
             }
 
-            playerCount = peer->mPlayerCount;
+            int playerCount = peer->mPlayerCount;
             for (s8 player = 0; player < playerCount; ++player)
             {
                 NetworkPeerChannel* channel

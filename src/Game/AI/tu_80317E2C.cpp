@@ -239,8 +239,8 @@ extern "C" shdStateMachine* fn_80319E84(
 
 void UnidentifiedScriptMachine::Update(float deltaTime)
 {
-    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     bool selectState = false;
+    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     shdStateMachine* active = mUnidentified004;
 
     if (active != 0)
@@ -253,8 +253,7 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
     }
     if (active == mUnidentified004)
     {
-        int result = update.mData.i;
-        if (result != 0 && mUnidentified014 > -1)
+        if (update.mData.i != 0 && mUnidentified014 > -1)
         {
             bool force = false;
             if (mUnidentified018.IsSet(12))
@@ -267,7 +266,7 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
         }
         else
         {
-            switch (result)
+            switch (update.mData.i)
             {
             case 3:
             {

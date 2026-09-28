@@ -261,17 +261,17 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified090 = nlStringHash(functionName);
 
-    UnidentifiedFunctionHash_8027F9CC hash(mUnidentified088);
+    FunctionHash hash(mUnidentified088);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified088 = 0;
     }
-    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified08C);
+    hash = FunctionHash(mUnidentified08C);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified08C = 0;
     }
-    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified090);
+    hash = FunctionHash(mUnidentified090);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified090 = 0;

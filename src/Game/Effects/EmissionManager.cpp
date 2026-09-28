@@ -302,6 +302,39 @@ static void AllocateParticles(EmissionManager* manager)
     }
 }
 
+static void DeallocateParticles(EmissionManager* manager)
+{
+    manager->mParticles.Clear();
+    if (manager->mParticleMemory != 0)
+    {
+        delete[] manager->mParticleMemory;
+    }
+    manager->mParticleMemory = 0;
+}
+
+static void InitializeResourceStats()
+{
+    EmissionResourceStats* stats = EmissionManager::Instance()->mResourceStats;
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        stats[i].Initialize();
+    }
+}
+
+static void DeinitializeResourceStats()
+{
+    EmissionResourceStats* stats = EmissionManager::Instance()->mResourceStats;
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        delete stats[i].mCount;
+        delete stats[i].mHighWaterMark;
+        delete stats[i].mBudgetTweak;
+        stats[i].mBudgetTweak = 0;
+        stats[i].mHighWaterMark = 0;
+        stats[i].mCount = 0;
+    }
+}
+
 /**
  * Offset/Address/Size: 0x0 | 0x802E6C20 | size: 0x1D8
  */
@@ -319,11 +352,7 @@ void EmissionManager::Startup(void* context,
     fxParticleStartup(numParticles);
     fxSetMaxNumParticles(maxRenderedParticles);
 
-    EmissionResourceStats* stats = Instance()->mResourceStats;
-    for (unsigned int i = 0; i < 8; ++i)
-    {
-        stats[i].Initialize();
-    }
+    InitializeResourceStats();
     mUpdateEnabled = true;
 }
 
@@ -376,12 +405,7 @@ void EmissionManager::Shutdown()
     }
 
     fxParticleShutdown();
-    mParticles.Clear();
-    if (mParticleMemory != 0)
-    {
-        delete[] mParticleMemory;
-    }
-    mParticleMemory = 0;
+    DeallocateParticles(this);
 
     MemoryAllocator* allocator = mMemoryContext;
     AllocatorStack[AllocatorStackDepth++] = allocator;
@@ -393,20 +417,12 @@ void EmissionManager::Shutdown()
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
-    EmissionResourceStats* stats = Instance()->mResourceStats;
-    for (unsigned int i = 0; i < 8; ++i)
-    {
-        delete stats[i].mCount;
-        delete stats[i].mHighWaterMark;
-        delete stats[i].mBudgetTweak;
-        stats[i].mBudgetTweak = 0;
-        stats[i].mHighWaterMark = 0;
-        stats[i].mCount = 0;
-    }
+    DeinitializeResourceStats();
 
+    BasicSlotPool<DLListEntry<Particle*> >* particlePool = &mParticles.m_Allocator;
     mUpdateEnabled = false;
     m_bRecording = true;
-    mParticles.m_Allocator.FreeBlocks();
+    particlePool->FreeBlocks();
 }
 
 /**

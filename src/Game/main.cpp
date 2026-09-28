@@ -31,6 +31,7 @@
 #include "Game/Render/RLViewLayers.h"
 #include "Game/Render/depthoffield.h"
 #include "Game/Render/FlareHandler.h"
+#include "Game/Render/Warble.h"
 #include "Game/Sys/clock.h"
 #include "Game/Sys/debug.h"
 #include "Game/GameInfo.h"
@@ -80,6 +81,7 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/tu_802A12E4.h"
+#include "NL/glx/GXShadowedDiffuseMaterialProgram.h"
 #include "Game/FE/feDPD.h"
 #include "NL/plat/nlFlash.h"
 #include "NL/plat/nlFileCache.h"
@@ -130,6 +132,8 @@ extern "C"
     void fn_80184ADC();
 }
 
+bool fn_80183C54();
+
 void nlRegHandleDVDMessageCB(const Function<void(int)>&);
 void nlRegHandleDVDAllClearCB(const Function<void(int)>&);
 void nlRegHandleDVDRetryingCB(const Function<void(int)>&);
@@ -166,7 +170,7 @@ int g_BuildNumber;
 static u32 sPreviousVirtualFree;
 static bool sDateTimeLoaded;
 static u32 sWarbleTexture;
-static bool sWarbleTextureCached;
+static char sWarbleTextureCached;
 
 FrameCounter g_FrameCounter("frame", "send");
 
@@ -603,10 +607,10 @@ static void Initialize()
     ExcitementSystem::fn_80196644();
     AddTasks();
     SetupViews();
-    fn_80273A30(eCLV_ScreenBlur);
-    fn_80273A30(eCLV_ScreenBlur2);
-    fn_80273A30(eCLV_ShadowVolume);
-    fn_80273A30(eCLV_ShadowVolumeBlend);
+    HideLayerView(eCLV_ScreenBlur);
+    HideLayerView(eCLV_ScreenBlur2);
+    HideLayerView(eCLV_ShadowVolume);
+    HideLayerView(eCLV_ShadowVolumeBlend);
     ParticleSystem::m_Callback = fn_8011D1BC;
     ModeledScreenTransition::s_3DView = GetLayerView(eCLV_Transitions3D);
     SetDebugFontView(GetLayerView(eCLV_Debug));
@@ -658,7 +662,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&Wiper::Instance(), 13, (u32)-1);
 }
 
-extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView*,
+extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
     nlDLListSlotPool<Particle*>* vertices, const nlVector3& viewRight,
     const nlVector3& viewUp, const nlMatrix4* pCoordSys)
 {
@@ -668,24 +672,49 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView*,
         sWarbleTextureCached = true;
     }
 
-    if (!sAllowWarble)
-    {
-        return true;
-    }
-
-    glGetTexture(sUseCheckerTextureForWarble
-            ? "global/checkers"
-            : "target/warbletexture");
-
-    if (sRenderWarbleToParticleView)
-    {
-        GLTexturedColourMeshWriter writer;
-        fn_8011D3CC(&writer, source, vertices, viewRight, viewUp, pCoordSys);
-    }
-    else
+    bool isWarble = sWarbleTexture == source->m_pTemplate->m_hTexture;
+    if (fn_80183C54() && !isWarble)
     {
         State_802A12E4 writer;
         fn_8011D5B0(&writer, source, vertices, viewRight, viewUp, pCoordSys);
+
+        GXShadowedDiffuseParameters* parameters =
+            static_cast<GXShadowedDiffuseParameters*>(
+                writer.GetModel()->packets->materialParameters);
+        parameters->receiveShadows = source->m_pTemplate->m_eBlend == EfBlend_Normal;
+
+        if (writer.fn_802A14F0())
+        {
+            view->AttachModel(writer.GetModel(), source->m_uLayer);
+        }
+    }
+    else if (sAllowWarble)
+    {
+        GLTexturedColourMeshWriter writer;
+        fn_8011D3CC(&writer, source, vertices, viewRight, viewUp, pCoordSys);
+
+        if (isWarble && fn_80115EB0())
+        {
+            u32 texture = glGetTexture(sUseCheckerTextureForWarble
+                    ? "global/checkers" : "target/warbletexture");
+            glTextureBinding* textureState =
+                static_cast<glTextureBinding*>(
+                    writer.GetModel()->packets->materialParameters);
+            textureState->texture = texture;
+            textureState->textureIndex = 0xFFFF;
+            textureState->SetWrapS(true);
+            textureState->SetWrapT(true);
+            textureState->unknown07 = 0;
+
+            view = GetLayerView(sRenderWarbleToParticleView
+                    ? eCLV_Particles : eCLV_Warble);
+            gWarbleEnabled = true;
+        }
+
+        if (writer.End())
+        {
+            view->AttachModel(writer.GetModel(), source->m_uLayer);
+        }
     }
     return true;
 }
