@@ -6,7 +6,7 @@
 class DesireShoot : public Desire
 {
 public:
-    DesireShoot(int state, const UnidentifiedStateTransition& transition)
+    DesireShoot(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -26,7 +26,7 @@ class DesireWindupShot : public Desire
 {
 public:
     DesireWindupShot(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }

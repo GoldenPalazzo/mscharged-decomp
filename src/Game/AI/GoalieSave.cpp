@@ -1514,19 +1514,24 @@ void GoalieSave::AddSegmentToGrid(
         nlVec3Scale(v3Delta, v3Delta, 1.0f / (float)divisions);
     }
     v3CurPos = pSaveData1->mv3SavePos;
-    for (count = 0; count <= divisions; count++)
+    count = 0;
+    if (divisions >= 0)
     {
-        if (nlGetLengthSquared2D(
-                pSaveData1->mv3SavePos.y - v3CurPos.y,
-                pSaveData1->mv3SavePos.z - v3CurPos.z)
-            < nlGetLengthSquared2D(
-                pSaveData2->mv3SavePos.y - v3CurPos.y,
-                pSaveData2->mv3SavePos.z - v3CurPos.z))
-            pCurSaveData = pSaveData1;
-        else
-            pCurSaveData = pSaveData2;
-        AddPointToGrid(pCurSaveData, v3CurPos);
-        nlVec3Add(v3CurPos, v3CurPos, v3Delta);
+        while (count <= divisions)
+        {
+            if (nlGetLengthSquared2D(
+                    pSaveData1->mv3SavePos.y - v3CurPos.y,
+                    pSaveData1->mv3SavePos.z - v3CurPos.z)
+                < nlGetLengthSquared2D(
+                    pSaveData2->mv3SavePos.y - v3CurPos.y,
+                    pSaveData2->mv3SavePos.z - v3CurPos.z))
+                pCurSaveData = pSaveData1;
+            else
+                pCurSaveData = pSaveData2;
+            AddPointToGrid(pCurSaveData, v3CurPos);
+            nlVec3Add(v3CurPos, v3CurPos, v3Delta);
+            count++;
+        }
     }
 }
 

@@ -104,8 +104,8 @@ void NetworkStatsReporter::Open()
 }
 
 bool NetworkStatsReporter::ReportGameResult(int,
-    const NetworkScoreSubmission*, const NetworkStatsPlayer* home,
-    const NetworkStatsPlayer* away, bool reportHome, int homeScore,
+    const NetworkScoreSubmission*, NetworkStatsPlayer* home,
+    NetworkStatsPlayer* away, bool reportHome, int homeScore,
     int awayScore, const NetworkScoreSubmission*)
 {
     if (!reportHome)
@@ -411,8 +411,8 @@ static u8 sRankingHmacKey[32] = {
 };
 
 bool NetworkRanking::ReportGameResult(int category,
-    const NetworkScoreSubmission*, const NetworkStatsPlayer*,
-    const NetworkStatsPlayer*, bool, int, int,
+    const NetworkScoreSubmission*, NetworkStatsPlayer*,
+    NetworkStatsPlayer*, bool, int, int,
     const NetworkScoreSubmission* fallback)
 {
     mSubmission.mWins = fallback->mWins;

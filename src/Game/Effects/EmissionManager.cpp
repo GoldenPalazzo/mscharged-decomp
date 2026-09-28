@@ -146,6 +146,13 @@ inline void EffectsBundleManager::ClearAdditional()
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
 
+inline void EmissionResourceStats::Configure(const char* name, int budget)
+{
+    nlStrNCpy(mName, name, sizeof(mName));
+    mBudget = budget;
+    unknown_0x32_bit15 = mBudget != 0;
+}
+
 inline EmissionResourceStats::EmissionResourceStats()
     : mId(sResourceIdCounter++)
 {
@@ -156,9 +163,7 @@ inline EmissionResourceStats::EmissionResourceStats()
     mCount = 0;
     if (mId < 2)
     {
-        nlStrNCpy(mName, sDefaultResourceNames[mId], sizeof(mName));
-        mBudget = 0xFFFF;
-        unknown_0x32_bit15 = mBudget != 0;
+        Configure(sDefaultResourceNames[mId], 0xFFFF);
     }
 }
 

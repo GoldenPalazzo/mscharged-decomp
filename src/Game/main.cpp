@@ -143,12 +143,6 @@ extern u8 lbl_806E1458;
 volatile int g_Region = 3;
 static u32 sPreviousTaskState = 1;
 
-static GLMemoryRequirement sGlobalResourceRequirements[3] = {
-    { GLM_TextureData, 0 },
-    { GLM_VertexData, 0 },
-    { GLM_Header, 0 },
-};
-
 static u32 sCountryCode;
 GameAudio* g_pGameAudio;
 bool g_e3_Build;
@@ -177,13 +171,13 @@ static bool sWarbleTextureCached;
 FrameCounter g_FrameCounter("frame", "send");
 
 static TweakBoolBinding sDisableWriteOutTweak(
-    "g_bDisableWriteOut", "/General", &g_bDisableWriteOut, false);
+    "g_bDisableWriteOut", "/General", &g_bDisableWriteOut, true);
 static TweakBoolBinding sMemoryLowWaterMarkCheckingTweak(
-    "g_bActivateMemoryLowWaterMarkChecking", "/General",
-    &g_bActivateMemoryLowWaterMarkChecking, false);
+    "g_bActivateMemoryLowWaterMarkChecking", gLastTweakCategory,
+    &g_bActivateMemoryLowWaterMarkChecking, true);
 static TweakBoolBinding sPrintMemoryLowWaterMarksTweak(
-    "g_bPrintMemoryNewLowWaterMarks", "/General",
-    &g_bPrintMemoryNewLowWaterMarks, false);
+    "g_bPrintMemoryNewLowWaterMarks", gLastTweakCategory,
+    &g_bPrintMemoryNewLowWaterMarks, true);
 
 static ComUpdateTask comUpdateTask;
 static UnidentifiedPingerUpdateTask pingerUpdateTask;
@@ -205,12 +199,18 @@ static TextWindowTask textWindowTask;
 static FEDPDTask feDPDTask;
 static FlashMemoryTask flashMemoryTask;
 
+static GLMemoryRequirement sGlobalResourceRequirements[3] = {
+    { GLM_TextureData, MB(3) },
+    { GLM_VertexData, MB(2) },
+    { GLM_Header, MB(2) + KB(256) },
+};
+
 static TweakValueBool sAllowWarble(
     "sbAllowWarble", "/Rendering/Effects/Warble", true);
 static TweakValueBool sRenderWarbleToParticleView(
-    "sbRenderWarbleToParticleView", "/Rendering/Effects/Warble", false);
+    "sbRenderWarbleToParticleView", gLastTweakCategory, false);
 static TweakValueBool sUseCheckerTextureForWarble(
-    "sbUseCheckerTextureForWarble", "/Rendering/Effects/Warble", false);
+    "sbUseCheckerTextureForWarble", gLastTweakCategory, false);
 
 static void PreInitFS();
 static void Initialize();
