@@ -273,6 +273,10 @@ public:
     {
         return mUnidentified024.m_aActualFacingDirection;
     }
+    float GetPlayerScale() const
+    {
+        return mUnidentified024.m_fPlayerScale;
+    }
     int GetHeadJointIndex() const
     {
         return m_nHeadJointIndex;

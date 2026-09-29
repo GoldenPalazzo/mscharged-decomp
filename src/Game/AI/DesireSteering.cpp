@@ -504,8 +504,10 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     }
     case PSS_NEAR_SEEKING:
     {
-        float fOutRad = fRadiusScale * gGameTweaks.m_pGameTweaks->fNearSeekOutRadius;
-        float fInRad = fRadiusScale * gGameTweaks.m_pGameTweaks->fArrivalInRadius;
+        float fOutRad = fRadiusScale
+                      * gGameTweaks.m_pGameTweaks->fNearSeekOutRadius.GetValue();
+        float fInRad = fRadiusScale
+                     * gGameTweaks.m_pGameTweaks->fArrivalInRadius.GetValue();
         fSpeedPercent = NormalizeVal(fDistance, fInRad, fOutRad);
         float fNearSeekOut
             = fRadiusScale * gGameTweaks.m_pGameTweaks->fNearSeekOutRadius;
@@ -522,8 +524,10 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     }
     case PSS_FAR_SEEKING:
     {
-        float fOutRad = fRadiusScale * gGameTweaks.m_pGameTweaks->fNearSeekOutRadius;
-        float fInRad = fRadiusScale * gGameTweaks.m_pGameTweaks->fNearSeekInRadius;
+        float fOutRad = fRadiusScale
+                      * gGameTweaks.m_pGameTweaks->fNearSeekOutRadius.GetValue();
+        float fInRad = fRadiusScale
+                     * gGameTweaks.m_pGameTweaks->fNearSeekInRadius.GetValue();
         fSpeedPercent = NormalizeVal(fDistance, fInRad, fOutRad);
         float fNearSeekIn
             = fRadiusScale * gGameTweaks.m_pGameTweaks->fNearSeekInRadius;
