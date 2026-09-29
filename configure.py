@@ -827,7 +827,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/FrontEndPresentation.cpp"),
             Object(Matching, "Game/Render/HammerObject.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/HighRange.cpp", cflags=cflags_game),
-            Object(NonMatching, "Game/Render/HomeButtonFade.cpp"),
+            Object(Matching, "Game/Render/HomeButtonFade.cpp"),
             Object(Matching, "Game/Render/Impostor.cpp"),
             Object(NonMatching, "Game/Render/ImpostorCharacter.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Render/ImpostorCluster.cpp"),
