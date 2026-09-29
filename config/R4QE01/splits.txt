@@ -3734,7 +3734,7 @@ Game/Audio/AudioResourceRuntime.cpp:
 	.sbss       start:0x806E2028 end:0x806E2030
 	.sdata2     start:0x806E6658 end:0x806E6660
 
-Game/Audio/UnidentifiedAudioScriptRuntime.cpp:
+Game/Audio/AudioScriptRuntime.cpp:
 	.text       start:0x802F6BC4 end:0x802F8418
 	.ctors      start:0x804DBA70 end:0x804DBA74
 	.data       start:0x8052F978 end:0x8052F998

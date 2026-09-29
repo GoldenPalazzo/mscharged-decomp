@@ -389,7 +389,6 @@ extern "C" void fn_800C6390(DesireSteering* desire,
 
     nlVector3 v3DeltaFromDesired;
     nlVec3Sub(v3DeltaFromDesired, v3FixedPos, desire->m_v3LastDesiredPos);
-    float fDesiredPositionDistanceSq = v3DeltaFromDesired.GetLengthSq3D();
     float fDistSq = nlVec3DistanceSquared2D(v3FixedPos,
         desire->m_pFielder->mUnidentified024.m_v3Position);
 
@@ -400,7 +399,7 @@ extern "C" void fn_800C6390(DesireSteering* desire,
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
             desire->m_pFielder->Unknown8(
-                (unsigned short)(int)(desire->m_fDesiredFacingDirection
+                (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
         }
@@ -424,7 +423,7 @@ extern "C" void fn_800C6390(DesireSteering* desire,
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
             desire->m_pFielder->Unknown8(
-                (unsigned short)(int)(desire->m_fDesiredFacingDirection
+                (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
         }
