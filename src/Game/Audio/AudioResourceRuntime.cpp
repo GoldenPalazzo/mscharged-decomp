@@ -71,8 +71,9 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* effectParameter
-        = effect->CreateParameter(definition, parameterData, inverted);
+    AudioEffectParameter* effectParameter = 0;
+    effect->CreateParameter(
+        definition, parameterData, inverted, &effectParameter);
     effect->AddParameter(effectParameter, owner);
 }
 
@@ -99,8 +100,9 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* effectParameter
-        = effect->CreateParameter(definition, parameterData, inverted);
+    AudioEffectParameter* effectParameter = 0;
+    effect->CreateParameter(
+        definition, parameterData, inverted, &effectParameter);
     effect->AddParameter(effectParameter, duration);
 }
 
