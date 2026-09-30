@@ -24,6 +24,12 @@ static inline u32 UnidentifiedGetDefinitionValue(u32 definition, u32 key)
     return ConfigFindDefinition(definition)->Get(key).m_Words.m_Value;
 }
 
+static inline u32 UnidentifiedGetEffectId(u32 definition)
+{
+    u32 key = AUDIO_EFFECT_KEY;
+    return ConfigFindDefinition(definition)->Get(key).m_Words.m_Value;
+}
+
 static inline RegistryContainer* UnidentifiedGetEffectSet(u32 effectSet)
 {
     u32 key = AUDIO_EFFECT_SET_KEY;
@@ -53,7 +59,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
     bool inverted, void* owner)
 {
     u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
+    u32 effectId = UnidentifiedGetEffectId(definition);
 
     AudioEffectBase* effect;
     AudioEffectBase** found;
@@ -82,7 +88,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
     bool inverted, float duration)
 {
     u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
+    u32 effectId = UnidentifiedGetEffectId(definition);
 
     AudioEffectBase* effect;
     AudioEffectBase** found;
