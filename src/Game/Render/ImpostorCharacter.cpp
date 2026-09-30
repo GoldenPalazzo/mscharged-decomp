@@ -22,7 +22,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     , mUnidentified00C(false)
     , mWidth(0x40)
     , mHeight(0x40)
-    , mUnidentified034(false)
+    , mUseAdditiveBlend(false)
     , mUseIntensityAlpha(false)
     , mBaseAngle(0)
     , mName(name)
@@ -31,7 +31,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     {
         mWidth = params->mWidth;
         mHeight = params->mHeight;
-        mUnidentified034 = params->mUnidentified008;
+        mUseAdditiveBlend = params->mUseAdditiveBlend;
         mUseIntensityAlpha = params->mUseIntensityAlpha;
         mBaseAngle = params->mBaseAngle;
     }

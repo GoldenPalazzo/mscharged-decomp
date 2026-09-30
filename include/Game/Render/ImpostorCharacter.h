@@ -35,7 +35,7 @@ struct ImpostorCharacterParams
 {
     /* 0x00 */ int mWidth;
     /* 0x04 */ int mHeight;
-    /* 0x08 */ u8 mUnidentified008;
+    /* 0x08 */ u8 mUseAdditiveBlend;
     /* 0x09 */ u8 mUseIntensityAlpha;
     /* 0x0A */ u16 mBaseAngle;
 }; // size: 0x0C
@@ -75,7 +75,7 @@ public:
     /* 0x10 */ nlDLListSlotPool<ImpostorSprite*> mSprites;
     /* 0x2C */ int mWidth;
     /* 0x30 */ int mHeight;
-    /* 0x34 */ u8 mUnidentified034;
+    /* 0x34 */ u8 mUseAdditiveBlend;
     /* 0x35 */ u8 mUseIntensityAlpha;
     /* 0x36 */ u16 mBaseAngle;
     /* 0x38 */ const char* mName;

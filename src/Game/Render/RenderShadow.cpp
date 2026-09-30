@@ -9,6 +9,7 @@
 #include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/Frustum.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMaterialParameters.h"
@@ -27,10 +28,6 @@ struct BallShadowParams
 };
 
 extern "C" {
-extern float lbl_806DCCA4;
-extern float lbl_806DCCA8;
-extern float lbl_806DCCAC;
-
 RLView* fn_8027261C();
 void fn_80273A4C(eCLV, const glModel*, unsigned long);
 void fn_80186524(nlMatrix4& out, const nlMatrix4& in);
@@ -49,14 +46,19 @@ u32 GetShadowPartitionTexture(int partition);
 void SetShadowPartitionCamera(int partition, const nlMatrix4& view,
     const nlMatrix4& projection);
 
+static bool g_bPlanarShadows = true;
+bool g_bProjectedShadows = true;
+extern "C" {
+float lbl_806DCCA4 = 1.0f;
+float lbl_806DCCA8 = 1.0f;
+float lbl_806DCCAC = 1.0f;
+}
 static float g_fBallShadowH = 4.0f;
 static float g_fBallShadowR0 = 0.35f;
 static float g_fBallShadowR1 = 0.65f;
 static int g_nBallShadowA0 = 10;
 static int g_nBallShadowA1 = 50;
 static bool g_bBallGlow = true;
-static bool g_bPlanarShadows = true;
-static bool g_bProjectedShadows = true;
 static float g_fBallGlowH = 4.0f;
 static float g_fBallGlowR0 = 2.0f;
 static float g_fBallGlowR1 = 2.0f;
@@ -77,10 +79,18 @@ int MaxProjectedShadows;
 static u8 g_bShadowBlobs;
 static u8 g_bShadowPositionOverride;
 static RLView* g_CharacterShadowView;
-static float g_AntiFlimmer = 0.015625f
-    + (BasicStadium::GetCurrentStadium() != 0
-              ? BasicStadium::GetCurrentStadium()->m_shadowHeight
-              : 0.0f);
+static inline float GetDefaultAntiFlimmer()
+{
+    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
+    float height = 0.0f;
+    if (stadium != 0)
+    {
+        height = stadium->m_shadowHeight;
+    }
+    return height + 0.015625f;
+}
+
+static float g_AntiFlimmer = GetDefaultAntiFlimmer();
 static int lbl_806E1480;
 static u8 g_bShadowBounds;
 static int g_Alpha[3] = { 180, 80, 32 };
@@ -160,13 +170,7 @@ extern "C" float fn_80184AF8(float antiFlimmer)
 extern "C" float fn_80184B08()
 {
     float previous = g_AntiFlimmer;
-    BasicStadium* stadium = BasicStadium::GetCurrentStadium();
-    float height = 0.0f;
-    if (stadium != 0)
-    {
-        height = stadium->m_shadowHeight;
-    }
-    g_AntiFlimmer = height + 0.015625f;
+    g_AntiFlimmer = GetDefaultAntiFlimmer();
     return previous;
 }
 
@@ -804,28 +808,38 @@ void SetPlanarShadowOpacity(float opacity)
  * Flattens a transform onto the ground plane along the stadium's shadow light
  * direction.
  */
-extern "C" void fn_80186524(nlMatrix4& out, const nlMatrix4& in)
+extern "C" void fn_80186524(nlMatrix4& shadowMatrix, const nlMatrix4& objectToWorldMatrix)
 {
-    const nlVector3& light = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
-    float x = -light.x / light.z;
-    float y = -light.y / light.z;
+    nlVector3 vPosition = { 0.0f, 0.0f, 0.0f };
+    const nlVector3& lightVector
+        = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
+    float m11 = objectToWorldMatrix.m11;
+    float m21 = objectToWorldMatrix.m21;
+    float m31 = objectToWorldMatrix.m31;
+    float m41 = objectToWorldMatrix.m41;
+    float m12 = objectToWorldMatrix.m12;
+    float m22 = objectToWorldMatrix.m22;
+    float m32 = objectToWorldMatrix.m32;
+    float m42 = objectToWorldMatrix.m42;
+    float xOverZ = -lightVector.x / lightVector.z;
+    float yOverZ = -lightVector.y / lightVector.z;
 
-    out.m11 = x * in.m13 + in.m11;
-    out.m21 = x * in.m23 + in.m21;
-    out.m31 = x * in.m33 + in.m31;
-    out.m41 = x * in.m43 + in.m41;
-    out.m12 = y * in.m13 + in.m12;
-    out.m22 = y * in.m23 + in.m22;
-    out.m32 = y * in.m33 + in.m32;
-    out.m42 = y * in.m43 + in.m42;
-    out.m13 = 0.0f;
-    out.m23 = 0.0f;
-    out.m33 = 0.0f;
-    out.m43 = 0.0f;
-    out.m14 = 0.0f;
-    out.m24 = 0.0f;
-    out.m34 = 0.0f;
-    out.m44 = 1.0f;
+    shadowMatrix.m11 = m11 + xOverZ * objectToWorldMatrix.m13;
+    shadowMatrix.m21 = m21 + xOverZ * objectToWorldMatrix.m23;
+    shadowMatrix.m31 = m31 + xOverZ * objectToWorldMatrix.m33;
+    shadowMatrix.m41 = m41 + xOverZ * objectToWorldMatrix.m43;
+    shadowMatrix.m12 = m12 + yOverZ * objectToWorldMatrix.m13;
+    shadowMatrix.m22 = m22 + yOverZ * objectToWorldMatrix.m23;
+    shadowMatrix.m32 = m32 + yOverZ * objectToWorldMatrix.m33;
+    shadowMatrix.m42 = m42 + yOverZ * objectToWorldMatrix.m43;
+    shadowMatrix.m13 = 0.0f;
+    shadowMatrix.m23 = 0.0f;
+    shadowMatrix.m33 = 0.0f;
+    shadowMatrix.m43 = 0.0f;
+    shadowMatrix.m14 = 0.0f;
+    shadowMatrix.m24 = 0.0f;
+    shadowMatrix.m34 = 0.0f;
+    shadowMatrix.m44 = 1.0f;
 }
 
 /**

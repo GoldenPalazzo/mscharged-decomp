@@ -33,7 +33,6 @@
 #include "Game/Sys/tweak.h"
 
 extern "C" {
-extern bool lbl_806DCCA1;
 void GXPokeARGB(u16 x, u16 y, u32 color);
 void GXCopyDisp(void* dest, u8 clear);
 void GXDrawDone();
@@ -479,7 +478,7 @@ void BeginFrameTask::Run(float dt)
     SetupMatrices(NisPlayer::Instance()->fn_8027E708(), pOverride);
     SetupRenderInfo();
 
-    if (!lbl_806DCCA1)
+    if (!g_bProjectedShadows)
     {
         DrawCoPlanarReference();
     }

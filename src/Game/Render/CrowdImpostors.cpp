@@ -1,3 +1,4 @@
+#include "Game/Render/CrowdImpostors.h"
 #include "Game/Render/ImpostorLighting.h"
 #include "NL/gl/glMemory.h"
 #include "Game/Camera/CameraMan.h"
@@ -20,7 +21,6 @@
 #include "NL/nlMath.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlString.h"
-#include "Game/Render/CrowdImpostors.h"
 #include "NL/nlstring_tmpl.h"
 
 #include <math.h>
@@ -223,28 +223,8 @@ public:
     int capacity;
 };
 
-class CrowdImpostorCharacter
-    : public AnimatedImpostorCharacter
-{
-public:
-    CrowdImpostorCharacter(const char* name,
-        ImpostorModel* model, void* animations, int budget,
-        int numAngles, int numTextures,
-        const ImpostorCharacterParams* params)
-        : AnimatedImpostorCharacter(name, model, animations, budget,
-            numAngles, numTextures, params)
-    {
-    }
-    virtual ~CrowdImpostorCharacter();
-};
-
 static const char* sCrowdCharactersToLoadPath = "/Render/Crowd/CharactersToLoad";
 static char sAlternateCrowdListSuffix[] = "Alt";
-static char sDefaultCrowdListSuffix[] = "";
-static char sCrowdIdleAnimation[] = "idle";
-static char sCrowdExcitedAnimation[] = "excited";
-static float sCrowdExcitedThreshold = 200.0f;
-static float sCrowdIdleThreshold = 100.0f;
 static char sCrowdCharacterListFormat[] = "ini/CrowdCharacterLists/%s%s.ini";
 static const double sCrowdViewVectorMinLengthSq = 0.001;
 static const float sCrowdZero = 0.0f;
@@ -254,10 +234,8 @@ static const float sAlternateCrowdViewBudgetScale = 750.0f;
 static const float sDefaultMaxCrowdSize = 10000.0f;
 static const float sCrowdImpostorSizeScale = 1.5f;
 static const double sCrowdIntegerConversionBias = 4503599627370496.0;
-static const float sCrowdLayoutTransformW = 0.96f;
-static const float sCrowdLayoutXScale = 12.0f;
-static const float sCrowdLayoutRotationX = 2.0f;
-static const float sCrowdLayoutSize = 5.0f;
+static const float sCrowdLayoutRotationX = 0.9599311f;
+static const float sCrowdLayoutSize = 12.0f;
 static const float sCrowdExcitedBlendTime = 2.0f;
 static const float sCrowdIdleBlendTime = 5.0f;
 static GLMemoryRequirement sCrowdResourceRequirements[2]
@@ -320,7 +298,7 @@ void LoadCrowdCharacterList()
     bool alternateColour = NeedsAlternateColour(team, opponent);
     char fileName[256];
     nlSNPrintf(fileName, sizeof(fileName), sCrowdCharacterListFormat, teamName,
-        alternateColour ? sAlternateCrowdListSuffix : sDefaultCrowdListSuffix);
+        alternateColour ? sAlternateCrowdListSuffix : "");
 
     LoadTweakConfigFile(fileName, sCrowdCharactersToLoadPath, true);
     TweakEntry* entry
@@ -343,13 +321,18 @@ void LoadCrowdCharacterList()
     gCrowdModelCollection.Initialize(sCrowdLoadDefinitions.data, sNumCrowdCharacters);
 }
 
+static char sCrowdIdleAnimation[] = "idle";
+static char sCrowdExcitedAnimation[] = "excited";
+static float sCrowdExcitedThreshold = 200.0f;
+static float sCrowdIdleThreshold = 100.0f;
+
 static inline void CreateCrowdCharacters(
     ImpostorCharacterParams* params)
 {
     int budget = 20000 / sNumCrowdCharacters;
     params->mWidth = 64;
     params->mHeight = 64;
-    params->mUnidentified008 = false;
+    params->mUseAdditiveBlend = false;
     params->mUseIntensityAlpha = false;
     params->mBaseAngle = 0;
     for (int i = 0; i < sNumCrowdCharacters; ++i)
@@ -365,8 +348,8 @@ static inline void CreateCrowdCharacters(
 
 void InitializeCrowdImpostors(bool alternateView)
 {
-    CrowdSidelineFilter* tweak = new (8, false) CrowdSidelineFilter;
-    sCrowdSidelineFilter = tweak;
+    CrowdSidelineFilter* filter = new (8, false) CrowdSidelineFilter;
+    sCrowdSidelineFilter = filter;
 
     int crowdMax = GetTweakInt(sMaxCrowdSizePath, 10000);
     if (!sCrowdViewBudgetConfigured)
@@ -393,7 +376,7 @@ void InitializeCrowdImpostors(bool alternateView)
     CreateCrowdLayoutObject();
 
     ImpostorCharacterParams clusterParams;
-    clusterParams.mUnidentified008 = false;
+    clusterParams.mUseAdditiveBlend = false;
     clusterParams.mUseIntensityAlpha = false;
     clusterParams.mBaseAngle = 0;
     clusterParams.mWidth = 128;
@@ -401,13 +384,13 @@ void InitializeCrowdImpostors(bool alternateView)
     ImpostorCluster* clusterCharacter
         = new (8, false) ImpostorCluster(sCrowdClusterName, 10, &clusterParams);
     sCrowdCluster = clusterCharacter;
-    unsigned long cluster;
+    unsigned long clusterTexture;
     u32 firstHash = nlStringLowerHash(sViceCrowdModelName);
-    cluster = sCrowdCluster->GetTexture();
-    SetCrowdModelTexture(firstHash, cluster);
-    SetCrowdModelTexture(nlStringLowerHash(sViceNightCrowdModelName), cluster);
-    SetCrowdModelTexture(nlStringLowerHash(sUndergroundCrowdModelName), cluster);
-    SetCrowdModelTexture(nlStringLowerHash(sWastelandsCrowdModelName), cluster);
+    clusterTexture = sCrowdCluster->GetTexture();
+    SetCrowdModelTexture(firstHash, clusterTexture);
+    SetCrowdModelTexture(nlStringLowerHash(sViceNightCrowdModelName), clusterTexture);
+    SetCrowdModelTexture(nlStringLowerHash(sUndergroundCrowdModelName), clusterTexture);
+    SetCrowdModelTexture(nlStringLowerHash(sWastelandsCrowdModelName), clusterTexture);
 
     GetCrowdImpostorManager()->GenerateCrowd( 0);
     GetCrowdImpostorManager()->AddVisibilityFilter( sCrowdSidelineFilter);
@@ -446,34 +429,39 @@ void UninitializeCrowdImpostors()
     }
 }
 
+extern const float sCrowdLayoutTransformW = 1.0f;
+extern const float sCrowdLayoutXScale = 0.5f;
+
 void CreateCrowdLayoutObject()
 {
+    const float& w = sCrowdLayoutTransformW;
+    const float& scale = sCrowdLayoutXScale;
     nlMatrix4 transform;
     transform.SetIdentity();
     nlMakeRotationMatrixX(transform, sCrowdLayoutRotationX);
 
-    float distance = sCrowdLayoutSize;
+    float layoutSize = sCrowdLayoutSize;
     float zero = sCrowdZero;
-    transform.m41 = sCrowdLayoutXScale * -distance;
+    transform.m41 = scale * -layoutSize;
     transform.m42 = zero;
     transform.m43 = zero;
-    transform.m44 = sCrowdLayoutTransformW;
+    transform.m44 = w;
 
     BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     WorldObjectLoadContext* context
         = new (8, false) WorldObjectLoadContext(stadium);
     sCrowdLayoutObject = new (8, false) CrowdLayoutObject;
     sCrowdLayoutObject->Initialize();
-    sCrowdLayoutObject->mStartWidth = distance;
-    sCrowdLayoutObject->mEndWidth = distance;
-    sCrowdLayoutObject->mLength = distance;
+    sCrowdLayoutObject->mStartWidth = layoutSize;
+    sCrowdLayoutObject->mEndWidth = layoutSize;
+    sCrowdLayoutObject->mLength = layoutSize;
     sCrowdLayoutObject->mEndOffset = zero;
     sCrowdLayoutObject->SetWorldMatrix(transform);
     GetCrowdImpostorManager()->AddObject( sCrowdLayoutObject, 1);
     delete context;
 }
 
-void SetCrowdModelTexture(u32 hash, unsigned long texture)
+void SetCrowdModelTexture(u32 textureHash, unsigned long texture)
 {
     nlDLListIterator<WorldListObject0_80340AC8*> iterator
         = BasicStadium::GetCurrentStadium()->m_objectList0.Begin();
@@ -492,7 +480,7 @@ void SetCrowdModelTexture(u32 hash, unsigned long texture)
                 unsigned long packetTexture
                     = glGetMaterialUnsignedParameter(
                         pPacket, gDiffuseTextureSemantic);
-                if (packetTexture == hash)
+                if (packetTexture == textureHash)
                 {
                     glSetMaterialTextureParameter(pPacket, gDiffuseTextureSemantic, texture);
                     unsigned long resolvedTexture = textureIndex;
