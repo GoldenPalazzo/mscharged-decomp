@@ -157,7 +157,7 @@ void RenderSnapshot::Replay(T& frame)
         frame.fn_80191504();
     }
     frame.fn_80191504();
-    if (NetMesh::fn_801919B8())
+    if (NetMesh::IsAnimatedNetMeshEnabled())
     {
         if (ReplayFrameTraits<T>::IsLoadFrame
             && ((LoadFrame&)frame).GetInterval() == 1)
@@ -165,12 +165,12 @@ void RenderSnapshot::Replay(T& frame)
             if (lbl_806E14C0)
             {
                 lbl_806E14C0 = false;
-                NetMesh::fn_801919C0()->Update(g_fFixedUpdateTick,
+                NetMesh::GetPositiveXNetMesh()->Update(g_fFixedUpdateTick,
                     mBall.fn_801925BC(),
                     lbl_80570CA0,
                     _2430,
                     0);
-                NetMesh::fn_801919C8()->Update(g_fFixedUpdateTick,
+                NetMesh::GetNegativeXNetMesh()->Update(g_fFixedUpdateTick,
                     mBall.fn_801925BC(),
                     lbl_80570CA0,
                     _2431,

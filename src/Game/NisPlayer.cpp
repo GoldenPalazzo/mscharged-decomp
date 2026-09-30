@@ -52,7 +52,6 @@
 
 extern "C" bool lbl_806DCD60;
 extern "C" unsigned long OSGetConsoleType(void);
-void fn_8028346C();
 
 extern "C" {
 void fn_8027F018(void*, unsigned long, void*);
@@ -116,7 +115,7 @@ void NisPlayer::fn_8027BD64()
                 && (j == mPlaying[i]->unknown_0x034 || (j == 1 && mPlaying[i]->unknown_0x034 == 2))
                 && mPlaying[i]->mNumCameras != 0)
             {
-                mPlaying[i]->fn_80281C70(mCamera[j]);
+                mPlaying[i]->SelectRandomCamera(mCamera[j]);
                 break;
             }
         }
@@ -283,7 +282,7 @@ void NisPlayer::fn_802805B4(NisHeader& nisHeader, NisTarget target, NisUseStadiu
     nisHeader.unknown_0x180 = param5;
     if (!param6)
     {
-        nisHeader.mUnidentified195 = IsMirrored(target, nisHeader.name, winnerType);
+        nisHeader.mirrored = IsMirrored(target, nisHeader.name, winnerType);
     }
     if (useStadiumOffset == NIS_NO_STADIUM_OFFSET)
     {
@@ -304,14 +303,14 @@ void NisPlayer::fn_802805B4(NisHeader& nisHeader, NisTarget target, NisUseStadiu
     for (int i = 0; i < nisHeader.numAnimations; i++)
     {
         mBeginPositions[i] = nisHeader.beginPositions[i];
-        if (nisHeader.mUnidentified195)
+        if (nisHeader.mirrored)
         {
             mBeginPositions[i].x *= -1.0f;
         }
     }
-    if (nisHeader.unknown_0x198 != NULL)
+    if (nisHeader.buffer != NULL)
     {
-        Load(nisHeader.unknown_0x198, nisHeader.unknown_0x19C, nisHeader);
+        Load(nisHeader.buffer, nisHeader.bufferSize, nisHeader);
     }
     else
     {
@@ -367,7 +366,7 @@ void NisPlayer::Load(char* buffer, unsigned int size, NisHeader& nisHeader)
         if (mLoaded[i] != 0)
             continue;
 
-        if (nisHeader.unknown_0x198 == 0)
+        if (nisHeader.buffer == 0)
         {
             for (int j = 0; j < 8; j++)
             {
@@ -435,7 +434,7 @@ void NisPlayer::Reset()
         mCamera[i].UnselectCameraAnimation();
     }
     cCameraManager::Remove(mCamera[0]);
-    fn_8028346C();
+    ClearNisAnimatedCharacters();
     lbl_806DCD60 = true;
     if (mUnidentified343E8 != -1.0f)
     {
@@ -468,10 +467,10 @@ void NisPlayer::fn_8027E5D4()
 {
     for (int i = 0; i < mDictSize; i++)
     {
-        delete mDict[i].unknown_0x198;
+        delete mDict[i].buffer;
         mDict[i].mUnidentified194 = false;
-        mDict[i].unknown_0x198 = 0;
-        mDict[i].unknown_0x19C = 0;
+        mDict[i].buffer = 0;
+        mDict[i].bufferSize = 0;
     }
 }
 
@@ -796,21 +795,21 @@ void NisPlayer::fn_8027B880(char* data)
                 SkipLine(dictionaryCursor);
                 header.beginPositions[i] = beginPos;
             }
-            sscanf(dictionaryCursor, "\tnum_anim_proxies %d", &header.mUnidentified0A4);
+            sscanf(dictionaryCursor, "\tnum_anim_proxies %d", &header.numAnimProxies);
             SkipLine(dictionaryCursor);
-            for (int i = 0; i < header.mUnidentified0A4; i++)
+            for (int i = 0; i < header.numAnimProxies; i++)
             {
-                sscanf(dictionaryCursor, "\tanim_proxy_name %s", header.mUnidentified0A8[i]);
+                sscanf(dictionaryCursor, "\tanim_proxy_name %s", header.animProxyNames[i]);
                 SkipLine(dictionaryCursor);
-                sscanf(dictionaryCursor, "\tanim_proxy_position %f %f", &header.mUnidentified128[i].x, &header.mUnidentified128[i].y);
+                sscanf(dictionaryCursor, "\tanim_proxy_position %f %f", &header.animProxyPositions[i].x, &header.animProxyPositions[i].y);
                 SkipLine(dictionaryCursor);
                 int direction;
                 sscanf(dictionaryCursor, "\tanim_proxy_direction %d", &direction);
-                header.mUnidentified168[i] = direction;
+                header.animProxyDirections[i] = direction;
                 SkipLine(dictionaryCursor);
             }
-            header.unknown_0x198 = 0;
-            header.unknown_0x19C = 0;
+            header.buffer = 0;
+            header.bufferSize = 0;
             header.mUnidentified194 = false;
             mDictSize++;
         }
@@ -1151,9 +1150,9 @@ void NisPlayer::fn_8027CA44()
     }
     for (int i = 0; i < 8; i++)
     {
-        if (mLoaded[i] != 0 && !mLoaded[i]->mUnidentifiedBAC)
+        if (mLoaded[i] != 0 && !mLoaded[i]->mScriptStarted)
         {
-            mLoaded[i]->fn_802815E0();
+            mLoaded[i]->StartScript();
         }
     }
 }
@@ -1243,11 +1242,11 @@ bool NisPlayer::fn_8027CB44()
     {
         if (mLoaded[i] != 0)
         {
-            if (!mLoaded[i]->mUnidentifiedBAC)
+            if (!mLoaded[i]->mScriptStarted)
             {
-                mLoaded[i]->fn_802815E0();
+                mLoaded[i]->StartScript();
             }
-            if (mLoaded[i]->fn_80283930() == true)
+            if (mLoaded[i]->IsLoading() == true)
             {
                 return false;
             }
@@ -1285,8 +1284,8 @@ void NisPlayer::Play()
         mLoaded[j] = 0;
         if (mPlaying[j] != 0)
         {
-            mPlaying[j]->fn_802816CC();
-            mPlaying[j]->fn_802834A0();
+            mPlaying[j]->ApplyLoadedAnimations();
+            mPlaying[j]->AttachHeadImpostors();
         }
     }
 
@@ -1324,7 +1323,7 @@ void NisPlayer::Play()
     }
     fn_8027BD64();
     fn_8027EE38();
-    fn_8028346C();
+    ClearNisAnimatedCharacters();
 }
 
 const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerType) const
@@ -1629,11 +1628,11 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
 
     if (sameTarget != NIS_TARGET_NONE)
     {
-        fn_8028041C(nisHeader.name, "same", sameTarget, useStadiumOffset, winnerType, nisHeader.mUnidentified195, param5);
+        fn_8028041C(nisHeader.name, "same", sameTarget, useStadiumOffset, winnerType, nisHeader.mirrored, param5);
     }
     if (otherTarget != NIS_TARGET_NONE)
     {
-        fn_8028041C(nisHeader.name, "other", otherTarget, useStadiumOffset, winnerType, nisHeader.mUnidentified195, param5);
+        fn_8028041C(nisHeader.name, "other", otherTarget, useStadiumOffset, winnerType, nisHeader.mirrored, param5);
     }
 
     if (param5 != 1 && mUnidentified34354 == 0)
@@ -1657,7 +1656,7 @@ void NisPlayer::fn_8028041C(const char* param1, const char* param2, NisTarget ta
     {
         if (nlStrCmp(mDict[dictionaryIndex].name, fullName) == 0)
         {
-            mDict[dictionaryIndex].mUnidentified195 = param5;
+            mDict[dictionaryIndex].mirrored = param5;
             nisHeader = &mDict[dictionaryIndex];
             break;
         }

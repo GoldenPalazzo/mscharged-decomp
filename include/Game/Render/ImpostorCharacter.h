@@ -59,14 +59,13 @@ public:
     virtual void EvaluatePose(int texture) = 0;
     virtual void Render(GLView* target, int texture) = 0;
     virtual void UpdateAnimation(float dt) = 0;
-    virtual void PlayAnimation(
-        float dt, const char* unidentified) = 0;
+    virtual void PlayAnimation(float blendTime, const char* name) = 0;
     virtual void UpdateView(const nlVector3* direction, const nlVector3* up);
 
     void Acquire(Impostor* impostor);
     void EnableSprites(bool enable);
     void ReleaseSprites();
-    void RegisterSprites(GLView* registry);
+    void RegisterSprites(GLView* parentView);
     void UpdateSprites(int period, int slot);
 
     /* 0x04 */ int mNumAngles;
@@ -90,7 +89,7 @@ class AnimatedImpostorCharacter : public ImpostorCharacter
 {
 public:
     AnimatedImpostorCharacter(const char* name,
-        ImpostorModel* model, void* animations, int budget,
+        ImpostorModel* model, void* animation, int budget,
         int numAngles, int numTextures, const ImpostorCharacterParams* params);
     virtual ~AnimatedImpostorCharacter();
 
@@ -98,7 +97,7 @@ public:
     virtual void EvaluatePose(int texture);
     virtual void Render(GLView* target, int texture);
     virtual void UpdateAnimation(float dt);
-    virtual void PlayAnimation(float dt, const char* unidentified);
+    virtual void PlayAnimation(float blendTime, const char* name);
 
     /* 0x6C */ ImpostorModel** mModels;
     /* 0x70 */ int mNumModels;
@@ -115,8 +114,7 @@ public:
     virtual void EvaluatePose(int texture);
     virtual void Render(GLView* target, int texture);
     virtual void UpdateAnimation(float dt);
-    virtual void PlayAnimation(
-        float dt, const char* unidentified);
+    virtual void PlayAnimation(float blendTime, const char* name);
     virtual void UpdateView(
         const nlVector3* direction, const nlVector3* up);
 

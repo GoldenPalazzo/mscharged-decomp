@@ -173,6 +173,56 @@ static CrowdCharacterDefinition sCrowdCharacterDefinitions[36] = {
         "Art/Characters/Crowdmonkey/crowdmonkey.rlg" },
 };
 
+// Storage for the static crowd tables; their destructors follow __sinit.
+class CrowdModelArray
+{
+public:
+    CrowdModelArray(int count)
+    {
+        data = new (8, false) ImpostorModel*[count];
+        capacity = count;
+    }
+    ~CrowdModelArray() { delete[] data; }
+
+    ImpostorModel*& operator[](unsigned int index) { return data[index]; }
+
+    ImpostorModel** data;
+    int capacity;
+};
+
+class CrowdCharacterArray
+{
+public:
+    CrowdCharacterArray(int count)
+    {
+        data = new (8, false) AnimatedImpostorCharacter*[count];
+        capacity = count;
+    }
+    ~CrowdCharacterArray() { delete[] data; }
+
+    AnimatedImpostorCharacter*& operator[](unsigned int index)
+    {
+        return data[index];
+    }
+
+    AnimatedImpostorCharacter** data;
+    int capacity;
+};
+
+class CrowdDefinitionArray
+{
+public:
+    CrowdDefinitionArray(int count)
+    {
+        data = new (8, false) CrowdCharacterDefinition[count];
+        capacity = count;
+    }
+    ~CrowdDefinitionArray() { delete[] data; }
+
+    CrowdCharacterDefinition* data;
+    int capacity;
+};
+
 class CrowdImpostorCharacter
     : public AnimatedImpostorCharacter
 {
@@ -293,6 +343,26 @@ void LoadCrowdCharacterList()
     gCrowdModelCollection.Initialize(sCrowdLoadDefinitions.data, sNumCrowdCharacters);
 }
 
+static inline void CreateCrowdCharacters(
+    ImpostorCharacterParams* params)
+{
+    int budget = 20000 / sNumCrowdCharacters;
+    params->mWidth = 64;
+    params->mHeight = 64;
+    params->mUnidentified008 = false;
+    params->mUseIntensityAlpha = false;
+    params->mBaseAngle = 0;
+    for (int i = 0; i < sNumCrowdCharacters; ++i)
+    {
+        sCrowdModels[i] = gCrowdModelCollection.mModels[i];
+        sCrowdCharacters[i] = new (8, false) CrowdImpostorCharacter(
+                sCrowdLoadDefinitions.data[i % sNumCrowdCharacters].mName,
+                sCrowdModels[i],
+                (void*)sCrowdIdleAnimation, budget, 4, 2, params);
+        GetCrowdImpostorManager()->AddCharacter(sCrowdCharacters[i]);
+    }
+}
+
 void InitializeCrowdImpostors(bool alternateView)
 {
     CrowdSidelineFilter* tweak = new (8, false) CrowdSidelineFilter;
@@ -316,22 +386,8 @@ void InitializeCrowdImpostors(bool alternateView)
         GetLayerView(eCLV_ImpostorTexture), crowdMax, requirements, 2, false);
     ImpostorManager::GetInstance()->SetImpostorSizeScale(sCrowdImpostorSizeScale);
 
-    int budget = 20000 / sNumCrowdCharacters;
     ImpostorCharacterParams params;
-    params.mWidth = 64;
-    params.mHeight = 64;
-    params.mUnidentified008 = false;
-    params.mUseIntensityAlpha = false;
-    params.mBaseAngle = 0;
-    for (int i = 0; i < sNumCrowdCharacters; ++i)
-    {
-        sCrowdModels[i] = gCrowdModelCollection.mModels[i];
-        sCrowdCharacters[i] = new (8, false) CrowdImpostorCharacter(
-                sCrowdLoadDefinitions.data[i % sNumCrowdCharacters].mName,
-                sCrowdModels[i],
-                (void*)sCrowdIdleAnimation, budget, 4, 2, &params);
-        GetCrowdImpostorManager()->AddCharacter(sCrowdCharacters[i]);
-    }
+    CreateCrowdCharacters(&params);
 
     sCrowdImpostorsExcited = false;
     CreateCrowdLayoutObject();
@@ -359,14 +415,19 @@ void InitializeCrowdImpostors(bool alternateView)
     ImpostorManager::GetInstance()->StaggerAnimations();
 }
 
-void UninitializeCrowdImpostors()
+static inline void DeleteCrowdCharacterArrays()
 {
-    ImpostorManager::GetInstance()->ResetImpostors();
     for (int i = 0; i < sNumCrowdCharacters; ++i)
     {
         delete sCrowdModels[i];
         delete sCrowdCharacters[i];
     }
+}
+
+void UninitializeCrowdImpostors()
+{
+    ImpostorManager::GetInstance()->ResetImpostors();
+    DeleteCrowdCharacterArrays();
     sNumCrowdCharacters = 0;
 
     delete sCrowdCluster;
@@ -416,14 +477,14 @@ void SetCrowdModelTexture(u32 hash, unsigned long texture)
 {
     nlDLListIterator<WorldListObject0_80340AC8*> iterator
         = BasicStadium::GetCurrentStadium()->m_objectList0.Begin();
-    unsigned long textureIndex = glGetTextureManager()->GetTextureIndex(texture);
+    const unsigned long& textureIndex = glGetTextureManager()->GetTextureIndex(texture);
 
     for (; iterator.hasNext(); iterator.next())
     {
         DrawableObject* pObject = (DrawableObject*)*iterator;
         if (pObject->m_uRenderLayer == 0x10002)
         {
-            glModel* pGlModel = pObject->m_pModel;
+            glModel* pGlModel = pObject->GetModel();
             for (glModelPacket* pPacket = pGlModel->packets;
                  pPacket < pGlModel->packets + pGlModel->numPackets;
                  ++pPacket)

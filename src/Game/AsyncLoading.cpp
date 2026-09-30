@@ -20,6 +20,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/TrophyInfo.h"
 #include "Game/GameTweaks.h"
+#include "Game/Goalie.h"
 #include "NL/nlFunctionMemory.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Event.h"
@@ -139,7 +140,6 @@ extern "C" bool fn_802773B8(bool stadiumViewer);
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
-extern "C" void GoalieOnGameOver();
 extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     void* parameterData, bool immediate, float value);
 extern "C" void fn_8013D8DC();

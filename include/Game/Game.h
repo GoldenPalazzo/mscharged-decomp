@@ -19,6 +19,7 @@ class AIContext;
 struct DetermDataEvent;
 struct CharacterImpactEvent;
 struct GoalieSaveData;
+struct PlayerAttackData;
 class cFielder;
 class cPlayer;
 
@@ -138,6 +139,7 @@ public:
     inline bool IsLastTeamToScore(int side) const { return m_nLastTeamToScore == side; }
     inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
     inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
+    const nlVector3& GetTiltDirection() const { return mTiltDirection; }
 
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
     /* 0x08 */ Clock* m_pGameClock;
@@ -252,6 +254,12 @@ public:
 extern cGame* g_pGame;
 
 extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
+extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData);
+extern "C" void fn_8005D550(void* pManager, const GoalieSaveData* pData);
+extern "C" void fn_8005D948(void* pGame, const GoalieSaveData* pData);
+extern "C" void fn_8005DB7C();
+extern "C" void fn_8005E604(void* pManager, const PlayerAttackData* pData);
+extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
 
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 

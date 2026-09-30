@@ -943,11 +943,6 @@ void DesireSuperPower::fn_800CC720(DesireUpdate* update, float fDeltaT)
     }
 }
 
-static inline unsigned short UnidentifiedAngleRange_800CD060(float degrees)
-{
-    return (int)(65536.0f * degrees) / 360;
-}
-
 inline bool DesireSuperPower::fn_800CCF90() const
 {
     bool fire = false;
@@ -1005,7 +1000,7 @@ void DesireSuperPower::fn_800CCC0C(DesireUpdate* update, float fDeltaT)
                     nlPolar polar;
                     nlCartesianToPolar(polar, direction);
                     unsigned short angle = polar.a;
-                    unsigned short range = UnidentifiedAngleRange_800CD060(lbl_806DC2A4);
+                    unsigned short range = DegreesToAngle(lbl_806DC2A4);
                     angle += nlRandom(range) - 0.5f * range;
                     direction.x = m_pFielder->mUnidentified408 * nlSin(angle + 0x4000);
                     direction.y = m_pFielder->mUnidentified408 * nlSin(angle);
