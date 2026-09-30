@@ -1747,10 +1747,16 @@ Game/SH/SHOptions.cpp:
 	.sdata2     start:0x806E55E0 end:0x806E55F0
 
 Game/FE/feOptionsSubMenus.cpp:
-	.text       start:0x801D3674 end:0x801D90C0
-	.data       start:0x80518FA8 end:0x80519310
-	.sdata      start:0x806DD418 end:0x806DD480
-	.sdata2     start:0x806E55F0 end:0x806E5648
+	.text       start:0x801D3674 end:0x801D87C4
+	.data       start:0x80518FA8 end:0x805192A0
+	.sdata      start:0x806DD418 end:0x806DD460
+	.sdata2     start:0x806E55F0 end:0x806E5618
+
+Game/FE/tu_801D87C4.cpp:
+	.text       start:0x801D87C4 end:0x801D90C0
+	.data       start:0x805192A0 end:0x80519310
+	.sdata      start:0x806DD460 end:0x806DD480
+	.sdata2     start:0x806E5618 end:0x806E5648
 
 Game/SH/SHMoviePlayer.cpp:
 	.text       start:0x801D90C0 end:0x801DA134
