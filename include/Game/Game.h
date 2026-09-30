@@ -106,7 +106,7 @@ public:
     void ResetPowerups(bool clearPowerUps);
     void fn_80059A1C();
     void fn_80059B70(void* param1);
-    void fn_80059D80(u8 param1);
+    void SendNISLoadedCustomDeterm(u8 param1);
     void fn_80059DEC(int param1, int param2, float param3, float param4);
     void fn_80059E78();
     void fn_80059EDC();

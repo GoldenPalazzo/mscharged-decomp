@@ -64,9 +64,9 @@
 #include "Game/Task/BeginFrameTask.h"
 
 extern "C" void fn_8007F534(Goalie* pGoalie);
-class UnidentifiedFuzzyRuntimeBase;
+class FuzzyRuntimeBase;
 extern "C" UnidentifiedVariant_80054AB8 fn_80082140(
-    UnidentifiedFuzzyRuntimeBase*, const char*, cPlayer*);
+    FuzzyRuntimeBase*, const char*, cPlayer*);
 extern nlVector4 lbl_8056D3B0;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -124,7 +124,7 @@ float gfRepositionThreshold = 0.15f;
 bool gbEnableBallGoalieSweepTest = true;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
-    UnidentifiedFuzzyRuntimeBase*, cPlayer*, const char*);
+    FuzzyRuntimeBase*, cPlayer*, const char*);
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
 inline void Goalie::UnidentifiedResetState()
@@ -1659,7 +1659,7 @@ cPlayer* Goalie::FindOpenPassTarget()
     else
     {
         UnidentifiedVariant_80054AB8 vBestPassTarget = fn_80082140(
-            fn_800A695C(m_pTeam), "BestPassTarget", this);
+            GetTeamFuzzyRuntime(m_pTeam), "BestPassTarget", this);
 
         if (vBestPassTarget.UnidentifiedGetFloat(4) >= 0.5f)
         {
@@ -4551,7 +4551,7 @@ extern "C" void GoalieOnGameOver()
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80082140(
-    UnidentifiedFuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
+    FuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
 {
     return fn_80082150(runtime, player, name);
 }
@@ -4560,20 +4560,20 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
     InterpreterCore*, const unsigned int&, cPlayer*);
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
-    UnidentifiedFuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
+    FuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
 {
     unsigned int functionHash = nlStringHash(name);
     return fn_800821B0(runtime, functionHash, player);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
-    UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
+    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 
 extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
     InterpreterCore* interpreter, const unsigned int& hash, cPlayer* player)
 {
-    UnidentifiedFuzzyRuntimeBase* runtime = static_cast<UnidentifiedFuzzyRuntimeBase*>(interpreter);
+    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(interpreter);
     unsigned int functionHash = hash;
-    return UnidentifiedVariant_80054AB8(fn_80312360(
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(functionHash), 1, player, NULL));
 }

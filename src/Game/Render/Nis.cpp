@@ -358,7 +358,7 @@ void Nis::SelectCamera(cAnimCamera& camera, int cameraIndex)
 
 void Nis::SelectRandomCamera(cAnimCamera& camera)
 {
-    int randomIndex = nlRandom(mNumCameras, fn_80287B2C(GetPresentation()));
+    int randomIndex = nlRandom(mNumCameras, GetPresentationRandomSeed(GetPresentation()));
     SelectCamera(camera, randomIndex);
 }
 
@@ -837,11 +837,11 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
     }
     if (target == NIS_TARGET_UNIDENTIFIED_21)
     {
-        return (NisPlayer::Instance()->mUnidentified34238 == 0) ? 0 : 4;
+        return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 0 : 4;
     }
     if (target == NIS_TARGET_UNIDENTIFIED_22)
     {
-        return (NisPlayer::Instance()->mUnidentified34238 == 0) ? 9 : 8;
+        return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 9 : 8;
     }
     return (target == NIS_TARGET_NONE) ? 0 : -1;
 }

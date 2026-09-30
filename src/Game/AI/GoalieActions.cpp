@@ -145,7 +145,6 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-float Difficult(cTeam* pTeam);
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
@@ -177,7 +176,6 @@ extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetVelocity);
 extern "C" void fn_8008685C(Goalie* pGoalie, float fDeltaT);
 
-float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder);
 
 inline void Goalie::InitActionPassInterceptSave()
 {

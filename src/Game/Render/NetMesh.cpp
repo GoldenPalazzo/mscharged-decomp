@@ -22,13 +22,7 @@
 #include <math.h>
 #include <string.h>
 
-struct DebugTypeState
-{
-    unsigned short type;
-    unsigned short padding;
-};
-
-DebugTypeState s_DetMeshType = { 0xFFFF, 0 };
+unsigned short s_DetMeshType = 0xFFFF;
 float NetMesh::s_fReboundForceCoefficient = 6.0f;
 float NetMesh::s_fVelocityDampingCoefficient = 0.7f;
 float NetMesh::s_fBallRadiusExaggerationFactor = 2.0f;
@@ -41,7 +35,7 @@ float NetMesh::s_fIsBallMovingThreshold = 0.01f;
 float NetMesh::s_fDampening = 1.0f;
 float NetMesh::s_fNetStretchLimit = 1.0f;
 float s_fNetMeshLogTimeScale = 2.5f;
-DebugTypeState s_GenDetNetMeshType = { 0xFFFF, 0 };
+unsigned short s_GenDetNetMeshType = 0xFFFF;
 static float fDeltaZero = 0.001f;
 static float fGroundHeight = 0.01f;
 char sJoltName[] = "mfJolt";
@@ -236,9 +230,9 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
     crcs.restPosition = nlChecksum32(
         m_v3RestPosition, m_NumParticles * sizeof(nlVector3));
 
-    if (s_GenDetNetMeshType.type == 0xFFFF)
+    if (s_GenDetNetMeshType == 0xFFFF)
     {
-        s_GenDetNetMeshType.type = cache->BeginType(sGenDetNetMeshName);
+        s_GenDetNetMeshType = cache->BeginType(sGenDetNetMeshName);
         cache->AddField(2, gDebugFieldTypes[2].size, 0, sPosCRCName);
         cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.previousPosition - (unsigned char*)&crcs, sPrevPosCRCName);
         cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.accel - (unsigned char*)&crcs, sAccelCRCName);
@@ -246,12 +240,12 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
         cache->EndType();
     }
 
-    cache->ChecksumData(s_GenDetNetMeshType.type, &crcs, context);
-    cache->WriteData(s_GenDetNetMeshType.type, &crcs, sizeof(crcs));
+    cache->ChecksumData(s_GenDetNetMeshType, &crcs, context);
+    cache->WriteData(s_GenDetNetMeshType, &crcs, sizeof(crcs));
 
-    if (s_DetMeshType.type == 0xFFFF)
+    if (s_DetMeshType == 0xFFFF)
     {
-        s_DetMeshType.type = cache->BeginType(sDetMeshName);
+        s_DetMeshType = cache->BeginType(sDetMeshName);
         cache->AddField(16, gDebugFieldTypes[16].size, 0, sPositiveEndName);
         cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_NumParticles - (unsigned char*)&mbPositiveEnd, sNumParticlesName);
         cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMinX - (unsigned char*)&mbPositiveEnd, sMinXName);
@@ -271,8 +265,8 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
         cache->EndType();
     }
 
-    cache->ChecksumData(s_DetMeshType.type, &mbPositiveEnd, context);
-    cache->WriteData(s_DetMeshType.type, &mbPositiveEnd, 0x44);
+    cache->ChecksumData(s_DetMeshType, &mbPositiveEnd, context);
+    cache->WriteData(s_DetMeshType, &mbPositiveEnd, 0x44);
 }
 
 inline static void AccumForces(NetMesh* self, nlVector3& newPos)

@@ -176,7 +176,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
-class UnidentifiedFuzzyRuntimeBase;
+class FuzzyRuntimeBase;
 struct BulletBillObject;
 
 class cFielder : public cPlayer
@@ -197,7 +197,7 @@ public:
     float GetDistanceToDesiredPos();
     bool CanContactLooseBall(bool requireBestInterceptor);
     bool IsActionModifierPressed();
-    UnidentifiedFuzzyRuntimeBase* fn_8002E198() const;
+    FuzzyRuntimeBase* GetFuzzyRuntime() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
     unsigned int IsFrozen();

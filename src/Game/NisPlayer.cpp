@@ -1,4 +1,5 @@
 #include "Game/NisPlayer.h"
+#include "Game/Blinker.h"
 #include "NL/nlBasicString.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/CharacterTemplate.h"
@@ -50,7 +51,6 @@
 #include "NL/gl/glTexture.h"
 #include "Game/Transitions/ModelTransition.h"
 
-extern "C" bool lbl_806DCD60;
 extern "C" unsigned long OSGetConsoleType(void);
 
 extern "C" {
@@ -77,17 +77,17 @@ void NisPlayer::fn_8027BD60()
 {
 }
 
-void NisPlayer::fn_8027ED08()
+void NisPlayer::PreserveNisCueOnReset()
 {
     mUnidentified34358 = false;
 }
 
 void NisPlayer::fn_8027E054()
 {
-    fn_8027ED18();
+    StopNisCue();
 }
 
-void NisPlayer::fn_8027ED18()
+void NisPlayer::StopNisCue()
 {
     mUnidentified34358 = true;
     if (mUnidentified34350 != 0)
@@ -169,7 +169,7 @@ bool NisPlayer::WorldIsFrozen() const
     return stateOK;
 }
 
-void NisPlayer::fn_8027EE38()
+void NisPlayer::StartNisCue()
 {
     if (mUnidentified34354 != 0)
     {
@@ -246,12 +246,12 @@ void NisPlayer::fn_8027ED70()
     }
 }
 
-void NisPlayer::fn_8027EDCC(unsigned long param1)
+void NisPlayer::PrepareNisCue(unsigned long cue)
 {
-    StopSound(param1, (void*)-1);
-    if (PrepareTrackedSound(19, param1, 0, "Nis Cue", (void*)-1, true))
+    StopSound(cue, (void*)-1);
+    if (PrepareTrackedSound(19, cue, 0, "Nis Cue", (void*)-1, true))
     {
-        mUnidentified34354 = param1;
+        mUnidentified34354 = cue;
     }
 }
 
@@ -264,12 +264,12 @@ int NisPlayer::fn_8027E284(NisWinnerType winnerType) const
     return 0;
 }
 
-void NisPlayer::fn_8027D994()
+void NisPlayer::RandomizeBeginPositions()
 {
     for (int i = 0; i < 10; i++)
     {
-        mBeginPositions[i].x = nlRandomf(-8.0f, 8.0f, fn_80287B2C(GetPresentation()));
-        mBeginPositions[i].y = nlRandomf(-4.0f, 4.0f, fn_80287B2C(GetPresentation()));
+        mBeginPositions[i].x = nlRandomf(-8.0f, 8.0f, GetPresentationRandomSeed(GetPresentation()));
+        mBeginPositions[i].y = nlRandomf(-4.0f, 4.0f, GetPresentationRandomSeed(GetPresentation()));
         mBeginPositions[i].z = 0.0f;
     }
 }
@@ -338,7 +338,7 @@ void NisPlayer::fn_8027DFE4(cPlayer* param1)
     g_ForceDoubleBallTransition = false;
     if (param1 != NULL)
     {
-        mUnidentified34238 = param1->m_pTeam->m_nSide;
+        mMegaStrikeSide = param1->m_pTeam->m_nSide;
         mGoalScorerCharIndex = GetCharacterIndex(param1);
     }
 }
@@ -387,7 +387,7 @@ void NisPlayer::Load(char* buffer, unsigned int size, NisHeader& nisHeader)
     }
 }
 
-void NisPlayer::fn_8027CCEC()
+void NisPlayer::ClearLoadQueue()
 {
     for (int i = 0; i < 8; i++)
     {
@@ -435,7 +435,7 @@ void NisPlayer::Reset()
     }
     cCameraManager::Remove(mCamera[0]);
     ClearNisAnimatedCharacters();
-    lbl_806DCD60 = true;
+    gBlinkingEnabled = true;
     if (mUnidentified343E8 != -1.0f)
     {
         glx_SetFogStart(mUnidentified343E8);
@@ -447,7 +447,7 @@ void NisPlayer::Reset()
     mUnidentified343E8 = -1.0f;
     mUnidentified343F0 = -1.0f;
     DepthOfFieldManager::instance.TurnOn();
-    mUnidentified34468 = 0.0f;
+    mCameraOverrun = 0.0f;
 }
 
 NisPlayer* NisPlayer::Instance()
@@ -482,7 +482,7 @@ extern "C" void fn_8002E3F8(cFielder*);
 
 void NisPlayer::fn_8027D11C()
 {
-    mUnidentified34468 = 0.0f;
+    mCameraOverrun = 0.0f;
     ResetEffects();
     fn_8027D1EC();
     g_pGame->mpWeatherManager->Stop(true);
@@ -535,7 +535,7 @@ NisPlayer::NisPlayer()
     , mUnidentified343E8(-1.0f)
     , mUnidentified343F0(-1.0f)
     , mUnidentified343F4(-1)
-    , mUnidentified34468(0.0f)
+    , mCameraOverrun(0.0f)
 {
     mMemory = (char*)nlMalloc(0x70800, 8, false);
     unknown_0x00028 = 0;
@@ -649,11 +649,11 @@ bool NisPlayer::IsMirrored(NisTarget target, const char* name, NisWinnerType win
         {
             return false;
         }
-        return mUnidentified34238 == 0;
+        return mMegaStrikeSide == 0;
     }
     if (target == NIS_TARGET_UNIDENTIFIED_22)
     {
-        return mUnidentified34238 == 0;
+        return mMegaStrikeSide == 0;
     }
     if (strstr(name, "cup_win_home") != NULL)
     {
@@ -1166,8 +1166,8 @@ void NisPlayer::Update(float deltaT)
     {
         deltaT = 0.5f;
     }
-    deltaT += mUnidentified34468;
-    mUnidentified34468 = 0.0f;
+    deltaT += mCameraOverrun;
+    mCameraOverrun = 0.0f;
     HandleAsyncs();
 
     for (int i = 0; i < 8; i++)
@@ -1192,7 +1192,7 @@ void NisPlayer::Update(float deltaT)
                 float overrun = mCamera[i].ManualUpdate(deltaT);
                 if (i == 0 && overrun > 0.0f)
                 {
-                    mUnidentified34468 = overrun;
+                    mCameraOverrun = overrun;
                 }
             }
         }
@@ -1264,7 +1264,7 @@ void NisPlayer::Play()
     mUnidentified3435A = false;
     mUnidentified3439C = false;
     mActive = true;
-    lbl_806DCD60 = true;
+    gBlinkingEnabled = true;
     if (mUnidentified343E8 != -1.0f)
     {
         glx_SetFogStart(mUnidentified343E8);
@@ -1301,7 +1301,7 @@ void NisPlayer::Play()
     }
     if (mUnidentified343E0 == true)
     {
-        lbl_806DCD60 = false;
+        gBlinkingEnabled = false;
     }
     mUnidentified343E0 = false;
     mUnidentified343E4 = -1.0f;
@@ -1322,7 +1322,7 @@ void NisPlayer::Play()
         mUsedFromBack = 0x70800;
     }
     fn_8027BD64();
-    fn_8027EE38();
+    StartNisCue();
     ClearNisAnimatedCharacters();
 }
 
@@ -1414,7 +1414,7 @@ const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerTyp
 
     if (target == NIS_TARGET_UNIDENTIFIED_21)
     {
-        return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)mUnidentified34238));
+        return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)mMegaStrikeSide));
     }
 
     if (target == NIS_TARGET_HOME_GOALIE || target == NIS_TARGET_AWAY_GOALIE || target == NIS_TARGET_WINNER_GOALIE || target == NIS_TARGET_LOSER_GOALIE || target == NIS_TARGET_UNIDENTIFIED_22)
@@ -1430,7 +1430,7 @@ const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerTyp
     return kNisEmpty;
 }
 
-void NisPlayer::fn_8027F4B0(NisTarget target, NisWinnerType winnerType)
+void NisPlayer::SetTeamLogo(NisTarget target, NisWinnerType winnerType)
 {
     const char* filter = NisPlayer::Instance()->GetTargetFilter(target, winnerType);
     char textureName[64];
@@ -1484,7 +1484,7 @@ static inline void PlayNisCue(NisPlayer* player, const char* nisName)
     {
         nlStrNCpy(cueName + length - 4, "_nocrowd", sizeof(cueName) - length - 4);
     }
-    player->fn_8027EDCC(nlStringLowerHash(cueName));
+    player->PrepareNisCue(nlStringLowerHash(cueName));
 }
 
 void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int param5, int param6)
@@ -1529,7 +1529,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     else
     {
         index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
-        if (fn_80287B34(GetPresentation()) && param5 == 0)
+        if (DuringGoalCelebration(GetPresentation()) && param5 == 0)
         {
             if (numAvailableNis > 1 && mUnidentified343F4 == index && nlStrCmp(mUnidentified343F8, mExtraNameFilter) == 0)
             {

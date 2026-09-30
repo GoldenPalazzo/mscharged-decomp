@@ -556,7 +556,7 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
 
 int ReplayManager::fn_8018A16C(float time) const
 {
-    if (Instance()->fn_8018A4B4() || Instance()->fn_8018A4BC())
+    if (Instance()->IsSavingReplay() || Instance()->IsLoadingReplay())
     {
         return 0;
     }
@@ -629,12 +629,12 @@ static void fn_8018A46C(s32 result)
     }
 }
 
-bool ReplayManager::fn_8018A4B4() const
+bool ReplayManager::IsSavingReplay() const
 {
     return lbl_806E14D0;
 }
 
-bool ReplayManager::fn_8018A4BC() const
+bool ReplayManager::IsLoadingReplay() const
 {
     return lbl_806E14D1;
 }

@@ -481,7 +481,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 22:
         SetLoadingComment("AsyncFinalizeLoadingAI");
-        FinishLoadingStepOrUndo(this, fn_80311C5C());
+        FinishLoadingStepOrUndo(this, ApplyFuzzyByteCode());
         break;
     case 23:
         if (lbl_806E1060 == 0)
@@ -586,7 +586,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 40:
         SetLoadingComment("AsyncStartLoadingAI");
-        fn_80311AFC(fn_800E3198(), true);
+        LoadFuzzyByteCode(GetFuzzyAIScriptFilename(), true);
         FinishLoadingStep(this);
         break;
     case 41:
@@ -1937,7 +1937,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FESceneManager::Instance()->ForceImmediateStackProcessing();
 
     FlareHandler::instance.Cleanup();
-    NisPlayer::Instance()->fn_8027ED18();
+    NisPlayer::Instance()->StopNisCue();
     NisPlayer::Instance()->Reset();
     NisPlayer::Instance()->fn_8027E5D4();
     ReplayChoreo::Instance().Reset();
