@@ -54,6 +54,7 @@
 #include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlFunction.inl"
 
 struct UnidentifiedGameState
 {

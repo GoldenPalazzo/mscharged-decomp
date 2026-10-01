@@ -1025,7 +1025,7 @@ void cTeam::ResetCharacters()
             v3NewPosition.y = -v3NewPosition.y;
         }
 
-        pFielder->Unknown10(v3NewPosition, aNewFacingDirection);
+        pFielder->Reset(v3NewPosition, aNewFacingDirection);
     }
 
     s32 side = m_nSide;
@@ -1737,7 +1737,7 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
 
     for (int i = 0; i < 5; i++)
     {
-        m_pPlayers[i]->Unknown11(context, cache);
+        m_pPlayers[i]->SyncLog(context, cache);
         char buffer[32];
         nlSNPrintf(buffer, sizeof(buffer), lbl_80500A10,
             i + m_nSide * 5);

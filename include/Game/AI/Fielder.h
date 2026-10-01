@@ -217,9 +217,8 @@ public:
     virtual void Unknown8(unsigned short aParam, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
-    virtual void Unknown10(
-        const nlVector3& v3Position, unsigned short aDirection);
-    virtual void Unknown11(void* context, DebugWriteCache* cache);
+    virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
+    virtual void SyncLog(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
@@ -227,7 +226,7 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
 
     void ClearPassTargetIfAmThePassTarget();
     void CleanUpAction(eFielderActionState actionState);

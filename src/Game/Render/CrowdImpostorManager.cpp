@@ -62,6 +62,14 @@ public:
     /* 0x0C */ CrowdLayoutRecord* mLayout;
 }; // size: 0x10
 
+CrowdImpostorManager::CrowdImpostorManager()
+{
+    mLayouts = 0;
+    mPrimaryObjectCount = 0;
+    mNumLayouts = 0;
+    mNumAngles = 0;
+}
+
 CrowdImpostorManager* GetCrowdImpostorManager()
 {
     static CrowdImpostorManager manager;

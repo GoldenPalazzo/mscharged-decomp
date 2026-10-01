@@ -1202,7 +1202,7 @@ bool cFielder::IsStuck() const
                ->IsUnidentifiedState(2);
 }
 
-void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
+void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData)
 {
     int type = eventData->mUnidentified10->m_Type;
     if (type == 1)
@@ -3421,10 +3421,9 @@ void cFielder::UpdateController(float fDeltaT)
     }
 }
 
-void cFielder::Unknown10(
-    const nlVector3& v3Position, unsigned short aDirection)
+void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    cPlayer::Unknown10(v3Position, aDirection);
+    cPlayer::Reset(v3Position, aDirection);
     mUnidentified428->mScriptMachine->Reset(false);
     CleanUpAction(ACTION_NEED_ACTION);
     mtPowerupThrowTime.UnidentifiedClear();
@@ -3565,9 +3564,9 @@ struct UnidentifiedFielderDesireState
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
-void cFielder::Unknown11(void* context, DebugWriteCache* cache)
+void cFielder::SyncLog(void* context, DebugWriteCache* cache)
 {
-    cPlayer::Unknown11(context, cache);
+    cPlayer::SyncLog(context, cache);
 
     if (lbl_806DB842 == 0xFFFF)
     {
