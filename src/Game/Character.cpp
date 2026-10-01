@@ -2377,7 +2377,7 @@ extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
 
 extern "C" void fn_80022614(UnidentifiedEventData04*)
 {
-    if (g_pBall->m_tLightningTimer.m_uPackedTime != 0)
+    if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
     {
         PlaySound(10, 0xE07B30E9UL, NULL, NULL);
     }
