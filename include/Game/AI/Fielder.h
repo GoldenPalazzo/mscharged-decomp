@@ -230,7 +230,7 @@ public:
 
     void ClearPassTargetIfAmThePassTarget();
     void CleanUpAction(eFielderActionState actionState);
-    ePowerUpType GetPowerupType() const;
+    ePowerUpType GetPowerupType();
     void UseTeamPowerup(cFielder* pTarget);
     void UpdateActionState(float dt);
     void UpdateHeadTracking(float fDeltaT);
@@ -434,7 +434,7 @@ public:
     void fn_8004B2E4(float fDeltaT);
     bool fn_8004B86C(bool bIsChipShot, bool bParam);
     void fn_8004BF58(eFielderActionState eNewAction);
-    void InitActionSlideAttack(cFielder* pTarget, int nParam, float fTime);
+    void InitActionSlideAttack(cFielder* pTarget, float fTime, int nParam);
     void fn_8004BB80(float fDeltaT);
     void fn_8004C02C(float fDeltaT);
     void fn_8004C88C(float fDeltaT);

@@ -1333,28 +1333,6 @@ extern "C" float fn_800156A8(cBall* pBall)
     return fResult <= 1.0f ? fResult : 1.0f;
 }
 
-static inline void ShootAtFastImpl(cBall* pBall, nlVector3& v3Vel,
-    const nlVector3& v3Target, float fDesiredTime)
-{
-    float gravity = pBall->m_pPhysicsBall->m_gravity;
-    float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
-    float k = lbl_806DB584 * airResistance;
-    float g = lbl_806DB588 * gravity;
-    float eToTheNegativeKT = Exp(-k * fDesiredTime);
-    float kSquaredOverOneMinusEToTheNegativeKT
-        = (k * k) / (1.0f - eToTheNegativeKT);
-    float oneOverK = 1.0f / k;
-
-    v3Vel.x = kSquaredOverOneMinusEToTheNegativeKT
-        * (oneOverK * (v3Target.x - pBall->m_v3Position.x));
-    v3Vel.y = kSquaredOverOneMinusEToTheNegativeKT
-        * (oneOverK * (v3Target.y - pBall->m_v3Position.y));
-    v3Vel.z = kSquaredOverOneMinusEToTheNegativeKT
-            * (oneOverK * (v3Target.z - pBall->m_v3Position.z
-                              - g * fDesiredTime / k))
-        + g / k;
-}
-
 extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
 {
     g_pBall->m_pPhysicsBall->fn_8013FE14();
@@ -1446,7 +1424,7 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
         fDesiredTime = lbl_806DB540;
     }
 
-    ShootAtFastImpl(g_pBall, v3Velocity, v3Position, fDesiredTime);
+    g_pBall->ShootAtFast(v3Velocity, v3Position, fDesiredTime);
 
     eSpinType spinType;
     if (nlRandom(100) > 50)
@@ -1998,7 +1976,21 @@ void cBall::ShootRelease(const nlVector3& v3Velocity, eSpinType SpinType)
 void cBall::ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
     float fDesiredTime)
 {
-    ShootAtFastImpl(this, v3Vel, v3Target, fDesiredTime);
+    float k = lbl_806DB584 * m_pPhysicsBall->GetBallAirResistance();
+    float g = lbl_806DB588 * m_pPhysicsBall->GetGravity();
+    float eToTheNegativeKT = Exp(-k * fDesiredTime);
+    float kSquaredOverOneMinusEToTheNegativeKT
+        = (k * k) / (1.0f - eToTheNegativeKT);
+    float oneOverK = 1.0f / k;
+
+    v3Vel.x = kSquaredOverOneMinusEToTheNegativeKT
+        * (oneOverK * (v3Target.x - m_v3Position.x));
+    v3Vel.y = kSquaredOverOneMinusEToTheNegativeKT
+        * (oneOverK * (v3Target.y - m_v3Position.y));
+    v3Vel.z = kSquaredOverOneMinusEToTheNegativeKT
+            * (oneOverK * (v3Target.z - m_v3Position.z
+                              - g * fDesiredTime / k))
+        + g / k;
 }
 
 extern "C" void fn_80017114(cBall* pBall)
@@ -2026,7 +2018,10 @@ extern "C" void fn_80017114(cBall* pBall)
         nlRecipSqrt(v3Direction.GetLengthSq3D(), true));
     nlVec3Scale(v3Direction, lbl_806DB560);
 
-    float fSpeed = nlVec3Length(pBall->m_v3Velocity);
+    float fSpeed = nlSqrt(nlGetLengthSquared1D(pBall->m_v3Velocity.x)
+            + nlGetLengthSquared1D(pBall->m_v3Velocity.y)
+            + nlGetLengthSquared1D(pBall->m_v3Velocity.z),
+        true);
     if (fSpeed < lbl_806DB564)
     {
         fSpeed = lbl_806DB564;
@@ -2352,10 +2347,8 @@ void cBall::KillBlurHandler()
 extern "C" void fn_800180F4(
     cBall* pBall, nlVector3* pPosition, float fTime)
 {
-    float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
-    float gravity = pBall->m_pPhysicsBall->m_gravity;
-    float k = lbl_806DB584 * airResistance;
-    float g = lbl_806DB588 * gravity;
+    float k = lbl_806DB584 * pBall->m_pPhysicsBall->GetBallAirResistance();
+    float g = lbl_806DB588 * pBall->m_pPhysicsBall->GetGravity();
     float eToTheNegativeKT = Exp(-k * fTime);
     float oneMinusEToTheNegativeKTOverK
         = (1.0f / k) * (1.0f - eToTheNegativeKT);
@@ -2418,10 +2411,8 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
             return -10000.0f;
         }
 
-        float airResistance = m_pPhysicsBall->mfBallAirResistance;
-        float gravity = m_pPhysicsBall->m_gravity;
-        float k = lbl_806DB584 * airResistance;
-        float g = lbl_806DB588 * gravity;
+        float k = lbl_806DB584 * m_pPhysicsBall->GetBallAirResistance();
+        float g = lbl_806DB588 * m_pPhysicsBall->GetGravity();
         float eToTheNegativeKT = Exp(-k * fTime);
         float oneOverK = 1.0f / k;
         float oneMinusEToTheNegativeKTOverK

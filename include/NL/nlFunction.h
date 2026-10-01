@@ -110,15 +110,13 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void* UnidentifiedTransfer(const Function0& other)
+    void UnidentifiedTransfer(const Function0& other)
     {
         Function0& source = const_cast<Function0&>(other);
-        void* target = (void*)source.mFreeFunction;
         mTag = source.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = source.mFreeFunction;
         source.mTag = FUNCTION_EMPTY;
         source.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const
@@ -278,15 +276,13 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void* UnidentifiedTransfer(const Function1& other)
+    void UnidentifiedTransfer(const Function1& other)
     {
         Function1& source = const_cast<Function1&>(other);
-        void* target = (void*)source.mFreeFunction;
         mTag = source.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = source.mFreeFunction;
         source.mTag = FUNCTION_EMPTY;
         source.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const
@@ -634,14 +630,12 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void* UnidentifiedTransfer(Function3& other)
+    void UnidentifiedTransfer(Function3& other)
     {
-        void* target = (void*)other.mFreeFunction;
         mTag = other.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = other.mFreeFunction;
         other.mTag = FUNCTION_EMPTY;
         other.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const

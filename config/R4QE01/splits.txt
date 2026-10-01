@@ -989,6 +989,7 @@ Game/Physics/PhysicsBall.cpp:
 	.rodata     start:0x804DCC40 end:0x804DCC50
 	.data       start:0x8050E4C8 end:0x8050E5E8
 	.sdata      start:0x806DCA60 end:0x806DCA88
+	.sbss       start:0x806E11E8 end:0x806E11F0
 	.sdata2     start:0x806E4840 end:0x806E4890
 
 Game/Physics/PhysicsBanana.cpp:
@@ -1024,7 +1025,7 @@ Game/Physics/PhysicsEventQueue.cpp:
 	.data       start:0x8050EE30 end:0x80510590
 	.bss        start:0x80570100 end:0x805701C8
 	.sdata      start:0x806DCA90 end:0x806DCA98
-	.sbss       start:0x806E11E8 end:0x806E1280
+	.sbss       start:0x806E11F0 end:0x806E1280
 	.sdata2     start:0x806E4900 end:0x806E4928
 
 Game/Physics/PhysicsFakeBall.cpp:
