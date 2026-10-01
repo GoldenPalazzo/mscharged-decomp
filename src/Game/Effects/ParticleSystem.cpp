@@ -178,9 +178,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
     radius = RandomizedValue(0.0f, radius);
 
     nlVector3 localPos;
-    localPos.x = cosVal * radius;
-    localPos.y = -sinVal * radius;
-    localPos.z = 0.0f;
+    nlVec3Set(localPos, cosVal * radius, -sinVal * radius, 0.0f);
 
     if (pSpec != 0)
     {
