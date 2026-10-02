@@ -264,7 +264,7 @@ inline void DelayParameter::ApplySettings(AXFX_DELAY* delay)
 
 void Delay::OnSoundStarted(void*)
 {
-    AXFX_DELAY* delay = &g_pAudioBackend->m_DelayEffect.m_Delay;
+    AXFX_DELAY* delay = g_pAudioBackend->GetDelay();
     if (g_pAudioBackend->m_OutputMode == 3)
     {
         m_Final.ApplySettings(delay);

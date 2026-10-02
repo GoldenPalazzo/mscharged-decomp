@@ -26,8 +26,8 @@ bool TutorialMegastrikeDesire::UnidentifiedInitialize(void*)
     {
         UnidentifiedScriptMachine* state = fn_8002E1A4(m_pTeam->GetFielder(i));
         ScriptTransitionFunc value(name);
-        state->mTransition.mFuncHash = value.mFuncHash;
-        state->mTransition.mNativeFunc = value.mNativeFunc;
+        state->mTransition.mValue.mFuncHash = value.mValue.mFuncHash;
+        state->mTransition.mValue.mNativeFunc = value.mValue.mNativeFunc;
     }
 
     return true;

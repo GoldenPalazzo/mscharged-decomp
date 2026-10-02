@@ -62,9 +62,6 @@ void fn_8027F12C(void*, unsigned long, void*);
 void fn_8027F174(glModel*);
 }
 
-NisPlayer* NisPlayer::sInstance;
-bool g_ForceDoubleBallTransition;
-
 namespace
 {
 static unsigned char useAsyncLoading = true;
@@ -452,11 +449,12 @@ void NisPlayer::Reset()
 
 NisPlayer* NisPlayer::Instance()
 {
-    if (sInstance == 0)
+    static NisPlayer* instance;
+    if (instance == 0)
     {
-        sInstance = new NisPlayer;
+        instance = new NisPlayer;
     }
-    return sInstance;
+    return instance;
 }
 
 void NisPlayer::fn_8027E5D0()
@@ -681,6 +679,8 @@ namespace
 {
 static void* byteCode;
 }
+
+bool g_ForceDoubleBallTransition;
 
 void NisPlayer::fn_8027B630(char* data, unsigned long size)
 {

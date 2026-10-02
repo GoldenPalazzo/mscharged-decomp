@@ -171,7 +171,7 @@ int lbl_806DC394 = 0;
  * Offset/Address/Size: 0x0 | 0x800C86FC | size: 0x60
  */
 DesireSuperPower::DesireSuperPower()
-    : Desire(23, TransitionFunc(g_UnsetTransitionFunc))
+    : Desire(23, UnsetTransitionFunc(g_UnsetTransitionFunc))
     , mpDKShockAvoidable(0)
     , mpTarget(0)
 {

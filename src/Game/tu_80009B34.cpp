@@ -51,11 +51,6 @@ static bool g_bLoadAnimsCached;
 
 static int sUnidentifiedEffectsLoadCount;
 
-static inline bool SameCharacterClass(eCharacterClass first, eCharacterClass second)
-{
-    return first == second;
-}
-
 static inline eCharacterClass GetAlternateCaptain(eCharacterClass captain0, eCharacterClass captain1)
 {
     eCharacterClass altcaptain = captain1;
@@ -87,7 +82,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
 {
     captain[0] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(0));
     captain[1] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(1));
-    for (short i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         sidekick[0][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, i));
         sidekick[1][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, i));
@@ -150,7 +145,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
             mEntries[n].nPlayerID = index;
             mEntries[n].cc = sidekick[plrindex][index - 1];
             mEntries[n].bGoalie = false;
-            if (SameCharacterClass(sidekick[plrindex][index - 1], captain[plrindex]))
+            if (sidekick[plrindex][index - 1] == captain[plrindex])
             {
                 mEntries[n].bCaptain = true;
                 mEntries[n].bSidekick = false;

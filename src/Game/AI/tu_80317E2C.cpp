@@ -19,7 +19,7 @@ class UnidentifiedStateMachine_803171D0 : public shdStateMachine
 public:
     UnidentifiedStateMachine_803171D0(
         int, const char*, UnidentifiedScriptMachine*,
-        const TransitionFunc&);
+        TransitionFunc);
     virtual ~UnidentifiedStateMachine_803171D0();
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void* context)
@@ -191,7 +191,7 @@ extern "C" void fn_80318D34(
         = new (nlMalloc(sizeof(UnidentifiedStateMachine_803171D0), 8, false))
             UnidentifiedStateMachine_803171D0(
                 state, name, machine,
-                UnsetTransitionFunc(g_UnsetTransitionFunc));
+                TransitionFunc(g_UnsetTransitionFunc));
     machine->UnidentifiedAddState(state, result, secondary);
 }
 
@@ -328,7 +328,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
         UnidentifiedVirtual8();
     }
 
-    if (IsTransitionFuncSet(&mTransition))
+    if (IsTransitionFuncSet(&mTransition.mValue))
     {
         float start = lbl_806DF560();
         UnidentifiedVariant_80054AB8 result;
@@ -337,7 +337,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
 
         if ((unsigned int)result.GetType() == FT_UNSPECIFIED)
         {
-            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mTransition.mFuncHash);
+            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mTransition.mValue.mFuncHash);
             UnidentifiedVirtual6();
         }
         else if (result.ExtraData.Get(9)->mData.b)

@@ -282,6 +282,21 @@ public:
     {
     }
 
+    void* Allocate()
+    {
+        void* result = 0;
+        if (m_FreeList == 0)
+        {
+            BaseAddNewBlock(this, 0x40);
+        }
+        if (m_FreeList != 0)
+        {
+            result = m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+        return result;
+    }
+
     ~TempStringSlotPool()
     {
         fn_802B467C(this);
@@ -350,15 +365,7 @@ public:
         void* result = 0;
         if (size <= 0x40)
         {
-            if (m_FreeList == 0)
-            {
-                BaseAddNewBlock(this, 0x40);
-            }
-            if (m_FreeList != 0)
-            {
-                result = m_FreeList;
-                m_FreeList = m_FreeList->next;
-            }
+            result = TempStringSlotPool::Allocate();
         }
         else if (size <= 0x8000)
         {

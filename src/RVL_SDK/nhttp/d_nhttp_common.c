@@ -88,21 +88,25 @@ NHTTPConnectionInfo* NHTTPi_ControlConnectionList(void* mutexInfo,
     return result;
 }
 
+static inline s32 NHTTPi_ConnectionListStatus(
+    const NHTTPConnectionInfo* connection,
+    const NHTTPConnectionInfo* invalidConnection)
+{
+    return connection != invalidConnection ? 0 : -1;
+}
+
 s32 NHTTPi_CommitConnectionList(void* mutexInfo_p,
     NHTTPConnectionInfo* connection_p)
 {
-    return ((NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 3)
-                != NULL)
-            ? 0
-            : -1);
+    return NHTTPi_ConnectionListStatus(
+        NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 3), NULL);
 }
 
 s32 NHTTPi_OmitConnectionList(void* mutexInfo_p,
     NHTTPConnectionInfo* connection_p)
 {
-    NHTTPConnectionInfo* result =
-        NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 4);
-    return (result != NULL) - 1;
+    return NHTTPi_ConnectionListStatus(
+        NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 4), NULL);
 }
 
 NHTTPRequestInfo* NHTTPi_Connection2Request(void* mutexInfo,

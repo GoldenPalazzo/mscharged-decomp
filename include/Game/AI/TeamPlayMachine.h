@@ -34,8 +34,7 @@ public:
     void SetTransition(const char* name)
     {
         ScriptTransitionFunc transition(name);
-        mTransition.mFuncHash = transition.mFuncHash;
-        mTransition.mNativeFunc = transition.mNativeFunc;
+        mTransition = transition.mValue;
     }
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
@@ -82,7 +81,7 @@ class UnidentifiedTeamDesire : public shdStateMachine
 {
 public:
     UnidentifiedTeamDesire(
-        int state, const TransitionFunc& transition);
+        int state, TransitionFunc& transition);
     virtual ~UnidentifiedTeamDesire()
     {
     }

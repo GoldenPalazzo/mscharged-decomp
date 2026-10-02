@@ -4325,13 +4325,18 @@ Game/World/worldanim.cpp:
 	.sdata2     start:0x806E69F0 end:0x806E6A00
 
 Game/World/worldanimobjects.cpp:
-	.text       start:0x803437C8 end:0x80344814
-	.ctors      start:0x804DBAF8 end:0x804DBAFC
-	.data       start:0x80534428 end:0x805344D8
+	.text       start:0x803437C8 end:0x803441C8
+	.data       start:0x80534428 end:0x805344B8
 	.bss        start:0x80584BC8 end:0x80584C08
 	.sdata      start:0x806DF868 end:0x806DF870
+	.sdata2     start:0x806E6A00 end:0x806E6A10
+
+Game/World/WorldEffect.cpp:
+	.text       start:0x803441C8 end:0x80344814
+	.ctors      start:0x804DBAF8 end:0x804DBAFC
+	.data       start:0x805344B8 end:0x805344D8
 	.sbss       start:0x806E2190 end:0x806E2198
-	.sdata2     start:0x806E6A00 end:0x806E6A20
+	.sdata2     start:0x806E6A10 end:0x806E6A20
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44

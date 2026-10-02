@@ -428,7 +428,7 @@ config.libs = [
             Object(Matching, "Game/CharacterTriggers.cpp", cflags=cflags_game + ["-ipa file"]),
             Object(Matching, "Game/CharacterTweaks.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/CrowdRiot.cpp"),
-            Object(NonMatching, "Game/DebugWriteCache.cpp"),
+            Object(NonMatching, "Game/DebugWriteCache.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/DetermDataEvent.cpp"),
             Object(NonMatching, "Game/DetInput.cpp"),
             Object(Matching, "Game/EventDataTypes.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
@@ -510,7 +510,7 @@ config.libs = [
             Object(Matching, "Game/TweakEntry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/TweakFileLoader.cpp"),
             Object(Matching, "Game/TweakNameRecycler.cpp"),
-            Object(NonMatching, "Game/TweakNode.cpp", cflags=[*cflags_game_common, "-inline level=4"]),
+            Object(NonMatching, "Game/TweakNode.cpp", cflags=cflags_game, extra_cflags=["-inline nobottomup", "-ipa file"]),
             Object(Matching, "Game/TweakRegistry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/TweaksBase.cpp"),
             Object(Matching, "Game/TweakValue.cpp"),
@@ -549,7 +549,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/HeadTrack.cpp"),
             Object(Matching, "Game/AI/Powerups.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/AI/SkillTweaks.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/AI/SkillTweaks.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/AI/SpaceSearch.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/AI/TeamDesire.cpp"),
             Object(Matching, "Game/AI/TeamPlayMachine.cpp"),
@@ -980,7 +980,8 @@ config.libs = [
 
             # Game/World
             Object(NonMatching, "Game/World/worldanim.cpp", extra_cflags=["-inline auto,depth=3", "-ipa file"]),
-            Object(NonMatching, "Game/World/worldanimobjects.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
+            Object(Matching, "Game/World/worldanimobjects.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
+            Object(Matching, "Game/World/WorldEffect.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
 
             # NL
             Object(Matching, "NL/blowfish.cpp"),

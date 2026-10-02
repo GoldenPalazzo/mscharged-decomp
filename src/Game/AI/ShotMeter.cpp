@@ -34,7 +34,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
     {
         if ((lbl_806E0DD0
                 || GameInfoManager::Instance()->IsRule0x8Equal3())
-            && fn_80039148(pFielder))
+            && pFielder->CanDoSidekickShootToScore())
         {
             m_eShotMeterState = SHOT_METER_STS_RELEASED;
         }
@@ -53,7 +53,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
     {
         m_fSpeedValue = 1.0f;
     }
-    if (fn_80039148(pFielder))
+    if (pFielder->CanDoSidekickShootToScore())
     {
         m_fSTSValue = fn_800156A8(g_pBall);
     }
@@ -293,7 +293,7 @@ void ShotMeter::Update(float fDeltaT)
                 {
                     m_eShotMeterState = SHOT_METER_STS_TRANSISTION;
                 }
-                else if (fn_80039148(g_pBall->GetOwnerFielder()))
+                else if (g_pBall->GetOwnerFielder()->CanDoSidekickShootToScore())
                 {
                     m_eShotMeterState = SHOT_METER_STS_RELEASED;
                     fn_80060A00(g_pGame,

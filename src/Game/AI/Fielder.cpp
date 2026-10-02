@@ -432,6 +432,33 @@ bool cFielder::CanGetElectrocuted(
     return false;
 }
 
+static inline bool CanShootFromPosition(cFielder* pFielder, bool requireBall)
+{
+    float radius = lbl_806E3420;
+    pFielder->m_pPhysicsCharacter->GetRadius(&radius);
+
+    float offset = lbl_806E342C + radius;
+    float maxX = offset + pFielder->GetPosition().x;
+    float minX = pFielder->GetPosition().x - offset;
+    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+    bool inAttackingHalf = true;
+    if (!maxXInHalf)
+    {
+        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+        if (!minXInHalf)
+        {
+            inAttackingHalf = false;
+        }
+    }
+
+    bool canShoot = !requireBall && inAttackingHalf;
+    if (pFielder->HasBall())
+    {
+        canShoot = inAttackingHalf;
+    }
+    return canShoot;
+}
+
 bool cFielder::CanDoCaptainShootToScore()
 {
     if (GameInfoManager::Instance()->IsRule0x8Equal4())
@@ -441,52 +468,29 @@ bool cFielder::CanDoCaptainShootToScore()
 
     if (g_pBall->GetOwnerFielder() != 0)
     {
-        bool bUnidentified0 = false;
+        bool homeMegastrikeEnabled = false;
         if (GameInfoManager::Instance()
                 ->GetCurrentSettings()
                 ->mHomeMegastrikeEnabled
-            && m_pTeam->m_nSide == 0)
+            && m_pTeam->m_nSide == HOME)
         {
-            bUnidentified0 = true;
+            homeMegastrikeEnabled = true;
         }
 
-        bool bUnidentified1 = false;
-        if (bUnidentified0
+        bool megastrikeEnabled = false;
+        if (homeMegastrikeEnabled
             || (GameInfoManager::Instance()
                     ->GetCurrentSettings()
                     ->mAwayMegastrikeEnabled
-                && m_pTeam->m_nSide == 1))
+                && m_pTeam->m_nSide == AWAY))
         {
-            bUnidentified1 = true;
+            megastrikeEnabled = true;
         }
 
-        bool bUnidentified2 = IsCaptain();
-        if (bUnidentified1 && bUnidentified2)
+        bool isCaptain = IsCaptain();
+        if (megastrikeEnabled && isCaptain)
         {
-            float fRadius = lbl_806E3420;
-            m_pPhysicsCharacter->GetRadius(&fRadius);
-
-            float fOffset = lbl_806E342C + fRadius;
-            float fMinX;
-            float fMaxX = fOffset + mUnidentified024.m_v3Position.x;
-            fMinX = mUnidentified024.m_v3Position.x - fOffset;
-            bool bUnidentified3
-                = fMaxX * m_pTeam->GetOtherNet()->m_fDirection
-                >= lbl_806E3420;
-            bool bUnidentified4 = true;
-            if (!bUnidentified3)
-            {
-                bool bUnidentified5
-                    = fMinX
-                        * m_pTeam->GetOtherNet()->m_fDirection
-                    >= lbl_806E3420;
-                if (!bUnidentified5)
-                {
-                    bUnidentified4 = false;
-                }
-            }
-
-            if (bUnidentified4)
+            if (CanShootFromPosition(this, false))
             {
                 return true;
             }
@@ -494,6 +498,36 @@ bool cFielder::CanDoCaptainShootToScore()
     }
 
     return false;
+}
+
+bool cFielder::CanDoSidekickShootToScore()
+{
+    bool canShoot = CanShootFromPosition(this, true);
+    if (!canShoot || IsCaptain() || bIsModified)
+    {
+        return false;
+    }
+
+    if (GameInfoManager::Instance()->IsRule0x8Equal4())
+    {
+        return false;
+    }
+
+    bool homeEnabled = false;
+    if (GameInfoManager::Instance()->GetCurrentSettings()->m_unk18
+        && m_pTeam->m_nSide == HOME)
+    {
+        homeEnabled = true;
+    }
+
+    bool enabled = false;
+    if (homeEnabled
+        || (GameInfoManager::Instance()->GetCurrentSettings()->m_unk19
+            && m_pTeam->m_nSide == AWAY))
+    {
+        enabled = true;
+    }
+    return enabled;
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(

@@ -23,7 +23,7 @@ extern "C" Desire* fn_8002E08C(cFielder*, int);
 class shdStateMachine
 {
 public:
-    shdStateMachine(int, const TransitionFunc&);
+    shdStateMachine(int, TransitionFunc&);
     virtual ~shdStateMachine();
 
     virtual bool UnidentifiedInitialize(void*) = 0;
@@ -73,7 +73,7 @@ extern "C" void fn_80317010(shdStateMachine* machine, UnidentifiedVariant_80054A
 class Desire : public shdStateMachine
 {
 public:
-    Desire(int, const TransitionFunc&);
+    Desire(int, TransitionFunc&);
     virtual ~Desire()
     {
     }

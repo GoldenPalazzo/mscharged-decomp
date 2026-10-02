@@ -56,7 +56,7 @@ static inline bool IsNearlyZero(float value, float zero)
 }
 
 DesireSteering::DesireSteering()
-    : Desire(34, TransitionFunc(g_UnsetTransitionFunc)),
+    : Desire(34, UnsetTransitionFunc(g_UnsetTransitionFunc)),
       m_AvoidanceHistory(lbl_806DC230)
 {
     m_pAvoidance = NULL;

@@ -7,10 +7,10 @@ static const float cornerRadius = 3.0f;
 
 nlVector3 cField::mv3FieldPosition = { 20.6f, 12.5f, 0.0f };
 sSideLinePlane cField::mSidelines[4] = {
-    { { 1.0f, 0.0f }, cField::mv3FieldPosition.x },
-    { { -1.0f, 0.0f }, cField::mv3FieldPosition.x },
-    { { 0.0f, 1.0f }, cField::mv3FieldPosition.y },
-    { { 0.0f, -1.0f }, cField::mv3FieldPosition.y }
+    { { 1.0f, 0.0f }, cField::GetGoalLineX(1u) },
+    { { -1.0f, 0.0f }, cField::GetGoalLineX(1u) },
+    { { 0.0f, 1.0f }, cField::GetSidelineY(1u) },
+    { { 0.0f, -1.0f }, cField::GetSidelineY(1u) }
 };
 sCornerSegment cField::mCorners[4] = {
     { { cField::mv3FieldPosition.x - cornerRadius, cField::mv3FieldPosition.y - cornerRadius }, 0x0000, 0x4000, cornerRadius },

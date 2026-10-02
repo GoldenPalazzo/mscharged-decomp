@@ -55,6 +55,12 @@ struct UnidentifiedConnection
         unsigned int mFlags;
         struct
         {
+            unsigned int : 2;
+            unsigned int mPendingRemoval : 1;
+            unsigned int : 29;
+        };
+        struct
+        {
             unsigned short mUnidentified08;
             unsigned short mGroupCount : 16;
         };
@@ -267,7 +273,7 @@ void UnidentifiedEvent<T>::Remove(Listener* listener)
     UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
     {
-        listener->mFlags |= 0x20000000;
+        listener->mPendingRemoval = 1;
         return;
     }
 

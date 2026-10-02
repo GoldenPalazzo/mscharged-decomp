@@ -34,7 +34,7 @@ class UnidentifiedStateMachine_803171D0 : public shdStateMachine
 public:
     UnidentifiedStateMachine_803171D0(
         int state, const char* name, UnidentifiedScriptMachine* context,
-        const TransitionFunc& transition);
+        TransitionFunc transition);
     virtual ~UnidentifiedStateMachine_803171D0();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -48,14 +48,12 @@ public:
 };
 
 shdStateMachine::shdStateMachine(
-    int state, const TransitionFunc& transition)
+    int state, TransitionFunc& transition)
     : mUnidentifiedTimer(lbl_806E6880)
     , mUnidentified01C()
 {
     mUnidentifiedState = state;
-    mDefaultTransition.mFuncHash = transition.mFuncHash;
-    mDefaultTransition.mNativeFunc
-        = transition.mNativeFunc;
+    mDefaultTransition = transition;
     mUnidentified018 = 0;
     mUnidentified080 = lbl_806E6880;
     mUnidentified084 = lbl_806E6884;
@@ -146,23 +144,23 @@ extern "C" bool fn_80316A84(
         switch (value->GetType())
         {
         case FT_U32:
-            machine->mOverrideTransition.mFuncHash = value->mData.u;
-            machine->mOverrideTransition.mNativeFunc = 0;
+            machine->mOverrideTransition.mValue.mFuncHash = value->mData.u;
+            machine->mOverrideTransition.mValue.mNativeFunc = 0;
             break;
         case FT_INT:
-            machine->mOverrideTransition.mFuncHash = value->mData.i;
-            machine->mOverrideTransition.mNativeFunc = 0;
+            machine->mOverrideTransition.mValue.mFuncHash = value->mData.i;
+            machine->mOverrideTransition.mValue.mNativeFunc = 0;
             break;
         case FT_POINTER:
         {
             void* function = value->mData.pointer;
-            machine->mOverrideTransition.mFuncHash = -1;
-            machine->mOverrideTransition.mNativeFunc = function;
+            machine->mOverrideTransition.mValue.mFuncHash = -1;
+            machine->mOverrideTransition.mValue.mNativeFunc = function;
             break;
         }
         case FT_STRING:
-            machine->mOverrideTransition.mFuncHash = nlStringHash(value->mData.string);
-            machine->mOverrideTransition.mNativeFunc = 0;
+            machine->mOverrideTransition.mValue.mFuncHash = nlStringHash(value->mData.string);
+            machine->mOverrideTransition.mValue.mNativeFunc = 0;
             break;
         }
     }
@@ -206,9 +204,9 @@ extern "C" void fn_80317010(
     machine->mUnidentified014 = lbl_806DF564();
 
     float start = lbl_806DF560();
-    if (IsTransitionFuncSet(&machine->mOverrideTransition))
+    if (IsTransitionFuncSet(&machine->mOverrideTransition.mValue))
     {
-        if (HasTransitionFunc(&machine->mOverrideTransition))
+        if (HasTransitionFunc(&machine->mOverrideTransition.mValue))
         {
             machine->mOverrideTransition.Execute(
                 fn_80317E2C(machine->mUnidentified018),
@@ -216,8 +214,8 @@ extern "C" void fn_80317010(
                 (UnidentifiedFuzzyRuntimeValue*)machine);
         }
     }
-    else if (IsTransitionFuncSet(&machine->mDefaultTransition)
-             && HasTransitionFunc(&machine->mDefaultTransition))
+    else if (IsTransitionFuncSet(&machine->mDefaultTransition.mValue)
+             && HasTransitionFunc(&machine->mDefaultTransition.mValue))
     {
         machine->mDefaultTransition.Execute(
             fn_80317E2C(machine->mUnidentified018),
@@ -243,7 +241,7 @@ extern "C" void fn_80317010(
 
 UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     int state, const char* name, UnidentifiedScriptMachine* context,
-    const TransitionFunc& transition)
+    TransitionFunc transition)
     : shdStateMachine(state, transition)
 {
     UnidentifiedSetContext(context);

@@ -152,12 +152,6 @@ static TweakFloatBinding lbl_8056DAE8("sfSpeedAdjustChargeLevelMax",
     "Game/Gameplay/Charging/Pass", &lbl_806DC1F0, true);
 
 
-static inline float GetNormalizedContactTime(
-    const cSAnim* anim, float contactFrame)
-{
-    return contactFrame / (float)anim->m_nNumKeys;
-}
-
 static inline float DoCalculatePassSpeed(const nlVector2& distance,
     float passSpeedMin, float passSpeedMax,
     float passDistMin, float passDistMax)

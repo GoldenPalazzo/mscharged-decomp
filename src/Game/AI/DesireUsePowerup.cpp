@@ -353,16 +353,16 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             UnidentifiedVariantCollection params;
             TransitionFunc* pTransition
                 = !pDesire->mOverrideTransition.IsUnset()
-                ? &pDesire->mOverrideTransition
-                : &pDesire->mDefaultTransition;
+                ? &pDesire->mOverrideTransition.mValue
+                : &pDesire->mDefaultTransition.mValue;
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
             fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
             NativeTransitionFunc transition((void*)fn_800D2074);
-            pDesire->mOverrideTransition.mFuncHash
-                = transition.mFuncHash;
-            pDesire->mOverrideTransition.mNativeFunc
-                = transition.mNativeFunc;
+            pDesire->mOverrideTransition.mValue.mFuncHash
+                = transition.mValue.mFuncHash;
+            pDesire->mOverrideTransition.mValue.mNativeFunc
+                = transition.mValue.mNativeFunc;
             pDesire->UnidentifiedResetPowerupState();
         }
         break;

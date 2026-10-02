@@ -30,6 +30,7 @@
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
 #include "Game/Audio/GameStreams.h"
+#include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/DB/GameProgress.h"
@@ -138,7 +139,6 @@ extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
-extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
@@ -770,7 +770,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
                 StopSound(soundID, g_pGame);
                 PlaySound(10, soundID, lbl_804FB284, g_pGame);
 
-                unsigned long hash = nlStringLowerHash(lbl_804FB294);
+                u32 hash = nlStringLowerHash(lbl_804FB294);
                 fn_802F4E84(&hash, 0, 0);
             }
 
