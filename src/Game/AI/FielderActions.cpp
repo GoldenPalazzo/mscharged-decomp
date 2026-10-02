@@ -1255,7 +1255,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
-        fn_801B8FF4(this);
+        EmitShyGuyDeke(this);
     }
 
     s16 sFacingDelta;
