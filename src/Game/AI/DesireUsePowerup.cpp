@@ -34,13 +34,13 @@ static bool lbl_806DC3A4 = true;
 /**
  * Offset/Address/Size: 0x0 | 0x800D2074 | size: 0xF48
  */
-extern "C" DesireUpdate fn_800D2074(
+DesireUpdate TransDesireUsePowerup(
     AIContext* input)
 {
     DesireUpdate result(FT_INT, lbl_806DC39C);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
     unsigned long key = input->GetTimerKey(
-        (unsigned long)fn_800D2074, 1);
+        (unsigned long)TransDesireUsePowerup, 1);
 
     if (UserControlledT(fn_800D6670(pFielder))
         || (1.0f - fn_800D85F8(pFielder)))
@@ -358,7 +358,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
             fn_80319E84(pDesire->mScriptMachine, 23, &params, false);
-            NativeTransitionFunc transition((void*)fn_800D2074);
+            NativeTransitionFunc transition((void*)TransDesireUsePowerup);
             pDesire->mOverrideTransition.mValue.mFuncHash
                 = transition.mValue.mFuncHash;
             pDesire->mOverrideTransition.mValue.mNativeFunc
