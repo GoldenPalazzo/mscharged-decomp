@@ -19,7 +19,6 @@
 
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
-extern "C" void fn_8005FA2C(cGame*);
 bool gMegaStrikeUsePassButton;
 bool gMegaStrikeInvincible;
 
