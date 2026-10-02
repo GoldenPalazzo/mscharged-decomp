@@ -68,11 +68,11 @@ struct UnidentifiedGameState
 };
 
 template <typename P1, typename P2>
-class UnidentifiedTypedEvent2 : public UnidentifiedEventBase
+class UnidentifiedTypedEvent2 : public EventBase
 {
 public:
     UnidentifiedTypedEvent2(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
+        : EventBase(name, length)
     {
     }
 
@@ -82,13 +82,13 @@ public:
 };
 
 template <typename P1, typename P2>
-struct UnidentifiedListener2 : public UnidentifiedConnection
+struct UnidentifiedListener2 : public EventConnection
 {
     Function<void(P1, P2)> callback;
 };
 
 template <typename P1, typename P2>
-class UnidentifiedEvent2View : public UnidentifiedEventBase
+class UnidentifiedEvent2View : public EventBase
 {
     typedef UnidentifiedListener2<P1, P2> Listener;
     typedef DLListEntry<Listener> ListenerEntry;

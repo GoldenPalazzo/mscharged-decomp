@@ -70,6 +70,36 @@ void DebugWriteCache::Reset()
     }
 }
 
+static inline void WriteDebugFloatData(DebugWriteCache* cache,
+    u16 recordType, const float* value)
+{
+    DebugWriteBuffer* buffer
+        = GetCurrentDebugBuffer(cache);
+    DebugWriteRecordHeader header;
+    header.mType = recordType;
+    header.mMarker = 0xDADA;
+    header.mSize = sizeof(*value);
+    header.mPaddedSize = header.mSize;
+    if (header.mPaddedSize % 4 != 0)
+    {
+        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
+    }
+
+    if (buffer->mCurrent + sizeof(header) + sizeof(*value)
+        < buffer->mData + buffer->mSize)
+    {
+        memcpy(buffer->mCurrent, &header, sizeof(header));
+        buffer->mCurrent += sizeof(header);
+        memcpy(buffer->mCurrent, value, sizeof(*value));
+        buffer->mCurrent += sizeof(*value);
+
+        for (int i = header.mSize; i < header.mPaddedSize; ++i)
+        {
+            *buffer->mCurrent++ = 0;
+        }
+    }
+}
+
 void DebugWriteCache::WriteFloat(u16* type,
     const char* name, RunningChecksum* checksum, float value)
 {
@@ -94,32 +124,7 @@ void DebugWriteCache::WriteFloat(u16* type,
 
     checksum->ChecksumData(&value, sizeof(value));
 
-    u16 recordType = *type;
-    DebugWriteBuffer* buffer
-        = GetCurrentDebugBuffer(this);
-    DebugWriteRecordHeader header;
-    header.mType = recordType;
-    header.mMarker = 0xDADA;
-    header.mSize = sizeof(value);
-    header.mPaddedSize = header.mSize;
-    if (header.mPaddedSize % 4 != 0)
-    {
-        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
-    }
-
-    if (buffer->mCurrent + sizeof(header) + sizeof(value)
-        < buffer->mData + buffer->mSize)
-    {
-        memcpy(buffer->mCurrent, &header, sizeof(header));
-        buffer->mCurrent += sizeof(header);
-        memcpy(buffer->mCurrent, &value, sizeof(value));
-        buffer->mCurrent += sizeof(value);
-
-        for (int i = header.mSize; i < header.mPaddedSize; ++i)
-        {
-            *buffer->mCurrent++ = 0;
-        }
-    }
+    WriteDebugFloatData(this, *type, &value);
 }
 
 inline void DebugWriteType::InitializeComposite(u16 type, const char* name)

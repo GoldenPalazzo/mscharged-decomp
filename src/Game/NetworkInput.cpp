@@ -332,7 +332,7 @@ void NetMessageInput::SetNetworkInputMessageCongested(bool congested)
         mUnidentified008 &= ~8;
 }
 
-void NetMessageInput::AddNetworkInputMessageEvent(const DetermDataEvent* event)
+void NetMessageInput::AddNetworkInputMessageEvent(DetermDataEvent* event)
 {
     if (mUnidentified05C < 4)
     {

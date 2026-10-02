@@ -9,9 +9,8 @@ typedef struct NHTTPSysInfo
     u8 threadInfo[0x460];
 } NHTTPSysInfo;
 
-static NHTTPConnectionInfo* sConnectionList;
+static NHTTPConnectionInfo* sConnectionList = NULL;
 static NHTTPSysInfo sysInfo;
-static NHTTPSysInfo* sysInfo_p = NULL;
 
 void NHTTPi_lockReqList(void* mutexInfo);
 void NHTTPi_unlockReqList(void* mutexInfo);
@@ -307,6 +306,8 @@ static void NHTTPi_InitSystemInfo(NHTTPSysInfo* sysInfo_p)
 
 NHTTPSysInfo* NHTTPi_GetSystemInfoP(void)
 {
+    static NHTTPSysInfo* sysInfo_p = NULL;
+
     if (sysInfo_p == NULL)
     {
         sysInfo_p = &sysInfo;

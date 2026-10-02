@@ -3,7 +3,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-UnidentifiedTeamDesire::UnidentifiedTeamDesire(
+TeamDesire::TeamDesire(
     int state, TransitionFunc& transition)
     : shdStateMachine(state, transition)
 {
@@ -11,7 +11,7 @@ UnidentifiedTeamDesire::UnidentifiedTeamDesire(
     mUnidentified084 = 1.0f;
 }
 
-void UnidentifiedTeamDesire::UnidentifiedSetContext(
+void TeamDesire::UnidentifiedSetContext(
     UnidentifiedScriptMachine* context)
 {
     shdStateMachine::UnidentifiedSetContext(context);
@@ -25,15 +25,15 @@ void UnidentifiedTeamDesire::UnidentifiedSetContext(
     }
 }
 
-bool UnidentifiedTeamDesire::UnidentifiedReinitialize(void*)
+bool TeamDesire::UnidentifiedReinitialize(void*)
 {
     return true;
 }
 
-void UnidentifiedTeamDesire::UnidentifiedCleanup()
+void TeamDesire::UnidentifiedCleanup()
 {
 }
 
-void UnidentifiedTeamDesire::Update(DesireUpdate*, float)
+void TeamDesire::Update(DesireUpdate*, float)
 {
 }

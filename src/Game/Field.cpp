@@ -107,10 +107,16 @@ bool cField::IsOnField(const nlVector2& location)
 
 static float FixComponent(const float& component, float fMin, float fMax)
 {
-    float value = component;
-    value = (value >= fMin) ? value : fMin;
-    value = (value <= fMax) ? value : fMax;
-    return value;
+    float value;
+    if (component >= fMin)
+    {
+        value = component;
+    }
+    else
+    {
+        value = fMin;
+    }
+    return nlMinEquals(value, fMax);
 }
 
 static bool FixOutOfBoundsY(nlVector3& v, float fMinDistanceFromWall)
@@ -144,13 +150,14 @@ bool cField::FixOutOfBoundsPosition(nlVector3& v, float fMinDistanceFromWall, bo
     }
     else
     {
-        bool bFixedX = true;
-        if (!FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall))
+        bool bFixedX = FixOutOfBoundsX(v, bExcludeNet, fMinDistanceFromWall);
+        bFixed = true;
+        if (!bFixedX)
         {
-            bFixedX = false;
+            bFixed = false;
         }
         bool bFixedY = FixOutOfBoundsY(v, fMinDistanceFromWall);
-        bFixed = bFixedY || bFixedX;
+        bFixed = bFixedY || bFixed;
     }
 
     return bFixed;

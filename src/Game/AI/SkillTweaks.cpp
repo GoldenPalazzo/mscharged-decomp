@@ -463,10 +463,7 @@ void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
 {
     SkillTweak* tweak;
     unsigned long hash = (*value)->mHash;
-    SkillTweak** foundValue;
-    bool found = mTweaks->mSkillTweaksList.FindGet(hash, &foundValue);
-    if (found)
-        tweak = *foundValue;
+    bool found = mTweaks->mSkillTweaksList.FindGet(hash, tweak);
     if (found)
     {
         *tweak = **value;
@@ -480,11 +477,7 @@ void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
 
 static inline bool FindDefaultSkillTweak(const unsigned long& hash, SkillTweak** tweak)
 {
-    SkillTweak** found;
-    if (!sDefaultSkillTweaks.FindGet(hash, &found))
-        return false;
-    *tweak = *found;
-    return true;
+    return sDefaultSkillTweaks.FindGet(hash, *tweak);
 }
 
 SkillTweak* SkillTweaks::AddTweak(const char* name)
@@ -552,12 +545,7 @@ bool SkillTweaks::GetSkillValue(
 
     bool found = false;
     SkillTweak* pSkillTweak;
-    SkillTweak** ppSkillTweak;
-    bool tweakFound = mSkillTweaksList.FindGet(param1, &ppSkillTweak);
-    if (tweakFound)
-    {
-        pSkillTweak = *ppSkillTweak;
-    }
+    bool tweakFound = mSkillTweaksList.FindGet(param1, pSkillTweak);
     if (tweakFound)
     {
         *param2 = pSkillTweak->GetValue();

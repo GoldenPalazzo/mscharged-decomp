@@ -122,6 +122,7 @@ public:
     }
     WorldAnimController* GetOrCreateController(unsigned long uHashID);
     WorldAnimController* FindController(unsigned long uHashID);
+    AnimationSet* GetOrCreateAnimationSet(unsigned long uHierarchyHash);
     AnimationSet* LoadHierarchy(nlChunk* pChunk);
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
     void BindObjects();
@@ -137,7 +138,7 @@ public:
 };
 
 PhysicsObject* CreatePhysicsPrimitive(
-    WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
+    const WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
 void ReleaseWorldPhysicsObject(WorldPhysicsDrawable* pOwner);
 
 typedef char AnimationSet_size_check[sizeof(AnimationSet) == 0x20 ? 1 : -1];

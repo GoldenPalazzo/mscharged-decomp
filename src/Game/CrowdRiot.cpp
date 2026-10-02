@@ -387,7 +387,7 @@ void fn_80029B9C(void* param)
             }
             else
             {
-                static_cast<Goalie*>(player)->fn_8007EB90();
+                static_cast<Goalie*>(player)->FumbleBall();
             }
         }
         else

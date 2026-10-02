@@ -142,14 +142,6 @@ extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
-extern int gNextAvoidableObjectId;
-
-struct Unidentified0C74
-{
-    virtual ~Unidentified0C74();
-};
-
-extern Unidentified0C74* lbl_806E0C74;
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
@@ -226,9 +218,9 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     }
     if (lbl_806E12C8 == 0)
     {
-        PhysicsPatchManager_801740D0* memory
-            = new (nlMalloc(sizeof(PhysicsPatchManager_801740D0), 8, false))
-                PhysicsPatchManager_801740D0();
+        PhysicsPatchManager* memory
+            = new (nlMalloc(sizeof(PhysicsPatchManager), 8, false))
+                PhysicsPatchManager();
         lbl_806E12C8 = memory;
     }
     if (UnidentifiedCameraEffects::Instance() == 0)
@@ -1705,7 +1697,7 @@ extern "C" void fn_80072194(PlayerAttackData* node)
     g_PlayerAttackDataPool.Free(node);
 }
 
-extern "C" void fn_800721AC(CollisionPlayerWallData* node)
+void FreeCollisionPlayerWallData(CollisionPlayerWallData* node)
 {
     g_CollisionPlayerWallDataPool.Free(node);
 }

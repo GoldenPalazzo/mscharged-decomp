@@ -42,4 +42,6 @@ struct AIPadManager
 
 cAIPad* GetAIPad(int index);
 
+extern "C" void StartupAIPads();
+
 #endif // GAME_AI_AIPAD_H

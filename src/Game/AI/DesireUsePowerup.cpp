@@ -405,7 +405,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             event->Type = params.eType;
             event->Thrower = pDesire->m_pFielder;
             event->Target = pDesire->mpTarget;
-            fn_80148074(event);
+            QueuePowerupUsed(event);
         }
         pDesire->UnidentifiedResetPowerupState();
         break;

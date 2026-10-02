@@ -72,7 +72,7 @@ void FielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(1, cutAndBreak, false);
 
     DesireDefendPos* defendPos
-        = new (8, false) DesireDefendPos(2, (void*)fn_800B7B1C);
+        = new (8, false) DesireDefendPos(2, (void*)TransDesireDefendPos);
     UnidentifiedAddState(2, defendPos, false);
 
     DesireDeke* deke
@@ -309,7 +309,7 @@ void FielderDesireMachine::UnidentifiedVirtual7()
                 params.Set(13, FuzzyVariant(lbl_806DC3B4));
                 params.Set(2, FuzzyVariant(lbl_806DC3B8[0]));
 
-                nlVector3 position = lbl_804DC388;
+                nlVector3 position = gFielderDesireZeroVector;
                 position.x = GetFielder()->mUnidentified024.m_v3Position.x;
                 position.x -= 10.0f * AIsgn(position.x);
                 params.Set(14, FuzzyVariant(FT_VECTOR, position));

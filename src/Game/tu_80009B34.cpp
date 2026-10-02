@@ -402,6 +402,11 @@ static void fn_8000A668(void* data, unsigned long size, void* param)
     CharacterLoader_8056B290::sUnidentifiedInstance.mExtraTextureSize = size;
 }
 
+static inline void GetCharacterTexturePath(char* path, eCharacterClass cc, unsigned long capacity)
+{
+    nlStrNCpy(path, GetCharacterTemplateInfo(cc)->szTextureFilename, capacity);
+}
+
 bool CharacterLoader_8056B290::fn_8000A67C()
 {
     char szPath[128];
@@ -414,7 +419,7 @@ bool CharacterLoader_8056B290::fn_8000A67C()
         return false;
     }
 
-    nlStrNCpy(szPath, GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, sizeof(szPath));
+    GetCharacterTexturePath(szPath, pEntry->cc, sizeof(szPath));
     char* pEnd = &szPath[nlStrLen(szPath) - 1];
     while (*pEnd != '/')
     {

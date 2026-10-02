@@ -103,7 +103,6 @@ public:
     static SlotPool<Delay> s_Pool;
 };
 
-static const int sDelayEffectId = 0;
 static const int sDelaySendEffectId = 0;
 
 SlotPool<DelayParameter> DelayParameter::s_Pool(16, 16);
@@ -130,9 +129,9 @@ Delay::Delay()
 {
     AXAuxCallback callback;
     void* context = 0;
-    void* delayEffect = &g_pAudioBackend->m_DelayEffect;
     AudioBackend* platform = g_pAudioBackend;
-    switch (g_pAuxEffectMap->GetAuxiliary(sDelayEffectId))
+    AXFX_DELAY* delayEffect = platform->GetDelay();
+    switch (g_pAuxEffectMap->GetAuxiliary(0))
     {
     case 0:
         AXGetAuxACallback(&callback, &context);

@@ -255,6 +255,7 @@ class DesireRunInDirection : public Desire
 public:
     float GetMaxDistance() const { return m_fMaxDistance; }
     float GetDistanceTravelled() const { return m_fDistTravelled; }
+    cFielder* GetTarget() const { return m_pTarget; }
     DesireRunInDirection(int state, void* function)
         : Desire(state, NativeTransitionFunc(function))
     {
@@ -339,7 +340,7 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
-extern "C" DesireUpdate fn_800B7B1C(AIContext* input);
+DesireUpdate TransDesireDefendPos(AIContext* input);
 
 class DesireDefendPos : public Desire
 {
@@ -549,9 +550,9 @@ inline void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
 }
 
-extern "C" int fn_800D1D34(const shdStateMachine*);
-extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
-extern "C" float fn_800D1D44(const DesireRunInDirection*);
-extern "C" float fn_800D1D4C(const DesireRunInDirection*);
+int GetStateMachineState(const shdStateMachine*);
+UnidentifiedVariantCollection* GetStateMachineParameters(shdStateMachine*);
+float GetRunInDirectionMaxDistance(const DesireRunInDirection*);
+float GetRunInDirectionDistanceTravelled(const DesireRunInDirection*);
 
 #endif // GAME_AI_DESIRE_H
