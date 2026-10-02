@@ -204,6 +204,7 @@ void DesireSteering::Update(
 
 extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
 {
+    bool bHasGlobalPad;
     float fRepulsionMult = desire->m_fAvoidanceMult;
     int nThingsToAvoid = desire->m_ThingsToAvoid;
 
@@ -213,8 +214,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     }
     else
     {
-        bool bHasGlobalPad
-            = desire->m_pFielder->GetGlobalPad() != NULL;
+        bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
         if (bHasGlobalPad)
         {
             if ((fn_8003E8A0(desire->m_pFielder)
@@ -249,8 +249,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         }
     }
 
-    bool bHasGlobalPad
-        = desire->m_pFielder->GetGlobalPad() != NULL;
+    bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
     if (!bHasGlobalPad && desire->m_pFielder->fn_8003EA6C())
     {
         nThingsToAvoid &= ~(AVOID_FIELDERS | AVOID_POWERUPS);
@@ -259,7 +258,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     if (nThingsToAvoid & AVOID_SIDELINES)
     {
         float fInterceptScore = fn_800DED80(desire->m_pFielder);
-        bool bHasBall = desire->m_pFielder->m_pBall != NULL;
+        bool bHasBall = desire->m_pFielder->HasBall();
         float fCloseToTheirNet
             = CloseToTheirNet(desire->m_pFielder);
         float fCloseToMyNet
@@ -268,8 +267,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
             = (float)fabs(desire->m_pFielder
                               ->mUnidentified024.m_v3Position.y)
             <= 0.5f * cNet::GetNetWidth() + cNet::GetPostRadius();
-        bool bHasGlobalPad
-            = desire->m_pFielder->GetGlobalPad() != NULL;
+        bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
 
         if (bHasGlobalPad)
         {
