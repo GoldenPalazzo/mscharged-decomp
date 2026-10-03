@@ -2,7 +2,7 @@
 #define GAME_CAMERA_ANIMCAM_H
 
 #include "Game/Camera/BaseCam.h"
-#include "Game/SAnim.h"
+#include "NL/nlChunk.h"
 
 class cCameraData
 {
