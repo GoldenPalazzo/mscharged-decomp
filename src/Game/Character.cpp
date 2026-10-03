@@ -138,7 +138,7 @@ nlVector3 g_v3PrevJointPosition = { 0.0f, 0.0f, 0.0f };
 extern "C" void fn_8001FE80();
 extern "C" void fn_80020B8C(cFielder* pFielder);
 extern "C" void fn_80020BB0(PlayerAttackData* pEventData);
-extern "C" void fn_80020C70(UnidentifiedEventData_80066A04* pEventData);
+extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData);
 extern "C" void fn_80020CDC(GoalScoredData* pEventData);
 extern "C" void fn_80020E04(MegaStrikeEndData* pEventData);
 extern "C" void fn_80020E1C(UnidentifiedEventData_80066008*);
@@ -1802,7 +1802,7 @@ extern "C" void fn_8001FE80()
     UnidentifiedFindEvent<CollisionBulletBillData>("CollisionBulletBillFreeze", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FB8), 0, -1);
     UnidentifiedFindEvent<CollisionBulletBillData>("ExplosionBulletBill", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
     UnidentifiedFindEvent<CollisionBulletBillData>("BulletBillExplode", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_80066A04>("PowerupStats", -1)->Add(Function<UnidentifiedEventData_80066A04*>(fn_80020C70), 0, -1);
+    UnidentifiedFindEvent<CollisionPowerupStatsData>("PowerupStats", -1)->Add(Function<CollisionPowerupStatsData*>(fn_80020C70), 0, -1);
     UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(fn_80020BB0), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventData26>("CollisionHammerPlayer", -1)->Add(Function<UnidentifiedEventData26*>(fn_80022B1C), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventData24>("CollisionPatchPlayer", -1)->Add(Function<UnidentifiedEventData24*>(fn_80022B04), 0, -1);
@@ -1837,12 +1837,12 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
     }
 }
 
-extern "C" void fn_80020C70(UnidentifiedEventData_80066A04* pEventData)
+extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData)
 {
     if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
-        && pEventData->mUnidentified08 != NULL)
+        && pEventData->pThrower != NULL)
     {
-        PlayCrowdReaction(pEventData->mUnidentified08->m_pTeam->m_nSide == HOME
+        PlayCrowdReaction(pEventData->pThrower->m_pTeam->m_nSide == HOME
                 ? 0x5087D7C9UL : 0xA7E73452UL);
     }
 }
@@ -2067,19 +2067,19 @@ extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData)
         {
             CollisionPowerupStatsData* pStatsData = NULL;
             g_CollisionPowerupStatsDataPool.Allocate(pStatsData);
-            pStatsData->mUnidentified08 = pEventData->pThrower;
-            pStatsData->mUnidentified0C = pEventData->nThrowerPadID;
+            pStatsData->pThrower = pEventData->pThrower;
+            pStatsData->nThrowerPadID = pEventData->nThrowerPadID;
             cPlayer* pPlayer = pEventData->pPlayer;
             if (pPlayer->m_eClassType == FIELDER)
             {
-                pStatsData->mUnidentified00 = pPlayer;
+                pStatsData->pPlayer = pPlayer;
                 bool bHasPad = pPlayer->GetGlobalPad() != NULL;
-                pStatsData->mUnidentified04 = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
+                pStatsData->nPlayerPadID = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
             }
             else
             {
-                pStatsData->mUnidentified00 = NULL;
-                pStatsData->mUnidentified04 = -1;
+                pStatsData->pPlayer = NULL;
+                pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
                 Function<CollisionPowerupStatsData*>(fn_80025A14));
@@ -2099,19 +2099,19 @@ extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData)
         {
             CollisionPowerupStatsData* pStatsData = NULL;
             g_CollisionPowerupStatsDataPool.Allocate(pStatsData);
-            pStatsData->mUnidentified08 = pEventData->pThrower;
-            pStatsData->mUnidentified0C = (s32)(s8)pEventData->nThrowerPadID;
+            pStatsData->pThrower = pEventData->pThrower;
+            pStatsData->nThrowerPadID = (s32)(s8)pEventData->nThrowerPadID;
             cPlayer* pPlayer = pEventData->pPlayer;
             if (pPlayer->m_eClassType == FIELDER)
             {
-                pStatsData->mUnidentified00 = pPlayer;
+                pStatsData->pPlayer = pPlayer;
                 bool bHasPad = pPlayer->GetGlobalPad() != NULL;
-                pStatsData->mUnidentified04 = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
+                pStatsData->nPlayerPadID = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
             }
             else
             {
-                pStatsData->mUnidentified00 = NULL;
-                pStatsData->mUnidentified04 = -1;
+                pStatsData->pPlayer = NULL;
+                pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
                 Function<CollisionPowerupStatsData*>(fn_80025A14));
@@ -2129,19 +2129,19 @@ extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData)
         {
             CollisionPowerupStatsData* pStatsData = NULL;
             g_CollisionPowerupStatsDataPool.Allocate(pStatsData);
-            pStatsData->mUnidentified08 = pEventData->pThrower;
-            pStatsData->mUnidentified0C = pEventData->nThrowerPadID;
+            pStatsData->pThrower = pEventData->pThrower;
+            pStatsData->nThrowerPadID = pEventData->nThrowerPadID;
             cPlayer* pPlayer = pEventData->pPlayer;
             if (pPlayer->m_eClassType == FIELDER)
             {
-                pStatsData->mUnidentified00 = pPlayer;
+                pStatsData->pPlayer = pPlayer;
                 bool bHasPad = pPlayer->GetGlobalPad() != NULL;
-                pStatsData->mUnidentified04 = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
+                pStatsData->nPlayerPadID = bHasPad ? pPlayer->GetGlobalPad()->GetPadID() : -1;
             }
             else
             {
-                pStatsData->mUnidentified00 = NULL;
-                pStatsData->mUnidentified04 = -1;
+                pStatsData->pPlayer = NULL;
+                pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
                 Function<CollisionPowerupStatsData*>(fn_80025A14));

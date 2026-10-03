@@ -265,14 +265,13 @@ struct CollisionPlayerBananaData
     /* 0x0C */ nlVector3 v3CollisionLocation;
 }; // total size: 0x18
 
-struct UnidentifiedEventData_80066A04
+struct CollisionPowerupStatsData
 {
-    /* 0x00 */ cPlayer* mUnidentified00;
-    /* 0x04 */ int mUnidentified04;
-    /* 0x08 */ cPlayer* mUnidentified08;
-    /* 0x0C */ int mUnidentified0C;
+    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x04 */ int nPlayerPadID;
+    /* 0x08 */ cPlayer* pThrower;
+    /* 0x0C */ int nThrowerPadID;
 }; // total size: 0x10
-typedef UnidentifiedEventData_80066A04 CollisionPowerupStatsData;
 
 struct CollisionBallGoalpostData
 {
