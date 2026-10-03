@@ -23,7 +23,7 @@
 extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
 
-class WorldAnimBinder_80342BDC
+class WorldAnimBinder
 {
 public:
     void BindControllerObjects(const unsigned long& uHashID,
@@ -146,12 +146,12 @@ void WorldAnimManager::LoadAnimationSet(
 
 void WorldAnimManager::BindObjects()
 {
-    WorldAnimBinder_80342BDC binder;
+    WorldAnimBinder binder;
     m_animationControllerMap.Walk(
-        &binder, &WorldAnimBinder_80342BDC::BindControllerObjects);
+        &binder, &WorldAnimBinder::BindControllerObjects);
 }
 
-void WorldAnimBinder_80342BDC::BindControllerObjects(const unsigned long&,
+void WorldAnimBinder::BindControllerObjects(const unsigned long&,
     WorldAnimController** ppController)
 {
     BindWorldAnimObjectDrawables((*ppController)->m_pWorldAnimObject);

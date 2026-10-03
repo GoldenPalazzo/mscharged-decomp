@@ -11975,7 +11975,7 @@ FindController__16WorldAnimManagerFUl = .text:0x803427B0; // type:function size:
 LoadHierarchy__16WorldAnimManagerFP7nlChunk = .text:0x8034281C; // type:function size:0x1A0
 LoadAnimationSet__16WorldAnimManagerFP12AnimationSetP7nlChunk = .text:0x803429BC; // type:function size:0xB8
 BindObjects__16WorldAnimManagerFv = .text:0x80342A74; // type:function size:0x168
-BindControllerObjects__24WorldAnimBinder_80342BDCFRCUlPP19WorldAnimController = .text:0x80342BDC; // type:function size:0xC
+BindControllerObjects__15WorldAnimBinderFRCUlPP19WorldAnimController = .text:0x80342BDC; // type:function size:0xC
 Update__16WorldAnimManagerFf = .text:0x80342BE8; // type:function size:0x194
 Update__15WorldAnimUpdateFRCUlPP19WorldAnimController = .text:0x80342D7C; // type:function size:0xB8
 GetAnimationTime__19WorldAnimControllerFv = .text:0x80342E34; // type:function size:0xC
@@ -11990,7 +11990,7 @@ DeleteEntry__104AVLTreeBase<Ul,P12AnimationSet,46NewAdapter<32AVLTreeEntry<Ul,P1
 DeleteEntry__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP18AVLTreeUntemplatedP11AVLTreeNode = .text:0x80343058; // type:function size:0x8
 DeleteValue__104AVLTreeBase<Ul,P12AnimationSet,46NewAdapter<32AVLTreeEntry<Ul,P12AnimationSet>>,21DefaultKeyCompare<Ul>>FP18AVLTreeUntemplatedP11AVLTreeNode = .text:0x80343060; // type:function size:0x2CC
 DeleteValue__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP18AVLTreeUntemplatedP11AVLTreeNode = .text:0x8034332C; // type:function size:0x7C
-InorderWalk<24WorldAnimBinder_80342BDC>__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP39AVLTreeEntry<Ul,P19WorldAnimController>P24WorldAnimBinder_80342BDCM24WorldAnimBinder_80342BDCFPCvPvRCUlPP19WorldAnimController_v_v = .text:0x803433A8; // type:function size:0x154
+InorderWalk<15WorldAnimBinder>__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP39AVLTreeEntry<Ul,P19WorldAnimController>P15WorldAnimBinderM15WorldAnimBinderFPCvPvRCUlPP19WorldAnimController_v_v = .text:0x803433A8; // type:function size:0x154
 InorderWalk<15WorldAnimUpdate>__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP39AVLTreeEntry<Ul,P19WorldAnimController>P15WorldAnimUpdateM15WorldAnimUpdateFPCvPvRCUlPP19WorldAnimController_v_v = .text:0x803434FC; // type:function size:0x154
 CompareNodes__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FP11AVLTreeNodeP11AVLTreeNode = .text:0x80343650; // type:function size:0x28
 CompareKey__118AVLTreeBase<Ul,P19WorldAnimController,53NewAdapter<39AVLTreeEntry<Ul,P19WorldAnimController>>,21DefaultKeyCompare<Ul>>FPvP11AVLTreeNode = .text:0x80343678; // type:function size:0x28
