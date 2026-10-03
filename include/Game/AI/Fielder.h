@@ -586,9 +586,9 @@ private:
 public:
     /* 0x3E0 */ float mUnidentified3E0;
     /* 0x3E4 */ float mUnidentified3E4;
-    /* 0x3E8 */ UnidentifiedFielderAbility3E8 mUnidentified3E8;
+    /* 0x3E8 */ ActBowserSuper mUnidentified3E8;
     /* 0x3F4 */ float mUnidentified3F4;
-    /* 0x3F8 */ UnidentifiedAbilityEffect mUnidentified3F8;
+    /* 0x3F8 */ WaluigiWallState mUnidentified3F8;
 
 private:
     /* 0x404 */ float mUnidentified404;

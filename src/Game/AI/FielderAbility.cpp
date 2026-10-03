@@ -456,11 +456,11 @@ bool cFielder::fn_80050284()
     return true;
 }
 
-void UnidentifiedFielderAbility3E8::fn_800504A4()
+void ActBowserSuper::fn_800504A4()
 {
 }
 
-void UnidentifiedAbilityEffect::fn_800504A8()
+void WaluigiWallState::fn_800504A8()
 {
     if (mUnidentified08 != 0)
     {
