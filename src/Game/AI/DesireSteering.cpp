@@ -31,8 +31,7 @@ extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
 
-extern float lbl_806DC230;
-extern bool lbl_806E0E58;
+bool lbl_806E0E58 = false;
 
 static nlVector2 sSteeringSpeedScalePoints[] = {
     { 0.0f, 0.0f },
@@ -49,6 +48,7 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static unsigned short sDesireSteeringType = 0xFFFF;
 static bool sUseAvoidance = true;
 static float sMinimumDesiredSpeed = 0.1f;
+float lbl_806DC230 = 0.3f;
 
 static inline bool IsNearlyZero(float value, float zero)
 {
@@ -823,75 +823,6 @@ extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
     return STRAFE_FORWARD;
 }
 
-void DesireSteering::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireSteering");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&m_ePositionSeekState - (u8*)&mvDesiredPosition,
-        "m_ePositionSeekState");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&m_v3DesiredPos - (u8*)&mvDesiredPosition,
-        "m_v3DesiredPos");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fDesiredFacingDirection - (u8*)&mvDesiredPosition,
-        "m_fDesiredFacingDirection");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fFacingTotalWeight - (u8*)&mvDesiredPosition,
-        "m_fFacingTotalWeight");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&m_v3LastDesiredPos - (u8*)&mvDesiredPosition,
-        "m_v3LastDesiredPos");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&m_v3DesiredVel - (u8*)&mvDesiredPosition,
-        "m_v3DesiredVel");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&m_v3TempDesiredPos - (u8*)&mvDesiredPosition,
-        "m_v3TempDesiredPos");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fTotalWeight - (u8*)&mvDesiredPosition,
-        "m_fTotalWeight");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fUrgency - (u8*)&mvDesiredPosition,
-        "m_fUrgency");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fDesiredArrivalTime - (u8*)&mvDesiredPosition,
-        "m_fDesiredArrivalTime");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fForcedArrivalRadius - (u8*)&mvDesiredPosition,
-        "m_fForcedArrivalRadius");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&m_fAvoidanceMult - (u8*)&mvDesiredPosition,
-        "m_fAvoidanceMult");
-    cache->AddField(8, gDebugFieldTypes[8].size,
-        (u8*)&m_ThingsToAvoid - (u8*)&mvDesiredPosition,
-        "m_ThingsToAvoid");
-    cache->EndType();
-}
-
-void DesireSteering::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireSteeringType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireSteeringType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireSteeringType, data, context);
-    cache->WriteData(sDesireSteeringType, data,
-        sizeof(DesireSteering) - offset);
-}
-
 bool UnidentifiedDesire35::Initialize(void*)
 {
     mMaxDuration = 10.0f;
@@ -978,6 +909,4 @@ void UnidentifiedDesire35::Cleanup()
     fn_80060608(g_pGame, m_pFielder);
 }
 
-UnidentifiedDesire35::~UnidentifiedDesire35()
-{
-}
+#include "Game/AI/DesireSteeringDebug.inl"

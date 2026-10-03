@@ -45,8 +45,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
     void fn_800C2F48(float fAvoidanceMult) { m_fAvoidanceMult = fAvoidanceMult; }
 
@@ -94,7 +94,6 @@ public:
     {
     }
 
-    virtual ~UnidentifiedDesire35();
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);

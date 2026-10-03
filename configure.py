@@ -533,7 +533,7 @@ config.libs = [
             Object(Matching, "Game/AI/DesireRunToNet.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireShoot.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireSlideAttack.cpp"),
-            Object(NonMatching, "Game/AI/DesireSteering.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AI/DesireSteering.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/DesireSuperPower.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/DesireUsePowerup.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireUserControlled.cpp", extra_cflags=["-ipa file"]),
