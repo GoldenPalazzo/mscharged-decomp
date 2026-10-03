@@ -397,7 +397,6 @@ struct UnidentifiedEventData26
 }; // total size: 0x20
 struct UnidentifiedEventData27;
 struct UnidentifiedEventData28;
-struct UnidentifiedEventData29;
 struct UnidentifiedEventData30
 {
     /* 0x00 */ PowerupBase* mUnidentified00;
@@ -416,8 +415,6 @@ struct UnidentifiedEventData34
     /* 0x10 */ u32 mUnidentified10;
 }; // total size: 0x14
 struct UnidentifiedEventData35;
-struct UnidentifiedEventData36;
-struct UnidentifiedEventData37;
 
 struct CollisionShockwaveData
 {
