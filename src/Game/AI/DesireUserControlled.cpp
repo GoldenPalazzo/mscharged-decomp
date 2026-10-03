@@ -120,7 +120,7 @@ void DesireUserControlled::Update(
             {
                 if (!m_pFielder->GetGlobalPad()->IsPressed(0x1C, true))
                 {
-                    m_pFielder->fn_8004B86C(
+                    m_pFielder->InitActionShot(
                         m_pFielder->bIsModified,
                         false);
                 }
@@ -131,7 +131,7 @@ void DesireUserControlled::Update(
                 || pShotMeter->m_eShotMeterState
                     == SHOT_METER_STS_RELEASED)
             {
-                m_pFielder->fn_8004B86C(
+                m_pFielder->InitActionShot(
                     m_pFielder->bIsModified,
                     false);
                 return;

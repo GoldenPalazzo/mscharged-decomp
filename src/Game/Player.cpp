@@ -689,7 +689,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
             bShotInProgress = false;
         if (bShotInProgress || (pFielder->GetActionState() != ACTION_UNKNOWN_15 && pMeter->m_eShotMeterState == SHOT_METER_RELEASED))
         {
-            pFielder->fn_8004B86C(false, false);
+            pFielder->InitActionShot(false, false);
             return;
         }
     }

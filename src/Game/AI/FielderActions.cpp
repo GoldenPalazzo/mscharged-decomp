@@ -3091,7 +3091,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     if (g_pGame->m_eGameState == 3 || bNearGoal)
     {
         KillWindup("ball_sts_windup");
-        fn_8004B86C(false, false);
+        InitActionShot(false, false);
         bDidWindup = true;
     }
 
@@ -4185,7 +4185,7 @@ void cFielder::fn_8004B658()
     }
 }
 
-bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
+bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 {
     if (m_pBall == 0)
     {
@@ -4194,7 +4194,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
     }
     else
     {
-        if (bParam)
+        if (bIsOneTimer)
         {
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
