@@ -12,7 +12,7 @@ public:
     virtual void ReliableCallbackVirtual08() = 0;
     virtual void OnMessageReceived(
         u32 connection, void* buffer, int size, bool reliable) = 0;
-    virtual void ReliableCallbackVirtual10(
+    virtual void OnVoiceReceived(
         u32 connection, void* buffer, int size) = 0;
     virtual void OnConnectionRequest(
         u32 connection, u8* address, int a, int b, int c) = 0;

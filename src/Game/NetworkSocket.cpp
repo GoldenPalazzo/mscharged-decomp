@@ -89,7 +89,7 @@ void NetworkSocket::OnMessageReceived(
     mListener->OnMessageReceived(connection, buffer, size, reliable);
 }
 
-void NetworkSocket::ReliableCallbackVirtual10(
+void NetworkSocket::OnVoiceReceived(
     u32 connection, void* buffer, int size)
 {
     mListener->ListenerVirtual18();
