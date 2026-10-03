@@ -1,6 +1,6 @@
 namespace
 {
-static void* byteCode;
+static void* sTriggerByteCode;
 }
 
 const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerType) const
@@ -27,17 +27,17 @@ const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerTyp
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 0));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_5)
+    if (target == NIS_TARGET_HOME_SIDEKICK_1)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 0));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_6)
+    if (target == NIS_TARGET_HOME_SIDEKICK_2)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 1));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_7)
+    if (target == NIS_TARGET_HOME_SIDEKICK_3)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 2));
     }
@@ -47,54 +47,54 @@ const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerTyp
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 0));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_9)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_1)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 0));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_10)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_2)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 1));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_11)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_3)
     {
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 2));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_14)
+    if (target == NIS_TARGET_SCORER)
     {
         return g_pCharacters[mGoalScorerCharIndex]->mUnidentified11C->mName;
     }
 
     if (target == NIS_TARGET_WINNER_SIDEKICK)
     {
-        return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick((short)fn_8027E284(winnerType), 0));
+        return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick((short)GetWinnerSide(winnerType), 0));
     }
 
     if (target == NIS_TARGET_LOSER_SIDEKICK)
     {
-        int side = (fn_8027E284(winnerType) + 1) % 2;
+        int side = (GetWinnerSide(winnerType) + 1) % 2;
         return GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick((short)side, 0));
     }
 
     if (target == NIS_TARGET_WINNER_CAPTAIN)
     {
-        return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)fn_8027E284(winnerType)));
+        return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)GetWinnerSide(winnerType)));
     }
 
     if (target == NIS_TARGET_LOSER_CAPTAIN)
     {
-        int side = (fn_8027E284(winnerType) + 1) % 2;
+        int side = (GetWinnerSide(winnerType) + 1) % 2;
         return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)side));
     }
 
-    if (target == NIS_TARGET_UNIDENTIFIED_21)
+    if (target == NIS_TARGET_MEGASTRIKE_CAPTAIN)
     {
         return GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam((short)mMegaStrikeSide));
     }
 
-    if (target == NIS_TARGET_HOME_GOALIE || target == NIS_TARGET_AWAY_GOALIE || target == NIS_TARGET_WINNER_GOALIE || target == NIS_TARGET_LOSER_GOALIE || target == NIS_TARGET_UNIDENTIFIED_22)
+    if (target == NIS_TARGET_HOME_GOALIE || target == NIS_TARGET_AWAY_GOALIE || target == NIS_TARGET_WINNER_GOALIE || target == NIS_TARGET_LOSER_GOALIE || target == NIS_TARGET_MEGASTRIKE_DEFENDING_GOALIE)
     {
         return "goalie";
     }
@@ -155,7 +155,7 @@ static inline void PlayNisCue(NisPlayer* player, const char* nisName)
     player->PrepareNisCue(nlStringLowerHash(cueName));
 }
 
-void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int param5, int param6)
+void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int renderMode, int variantIndex)
 {
     char fullName[64];
     mActive = true;
@@ -190,29 +190,29 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     }
 
     int index;
-    if (param6 >= 0)
+    if (variantIndex >= 0)
     {
-        index = param6 % numAvailableNis;
+        index = variantIndex % numAvailableNis;
     }
     else
     {
         index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
-        if (DuringGoalCelebration(GetPresentation()) && param5 == 0)
+        if (DuringGoalCelebration(GetPresentation()) && renderMode == 0)
         {
-            if (numAvailableNis > 1 && mUnidentified343F4 == index && nlStrCmp(mUnidentified343F8, mExtraNameFilter) == 0)
+            if (numAvailableNis > 1 && mLastCelebrationIndex == index && nlStrCmp(mLastCelebrationFilter, mExtraNameFilter) == 0)
             {
-                while (index == mUnidentified343F4)
+                while (index == mLastCelebrationIndex)
                 {
                     index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
                 }
             }
-            mUnidentified343F4 = index;
-            nlStrNCpy(mUnidentified343F8, mExtraNameFilter, sizeof(mUnidentified343F8));
+            mLastCelebrationIndex = index;
+            nlStrNCpy(mLastCelebrationFilter, mExtraNameFilter, sizeof(mLastCelebrationFilter));
         }
     }
 
     NisHeader& nisHeader = *availableNis[index];
-    fn_802805B4(nisHeader, target, useStadiumOffset, winnerType, param5, false);
+    QueueNisLoad(nisHeader, target, useStadiumOffset, winnerType, renderMode, false);
 
     NisTarget sameTarget = NIS_TARGET_NONE;
     NisTarget otherTarget = NIS_TARGET_NONE;
@@ -238,7 +238,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
         sameTarget = NIS_TARGET_WINNER_SIDEKICK;
         otherTarget = NIS_TARGET_LOSER_SIDEKICK;
         break;
-    case NIS_TARGET_UNIDENTIFIED_14:
+    case NIS_TARGET_SCORER:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
         if (character != NULL && character->IsCaptain())
@@ -256,7 +256,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
         }
         break;
     }
-    case NIS_TARGET_UNIDENTIFIED_22:
+    case NIS_TARGET_MEGASTRIKE_DEFENDING_GOALIE:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
         if (character != NULL && character->IsCaptain())
@@ -274,7 +274,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
         }
         break;
     }
-    case NIS_TARGET_UNIDENTIFIED_21:
+    case NIS_TARGET_MEGASTRIKE_CAPTAIN:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
         if (character != NULL && character->IsCaptain())
@@ -296,35 +296,35 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
 
     if (sameTarget != NIS_TARGET_NONE)
     {
-        fn_8028041C(nisHeader.name, "same", sameTarget, useStadiumOffset, winnerType, nisHeader.mirrored, param5);
+        LoadRelatedNis(nisHeader.name, "same", sameTarget, useStadiumOffset, winnerType, nisHeader.mirrored, renderMode);
     }
     if (otherTarget != NIS_TARGET_NONE)
     {
-        fn_8028041C(nisHeader.name, "other", otherTarget, useStadiumOffset, winnerType, nisHeader.mirrored, param5);
+        LoadRelatedNis(nisHeader.name, "other", otherTarget, useStadiumOffset, winnerType, nisHeader.mirrored, renderMode);
     }
 
-    if (param5 != 1 && mUnidentified34354 == 0)
+    if (renderMode != 1 && mPreparedNisCue == 0)
     {
         PlayNisCue(this, nisHeader.name);
     }
 }
 
-void NisPlayer::fn_8028041C(const char* param1, const char* param2, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisWinnerType winnerType, bool param5, int param6)
+void NisPlayer::LoadRelatedNis(const char* nisName, const char* relation, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisWinnerType winnerType, bool mirrored, int renderMode)
 {
     char baseName[64];
-    int length = nlStrChr(param1, '.') - param1 + 1;
-    nlStrNCpy(baseName, param1, nlMin((int)sizeof(baseName), length));
+    int length = nlStrChr(nisName, '.') - nisName + 1;
+    nlStrNCpy(baseName, nisName, nlMin((int)sizeof(baseName), length));
 
     const char* filter = GetTargetFilter(target, winnerType);
     char fullName[64];
-    nlSNPrintf(fullName, sizeof(fullName), "%s_%s_%s.nis", baseName, filter, param2);
+    nlSNPrintf(fullName, sizeof(fullName), "%s_%s_%s.nis", baseName, filter, relation);
 
     NisHeader* nisHeader = NULL;
     for (int dictionaryIndex = 0; dictionaryIndex < mDictSize; dictionaryIndex++)
     {
         if (nlStrCmp(mDict[dictionaryIndex].name, fullName) == 0)
         {
-            mDict[dictionaryIndex].mirrored = param5;
+            mDict[dictionaryIndex].mirrored = mirrored;
             nisHeader = &mDict[dictionaryIndex];
             break;
         }
@@ -332,17 +332,17 @@ void NisPlayer::fn_8028041C(const char* param1, const char* param2, NisTarget ta
 
     if (nisHeader != NULL)
     {
-        fn_802805B4(*nisHeader, target, useStadiumOffset, winnerType, param6, true);
+        QueueNisLoad(*nisHeader, target, useStadiumOffset, winnerType, renderMode, true);
     }
 }
 
-void NisPlayer::fn_802805B4(NisHeader& nisHeader, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisWinnerType winnerType, int param5, bool param6)
+void NisPlayer::QueueNisLoad(NisHeader& nisHeader, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisWinnerType winnerType, int renderMode, bool preserveMirroring)
 {
     nisHeader.target = target;
     nisHeader.winnerType = winnerType;
     nisHeader.mTime = 0.0f;
-    nisHeader.unknown_0x180 = param5;
-    if (!param6)
+    nisHeader.renderMode = renderMode;
+    if (!preserveMirroring)
     {
         nisHeader.mirrored = IsMirrored(target, nisHeader.name, winnerType);
     }

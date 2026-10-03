@@ -100,7 +100,7 @@ int NisPlayerOverlay_80523808::Update(float dt)
         return 3;
     }
 
-    mPlayer->fn_8027E714();
+    mPlayer->SwapCameras();
     return 0;
 }
 
@@ -129,7 +129,7 @@ NisPlayerOverlay_80523824::~NisPlayerOverlay_80523824()
  */
 int NisPlayerOverlay_80523824::Update(float dt)
 {
-    mPlayer->fn_8027E714();
+    mPlayer->SwapCameras();
     return 1;
 }
 

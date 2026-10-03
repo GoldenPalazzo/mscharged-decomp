@@ -1744,7 +1744,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     StatsTracker::Instance()->CreateEventHandler();
     ReplayManager::Instance()->RegisterEventHandlers();
     fn_80194EF8(&ReplayChoreo::Instance());
-    NisPlayer::Instance()->fn_8027DA28();
+    NisPlayer::Instance()->RegisterEventHandlers();
     GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();
     ExcitementSystem::fn_80196644().fn_80196924();
@@ -1936,7 +1936,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FlareHandler::instance.Cleanup();
     NisPlayer::Instance()->StopNisCue();
     NisPlayer::Instance()->Reset();
-    NisPlayer::Instance()->fn_8027E5D4();
+    NisPlayer::Instance()->ReleaseCachedNisBuffers();
     ReplayChoreo::Instance().Reset();
     ReplayManager::Instance()->Uninitialize();
 

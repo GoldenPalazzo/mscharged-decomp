@@ -55,19 +55,17 @@
 
 extern "C" unsigned long OSGetConsoleType(void);
 
-extern "C" {
-void fn_8027F018(void*, unsigned long, void*);
-void fn_8027F064(void*, unsigned long, void*);
-void fn_8027F084(void*, unsigned long, void*);
-void fn_8027F0D8(void*, unsigned long, void*);
-void fn_8027F12C(void*, unsigned long, void*);
-void fn_8027F174(glModel*);
-}
+void OnNisTriggersLoaded(void*, unsigned long, void*);
+void OnNisAnimProxyLoaded(void*, unsigned long, void*);
+void OnNisDoNotMirrorListLoaded(void*, unsigned long, void*);
+void OnNisDoNotShowPIPListLoaded(void*, unsigned long, void*);
+void OnNisDictionaryLoaded(void*, unsigned long, void*);
+void ApplyNisTransitionTeamLogo(glModel*);
 
 #include "src/Game/NisPlayer_interp.cpp"
 
-float lbl_806DEE9C = 0.65f;
-float lbl_806DEEA0 = 0.65f;
+float g_NisWorldDarkeningAmount = 0.65f;
+float g_NisWorldDarkeningFadeTime = 0.65f;
 
 namespace
 {
@@ -88,7 +86,7 @@ NisPlayer* NisPlayer::Instance()
 
 NisPlayer::NisPlayer()
     : InterpreterCore(100)
-    , unknown_0x00028(0)
+    , mLoadedAssetMask(0)
     , mActive(false)
     , mDictSize(0)
     , mMaxNumBallsVisible(1)
@@ -96,27 +94,27 @@ NisPlayer::NisPlayer()
     , mUsedFromFront(0)
     , mUsedFromBack(0x70800)
     , mGoalScorerCharIndex(-1)
-    , mUnidentified34334(0)
-    , mUnidentified34338(1)
-    , mUnidentified34350(0)
-    , mUnidentified34354(0)
-    , mUnidentified34358(true)
-    , mUnidentified34359(false)
-    , mUnidentified3435A(false)
+    , mAnimProxyByteCode(0)
+    , mOverlayMode(1)
+    , mPlayingNisCue(0)
+    , mPreparedNisCue(0)
+    , mStopNisCueOnReset(true)
+    , mDisplayNisInfo(false)
+    , mUseViewMatrixOverride(false)
     , mUnidentified3439C(false)
-    , mUnidentified343E8(-1.0f)
-    , mUnidentified343F0(-1.0f)
-    , mUnidentified343F4(-1)
+    , mSavedFogStart(-1.0f)
+    , mSavedFogEnd(-1.0f)
+    , mLastCelebrationIndex(-1)
     , mCameraOverrun(0.0f)
 {
     mMemory = (char*)nlMalloc(0x70800, 8, false);
-    unknown_0x00028 = 0;
-    mUnidentified34334 = NULL;
-    nlLoadEntireFileAsync("art/Scripts/nis_triggers.byte_code", fn_8027F018, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
-    nlLoadEntireFileAsync("art/Scripts/nis_anim_proxy.byte_code", fn_8027F064, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
-    nlLoadEntireFileAsync("art/nis/do_not_mirror.txt", fn_8027F084, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
-    nlLoadEntireFileAsync("art/nis/do_not_showPiP.txt", fn_8027F0D8, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
-    nlLoadEntireFileAsync("art/nis/nis_dict.txt", fn_8027F12C, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
+    mLoadedAssetMask = 0;
+    mAnimProxyByteCode = NULL;
+    nlLoadEntireFileAsync("art/Scripts/nis_triggers.byte_code", OnNisTriggersLoaded, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
+    nlLoadEntireFileAsync("art/Scripts/nis_anim_proxy.byte_code", OnNisAnimProxyLoaded, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
+    nlLoadEntireFileAsync("art/nis/do_not_mirror.txt", OnNisDoNotMirrorListLoaded, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
+    nlLoadEntireFileAsync("art/nis/do_not_showPiP.txt", OnNisDoNotShowPIPListLoaded, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
+    nlLoadEntireFileAsync("art/nis/nis_dict.txt", OnNisDictionaryLoaded, this, 0x20, AllocateEnd, NULL, 0, &VirtualAllocator);
     for (int i = 0; i < 8; i++)
     {
         mLoadQueue[i] = NULL;
@@ -130,34 +128,34 @@ NisPlayer::NisPlayer()
         mCamera[i].m_LetManagerDoUpdate = false;
         mCamera[i].m_bCyclic = false;
     }
-    mUnidentified3433C[0] = new (8, false) NisPlayerOverlay_80523878(this);
-    mUnidentified3433C[1] = new (8, false) NisPlayerOverlay_8052385C(this);
-    mUnidentified3433C[4] = new (8, false) NisPlayerOverlay_80523840(this);
-    mUnidentified3433C[2] = new (8, false) NisPlayerOverlay_80523824(this);
-    mUnidentified3433C[3] = new (8, false) NisPlayerOverlay_80523808(this, 1.0f);
-    mUnidentified34359 = GetTweakBool("/user/DisplayNISInfo", false);
-    mUnidentified343E0 = false;
-    mUnidentified343E4 = -1.0f;
-    mUnidentified343EC = -1.0f;
+    mOverlays[0] = new (8, false) NisPlayerOverlay_80523878(this);
+    mOverlays[1] = new (8, false) NisPlayerOverlay_8052385C(this);
+    mOverlays[4] = new (8, false) NisPlayerOverlay_80523840(this);
+    mOverlays[2] = new (8, false) NisPlayerOverlay_80523824(this);
+    mOverlays[3] = new (8, false) NisPlayerOverlay_80523808(this, 1.0f);
+    mDisplayNisInfo = GetTweakBool("/user/DisplayNISInfo", false);
+    mSuppressBlinking = false;
+    mRequestedFogStart = -1.0f;
+    mRequestedFogEnd = -1.0f;
     for (int i = 0; i < 10; i++)
     {
-        mUnidentified34440[i] = NULL;
+        mTeamLogoPackets[i] = NULL;
     }
-    g_ModelTransitionRenderCallback = fn_8027F174;
-    mUnidentified343F8[0] = '\0';
+    g_ModelTransitionRenderCallback = ApplyNisTransitionTeamLogo;
+    mLastCelebrationFilter[0] = '\0';
 }
 
 NisPlayer::~NisPlayer()
 {
-    delete[] mUnidentified340A4;
-    delete[] mUnidentified340AC;
+    delete[] mDoNotMirrorNames;
+    delete[] mDoNotShowPIPNames;
     for (int i = 0; i < 10; i++)
     {
-        mUnidentified34440[i] = NULL;
+        mTeamLogoPackets[i] = NULL;
     }
 }
 
-void NisPlayer::fn_8027B630(char* data, unsigned long size)
+void NisPlayer::ParseDoNotMirrorList(char* data, unsigned long size)
 {
     SimpleParser parser;
     const char* separators = "\n\r";
@@ -169,9 +167,9 @@ void NisPlayer::fn_8027B630(char* data, unsigned long size)
         count++;
         more = parser.AdvanceLine();
     }
-    mUnidentified340A8 = count;
+    mNumDoNotMirrorNames = count;
     parser.StartParsing(data, size + 1, separators);
-    mUnidentified340A4 = new (8, false) char*[count];
+    mDoNotMirrorNames = new (8, false) char*[count];
     char* token = parser.NextTokenOnLine(false);
     int i = 0;
     while (token != NULL)
@@ -179,7 +177,7 @@ void NisPlayer::fn_8027B630(char* data, unsigned long size)
         char* name = new (8, false) char[parser.GetTokenLength() + 1];
         memcpy(name, token, parser.GetTokenLength());
         name[parser.GetTokenLength()] = 0;
-        mUnidentified340A4[i] = name;
+        mDoNotMirrorNames[i] = name;
         parser.AdvanceLine();
         token = parser.NextTokenOnLine(false);
         i++;
@@ -187,7 +185,7 @@ void NisPlayer::fn_8027B630(char* data, unsigned long size)
     nlFree(data);
 }
 
-void NisPlayer::fn_8027B758(char* data, unsigned long size)
+void NisPlayer::ParseDoNotShowPIPList(char* data, unsigned long size)
 {
     SimpleParser parser;
     const char* separators = "\n\r";
@@ -199,9 +197,9 @@ void NisPlayer::fn_8027B758(char* data, unsigned long size)
         count++;
         more = parser.AdvanceLine();
     }
-    mUnidentified340B0 = count;
+    mNumDoNotShowPIPNames = count;
     parser.StartParsing(data, size + 1, separators);
-    mUnidentified340AC = new (8, false) char*[count];
+    mDoNotShowPIPNames = new (8, false) char*[count];
     char* token = parser.NextTokenOnLine(false);
     int i = 0;
     while (token != NULL)
@@ -209,7 +207,7 @@ void NisPlayer::fn_8027B758(char* data, unsigned long size)
         char* name = new (8, false) char[parser.GetTokenLength() + 1];
         memcpy(name, token, parser.GetTokenLength());
         name[parser.GetTokenLength()] = 0;
-        mUnidentified340AC[i] = name;
+        mDoNotShowPIPNames[i] = name;
         parser.AdvanceLine();
         token = parser.NextTokenOnLine(false);
         i++;
@@ -225,7 +223,7 @@ static inline void SkipLine(const char*& data)
         data++;
 }
 
-void NisPlayer::fn_8027B880(char* data)
+void NisPlayer::ParseDictionary(char* data)
 {
     if (data != NULL)
     {
@@ -296,14 +294,14 @@ void NisPlayer::fn_8027BD60()
 {
 }
 
-void NisPlayer::fn_8027BD64()
+void NisPlayer::SelectCameras()
 {
     for (int j = 0; j < 2; j++)
     {
         for (int i = 0; i < 8; i++)
         {
             if (mPlaying[i] != 0
-                && (j == mPlaying[i]->unknown_0x034 || (j == 1 && mPlaying[i]->unknown_0x034 == 2))
+                && (j == mPlaying[i]->mRenderMode || (j == 1 && mPlaying[i]->mRenderMode == 2))
                 && mPlaying[i]->mNumCameras != 0)
             {
                 mPlaying[i]->SelectRandomCamera(mCamera[j]);
@@ -345,12 +343,12 @@ float NisPlayer::TimeLeft() const
     return timeLeft;
 }
 
-float NisPlayer::fn_8027C064(int param1) const
+float NisPlayer::GetCameraTimeLeft(int cameraIndex) const
 {
-    cCameraData* pCameraData = mCamera[param1].m_pActiveCameraData;
+    cCameraData* pCameraData = mCamera[cameraIndex].m_pActiveCameraData;
     if (pCameraData != 0)
     {
-        float timeLeft = mCamera[param1].GetTimeLeft();
+        float timeLeft = mCamera[cameraIndex].GetTimeLeft();
 
         cCameraData* pCameraData = mCamera[0].m_pActiveCameraData;
         if (pCameraData != 0)
@@ -448,7 +446,7 @@ void NisPlayer::Update(float deltaT)
     if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
     {
         UpdateStadium(deltaT);
-        fn_8027CA44();
+        StartLoadedScripts();
 
         float animTime[2];
         for (int i = 0; i < 2; i++)
@@ -471,7 +469,7 @@ void NisPlayer::Update(float deltaT)
             {
                 continue;
             }
-            int cameraIndex = mPlaying[i]->unknown_0x034;
+            int cameraIndex = mPlaying[i]->mRenderMode;
             if (cameraIndex == 2)
             {
                 cameraIndex = 1;
@@ -482,12 +480,12 @@ void NisPlayer::Update(float deltaT)
             mCamera[cameraIndex].m_OffsetPos = mPlaying[i]->Offset();
         }
 
-        int overlay = mUnidentified3433C[mUnidentified34338]->Update(deltaT);
-        if (mUnidentified34338 != overlay)
+        int overlay = mOverlays[mOverlayMode]->Update(deltaT);
+        if (mOverlayMode != overlay)
         {
-            mUnidentified34338 = overlay;
-            mUnidentified3433C[mUnidentified34338]->Reset();
-            mUnidentified3433C[mUnidentified34338]->GetOverlayType();
+            mOverlayMode = overlay;
+            mOverlays[mOverlayMode]->Reset();
+            mOverlays[mOverlayMode]->GetOverlayType();
         }
     }
 }
@@ -499,17 +497,17 @@ void NisPlayer::Reset()
         return;
     }
 
-    fn_8027D1EC();
-    mUnidentified34338 = 0;
-    if (mUnidentified34350 != 0 && mUnidentified34358)
+    ResetPlayerEffects();
+    mOverlayMode = 0;
+    if (mPlayingNisCue != 0 && mStopNisCueOnReset)
     {
-        StopSound(mUnidentified34350, (void*)-1);
-        mUnidentified34350 = 0;
+        StopSound(mPlayingNisCue, (void*)-1);
+        mPlayingNisCue = 0;
     }
-    if (mUnidentified34354 != 0)
+    if (mPreparedNisCue != 0)
     {
-        StopSound(mUnidentified34354, (void*)-1);
-        mUnidentified34354 = 0;
+        StopSound(mPreparedNisCue, (void*)-1);
+        mPreparedNisCue = 0;
     }
 
     for (int i = 0; i < 8; i++)
@@ -533,21 +531,21 @@ void NisPlayer::Reset()
     cCameraManager::Remove(mCamera[0]);
     ClearNisAnimatedCharacters();
     gBlinkingEnabled = true;
-    if (mUnidentified343E8 != -1.0f)
+    if (mSavedFogStart != -1.0f)
     {
-        glx_SetFogStart(mUnidentified343E8);
+        glx_SetFogStart(mSavedFogStart);
     }
-    if (mUnidentified343F0 != -1.0f)
+    if (mSavedFogEnd != -1.0f)
     {
-        glx_SetFogEnd(mUnidentified343F0);
+        glx_SetFogEnd(mSavedFogEnd);
     }
-    mUnidentified343E8 = -1.0f;
-    mUnidentified343F0 = -1.0f;
+    mSavedFogStart = -1.0f;
+    mSavedFogEnd = -1.0f;
     DepthOfFieldManager::instance.TurnOn();
     mCameraOverrun = 0.0f;
 }
 
-void NisPlayer::fn_8027CA44()
+void NisPlayer::StartLoadedScripts()
 {
     for (int i = 0; i < 8; i++)
     {
@@ -565,9 +563,9 @@ void NisPlayer::fn_8027CA44()
     }
 }
 
-bool NisPlayer::fn_8027CB44()
+bool NisPlayer::IsReadyToPlay()
 {
-    if (unknown_0x00028 != 0x1F)
+    if (mLoadedAssetMask != 0x1F)
     {
         return false;
     }
@@ -592,7 +590,7 @@ bool NisPlayer::fn_8027CB44()
             }
         }
     }
-    if (mUnidentified34354 != 0 && GetSoundState(mUnidentified34354, (void*)-1) == 2)
+    if (mPreparedNisCue != 0 && GetSoundState(mPreparedNisCue, (void*)-1) == 2)
     {
         return false;
     }
@@ -609,20 +607,20 @@ void NisPlayer::ClearLoadQueue()
 
 void NisPlayer::Play()
 {
-    mUnidentified3435A = false;
+    mUseViewMatrixOverride = false;
     mUnidentified3439C = false;
     mActive = true;
     gBlinkingEnabled = true;
-    if (mUnidentified343E8 != -1.0f)
+    if (mSavedFogStart != -1.0f)
     {
-        glx_SetFogStart(mUnidentified343E8);
+        glx_SetFogStart(mSavedFogStart);
     }
-    if (mUnidentified343F0 != -1.0f)
+    if (mSavedFogEnd != -1.0f)
     {
-        glx_SetFogEnd(mUnidentified343F0);
+        glx_SetFogEnd(mSavedFogEnd);
     }
-    mUnidentified343E8 = -1.0f;
-    mUnidentified343F0 = -1.0f;
+    mSavedFogStart = -1.0f;
+    mSavedFogEnd = -1.0f;
     DepthOfFieldManager::instance.TurnOn();
 
     for (int j = 0; j < 8; j++)
@@ -637,26 +635,26 @@ void NisPlayer::Play()
         }
     }
 
-    if (mUnidentified343E4 != -1.0f)
+    if (mRequestedFogStart != -1.0f)
     {
-        mUnidentified343E8 = glx_GetFogStart();
-        glx_SetFogStart(mUnidentified343E4);
+        mSavedFogStart = glx_GetFogStart();
+        glx_SetFogStart(mRequestedFogStart);
     }
-    if (mUnidentified343EC != -1.0f)
+    if (mRequestedFogEnd != -1.0f)
     {
-        mUnidentified343F0 = glx_GetFogEnd();
-        glx_SetFogEnd(mUnidentified343EC);
+        mSavedFogEnd = glx_GetFogEnd();
+        glx_SetFogEnd(mRequestedFogEnd);
     }
-    if (mUnidentified343E0 == true)
+    if (mSuppressBlinking == true)
     {
         gBlinkingEnabled = false;
     }
-    mUnidentified343E0 = false;
-    mUnidentified343E4 = -1.0f;
-    mUnidentified343EC = -1.0f;
-    if (mUnidentified34338 != 4)
+    mSuppressBlinking = false;
+    mRequestedFogStart = -1.0f;
+    mRequestedFogEnd = -1.0f;
+    if (mOverlayMode != 4)
     {
-        mUnidentified34338 = 0;
+        mOverlayMode = 0;
     }
 
     if (mLoadingFromBack)
@@ -669,7 +667,7 @@ void NisPlayer::Play()
         mLoadingFromBack = true;
         mUsedFromBack = 0x70800;
     }
-    fn_8027BD64();
+    SelectCameras();
     StartNisCue();
     ClearNisAnimatedCharacters();
 }
@@ -710,13 +708,13 @@ void NisPlayer::HideAllActors() const
     snapshot.mChainChomp.visible = false;
 }
 
-void NisPlayer::fn_8027D11C()
+void NisPlayer::SetupNisPlayback()
 {
     mCameraOverrun = 0.0f;
     ResetEffects();
-    fn_8027D1EC();
+    ResetPlayerEffects();
     g_pGame->mpWeatherManager->Stop(true);
-    if (mUnidentified34338 != 4)
+    if (mOverlayMode != 4)
     {
         WorldDarkening::Instance().fn_801AF550();
     }
@@ -727,7 +725,7 @@ void NisPlayer::fn_8027D11C()
     }
 }
 
-void NisPlayer::fn_8027D1EC()
+void NisPlayer::ResetPlayerEffects()
 {
     for (int side = 0; side < 2; side++)
     {
@@ -774,7 +772,7 @@ void NisPlayer::Render(int pass) const
     HideAllActors();
 
     bool renderPass = false;
-    if (fn_8027E64C() && pass == 0)
+    if (HasSecondaryNis() && pass == 0)
     {
         renderPass = true;
     }
@@ -782,19 +780,19 @@ void NisPlayer::Render(int pass) const
     {
         if (mPlaying[i] != NULL)
         {
-            if (mPlaying[i]->unknown_0x034 == renderPass || mPlaying[i]->unknown_0x034 == 2)
+            if (mPlaying[i]->mRenderMode == renderPass || mPlaying[i]->mRenderMode == 2)
             {
                 mPlaying[i]->Render(renderPass);
             }
         }
     }
-    if (mUnidentified34359 && renderPass == 0)
+    if (mDisplayNisInfo && renderPass == 0)
     {
         PrintPlayingNisInfo(*this);
     }
-    if (pass == 0 && fn_8027E64C())
+    if (pass == 0 && HasSecondaryNis())
     {
-        mUnidentified3433C[mUnidentified34338]->Render();
+        mOverlays[mOverlayMode]->Render();
     }
 }
 
@@ -848,9 +846,9 @@ void NisPlayer::LoadTriggers(Nis& nis)
             if (name[i] == '_')
             {
                 name.erase(name.begin(), name.begin() + i);
-                char unknown_18[] = "all";
+                char fallbackPrefix[] = "all";
                 BasicString<char, Detail::TempStringAllocator> all("all");
-                name.insert(name.begin(), unknown_18, unknown_18 + sizeof(unknown_18) - 1);
+                name.insert(name.begin(), fallbackPrefix, fallbackPrefix + sizeof(fallbackPrefix) - 1);
                 break;
             }
         }
@@ -888,15 +886,15 @@ void NisPlayer::RandomizeBeginPositions()
 
 bool g_ForceDoubleBallTransition;
 
-void NisPlayer::fn_8027DA28()
+void NisPlayer::RegisterEventHandlers()
 {
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::fn_8027DF70)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::fn_8027DFE0)), 0, -1);
-    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::fn_8027DFE4)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::fn_8027E054)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::OnGoalScored)), 0, -1);
+    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::OnGoalieSave)), 0, -1);
+    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::OnMegaStrikeIntro)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::OnPauseGame)), 0, -1);
 }
 
-void NisPlayer::fn_8027DF70(GoalScoredData* goalScoredData)
+void NisPlayer::OnGoalScored(GoalScoredData* goalScoredData)
 {
     if (g_pGame == NULL)
     {
@@ -909,11 +907,11 @@ void NisPlayer::fn_8027DF70(GoalScoredData* goalScoredData)
     }
 }
 
-void NisPlayer::fn_8027DFE0(GoalieSaveData*)
+void NisPlayer::OnGoalieSave(GoalieSaveData*)
 {
 }
 
-void NisPlayer::fn_8027DFE4(cPlayer* param1)
+void NisPlayer::OnMegaStrikeIntro(cPlayer* player)
 {
     if (g_pGame == NULL)
     {
@@ -924,23 +922,23 @@ void NisPlayer::fn_8027DFE4(cPlayer* param1)
         return;
     }
     g_ForceDoubleBallTransition = false;
-    if (param1 != NULL)
+    if (player != NULL)
     {
-        mMegaStrikeSide = param1->m_pTeam->m_nSide;
-        mGoalScorerCharIndex = GetCharacterIndex(param1);
+        mMegaStrikeSide = player->m_pTeam->m_nSide;
+        mGoalScorerCharIndex = GetCharacterIndex(player);
     }
 }
 
-void NisPlayer::fn_8027E054()
+void NisPlayer::OnPauseGame()
 {
     StopNisCue();
 }
 
-inline bool NisPlayer::fn_8027E0AC(const char* name) const
+inline bool NisPlayer::AllowsPIP(const char* name) const
 {
-    for (int i = 0; i < mUnidentified340B0; i++)
+    for (int i = 0; i < mNumDoNotShowPIPNames; i++)
     {
-        if (nlStrICmp(name, mUnidentified340AC[i]) == 0)
+        if (nlStrICmp(name, mDoNotShowPIPNames[i]) == 0)
         {
             return false;
         }
@@ -948,15 +946,15 @@ inline bool NisPlayer::fn_8027E0AC(const char* name) const
     return true;
 }
 
-bool NisPlayer::fn_8027E0AC()
+bool NisPlayer::AllowsPIP()
 {
     for (int i = 0; i < 8; i++)
     {
-        if (mLoaded[i] != NULL && !fn_8027E0AC(mLoaded[i]->Name()))
+        if (mLoaded[i] != NULL && !AllowsPIP(mLoaded[i]->Name()))
         {
             return false;
         }
-        if (mLoadQueue[i] != NULL && !fn_8027E0AC(mLoadQueue[i]->name))
+        if (mLoadQueue[i] != NULL && !AllowsPIP(mLoadQueue[i]->name))
         {
             return false;
         }
@@ -964,7 +962,7 @@ bool NisPlayer::fn_8027E0AC()
     return true;
 }
 
-int NisPlayer::fn_8027E284(NisWinnerType winnerType) const
+int NisPlayer::GetWinnerSide(NisWinnerType winnerType) const
 {
     if (winnerType < NIS_NUM_WINNER_TYPES)
     {
@@ -975,9 +973,9 @@ int NisPlayer::fn_8027E284(NisWinnerType winnerType) const
 
 bool NisPlayer::IsMirrored(NisTarget target, const char* name, NisWinnerType winnerType) const
 {
-    for (int i = 0; i < mUnidentified340A8; i++)
+    for (int i = 0; i < mNumDoNotMirrorNames; i++)
     {
-        if (nlStrICmp(name, mUnidentified340A4[i]) == 0)
+        if (nlStrICmp(name, mDoNotMirrorNames[i]) == 0)
         {
             return false;
         }
@@ -987,9 +985,9 @@ bool NisPlayer::IsMirrored(NisTarget target, const char* name, NisWinnerType win
     {
         mirrored = false;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_14 || target == NIS_TARGET_WINNER_CAPTAIN || target == NIS_TARGET_WINNER_SIDEKICK || target == NIS_TARGET_LOSER_GOALIE)
+    if (target == NIS_TARGET_SCORER || target == NIS_TARGET_WINNER_CAPTAIN || target == NIS_TARGET_WINNER_SIDEKICK || target == NIS_TARGET_LOSER_GOALIE)
     {
-        if (fn_8027E284(winnerType) == 0)
+        if (GetWinnerSide(winnerType) == 0)
         {
             return mirrored;
         }
@@ -997,13 +995,13 @@ bool NisPlayer::IsMirrored(NisTarget target, const char* name, NisWinnerType win
     }
     if (target == NIS_TARGET_LOSER_CAPTAIN || target == NIS_TARGET_WINNER_GOALIE || target == NIS_TARGET_LOSER_SIDEKICK)
     {
-        if (fn_8027E284(winnerType) == 0)
+        if (GetWinnerSide(winnerType) == 0)
         {
             return !mirrored;
         }
         return mirrored;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_21)
+    if (target == NIS_TARGET_MEGASTRIKE_CAPTAIN)
     {
         if (strstr(name, "_megastrike_") != NULL)
         {
@@ -1011,7 +1009,7 @@ bool NisPlayer::IsMirrored(NisTarget target, const char* name, NisWinnerType win
         }
         return mMegaStrikeSide == 0;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_22)
+    if (target == NIS_TARGET_MEGASTRIKE_DEFENDING_GOALIE)
     {
         return mMegaStrikeSide == 0;
     }
@@ -1053,7 +1051,7 @@ void NisPlayer::fn_8027E5D0()
 {
 }
 
-void NisPlayer::fn_8027E5D4()
+void NisPlayer::ReleaseCachedNisBuffers()
 {
     for (int i = 0; i < mDictSize; i++)
     {
@@ -1064,11 +1062,11 @@ void NisPlayer::fn_8027E5D4()
     }
 }
 
-bool NisPlayer::fn_8027E64C() const
+bool NisPlayer::HasSecondaryNis() const
 {
     for (int i = 0; i < 8; i++)
     {
-        if (mPlaying[i] != 0 && mPlaying[i]->unknown_0x034 != 0)
+        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != 0)
         {
             return true;
         }
@@ -1076,24 +1074,24 @@ bool NisPlayer::fn_8027E64C() const
     return false;
 }
 
-cAnimCamera* NisPlayer::fn_8027E708()
+cAnimCamera* NisPlayer::GetSecondaryCamera()
 {
     return &mCamera[1];
 }
 
-void NisPlayer::fn_8027E714()
+void NisPlayer::SwapCameras()
 {
     for (int i = 0; i < 8; i++)
     {
         if (mPlaying[i] != NULL)
         {
-            if (mPlaying[i]->unknown_0x034 == 0)
+            if (mPlaying[i]->mRenderMode == 0)
             {
-                mPlaying[i]->unknown_0x034 = 1;
+                mPlaying[i]->mRenderMode = 1;
             }
-            else if (mPlaying[i]->unknown_0x034 == 1)
+            else if (mPlaying[i]->mRenderMode == 1)
             {
-                mPlaying[i]->unknown_0x034 = 0;
+                mPlaying[i]->mRenderMode = 0;
             }
         }
     }
@@ -1107,26 +1105,26 @@ void NisPlayer::fn_8027E714()
 
 void NisPlayer::PreserveNisCueOnReset()
 {
-    mUnidentified34358 = false;
+    mStopNisCueOnReset = false;
 }
 
 void NisPlayer::StopNisCue()
 {
-    mUnidentified34358 = true;
-    if (mUnidentified34350 != 0)
+    mStopNisCueOnReset = true;
+    if (mPlayingNisCue != 0)
     {
-        StopSound(mUnidentified34350, (void*)-1);
-        mUnidentified34350 = 0;
+        StopSound(mPlayingNisCue, (void*)-1);
+        mPlayingNisCue = 0;
     }
 }
 
-void NisPlayer::fn_8027ED70()
+void NisPlayer::ReleaseNisCue()
 {
-    mUnidentified34358 = true;
-    if (mUnidentified34350 != 0)
+    mStopNisCueOnReset = true;
+    if (mPlayingNisCue != 0)
     {
-        SetSoundCallbackEnabled(mUnidentified34350, (void*)-1, 1);
-        mUnidentified34350 = 0;
+        SetSoundCallbackEnabled(mPlayingNisCue, (void*)-1, 1);
+        mPlayingNisCue = 0;
     }
 }
 
@@ -1135,49 +1133,49 @@ void NisPlayer::PrepareNisCue(unsigned long cue)
     StopSound(cue, (void*)-1);
     if (PrepareTrackedSound(19, cue, 0, "Nis Cue", (void*)-1, true))
     {
-        mUnidentified34354 = cue;
+        mPreparedNisCue = cue;
     }
 }
 
 void NisPlayer::StartNisCue()
 {
-    if (mUnidentified34354 != 0)
+    if (mPreparedNisCue != 0)
     {
-        mUnidentified34350 = mUnidentified34354;
-        mUnidentified34354 = 0;
-        StartTrackedSound(mUnidentified34350, (void*)-1);
+        mPlayingNisCue = mPreparedNisCue;
+        mPreparedNisCue = 0;
+        StartTrackedSound(mPlayingNisCue, (void*)-1);
     }
 }
 
-void NisPlayer::fn_8027EE60(bool param1)
+void NisPlayer::EnableWorldDarkening(bool fade)
 {
-    mUnidentified34338 = 4;
-    if (param1)
+    mOverlayMode = 4;
+    if (fade)
     {
-        WorldDarkening::Instance().Fade(lbl_806DEE9C, lbl_806DEEA0);
+        WorldDarkening::Instance().Fade(g_NisWorldDarkeningAmount, g_NisWorldDarkeningFadeTime);
     }
 }
 
-void NisPlayer::fn_8027EEA0(float param1)
+void NisPlayer::FadeWorldDarkening(float duration)
 {
-    if (mUnidentified34338 == 4)
+    if (mOverlayMode == 4)
     {
-        WorldDarkening::Instance().Fade(lbl_806DEE9C, param1);
+        WorldDarkening::Instance().Fade(g_NisWorldDarkeningAmount, duration);
     }
 }
 
-void NisPlayer::fn_8027EEF0()
+void NisPlayer::ResetToPIPOverlay()
 {
     WorldDarkening::Instance().fn_801AF550();
-    mUnidentified34338 = 0;
-    fn_8027EF8C();
+    mOverlayMode = 0;
+    ClearSecondaryNis();
 }
 
-void NisPlayer::fn_8027EF8C()
+void NisPlayer::ClearSecondaryNis()
 {
     for (int i = 0; i < 8; i++)
     {
-        if (mPlaying[i] != 0 && mPlaying[i]->unknown_0x034 != 0)
+        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != 0)
         {
             delete mPlaying[i];
             mPlaying[i] = 0;
@@ -1185,75 +1183,75 @@ void NisPlayer::fn_8027EF8C()
     }
 }
 
-extern "C" void fn_8027F018(void* data, unsigned long size, void* userData)
+void OnNisTriggersLoaded(void* data, unsigned long size, void* userData)
 {
     NisPlayer* player = (NisPlayer*)userData;
     if (size != 0)
     {
-        byteCode = data;
+        sTriggerByteCode = data;
         player->LoadByteCode(data);
-        player->unknown_0x00028 |= 1;
+        player->mLoadedAssetMask |= 1;
     }
 }
 
-extern "C" void fn_8027F064(void* data, unsigned long size, void* userData)
+void OnNisAnimProxyLoaded(void* data, unsigned long size, void* userData)
 {
     NisPlayer* player = (NisPlayer*)userData;
     if (size != 0)
     {
-        player->mUnidentified34334 = data;
-        player->unknown_0x00028 |= 2;
+        player->mAnimProxyByteCode = data;
+        player->mLoadedAssetMask |= 2;
     }
 }
 
-extern "C" void fn_8027F084(void* data, unsigned long size, void* userData)
+void OnNisDoNotMirrorListLoaded(void* data, unsigned long size, void* userData)
 {
     NisPlayer* player = (NisPlayer*)userData;
     if (size != 0)
     {
-        player->fn_8027B630((char*)data, size);
-        player->unknown_0x00028 |= 4;
+        player->ParseDoNotMirrorList((char*)data, size);
+        player->mLoadedAssetMask |= 4;
     }
 }
 
-extern "C" void fn_8027F0D8(void* data, unsigned long size, void* userData)
+void OnNisDoNotShowPIPListLoaded(void* data, unsigned long size, void* userData)
 {
     NisPlayer* player = (NisPlayer*)userData;
     if (size != 0)
     {
-        player->fn_8027B758((char*)data, size);
-        player->unknown_0x00028 |= 8;
+        player->ParseDoNotShowPIPList((char*)data, size);
+        player->mLoadedAssetMask |= 8;
     }
 }
 
-extern "C" void fn_8027F12C(void* data, unsigned long size, void* userData)
+void OnNisDictionaryLoaded(void* data, unsigned long size, void* userData)
 {
     NisPlayer* player = (NisPlayer*)userData;
     if (size != 0)
     {
-        player->fn_8027B880((char*)data);
-        player->unknown_0x00028 |= 16;
+        player->ParseDictionary((char*)data);
+        player->mLoadedAssetMask |= 16;
     }
 }
 
-void fn_8027F174(glModel* model)
+void ApplyNisTransitionTeamLogo(glModel* model)
 {
-    static const unsigned long texture_806E19CC = glGetTexture("transitions/waluigi_logo");
+    static const unsigned long defaultTransitionLogo = glGetTexture("transitions/waluigi_logo");
     for (glModelPacket* packet = model->packets; packet < model->packets + model->numPackets; packet++)
     {
         unsigned long diffuseTexture = glGetMaterialUnsignedParameter(packet, gDiffuseTextureSemantic);
-        if (NisPlayer::Instance()->HasUnidentifiedPacket(packet))
+        if (NisPlayer::Instance()->HasTeamLogoPacket(packet))
         {
-            glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, NisPlayer::Instance()->mUnidentified34438);
-            unsigned long textureIndex = NisPlayer::Instance()->mUnidentified3443C;
+            glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, NisPlayer::Instance()->mTeamLogoTexture);
+            unsigned long textureIndex = NisPlayer::Instance()->mTeamLogoTextureIndex;
             glSetMaterialTextureIndexParameter(packet, gDiffuseTextureSemantic, &textureIndex);
         }
-        if (diffuseTexture == texture_806E19CC)
+        if (diffuseTexture == defaultTransitionLogo)
         {
-            glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, NisPlayer::Instance()->mUnidentified34438);
-            unsigned long textureIndex = NisPlayer::Instance()->mUnidentified3443C;
+            glSetMaterialTextureParameter(packet, gDiffuseTextureSemantic, NisPlayer::Instance()->mTeamLogoTexture);
+            unsigned long textureIndex = NisPlayer::Instance()->mTeamLogoTextureIndex;
             glSetMaterialTextureIndexParameter(packet, gDiffuseTextureSemantic, &textureIndex);
-            NisPlayer::Instance()->AddUnidentifiedPacket(packet);
+            NisPlayer::Instance()->AddTeamLogoPacket(packet);
         }
     }
 }
@@ -1263,8 +1261,8 @@ void NisPlayer::SetTeamLogo(NisTarget target, NisWinnerType winnerType)
     const char* filter = NisPlayer::Instance()->GetTargetFilter(target, winnerType);
     char textureName[64];
     nlSNPrintf(textureName, sizeof(textureName), "%s/%s_logo", filter, filter);
-    mUnidentified34438 = glGetTexture(textureName);
-    mUnidentified3443C = glGetTextureManager()->GetTextureIndex(mUnidentified34438);
+    mTeamLogoTexture = glGetTexture(textureName);
+    mTeamLogoTextureIndex = glGetTextureManager()->GetTextureIndex(mTeamLogoTexture);
 }
 
 #include "Game/Render/NisPlayerOverlay.inl"

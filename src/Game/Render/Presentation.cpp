@@ -457,7 +457,7 @@ void Presentation::Update(float deltaT)
         gpNumberDisplay->Update(deltaT);
     }
 
-    NisPlayer::Instance()->fn_8027CA44();
+    NisPlayer::Instance()->StartLoadedScripts();
 
     mWaitTimeRemaining -= deltaT;
     if (mWaitTimeRemaining < 0.0f)
@@ -1378,10 +1378,10 @@ void Presentation::WaitForNisLoaded()
         }
         else
         {
-            loaded = NisPlayer::Instance()->fn_8027CB44();
+            loaded = NisPlayer::Instance()->IsReadyToPlay();
         }
     }
-    else if (NisPlayer::Instance()->fn_8027CB44())
+    else if (NisPlayer::Instance()->IsReadyToPlay())
     {
         loaded = true;
     }
@@ -1425,10 +1425,10 @@ void Presentation::PlayNis()
         }
         else
         {
-            loaded = NisPlayer::Instance()->fn_8027CB44();
+            loaded = NisPlayer::Instance()->IsReadyToPlay();
         }
     }
-    else if (NisPlayer::Instance()->fn_8027CB44())
+    else if (NisPlayer::Instance()->IsReadyToPlay())
     {
         if (IsNetworkOrRecordedGame() && IsSynchronizedNisFunction(this))
         {
@@ -1921,7 +1921,7 @@ void Presentation::WaitForNisCompletion(const char* wipe)
     }
 
     if (NisPlayer::Instance()->TimeLeft() > cutTime
-        || !NisPlayer::Instance()->fn_8027CB44())
+        || !NisPlayer::Instance()->IsReadyToPlay())
     {
         StopWithUndo();
     }

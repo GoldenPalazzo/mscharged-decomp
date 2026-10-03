@@ -71,7 +71,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 5:
-        NisPlayer::Instance()->fn_8027EF8C();
+        NisPlayer::Instance()->ClearSecondaryNis();
         break;
     case 6:
         gBlinkingEnabled = false;
@@ -81,7 +81,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 8:
         ++m_SP;
-        m_SP[-1] = NisPlayer::Instance()->fn_8027E0AC();
+        m_SP[-1] = NisPlayer::Instance()->AllowsPIP();
         break;
     case 9:
     {
@@ -137,7 +137,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     case 15:
-        NisPlayer::Instance()->fn_8027EEF0();
+        NisPlayer::Instance()->ResetToPIPOverlay();
         break;
     case 16:
     {
@@ -166,7 +166,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         bool enabled = m_SP[-1] != 0;
         --m_SP;
-        NisPlayer::Instance()->fn_8027EE60(enabled);
+        NisPlayer::Instance()->EnableWorldDarkening(enabled);
         break;
     }
     case 21:
@@ -241,7 +241,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     case 32:
-        NisPlayer::Instance()->fn_8027ED70();
+        NisPlayer::Instance()->ReleaseNisCue();
         break;
     case 33:
     {
@@ -457,7 +457,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         float value = *(float*)&m_SP[-1];
         --m_SP;
-        NisPlayer::Instance()->fn_8027EEA0(value);
+        NisPlayer::Instance()->FadeWorldDarkening(value);
         break;
     }
     case 61:
