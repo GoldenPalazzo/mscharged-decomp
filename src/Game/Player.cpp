@@ -666,7 +666,7 @@ void cPlayer::fn_80096CDC(cBall* pBall)
     {
         DesireSteering* pDesire
             = (DesireSteering*)fn_8002E08C((cFielder*)this, 34);
-        fn_800C574C(pDesire);
+        ResetSteeringHistory(pDesire);
     }
     m_pBall = pBall;
 }

@@ -192,7 +192,7 @@ bool DesireReceivePass::Initialize(void* context)
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
         m_pFielder, 34);
-    fn_800C5784(desire);
+    ResetSteeringTargets(desire);
 
     mEstimated.Reset();
     mbOneTouchVolley = false;
@@ -347,9 +347,9 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             fArrivalRadius = lbl_806DC1C8;
         }
         DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
-        fn_800C61A4(pSteering, mEstimated.v3AnimStartPos,
+        SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
             mEstimated.aFacingDirection, mEstimated.fAnimStartTime, fArrivalRadius);
-        pSteering->fn_800C2F48(InterpolateClamped(lbl_806DC1E0, 0.0f, g_pBall->fn_800C2EC8()));
+        pSteering->SetAvoidanceMultiplier(InterpolateClamped(lbl_806DC1E0, 0.0f, g_pBall->fn_800C2EC8()));
         if (m_pFielder->GetDistanceToDesiredPos() <= fArrivalRadius)
         {
             if (!CalcExactEstimates(true))
@@ -385,7 +385,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         else
         {
             DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
-            fn_800C61A4(pSteering, mEstimated.v3AnimStartPos,
+            SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
                 mEstimated.aFacingDirection, mEstimated.fAnimStartTime, lbl_806DC1C4);
         }
         break;
@@ -725,8 +725,8 @@ void DesireReceivePass::Cleanup()
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
         m_pFielder, 34);
-    fn_800C574C(desire);
-    fn_800C577C(desire);
+    ResetSteeringHistory(desire);
+    ResetSteeringAvoidance(desire);
 }
 
 bool DesireReceivePass::fn_800C0E54()

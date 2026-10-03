@@ -31,7 +31,7 @@ extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
 
-bool lbl_806E0E58 = false;
+bool gForceSidelineAvoidance = false;
 
 static nlVector2 sSteeringSpeedScalePoints[] = {
     { 0.0f, 0.0f },
@@ -48,9 +48,9 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static unsigned short sDesireSteeringType = 0xFFFF;
 static bool sUseAvoidance = true;
 static float sMinimumDesiredSpeed = 0.1f;
-float lbl_806DC230 = 0.3f;
+float gSteeringHistoryDuration = 0.3f;
 
-static inline bool IsNearlyZero(float value, float zero)
+static inline bool IsNotNearlyZero(float value, float zero)
 {
     bool bNearlyZero = (float)fabs(value - zero) <= 0.0001f;
     return !bNearlyZero;
@@ -58,7 +58,7 @@ static inline bool IsNearlyZero(float value, float zero)
 
 DesireSteering::DesireSteering()
     : Desire(34, UnsetTransitionFunc(g_UnsetTransitionFunc)),
-      m_AvoidanceHistory(lbl_806DC230)
+      m_AvoidanceHistory(gSteeringHistoryDuration)
 {
     m_pAvoidance = NULL;
 }
@@ -105,17 +105,17 @@ void DesireSteering::Cleanup()
     m_AvoidanceHistory.UnidentifiedReset();
 }
 
-extern "C" void fn_800C574C(DesireSteering* desire)
+void ResetSteeringHistory(DesireSteering* desire)
 {
     desire->m_AvoidanceHistory.UnidentifiedReset();
 }
 
-extern "C" void fn_800C577C(DesireSteering* desire)
+void ResetSteeringAvoidance(DesireSteering* desire)
 {
     fn_8000F178(desire->m_pAvoidance);
 }
 
-extern "C" void fn_800C5784(DesireSteering* desire)
+void ResetSteeringTargets(DesireSteering* desire)
 {
     desire->m_v3LastDesiredPos = desire->m_v3DesiredPos;
     desire->m_v3DesiredPos = v3Zero;
@@ -144,10 +144,10 @@ void DesireSteering::Update(
     {
         if (m_fDesiredArrivalTime > 0.0f)
         {
-            fn_800C6390(this, m_v3DesiredPos,
+            SeekTimedSteeringTarget(this, m_v3DesiredPos,
                 fDeltaT, m_fDesiredArrivalTime);
             m_fDesiredArrivalTime -= fDeltaT;
-            fn_800C5784(this);
+            ResetSteeringTargets(this);
             bUseAvoidance = false;
         }
         else
@@ -170,13 +170,13 @@ void DesireSteering::Update(
         m_AvoidanceHistory.Update(
             m_v3DesiredPos, v3UnfilteredDesired, fDeltaT);
 
-        fn_800C66A4(this, m_v3DesiredPos,
+        SeekSteeringTarget(this, m_v3DesiredPos,
             TR_FAR_DISTANCE, fDeltaT, m_fUrgency);
         m_v3LastDesiredPos = v3UnfilteredDesired;
     }
     else
     {
-        fn_800C574C(this);
+        ResetSteeringHistory(this);
     }
 
     nlPolar desiredVelocity;
@@ -229,7 +229,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
                 || GameInfoManager::Instance()->IsRule0x4Equal3())
             {
                 if (desire->m_pFielder->fn_8001E160()
-                    && !lbl_806E0E58)
+                    && !gForceSidelineAvoidance)
                 {
                     nThingsToAvoid = AVOID_NOTHING;
                 }
@@ -299,7 +299,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     desire->m_fAvoidanceMult = 1.0f;
 }
 
-extern "C" void fn_800C60C4(DesireSteering* desire,
+void AddSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Position, float fUrgency, float fWeight)
 {
     fn_8003E948(desire->m_pFielder);
@@ -319,7 +319,7 @@ extern "C" void fn_800C60C4(DesireSteering* desire,
     }
 }
 
-extern "C" void fn_800C61A4(DesireSteering* desire,
+void SetTimedSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Position, unsigned short aFacingDirection,
     float fArrivalTime, float fForcedArrivalRadius)
 {
@@ -331,7 +331,7 @@ extern "C" void fn_800C61A4(DesireSteering* desire,
     desire->m_fDesiredFacingDirection = (float)aFacingDirection;
 }
 
-extern "C" const nlVector3* fn_800C61FC(DesireSteering* desire)
+const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
 {
     DesireReceivePass* receivePass = (DesireReceivePass*)fn_8002E08C(
         desire->m_pFielder, 22);
@@ -374,7 +374,7 @@ extern "C" const nlVector3* fn_800C61FC(DesireSteering* desire)
     return &desire->m_v3LastDesiredPos;
 }
 
-extern "C" void fn_800C6390(DesireSteering* desire,
+void SeekTimedSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Position, float fDeltaT, float fDesiredArrivalTime)
 {
     nlVector3 v3FixedPos = v3Position;
@@ -401,11 +401,11 @@ extern "C" void fn_800C6390(DesireSteering* desire,
                 false);
         }
         desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
-        fn_800C5784(desire);
+        ResetSteeringTargets(desire);
         return;
     }
 
-    desire->m_ePositionSeekState = PSS_UNIDENTIFIED_3;
+    desire->m_ePositionSeekState = PSS_TIMED_SEEKING;
     float fDesiredSpeed
         = nlSqrt(fDistSq, true) - desire->m_fForcedArrivalRadius;
     float fMinimumSpeed = 0.0f;
@@ -448,7 +448,7 @@ static inline float GetSteeringSpeedScale(float distance)
     return scale;
 }
 
-extern "C" void fn_800C66A4(DesireSteering* desire,
+void SeekSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Pos, eTurboRequest turboRequest,
     float fDeltaT, float fUrgency)
 {
@@ -467,7 +467,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     float fRadiusScale = fUrgency > 0.0f ? 1.0f / fUrgency : 1.0f;
     float fMinimumSpeedScale = 1.0f;
 
-    if (IsNearlyZero(fDistance, 0.0f))
+    if (IsNotNearlyZero(fDistance, 0.0f))
     {
         fDesiredPositionRateOfChange
             = nlSqrt(v3DeltaFromDesired.x * v3DeltaFromDesired.x
@@ -488,7 +488,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     switch (desire->m_ePositionSeekState)
     {
     case PSS_ARRIVED:
-    case PSS_UNIDENTIFIED_3:
+    case PSS_TIMED_SEEKING:
     {
         float fOutRad = fRadiusScale * gGameTweaks.m_pGameTweaks->fArrivalOutRadius;
         fSpeedPercent = NormalizeVal(fDistance, 0.0f, fOutRad);
@@ -521,7 +521,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         else if (fDistance <= fRadiusScale
                      * gGameTweaks.m_pGameTweaks->fArrivalInRadius)
         {
-            fn_800C5784(desire);
+            ResetSteeringTargets(desire);
             desire->m_ePositionSeekState = PSS_ARRIVED;
         }
         break;
@@ -541,7 +541,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         }
         else if (fDistance < fRadiusScale * gGameTweaks.m_pGameTweaks->fArrivalInRadius)
         {
-            fn_800C5784(desire);
+            ResetSteeringTargets(desire);
             desire->m_ePositionSeekState = PSS_ARRIVED;
         }
         break;
@@ -581,7 +581,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         }
         else if (turboRequest == TR_FORCED_ON
             || (turboRequest == TR_MOVING_TARGET
-                && IsNearlyZero(fDesiredPositionRateOfChange, 0.0f)))
+                && IsNotNearlyZero(fDesiredPositionRateOfChange, 0.0f)))
         {
             fMinSpeed = fn_8002C254(desire->m_pFielder->GetTweaks());
             fMaxSpeed = fMinSpeed;
@@ -616,14 +616,14 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         }
         else if (turboRequest == TR_FORCED_ON
             || (turboRequest == TR_MOVING_TARGET
-                && IsNearlyZero(fDesiredPositionRateOfChange, 0.0f)))
+                && IsNotNearlyZero(fDesiredPositionRateOfChange, 0.0f)))
         {
             fMinSpeed = desire->m_pFielder->GetTweaks()->GetRunningSpeed();
             fMaxSpeed = desire->m_pFielder->GetTweaks()->GetRunningSpeed();
         }
     }
 
-    if (!IsNearlyZero(fDistance, 0.0f))
+    if (!IsNotNearlyZero(fDistance, 0.0f))
     {
         fMinSpeed = 0.0f;
         fMaxSpeed = 0.0f;
@@ -637,7 +637,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
 }
 
-extern "C" float fn_800C6EB0(cFielder* pFielder)
+float GetBallFacingWeight(cFielder* pFielder)
 {
     float result = 0.0f;
     if (StrategicBallOwner(pFielder) >= 0.5f)
@@ -672,7 +672,7 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
     return result;
 }
 
-static float ShouldIStrafeMark(cFielder* TheFielder)
+static float GetMarkFacingWeight(cFielder* TheFielder)
 {
     cFielder* mark = fn_800D6734(TheFielder);
     float inBetween = InBetweenMyNetAnd(TheFielder, mark);
@@ -707,8 +707,8 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         }
         else
         {
-            float fFacingWeight = fn_800C6EB0(desire->m_pFielder);
-            float fMarkWeight = ShouldIStrafeMark(desire->m_pFielder);
+            float fFacingWeight = GetBallFacingWeight(desire->m_pFielder);
+            float fMarkWeight = GetMarkFacingWeight(desire->m_pFielder);
             float fTotalWeight = fFacingWeight + fMarkWeight;
             bool bTurning = true;
             bool bStrafing = true;
@@ -744,7 +744,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
             }
         }
 
-        eMovement = fn_800C7348(desire, (unsigned short)aFacingDirection,
+        eMovement = GetSteeringStrafeDirection(desire, (unsigned short)aFacingDirection,
             desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection);
         if (eMovement == STRAFE_FORWARD)
         {
@@ -760,7 +760,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
     desire->m_pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
 }
 
-extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
+eStrafeDirection GetSteeringStrafeDirection(DesireSteering* desire,
     unsigned short aDesiredFacingDirection,
     unsigned short aDesiredMovementDirection)
 {
