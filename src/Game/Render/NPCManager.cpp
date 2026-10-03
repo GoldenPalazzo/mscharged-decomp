@@ -172,7 +172,7 @@ void NPCManager::CreateDaisyFists()
     }
 }
 
-DaisyFistObject* NPCManager::fn_801A9CA4(int nIndex)
+DaisyFistObject* NPCManager::GetDaisyFist(int nIndex)
 {
     if (nIndex >= 0)
     {
@@ -192,7 +192,7 @@ DaisyFistObject* NPCManager::fn_801A9CA4(int nIndex)
     return 0;
 }
 
-BulletBillObject* NPCManager::fn_801A9D10(int nIndex)
+BulletBillObject* NPCManager::GetBulletBill(int nIndex)
 {
     return mUnidentified058[nIndex];
 }
@@ -261,7 +261,7 @@ void NPCManager::CreateHammers()
     }
 }
 
-int NPCManager::fn_801AA32C()
+int NPCManager::GetNumHammers()
 {
     return mUnidentified070[0] == 0 ? 0 : 15;
 }
@@ -278,7 +278,7 @@ void NPCManager::fn_801AA348()
     }
 }
 
-HammerObject* NPCManager::fn_801AA3AC(int nIndex)
+HammerObject* NPCManager::GetHammer(int nIndex)
 {
     if (nIndex >= 0)
     {

@@ -1423,9 +1423,9 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                 if (region.ContainsPoint2D(position))
                     gNPCManager->GetChainChomp()->Freeze(lbl_806DBD88, false);
             }
-            for (unsigned int i = 0; i < gNPCManager->UnidentifiedCount054(); i++)
+            for (unsigned int i = 0; i < gNPCManager->GetNumBulletBills(); i++)
             {
-                BulletBillObject* pBill = gNPCManager->fn_801A9D10(i);
+                BulletBillObject* pBill = gNPCManager->GetBulletBill(i);
                 if (pBill != NULL && pBill->active)
                 {
                     nlVector2 position;
@@ -1435,9 +1435,9 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                         pBill->Hide(false);
                 }
             }
-            for (unsigned int i = 0; i < gNPCManager->fn_801AA32C(); i++)
+            for (unsigned int i = 0; i < gNPCManager->GetNumHammers(); i++)
             {
-                HammerObject* pHammer = gNPCManager->fn_801AA3AC(i);
+                HammerObject* pHammer = gNPCManager->GetHammer(i);
                 if (pHammer != NULL && pHammer->mActive)
                 {
                     const nlVector3* pPosition = pHammer->GetPosition();

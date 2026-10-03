@@ -5060,7 +5060,7 @@ void cFielder::ReleaseHammerProjectile()
     {
         for (int i = 0; i < 1; i++)
         {
-            HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
+            HammerObject* pProjectile = gNPCManager->GetHammer(-1);
             if (pProjectile != 0)
             {
                 pProjectile->Activate(this);

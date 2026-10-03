@@ -714,7 +714,7 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
         unsigned short angle = m_pFielder->mUnidentified024.m_aActualFacingDirection;
         for (int i = 0; i < gDaisyFistCount; i++)
         {
-            DaisyFistObject* fist = gNPCManager->fn_801A9CA4(-1);
+            DaisyFistObject* fist = gNPCManager->GetDaisyFist(-1);
             if (fist != 0)
             {
                 fist->Spawn(m_pFielder, angle);

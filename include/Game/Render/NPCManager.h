@@ -72,17 +72,17 @@ public:
     void CreateBirdoEgg();
     void CreateKoopaShell();
     void CreateDaisyFists();
-    DaisyFistObject* fn_801A9CA4(int nIndex);
-    unsigned int UnidentifiedCount054() const { return mUnidentified054; }
-    BulletBillObject* fn_801A9D10(int nIndex);
+    DaisyFistObject* GetDaisyFist(int nIndex);
+    unsigned int GetNumBulletBills() const { return mUnidentified054; }
+    BulletBillObject* GetBulletBill(int nIndex);
     BulletBillObject* fn_801A9D20();
     UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
     void CreateWindDebris();
     void CreateDiddyBanana();
     void CreateHammers();
-    int fn_801AA32C();
+    int GetNumHammers();
     void fn_801AA348();
-    HammerObject* fn_801AA3AC(int nIndex);
+    HammerObject* GetHammer(int nIndex);
     void CreateThwomps();
     ThwompObject* GetThwomp(int nIndex);
     void BeginLoadNPCTemplate();
