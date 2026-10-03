@@ -398,7 +398,7 @@ public:
     void fn_8004FB04();
     void fn_8004FC90(float fDeltaT);
     void fn_8004FF40();
-    float fn_8004FFF8();
+    float GetSuperPowerTankFraction();
     void fn_80050008();
     void fn_8005001C(bool bForce);
     void fn_800501F0(bool bParam);

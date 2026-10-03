@@ -268,7 +268,7 @@ void cFielder::fn_8004FF40()
     }
 }
 
-float cFielder::fn_8004FFF8()
+float cFielder::GetSuperPowerTankFraction()
 {
     return mUnidentified3E0 / mUnidentified3E4;
 }
