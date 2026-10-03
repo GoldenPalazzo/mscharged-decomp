@@ -68,18 +68,18 @@ public:
     bool SelectNextNPCTemplate();
     ChainChomp* GetChainChomp() const { return mpChainChomp; }
     void CreateChainChomp();
-    void fn_801A9AF8();
+    void CreateYoshiEgg();
     void CreateBirdoEgg();
-    void fn_801A9BD0();
-    void fn_801A9C3C();
+    void CreateKoopaShell();
+    void CreateDaisyFists();
     DaisyFistObject* fn_801A9CA4(int nIndex);
     unsigned int UnidentifiedCount054() const { return mUnidentified054; }
     BulletBillObject* fn_801A9D10(int nIndex);
     BulletBillObject* fn_801A9D20();
     UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
-    void fn_801A9DF0();
+    void CreateWindDebris();
     void CreateDiddyBanana();
-    void fn_801AA2C0();
+    void CreateHammers();
     int fn_801AA32C();
     void fn_801AA348();
     HammerObject* fn_801AA3AC(int nIndex);

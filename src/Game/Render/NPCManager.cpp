@@ -144,7 +144,7 @@ void NPCManager::CreateChainChomp()
     chainPhysics->SetCallbackFunction(&ChainChomp::CollisionCallback);
 }
 
-void NPCManager::fn_801A9AF8()
+void NPCManager::CreateYoshiEgg()
 {
     mUnidentified024 = new (8, false) YoshiEggObject(GetRenderObject(3, 0));
 }
@@ -156,12 +156,12 @@ void NPCManager::CreateBirdoEgg()
     mpBirdoEgg = pObject;
 }
 
-void NPCManager::fn_801A9BD0()
+void NPCManager::CreateKoopaShell()
 {
     mUnidentified02C = new (8, false) KoopaShellObject(GetRenderObject(5, 0));
 }
 
-void NPCManager::fn_801A9C3C()
+void NPCManager::CreateDaisyFists()
 {
     for (unsigned int i = 0; i < 8; ++i)
     {
@@ -219,7 +219,7 @@ UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
     return mUnidentified0CC[nIndex];
 }
 
-void NPCManager::fn_801A9DF0()
+void NPCManager::CreateWindDebris()
 {
     for (long i = 0; i < 3; ++i)
     {
@@ -250,7 +250,7 @@ void NPCManager::CreateDiddyBanana()
     mpDiddyBanana = pObject;
 }
 
-void NPCManager::fn_801AA2C0()
+void NPCManager::CreateHammers()
 {
     for (unsigned int i = 0; i < 15; ++i)
     {
