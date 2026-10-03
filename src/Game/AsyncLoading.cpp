@@ -310,7 +310,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     }
     case 5:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AE04();
+        m_SP[-1] = CharacterLoader::sInstance.ShareDuplicateAnimInventory();
         break;
     case 6:
         fn_8011B2E4(this);
@@ -534,16 +534,16 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
         break;
     case 29:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C130();
+        CharacterLoader::sInstance.StartLoadingCaptainAudio();
         break;
     case 30:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C0FC();
+        CharacterLoader::sInstance.StartLoadingAudioBank0();
         break;
     case 31:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C22C();
+        CharacterLoader::sInstance.StartLoadingAudioBank13();
         break;
     case 32:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C1B0();
+        CharacterLoader::sInstance.StartLoadingSidekickAudio();
         break;
     case 33:
         SetLoadingComment("AsyncFELocalizationFinalize");
@@ -636,19 +636,19 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         --m_SP;
         break;
     case 50:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_80009BC8();
+        CharacterLoader::sInstance.BuildCharacterList();
         break;
     case 51:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C124();
+        m_SP[-1] = CharacterLoader::sInstance.NeedsCaptainAudio();
         break;
     case 52:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BD88();
+        m_SP[-1] = CharacterLoader::sInstance.HasAlternateSwapTexture();
         break;
     case 53:
         SetLoadingComment("CreateCharacterInstance");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BA00();
+        CharacterLoader::sInstance.CreateCharacterInstance();
         FinishLoadingStep(this);
         break;
     case 54:
@@ -682,30 +682,30 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 62:
         SetLoadingComment("FinalizeAudio");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C254());
+            CharacterLoader::sInstance.FinalizeAudio());
         break;
     case 63:
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BD70();
+        CharacterLoader::sInstance.fn_8000BD70();
         break;
     case 64:
         SetLoadingComment("FinalizeLoadingAnimRetarget");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B230());
+            CharacterLoader::sInstance.FinalizeLoadingAnimRetarget());
         break;
     case 65:
         SetLoadingComment("FinalizeLoadingCaptainOrGoalieAlternateSwapTexture");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BFA0());
+            CharacterLoader::sInstance.FinalizeLoadingCaptainOrGoalieAlternateSwapTexture());
         break;
     case 66:
         SetLoadingComment("FinalizeLoadingCharacterAnimations");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B00C());
+            CharacterLoader::sInstance.FinalizeLoadingCharacterAnimations());
         break;
     case 67:
         SetLoadingComment("FinalizeLoadingCharacterEffects");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A5D8());
+            CharacterLoader::sInstance.FinalizeLoadingCharacterEffects());
         break;
     case 68:
     {
@@ -713,28 +713,28 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP--;
         SetLoadingComment("FinalizeLoadingCharacterModel");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A9A4(value));
+            CharacterLoader::sInstance.FinalizeLoadingCharacterModel(value));
         break;
     }
     case 69:
         SetLoadingComment("FinalizeLoadingCharacterPhysicsElements");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AD4C());
+            CharacterLoader::sInstance.FinalizeLoadingCharacterPhysicsElements());
         break;
     case 70:
         SetLoadingComment("FinalizeLoadingCharacterTextures");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A144());
+            CharacterLoader::sInstance.FinalizeLoadingCharacterTextures());
         break;
     case 71:
         SetLoadingComment("FinalizeLoadingCharacterTriggers");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B14C());
+            CharacterLoader::sInstance.FinalizeLoadingCharacterTriggers());
         break;
     case 72:
         SetLoadingComment("FinalizeLoadingCharINIFiles");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B9F4());
+            CharacterLoader::sInstance.FinalizeLoadingCharINIFiles());
         break;
     case 73:
         SetLoadingComment("FinalizeLoadingCrowdCharacter");
@@ -743,12 +743,12 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 74:
         SetLoadingComment("FinalizeLoadingExtraTextures");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A790());
+            CharacterLoader::sInstance.FinalizeLoadingExtraTextures());
         break;
     case 75:
         SetLoadingComment("FinalizeLoadingHierarchy");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AB18());
+            CharacterLoader::sInstance.FinalizeLoadingHierarchy());
         break;
     case 76:
         SetLoadingComment("FinalizeLoadingNPCTemplate");
@@ -757,17 +757,17 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 77:
         SetLoadingComment("FinalizeLoadingSharedTextures");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A378());
+            CharacterLoader::sInstance.FinalizeLoadingSharedTextures());
         break;
     case 78:
         SetLoadingComment("FinalizeLoadingShockTexture");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A224());
+            CharacterLoader::sInstance.FinalizeLoadingShockTexture());
         break;
     case 79:
         SetLoadingComment("FinalizeLoadingSidekickSwapTexture");
         FinishLoadingStepOrUndo(this,
-            CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B6C4());
+            CharacterLoader::sInstance.FinalizeLoadingSidekickSwapTexture());
         break;
     case 80:
         SetLoadingComment("FinalizeLoadingWorldNPCs");
@@ -925,19 +925,19 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     }
     case 104:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B1B8();
+        m_SP[-1] = CharacterLoader::sInstance.HasAnimRetarget();
         break;
     case 105:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A870();
+        m_SP[-1] = CharacterLoader::sInstance.AcquireCurrentTemplate();
         break;
     case 106:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_80009F48();
+        m_SP[-1] = CharacterLoader::sInstance.NeedsCharacterTextures();
         break;
     case 107:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A2FC();
+        m_SP[-1] = CharacterLoader::sInstance.NeedsSharedTextures();
         break;
     case 108:
         m_SP++;
@@ -990,7 +990,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 122:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_80009EFC();
+        m_SP[-1] = CharacterLoader::sInstance.NextCharacter();
         break;
     case 123:
         m_SP++;
@@ -998,29 +998,29 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 124:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C1A4();
+        m_SP[-1] = CharacterLoader::sInstance.NeedsSidekickAudio();
         break;
     case 125:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B3C0();
+        m_SP[-1] = CharacterLoader::sInstance.NeedsSidekickSwapTexture();
         break;
     case 126:
         SetLoadingComment("StartLoadingAnimRetarget");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B1F8();
+        CharacterLoader::sInstance.StartLoadingAnimRetarget();
         FinishLoadingStep(this);
         break;
     case 127:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BF04();
+        m_SP[-1] = CharacterLoader::sInstance.StartLoadingCaptainOrGoalieAlternateSwapTexture();
         break;
     case 128:
         SetLoadingComment("StartLoadingCharacterAnimations");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AE90();
+        CharacterLoader::sInstance.StartLoadingCharacterAnimations();
         FinishLoadingStep(this);
         break;
     case 129:
         SetLoadingComment("StartLoadingCharacterEffects");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A418();
+        CharacterLoader::sInstance.StartLoadingCharacterEffects();
         FinishLoadingStep(this);
         break;
     case 130:
@@ -1028,28 +1028,28 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         int value = m_SP[-1];
         m_SP--;
         SetLoadingComment("StartLoadingCharacterModel");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A8E4(value);
+        CharacterLoader::sInstance.StartLoadingCharacterModel(value);
         FinishLoadingStep(this);
         break;
     }
     case 131:
         SetLoadingComment("StartLoadingCharacterPhysicsElements");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000ACEC();
+        CharacterLoader::sInstance.StartLoadingCharacterPhysicsElements();
         FinishLoadingStep(this);
         break;
     case 132:
         SetLoadingComment("StartLoadingCharacterTextures");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_80009FCC();
+        CharacterLoader::sInstance.StartLoadingCharacterTextures();
         FinishLoadingStep(this);
         break;
     case 133:
         SetLoadingComment("StartLoadingCharacterTriggers");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B0E8();
+        CharacterLoader::sInstance.StartLoadingCharacterTriggers();
         FinishLoadingStep(this);
         break;
     case 134:
         SetLoadingComment("StartLoadingCharINIFiles");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B8E8();
+        CharacterLoader::sInstance.StartLoadingCharINIFiles();
         FinishLoadingStep(this);
         break;
     case 135:
@@ -1064,11 +1064,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 136:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A67C();
+        m_SP[-1] = CharacterLoader::sInstance.StartLoadingExtraTextures();
         break;
     case 137:
         SetLoadingComment("StartLoadingHierarchy");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AAB8();
+        CharacterLoader::sInstance.StartLoadingHierarchy();
         FinishLoadingStep(this);
         break;
     case 138:
@@ -1078,17 +1078,17 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 139:
         SetLoadingComment("StartLoadingSharedTextures");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A324();
+        CharacterLoader::sInstance.StartLoadingSharedTextures();
         FinishLoadingStep(this);
         break;
     case 140:
         SetLoadingComment("StartLoadingShockTextures");
-        CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A0A8();
+        CharacterLoader::sInstance.StartLoadingShockTextures();
         FinishLoadingStep(this);
         break;
     case 141:
         m_SP++;
-        m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B3E0();
+        m_SP[-1] = CharacterLoader::sInstance.StartLoadingSidekickSwapTexture();
         break;
     case 142:
         SetLoadingComment("StartLoadingWorldNPCs");
