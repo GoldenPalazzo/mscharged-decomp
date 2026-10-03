@@ -62,7 +62,7 @@ struct tCharacterTemplateInfo
     /* 0x4C */ const char* pUnidentified4C;
     /* 0x50 */ const char* pUnidentified50;
     /* 0x54 */ const char* szAnimRetargetFilename;
-    /* 0x58 */ unsigned char bUnidentified58;
+    /* 0x58 */ unsigned char bTexturesLoaded;
     /* 0x59 */ unsigned char pad_0x59[3];
 }; // total size: 0x5C
 

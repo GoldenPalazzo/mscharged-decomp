@@ -739,7 +739,7 @@ void DestroyCharacters()
     }
     for (i = 0; i < 20; i++)
     {
-        g_aCharacterTemplateInfo[i].bUnidentified58 = 0;
+        g_aCharacterTemplateInfo[i].bTexturesLoaded = 0;
     }
 
     AnimTriggerCallbackInfo::m_AnimTriggerCallbackInfoSlotPool.FreeBlocks();

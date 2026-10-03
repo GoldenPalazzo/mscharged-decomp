@@ -185,7 +185,7 @@ bool CharacterLoader::NeedsCharacterTextures()
     {
         return true;
     }
-    return !GetCharacterTemplateInfo(pEntry->cc)->bUnidentified58;
+    return !GetCharacterTemplateInfo(pEntry->cc)->bTexturesLoaded;
 }
 
 static void TextureBundleLoaded_cb(void* data, unsigned long size, void* param)
@@ -212,7 +212,7 @@ void CharacterLoader::StartLoadingCharacterTextures()
     {
         glBeginLoadTextureBundle(GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, TextureBundleLoaded_cb,
             pEntry, glGetCurrentResourcePool());
-        GetCharacterTemplateInfo(mCurrent->cc)->bUnidentified58 = 1;
+        GetCharacterTemplateInfo(mCurrent->cc)->bTexturesLoaded = 1;
     }
 }
 
