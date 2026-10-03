@@ -1715,7 +1715,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/si/SISamplingRate.c"),
 
             # RVL_SDK/so
-            Object(NonMatching, "RVL_SDK/so/soBasic.c"),
+            Object(Matching, "RVL_SDK/so/soBasic.c"),
             Object(Matching, "RVL_SDK/so/soCommon.c"),
             Object(Matching, "RVL_SDK/so/SOInformation.c"),
             Object(Matching, "RVL_SDK/so/SOOption.c"),
