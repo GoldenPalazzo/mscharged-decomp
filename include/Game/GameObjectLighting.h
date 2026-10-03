@@ -17,7 +17,6 @@ extern TweakValueFloat gShadowLookupScaleY;
 extern TweakValueFloat gShadowLookupTransX;
 extern TweakValueFloat gShadowLookupTransY;
 extern LightingLookup* gpShadowLightingLookup;
-extern u8 lbl_806E1458;
 
 class nlVector2;
 class nlVector3;

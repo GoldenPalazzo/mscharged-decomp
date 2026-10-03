@@ -93,6 +93,28 @@ TweakValueFloat gShadowLookupTransX(
 TweakValueFloat gShadowLookupTransY(
     "Trans Y", GetLastTweakCategory(), 0.0f, false);
 
+bool lbl_806DCC40 = true;
+f32 lbl_806DCC44 = 1.0f;
+bool lbl_806DCC48 = true;
+u32 lbl_806DCC4C = 0x50;
+u32 lbl_806DCC50 = 0x50;
+u32 lbl_806DCC54 = 0x50;
+bool lbl_806DCC58 = true;
+bool lbl_806DCC59 = true;
+bool lbl_806DCC5A = true;
+s32 lbl_806DCC5C = 0x100;
+u32 lbl_806DCC60 = (u32)-1;
+s32 lbl_806DCC64 = 2;
+u8 lbl_806DCC68 = 1;
+u32 lbl_806DCC6C = (u32)-1;
+u32 lbl_806DCC70 = (u32)-1;
+s32 lbl_806DCC74 = -1;
+
+bool lbl_806E1410;
+bool lbl_806E1411;
+bool lbl_806E1412;
+bool lbl_806E1413;
+
 u32 lbl_806E1414 = glGetTexture("global/lightramp");
 u32 lbl_806E1418 = glGetTexture("global/black");
 u32 lbl_806E141C = glGetTexture("global/white");
@@ -105,6 +127,17 @@ StadiumLightingParams gStadiumGameObjectLightingParams = {
     55.0f, 60.0f, 55.0f, -120.0f,
     0,
 };
+
+Mtx lbl_80511490 = {
+    { 0.5f, 0.0f, 0.0f, 0.5f },
+    { 0.0f, -0.5f, 0.0f, 0.5f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+
+LightingLookup* gpShadowLightingLookup;
+PlatTexture* g_pGameObjectLightRamp;
+s32 lbl_806E1428;
+bool gAlwaysUseCameraRelativeCharacterLighting;
 
 GameObjectLight lbl_805709D8[8];
 GameObjectLight lbl_80570AF8[2];
@@ -128,85 +161,44 @@ UnidentifiedTweakAction lbl_806E1438(
 
 static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };
 
-extern "C" {
-extern bool lbl_806DCC40;
-extern bool lbl_806DCC48;
-extern s32 lbl_806DCC64;
-extern bool lbl_806E1410;
-extern bool lbl_806E1411;
-extern bool lbl_806E1412;
-extern u8 lbl_806DCC68;
-extern s32 lbl_806E1428;
-extern bool gAlwaysUseCameraRelativeCharacterLighting;
-extern PlatTexture* g_pGameObjectLightRamp;
-extern u32 lbl_806DCC60;
-extern u32 lbl_806DCC6C;
-extern u32 lbl_806DCC4C;
-extern u32 lbl_806DCC50;
-extern u32 lbl_806DCC54;
-extern s32 lbl_806DCC5C;
-extern bool lbl_806DCC58;
-extern bool lbl_806DCC59;
-extern bool lbl_806DCC5A;
-extern u32 lbl_806DCC70;
-extern s32 lbl_806DCC74;
-extern f32 lbl_806DCC44;
-extern bool lbl_806E1413;
-extern const u32 lbl_804DCD00[6];
-extern const u32 lbl_804DCD18[6];
-extern const nlVector3 lbl_804DCD30;
-extern const nlVector3 lbl_804DCD3C;
-extern const u32 lbl_806E4D10[2];
-extern const u8 lbl_806E4D1B;
-extern const u8 lbl_806E4D1F;
-extern const f32 lbl_806E4CD0;
-extern const f32 lbl_806E4CD4;
-extern const f32 lbl_806E4CD8;
-extern const f32 lbl_806E4D20;
-extern const f32 lbl_806E4D24;
-extern const f32 lbl_806E4D28;
-extern const f32 lbl_806E4D2C;
-extern const f32 lbl_806E4D30;
-extern const u8 lbl_806E4D34;
-extern const u8 lbl_806E4D35;
-extern const u8 lbl_806E4D36;
-extern const u8 lbl_806E4D37;
-extern const u8 lbl_806E4D3B;
-extern const u8 lbl_806E4D3C;
-extern const u8 lbl_806E4D3D;
-extern const u8 lbl_806E4D3E;
-extern const u8 lbl_806E4D3F;
-extern const f32 lbl_806E4D40;
-
-extern Mtx lbl_80511490;
-extern nlMatrix4 lbl_80570C18;
-
-bool fn_80183C54()
-{
-    if (!lbl_806DCC58)
-        return false;
-
-    if (lbl_806DCC6C == (u32)-1)
-        return false;
-
-    if (gpShadowLightingLookup == 0)
-        return false;
-
-    if (!g_bRenderWorldEffects)
-        return false;
-
-    return true;
-}
-}
-
-GameObjectLight::GameObjectLight()
-{
-    enabled = false;
-    unknown01 = false;
-    unknown02 = false;
-}
-
 void FillInGameObjectLightRamp();
+void SetCameraRelativeLightData(void* pLightData);
+extern "C" void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview);
+
+extern "C" {
+int IsGameObjectLightingEnabled()
+{
+    return lbl_806DCC40;
+}
+
+int ShouldUseGameObjectLightTexture(int character)
+{
+    return character ? lbl_806E1411 : lbl_806E1410;
+}
+
+int ShouldDoubleGameObjectLighting()
+{
+    return lbl_806E1412;
+}
+}
+
+bool AlwaysUseCameraRelativeCharacterLighting()
+{
+    return gAlwaysUseCameraRelativeCharacterLighting;
+}
+
+extern "C" {
+void fn_80182128()
+{
+    lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
+    lbl_80570B80.colour.c[1] = lbl_80570BD0.value;
+    lbl_80570B80.colour.c[2] = lbl_80570BF0.value;
+}
+
+void fn_80182164()
+{
+}
+}
 
 void PrepareStadiumLight(StadiumLight* pLight)
 {
@@ -215,9 +207,102 @@ void PrepareStadiumLight(StadiumLight* pLight)
     light.unknown01 = true;
     light.enabled = true;
     const nlMatrix4& matrix = *pLight->GetWorldMatrix();
-    ConvertColour(light.colour, pLight->m_colour);
+    light.colour.c[0] = nlFloatColourToByte(pLight->m_colour.c[0]);
+    light.colour.c[1] = nlFloatColourToByte(pLight->m_colour.c[1]);
+    light.colour.c[2] = nlFloatColourToByte(pLight->m_colour.c[2]);
+    light.colour.c[3] = nlFloatColourToByte(pLight->m_colour.c[3]);
     light.worldPosition = matrix.GetTranslation();
     light.intensity = pLight->GetIntensity();
+}
+
+extern "C" {
+int GetGameObjectLightCount(bool arg0, bool arg1)
+{
+    bool var0 = arg1 && lbl_806DCC48;
+    int var1 = var0 ? GetEmissionManager()->GetNumLights() : 0;
+
+    switch (lbl_806E1428)
+    {
+    case 0:
+        if (arg0)
+            return var1 + lbl_80570B70.value;
+        return lbl_806DCC64 + var1;
+    case 1:
+        return lbl_806DCC64 + var1;
+    case 2:
+        return 1;
+    default:
+        lbl_806E1428 = 0;
+        return 2;
+    }
+}
+
+GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
+{
+    s32 var0 = arg1 ? lbl_80570B70.value : lbl_806DCC64;
+    if (!lbl_806DCC68 && lbl_806E1428 == 1)
+    {
+        lbl_806E1428 = 0;
+    }
+
+    switch (lbl_806E1428)
+    {
+    case 0:
+        if (arg0 >= var0)
+        {
+            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
+            GameObjectLight* var1 = &lbl_805709D8[arg0];
+            var1->enabled = true;
+            var1->unknown01 = true;
+            var1->unknown02 = true;
+            var1->intensity = 1.0f;
+            var1->worldPosition = pLight->m_v3Position;
+            var1->colour.c[0] = pLight->m_Colour.c[0];
+            var1->colour.c[1] = pLight->m_Colour.c[1];
+            var1->colour.c[2] = pLight->m_Colour.c[2];
+            var1->colour.c[3] = pLight->m_Colour.c[3];
+            var1->unknown20 = pLight->m_fRadius;
+            return var1;
+        }
+        if (arg1)
+        {
+            if (arg0 == 0)
+                return &lbl_80570B80;
+            s32 characterLightCount = lbl_80570B70.value;
+            s32 lightIndex = arg0;
+            if (lightIndex < characterLightCount)
+                return &lbl_805709D8[lightIndex];
+            lightIndex -= characterLightCount;
+            return &lbl_805709D8[lightIndex + lbl_806DCC64];
+        }
+        return &lbl_805709D8[arg0];
+
+    case 1:
+        if (arg0 >= var0)
+        {
+            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
+            GameObjectLight* var1 = &lbl_805709D8[arg0];
+            var1->enabled = true;
+            var1->unknown01 = true;
+            var1->unknown02 = true;
+            var1->intensity = 1.0f;
+            var1->worldPosition = pLight->m_v3Position;
+            var1->colour.c[0] = pLight->m_Colour.c[0];
+            var1->colour.c[1] = pLight->m_Colour.c[1];
+            var1->colour.c[2] = pLight->m_Colour.c[2];
+            var1->colour.c[3] = pLight->m_Colour.c[3];
+            var1->unknown20 = pLight->m_fRadius;
+            return var1;
+        }
+        return &lbl_80570AF8[arg0];
+
+    case 2:
+        return &lbl_80570B40;
+
+    default:
+        return lbl_805709D8;
+    }
+}
 }
 
 void InitializeGameObjectLighting()
@@ -257,6 +342,17 @@ void InitializeGameObjectLighting()
     glRegisterTexture(pParams->lightRamp, pRampTexture, pResource);
     g_pGameObjectLightRamp->Create(0x100, 4, GXTex_RGBA8, pResource, 1, true, false);
     FillInGameObjectLightRamp();
+}
+
+void UpdateGameObjectLighting()
+{
+    if (!lbl_806DCC68)
+        return;
+
+    if (!DrawableCharacter::sCameraRelativeLighting && !gAlwaysUseCameraRelativeCharacterLighting && lbl_806E1428 != 1)
+        return;
+
+    SetCameraRelativeLightData(&lbl_80570AF8);
 }
 
 void SetCameraRelativeLightData(void* pLightData)
@@ -312,469 +408,6 @@ void SetCameraRelativeLightData(void* pLightData)
     pLights->lights[1].enabled = true;
     nlVec3Set(pLights->lights[1].worldPosition, -transformedDir.x, -transformedDir.y, -transformedDir.z);
     pLights->lights[1].intensity = params->fillLightIntensity;
-}
-
-int fn_80183DEC(const nlVector3* arg0)
-{
-    nlColour var0 = fn_80183C9C((const nlVector2*)arg0, true);
-    return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
-}
-
-void fn_80183E4C()
-{
-    if (gpShadowLightingLookup != 0)
-    {
-        delete gpShadowLightingLookup;
-        gpShadowLightingLookup = 0;
-    }
-    lbl_806DCC6C = -1;
-}
-
-extern "C" {
-
-void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix)
-{
-    if (fn_80183C54())
-        nlInvertMatrix(lbl_80570C18, *matrix);
-}
-
-void SetGameObjectShadowModelMatrix(u32 matrix)
-{
-    if (!fn_80183C54())
-        return;
-
-    if (matrix == (u32)-1)
-    {
-        lbl_806DCC70 = -1;
-    }
-    else if (matrix != lbl_806DCC70)
-    {
-        lbl_806DCC70 = matrix;
-
-        nlMatrix4 transform;
-        glGetMatrix(matrix, transform);
-
-        Mtx textureMatrix;
-        glxCopyMatrix(textureMatrix, transform);
-        GXLoadTexMtxImm(textureMatrix, 0x36, GX_MTX3x4);
-    }
-}
-
-void RestoreGameObjectShadowLighting()
-{
-    if (fn_80183C54() && lbl_806DCC74 >= 0)
-    {
-        gxSetNumTexGens(gxGetNumTexGens() - 1);
-        gxSetNumTevStages(gxGetNumTevStages() - 1);
-        gxSetTexCoordGen(lbl_806DCC74, 1, lbl_806DCC74 + 4, 0x3C);
-        lbl_806DCC74 = -1;
-    }
-}
-
-void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
-{
-    if (!fn_80183C54())
-        return;
-
-    u32 numTevStages;
-    u32 numTexGens;
-    numTexGens = gxGetNumTexGens();
-    numTevStages = gxGetNumTevStages();
-    gxSetNumTexGens(numTexGens + 1);
-    gxSetNumTevStages(numTevStages + 1);
-    lbl_806DCC74 = numTexGens;
-
-    if (arg1 != 0)
-    {
-        gxSetTevOrder(numTevStages, 0xFF, 0xFF, 0xFF);
-        gxSetTevColourIn(numTevStages, 15, 0, 6, 15);
-        gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
-
-        GXColor colour = *(GXColor*)&arg1;
-        GXSetTevColor(GX_TEVREG2, colour);
-    }
-    else
-    {
-        gxSetTevOrder(numTevStages, numTexGens, numTexGens, 0xFF);
-        if (arg0 && lbl_806DCC5A)
-            gxSetTexCoordGen(numTexGens, 1, 0, 0, false, 0x76);
-        else
-            gxSetTexCoordGen(numTexGens, 1, 0, 0x36, false, 0x76);
-
-        gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
-        gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
-
-        glTextureBinding textureState(lbl_806DCC6C, !lbl_806E1413, !lbl_806E1413);
-        glx_BindTexture(numTexGens, &textureState);
-
-        nlMatrix4 transform;
-        nlMakeScaleMatrix(transform, gShadowLookupScaleX,
-            gShadowLookupScaleY, lbl_806E4CD4);
-        transform.SetRow4_(3, gShadowLookupTransX,
-            gShadowLookupTransY, lbl_806E4CD8, lbl_806E4CD4);
-
-        Mtx gxTransform;
-        glxCopyMatrix(gxTransform, transform);
-
-        Mtx textureMatrix;
-        PSMTXConcat(lbl_80511490, gxTransform, textureMatrix);
-
-        if (arg0 && lbl_806DCC5A)
-        {
-            Mtx inverse;
-            glxCopyMatrix(inverse, lbl_80570C18);
-            if (lbl_806DCC59)
-                PSMTXConcat(textureMatrix, inverse, textureMatrix);
-            else
-                PSMTXConcat(inverse, textureMatrix, textureMatrix);
-        }
-
-        GXLoadTexMtxImm(textureMatrix, 0x76, GX_MTX3x4);
-    }
-}
-
-void fn_80183764(u32 textureHandle)
-{
-    if (textureHandle != (u32)-1 && glTextureLoad(textureHandle))
-    {
-        lbl_806DCC6C = textureHandle;
-        gpShadowLightingLookup = new (8, false) LightingLookup;
-        gpShadowLightingLookup->LoadTexture(textureHandle);
-    }
-    else
-    {
-        lbl_806DCC6C = -1;
-    }
-}
-
-void SetGameObjectAmbientLightingEnabled(s32 enabled)
-{
-    if (enabled)
-    {
-        gxSetChanAmbColour(0, (nlColour){
-            (u8)lbl_806DCC4C,
-            (u8)lbl_806DCC50,
-            (u8)lbl_806DCC54,
-            0,
-        });
-    }
-    else
-    {
-        gxSetChanAmbColour(0, (nlColour){ 0, 0, 0, 0 });
-    }
-}
-
-void SetGameObjectSpecularLightingEnabled(s32 enabled, s32)
-{
-    if (enabled)
-    {
-        nlColour colour = {
-            lbl_806E4D3C,
-            lbl_806E4D3D,
-            lbl_806E4D3E,
-            lbl_806E4D3F,
-        };
-        gxSetChanMatColour(1, colour);
-
-        nlColour ambient = {
-            0,
-            0,
-            0,
-            0,
-        };
-        gxSetChanAmbColour(1, ambient);
-
-        GXSetChanCtrl(GX_COLOR1, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT6,
-            GX_DF_NONE, GX_AF_SPEC);
-    }
-    else
-    {
-        GXSetChanCtrl(GX_COLOR1, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT6,
-            GX_DF_NONE, GX_AF_NONE);
-    }
-}
-
-void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 exponent, const nlMatrix4& viewMatrix)
-{
-    if (index < 0 || index >= 2)
-        return;
-
-    GXLightObj light;
-    nlVector3 var1;
-    nlVector3 var0;
-    nlVector3 initialDirection;
-    nlVector3 viewDir;
-    nlVector3 worldDir;
-
-    s32 var3 = (s32)(lbl_806E4CD0 * lightData->intensity);
-    if (var3 > 255)
-        var3 = 255;
-
-    GXColor colour;
-    colour.r = (u8)var3;
-    colour.a = lbl_806E4D3B;
-    colour.g = (u8)var3;
-    colour.b = (u8)var3;
-    GXInitLightColor(&light, colour);
-
-    if (lightData->enabled)
-    {
-        var0 = lightData->worldPosition;
-    }
-    else
-    {
-        float angleY = lightData->unknown08;
-        angleY = (lbl_806E4D20 * angleY) / lbl_806E4D24;
-        initialDirection = lbl_804DCD3C;
-        nlMatrix4 matY;
-        nlMatrix4 matZ;
-
-        nlMakeRotationMatrixY(matY, angleY);
-        float angleZ = lightData->unknown0C;
-        nlMakeRotationMatrixZ(
-            matZ, (lbl_806E4D20 * angleZ) / lbl_806E4D24);
-        nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var1, matZ);
-
-        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
-    }
-
-    nlVector3 origin = {
-        0.0f,
-        0.0f,
-        0.0f,
-    };
-
-    float worldY = var0.y - origin.y;
-    float worldX = var0.x - origin.x;
-    float worldZ = var0.z - origin.z;
-
-    worldDir.x = worldX;
-    worldDir.y = worldY;
-    worldDir.z = worldZ;
-
-    {
-        float lengthSq = worldDir.GetLengthSq3D();
-        float recipLength = nlRecipSqrt(lengthSq, true);
-
-        nlVec3Scale(worldDir, recipLength);
-    }
-
-    nlMultDirVectorMatrix(viewDir, worldDir, viewMatrix);
-    nlVec3Set(viewDir, -viewDir.x, -viewDir.y, -viewDir.z);
-    GXInitSpecularDir(&light, viewDir.x, viewDir.y, viewDir.z);
-
-    GXInitLightAttn(&light, lbl_806E4CD8, lbl_806E4CD8, lbl_806E4CD4,
-        exponent * lbl_806E4D2C, lbl_806E4CD8,
-        lbl_806E4CD4 - exponent * lbl_806E4D2C);
-
-    GXLoadLightObjImm(&light, (GXLightID)lbl_806E4D10[index]);
-}
-
-void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
-{
-    if (arg0)
-    {
-        if (!arg2)
-        {
-            nlColour colour = {
-                lbl_806E4D34,
-                lbl_806E4D35,
-                lbl_806E4D36,
-                lbl_806E4D37,
-            };
-            gxSetChanMatColour(0, colour);
-        }
-
-        s32 var0 = arg1 - 1;
-        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, (GXColorSrc)(arg2 != 0),
-            (GXLightID)lbl_804DCD18[var0], GX_DF_CLAMP, GX_AF_SPOT);
-    }
-    else
-    {
-        s32 var0 = arg1 - 1;
-        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX,
-            (GXLightID)lbl_804DCD18[var0], GX_DF_NONE, GX_AF_NONE);
-    }
-}
-
-void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
-{
-    GXLightObj light;
-    nlVector3 var1;
-    nlVector3 var0;
-    nlVector3 initialDirection;
-    nlVector3 viewPos;
-    nlVector3 viewDir;
-    nlVector3 worldDir;
-
-    if (pLight->unknown01)
-    {
-        f32 brightness = lbl_806E4CD0 * pLight->intensity;
-        s32 var3 = (s32)(brightness * lbl_806DCC44);
-        if (var3 > 255)
-            var3 = 255;
-
-        GXColor colour;
-        colour.a = lbl_806E4D1B;
-        colour.r = (u8)((var3 * pLight->colour.c[0]) >> 8);
-        colour.g = (u8)((var3 * pLight->colour.c[1]) >> 8);
-        colour.b = (u8)((var3 * pLight->colour.c[2]) >> 8);
-        GXInitLightColor(&light, colour);
-    }
-    else
-    {
-        f32 brightness = lbl_806E4CD0 * pLight->intensity;
-        s32 var3 = (s32)(brightness * lbl_806DCC44);
-        if (var3 > 255)
-            var3 = 255;
-
-        GXColor colour;
-        colour.r = (u8)var3;
-        colour.a = lbl_806E4D1F;
-        colour.g = (u8)var3;
-        colour.b = (u8)var3;
-        GXInitLightColor(&light, colour);
-    }
-
-    if (pLight->enabled)
-    {
-        var0 = pLight->worldPosition;
-    }
-    else
-    {
-        float angleY = pLight->unknown08;
-        angleY = (lbl_806E4D20 * angleY) / lbl_806E4D24;
-        initialDirection = lbl_804DCD30;
-        nlMatrix4 matY;
-        nlMatrix4 matZ;
-
-        nlMakeRotationMatrixY(matY, angleY);
-        float angleZ = pLight->unknown0C;
-        nlMakeRotationMatrixZ(
-            matZ, (lbl_806E4D20 * angleZ) / lbl_806E4D24);
-        nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var1, matZ);
-
-        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
-    }
-
-    if (pLight->unknown02)
-    {
-        nlMultPosVectorMatrix(viewPos, var0, mview);
-        GXInitLightPos(&light, viewPos.x, viewPos.y, viewPos.z);
-        GXInitLightAttnA(&light, lbl_806E4CD4, lbl_806E4CD8, lbl_806E4CD8);
-        GXInitLightDistAttn(
-            &light, lbl_806E4D28 * pLight->unknown20, lbl_806E4D2C, GX_DA_STEEP);
-    }
-    else
-    {
-        nlVector3 origin = {
-            0.0f,
-            0.0f,
-            0.0f,
-        };
-
-        float worldY = var0.y - origin.y;
-        float worldX = var0.x - origin.x;
-        float worldZ = var0.z - origin.z;
-
-        worldDir.x = worldX;
-        worldDir.y = worldY;
-        worldDir.z = worldZ;
-
-        if (worldDir.GetLengthSq3D() <= lbl_806E4CD8)
-            worldDir.x = lbl_806E4CD4;
-
-        {
-            float lengthSq = worldDir.GetLengthSq3D();
-            float recipLength = nlRecipSqrt(lengthSq, true);
-
-            nlVec3Scale(worldDir, recipLength);
-        }
-
-        nlMultDirVectorMatrix(viewDir, worldDir, mview);
-        nlVec3Scale(viewDir, lbl_806E4D30);
-
-        GXInitLightPos(&light, viewDir.x, viewDir.y, viewDir.z);
-        GXInitLightAttnA(&light, lbl_806E4CD4, lbl_806E4CD8, lbl_806E4CD8);
-        GXInitLightDistAttn(&light, lbl_806E4D30, lbl_806E4CD4, GX_DA_OFF);
-    }
-
-    GXLoadLightObjImm(&light, (GXLightID)lbl_804DCD00[lightId]);
-}
-
-void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
-{
-    static GLView* lbl_806E143C;
-    static bool lbl_806E1440;
-    s32 var0;
-    nlMatrix4 var1;
-
-    if (lbl_806E143C == arg1 && arg2 == lbl_806E1440)
-        return;
-
-    GLViewInterface* var2 = arg1->m_Interface;
-    lbl_806E143C = arg1;
-    var2->GetViewMatrix(var1);
-    lbl_806E1440 = arg2;
-
-    for (var0 = 0; var0 < arg0; var0++)
-    {
-        GameObjectLight* var3 = GetGameObjectLight(var0, arg2);
-        fn_80182F74(var0, var3, var1);
-    }
-}
-
-void SetGameObjectLightingMode(s32 mode)
-{
-    lbl_806E1428 = mode;
-}
-
-void SetGameObjectLightTexture(u32 texture)
-{
-    lbl_806DCC60 = texture;
-}
-
-u32 GetGameObjectLightTexture()
-{
-    return lbl_806DCC60;
-}
-}
-
-void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
-{
-    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
-    nlColour var1;
-    nlColourSet(var1, var0, var0, var0, 1);
-    unsigned long var2 = *(unsigned long*)&var1;
-    static unsigned long var3 = nlStringLowerHash("shadowLevel");
-    for (glModelPacket* var4 = arg1->packets; var4 < arg1->packets + arg1->numPackets; ++var4)
-    {
-        glSetMaterialUnsignedParameter(var4, var3, var2);
-    }
-}
-
-void fn_80183F78(ImpostorModel*, glModel* arg1)
-{
-    static unsigned long var0 = nlStringLowerHash("shadowLevel");
-    for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
-    {
-        nlMatrix4 var2;
-        glGetMatrix(var1->matrix, var2);
-        nlVector3 var3 = var2.GetTranslation();
-        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
-        unsigned long var5 = *(unsigned long*)&var4;
-        if (glHasMaterialParameter(var1, var0))
-        {
-            glSetMaterialUnsignedParameter(var1, var0, var5);
-        }
-    }
-}
-
-u32 GetGameObjectLightRamp()
-{
-    return gStadiumGameObjectLightingParams.lightRamp;
 }
 
 void FillInGameObjectLightRamp()
@@ -861,139 +494,448 @@ void FillInGameObjectLightRamp()
     g_pGameObjectLightRamp->Prepare();
 }
 
-void UpdateGameObjectLighting()
+u32 GetGameObjectLightRamp()
 {
-    if (!lbl_806DCC68)
+    return gStadiumGameObjectLightingParams.lightRamp;
+}
+
+static const GXLightID sGameObjectLightIDs[6] = {
+    GX_LIGHT0, GX_LIGHT1, GX_LIGHT2, GX_LIGHT3, GX_LIGHT4, GX_LIGHT5,
+};
+
+static const u32 sGameObjectLightMasks[6] = {
+    GX_LIGHT0,
+    GX_LIGHT0 | GX_LIGHT1,
+    GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2,
+    GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3,
+    GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4,
+    GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2 | GX_LIGHT3 | GX_LIGHT4 | GX_LIGHT5,
+};
+
+static const GXLightID sSpecularLightIDs[2] = { GX_LIGHT6, GX_LIGHT7 };
+
+nlMatrix4 lbl_80570C18;
+
+extern "C" {
+u32 GetGameObjectLightTexture()
+{
+    return lbl_806DCC60;
+}
+
+void SetGameObjectLightTexture(u32 texture)
+{
+    lbl_806DCC60 = texture;
+}
+
+void SetGameObjectLightingMode(s32 mode)
+{
+    lbl_806E1428 = mode;
+}
+
+void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
+{
+    static GLView* lbl_806E143C;
+    static bool lbl_806E1440;
+    s32 var0;
+    nlMatrix4 var1;
+
+    if (lbl_806E143C == arg1 && arg2 == lbl_806E1440)
         return;
 
-    if (!DrawableCharacter::sCameraRelativeLighting && !gAlwaysUseCameraRelativeCharacterLighting && lbl_806E1428 != 1)
+    GLViewInterface* var2 = arg1->m_Interface;
+    lbl_806E143C = arg1;
+    var2->GetViewMatrix(var1);
+    lbl_806E1440 = arg2;
+
+    for (var0 = 0; var0 < arg0; var0++)
+    {
+        GameObjectLight* var3 = GetGameObjectLight(var0, arg2);
+        fn_80182F74(var0, var3, var1);
+    }
+}
+
+void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
+{
+    GXLightObj light;
+    nlVector3 var1;
+    nlVector3 var0;
+    nlVector3 initialDirection;
+    nlVector3 viewPos;
+    nlVector3 viewDir;
+    nlVector3 worldDir;
+
+    if (pLight->unknown01)
+    {
+        f32 brightness = 255.0f * pLight->intensity;
+        s32 var3 = (s32)(brightness * lbl_806DCC44);
+        if (var3 > 255)
+            var3 = 255;
+
+        GXColor colour = {
+            (u8)((var3 * pLight->colour.c[0]) >> 8),
+            (u8)((var3 * pLight->colour.c[1]) >> 8),
+            (u8)((var3 * pLight->colour.c[2]) >> 8),
+            0xFF,
+        };
+        GXInitLightColor(&light, colour);
+    }
+    else
+    {
+        f32 brightness = 255.0f * pLight->intensity;
+        s32 var3 = (s32)(brightness * lbl_806DCC44);
+        if (var3 > 255)
+            var3 = 255;
+
+        GXColor colour = { (u8)var3, (u8)var3, (u8)var3, 0xFF };
+        GXInitLightColor(&light, colour);
+    }
+
+    if (pLight->enabled)
+    {
+        var0 = pLight->worldPosition;
+    }
+    else
+    {
+        float angleY = pLight->unknown08;
+        angleY = (3.1415927f * angleY) / 180.0f;
+        static const nlVector3 sDirection = { 1.0f, 0.0f, 0.0f };
+        initialDirection = sDirection;
+        nlMatrix4 matY;
+        nlMatrix4 matZ;
+
+        nlMakeRotationMatrixY(matY, angleY);
+        float angleZ = pLight->unknown0C;
+        nlMakeRotationMatrixZ(
+            matZ, (3.1415927f * angleZ) / 180.0f);
+        nlMultDirVectorMatrix(var1, initialDirection, matY);
+        nlMultDirVectorMatrix(var1, matZ);
+
+        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
+    }
+
+    if (pLight->unknown02)
+    {
+        nlMultPosVectorMatrix(viewPos, var0, mview);
+        GXInitLightPos(&light, viewPos.x, viewPos.y, viewPos.z);
+        GXInitLightAttnA(&light, 1.0f, 0.0f, 0.0f);
+        GXInitLightDistAttn(
+            &light, 0.666f * pLight->unknown20, 0.5f, GX_DA_STEEP);
+    }
+    else
+    {
+        nlVector3 origin = {
+            0.0f,
+            0.0f,
+            0.0f,
+        };
+
+        float worldY = var0.y - origin.y;
+        float worldX = var0.x - origin.x;
+        float worldZ = var0.z - origin.z;
+
+        worldDir.x = worldX;
+        worldDir.y = worldY;
+        worldDir.z = worldZ;
+
+        if (worldDir.GetLengthSq3D() <= 0.0f)
+            worldDir.x = 1.0f;
+
+        {
+            float lengthSq = worldDir.GetLengthSq3D();
+            float recipLength = nlRecipSqrt(lengthSq, true);
+
+            nlVec3Scale(worldDir, recipLength);
+        }
+
+        nlMultDirVectorMatrix(viewDir, worldDir, mview);
+        nlVec3Scale(viewDir, 1048576.0f);
+
+        GXInitLightPos(&light, viewDir.x, viewDir.y, viewDir.z);
+        GXInitLightAttnA(&light, 1.0f, 0.0f, 0.0f);
+        GXInitLightDistAttn(&light, 1048576.0f, 1.0f, GX_DA_OFF);
+    }
+
+    GXLoadLightObjImm(&light, sGameObjectLightIDs[lightId]);
+}
+
+void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
+{
+    if (arg0)
+    {
+        if (!arg2)
+        {
+            nlColour colour = {
+                0xFF,
+                0xFF,
+                0xFF,
+                0xFF,
+            };
+            gxSetChanMatColour(0, colour);
+        }
+
+        s32 var0 = arg1 - 1;
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, (GXColorSrc)(arg2 != 0),
+            (GXLightID)sGameObjectLightMasks[var0], GX_DF_CLAMP, GX_AF_SPOT);
+    }
+    else
+    {
+        s32 var0 = arg1 - 1;
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX,
+            (GXLightID)sGameObjectLightMasks[var0], GX_DF_NONE, GX_AF_NONE);
+    }
+}
+
+void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 exponent, const nlMatrix4& viewMatrix)
+{
+    if (index < 0 || index >= 2)
         return;
 
-    SetCameraRelativeLightData(&lbl_80570AF8);
-}
+    GXLightObj light;
+    nlVector3 var1;
+    nlVector3 var0;
+    nlVector3 initialDirection;
+    nlVector3 viewDir;
+    nlVector3 worldDir;
 
-extern "C"
-{
-GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
-{
-    s32 var0 = arg1 ? lbl_80570B70.value : lbl_806DCC64;
-    if (!lbl_806DCC68 && lbl_806E1428 == 1)
+    s32 var3 = (s32)(255.0f * lightData->intensity);
+    if (var3 > 255)
+        var3 = 255;
+
+    GXColor colour = { (u8)var3, (u8)var3, (u8)var3, 0xFF };
+    GXInitLightColor(&light, colour);
+
+    if (lightData->enabled)
     {
-        lbl_806E1428 = 0;
+        var0 = lightData->worldPosition;
+    }
+    else
+    {
+        float angleY = lightData->unknown08;
+        angleY = (3.1415927f * angleY) / 180.0f;
+        static const nlVector3 sDirection = { 1.0f, 0.0f, 0.0f };
+        initialDirection = sDirection;
+        nlMatrix4 matY;
+        nlMatrix4 matZ;
+
+        nlMakeRotationMatrixY(matY, angleY);
+        float angleZ = lightData->unknown0C;
+        nlMakeRotationMatrixZ(
+            matZ, (3.1415927f * angleZ) / 180.0f);
+        nlMultDirVectorMatrix(var1, initialDirection, matY);
+        nlMultDirVectorMatrix(var1, matZ);
+
+        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
     }
 
-    switch (lbl_806E1428)
+    nlVector3 origin = {
+        0.0f,
+        0.0f,
+        0.0f,
+    };
+
+    float worldY = var0.y - origin.y;
+    float worldX = var0.x - origin.x;
+    float worldZ = var0.z - origin.z;
+
+    worldDir.x = worldX;
+    worldDir.y = worldY;
+    worldDir.z = worldZ;
+
     {
-    case 0:
-        if (arg0 >= var0)
-        {
-            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
-            GameObjectLight* var1 = &lbl_805709D8[arg0];
-            var1->enabled = true;
-            var1->unknown01 = true;
-            var1->unknown02 = true;
-            var1->intensity = 1.0f;
-            var1->worldPosition = pLight->m_v3Position;
-            var1->colour.c[0] = pLight->m_Colour.c[0];
-            var1->colour.c[1] = pLight->m_Colour.c[1];
-            var1->colour.c[2] = pLight->m_Colour.c[2];
-            var1->colour.c[3] = pLight->m_Colour.c[3];
-            var1->unknown20 = pLight->m_fRadius;
-            return var1;
-        }
-        if (arg1)
-        {
-            if (arg0 == 0)
-                return &lbl_80570B80;
-            s32 characterLightCount = lbl_80570B70.value;
-            s32 lightIndex = arg0;
-            if (lightIndex < characterLightCount)
-                return &lbl_805709D8[lightIndex];
-            lightIndex -= characterLightCount;
-            return &lbl_805709D8[lightIndex + lbl_806DCC64];
-        }
-        return &lbl_805709D8[arg0];
+        float lengthSq = worldDir.GetLengthSq3D();
+        float recipLength = nlRecipSqrt(lengthSq, true);
 
-    case 1:
-        if (arg0 >= var0)
-        {
-            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - lbl_806DCC64);
-            GameObjectLight* var1 = &lbl_805709D8[arg0];
-            var1->enabled = true;
-            var1->unknown01 = true;
-            var1->unknown02 = true;
-            var1->intensity = 1.0f;
-            var1->worldPosition = pLight->m_v3Position;
-            var1->colour.c[0] = pLight->m_Colour.c[0];
-            var1->colour.c[1] = pLight->m_Colour.c[1];
-            var1->colour.c[2] = pLight->m_Colour.c[2];
-            var1->colour.c[3] = pLight->m_Colour.c[3];
-            var1->unknown20 = pLight->m_fRadius;
-            return var1;
-        }
-        return &lbl_80570AF8[arg0];
+        nlVec3Scale(worldDir, recipLength);
+    }
 
-    case 2:
-        return &lbl_80570B40;
+    nlMultDirVectorMatrix(viewDir, worldDir, viewMatrix);
+    nlVec3Set(viewDir, -viewDir.x, -viewDir.y, -viewDir.z);
+    GXInitSpecularDir(&light, viewDir.x, viewDir.y, viewDir.z);
 
-    default:
-        return lbl_805709D8;
+    GXInitLightAttn(&light, 0.0f, 0.0f, 1.0f,
+        exponent / 2.0f, 0.0f,
+        1.0f - exponent / 2.0f);
+
+    GXLoadLightObjImm(&light, sSpecularLightIDs[index]);
+}
+
+void SetGameObjectSpecularLightingEnabled(s32 enabled, s32)
+{
+    if (enabled)
+    {
+        nlColour colour = {
+            0xFF,
+            0xFF,
+            0xFF,
+            0xFF,
+        };
+        gxSetChanMatColour(1, colour);
+
+        nlColour ambient = {
+            0,
+            0,
+            0,
+            0,
+        };
+        gxSetChanAmbColour(1, ambient);
+
+        GXSetChanCtrl(GX_COLOR1, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT6,
+            GX_DF_NONE, GX_AF_SPEC);
+    }
+    else
+    {
+        GXSetChanCtrl(GX_COLOR1, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT6,
+            GX_DF_NONE, GX_AF_NONE);
     }
 }
 
-int GetGameObjectLightCount(bool arg0, bool arg1)
+void SetGameObjectAmbientLightingEnabled(s32 enabled)
 {
-    bool var0 = arg1 && lbl_806DCC48;
-    int var1 = var0 ? GetEmissionManager()->GetNumLights() : 0;
-
-    switch (lbl_806E1428)
+    if (enabled)
     {
-    case 0:
-        if (arg0)
-            return var1 + lbl_80570B70.value;
-        return lbl_806DCC64 + var1;
-    case 1:
-        return lbl_806DCC64 + var1;
-    case 2:
-        return 1;
-    default:
-        lbl_806E1428 = 0;
-        return 2;
+        gxSetChanAmbColour(0, (nlColour){
+            (u8)lbl_806DCC4C,
+            (u8)lbl_806DCC50,
+            (u8)lbl_806DCC54,
+            0,
+        });
+    }
+    else
+    {
+        gxSetChanAmbColour(0, (nlColour){ 0, 0, 0, 0 });
     }
 }
 
-void fn_80182164()
+void fn_80183764(u32 textureHandle)
 {
+    if (textureHandle != (u32)-1 && glTextureLoad(textureHandle))
+    {
+        lbl_806DCC6C = textureHandle;
+        gpShadowLightingLookup = new (8, false) LightingLookup;
+        gpShadowLightingLookup->LoadTexture(textureHandle);
+    }
+    else
+    {
+        lbl_806DCC6C = -1;
+    }
 }
 
-void fn_80182128()
+void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
 {
-    lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
-    lbl_80570B80.colour.c[1] = lbl_80570BD0.value;
-    lbl_80570B80.colour.c[2] = lbl_80570BF0.value;
-}
+    if (!fn_80183C54())
+        return;
+
+    u32 numTevStages;
+    u32 numTexGens;
+    numTexGens = gxGetNumTexGens();
+    numTevStages = gxGetNumTevStages();
+    gxSetNumTexGens(numTexGens + 1);
+    gxSetNumTevStages(numTevStages + 1);
+    lbl_806DCC74 = numTexGens;
+
+    if (arg1 != 0)
+    {
+        gxSetTevOrder(numTevStages, 0xFF, 0xFF, 0xFF);
+        gxSetTevColourIn(numTevStages, 15, 0, 6, 15);
+        gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
+
+        GXColor colour = *(GXColor*)&arg1;
+        GXSetTevColor(GX_TEVREG2, colour);
+    }
+    else
+    {
+        gxSetTevOrder(numTevStages, numTexGens, numTexGens, 0xFF);
+        if (arg0 && lbl_806DCC5A)
+            gxSetTexCoordGen(numTexGens, 1, 0, 0, false, 0x76);
+        else
+            gxSetTexCoordGen(numTexGens, 1, 0, 0x36, false, 0x76);
+
+        gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
+        gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
+
+        glTextureBinding textureState(lbl_806DCC6C, !lbl_806E1413, !lbl_806E1413);
+        glx_BindTexture(numTexGens, &textureState);
+
+        nlMatrix4 transform;
+        nlMakeScaleMatrix(transform, gShadowLookupScaleX,
+            gShadowLookupScaleY, 1.0f);
+        transform.SetRow4_(3, gShadowLookupTransX,
+            gShadowLookupTransY, 0.0f, 1.0f);
+
+        Mtx gxTransform;
+        glxCopyMatrix(gxTransform, transform);
+
+        Mtx textureMatrix;
+        PSMTXConcat(lbl_80511490, gxTransform, textureMatrix);
+
+        if (arg0 && lbl_806DCC5A)
+        {
+            Mtx inverse;
+            glxCopyMatrix(inverse, lbl_80570C18);
+            if (lbl_806DCC59)
+                PSMTXConcat(textureMatrix, inverse, textureMatrix);
+            else
+                PSMTXConcat(inverse, textureMatrix, textureMatrix);
+        }
+
+        GXLoadTexMtxImm(textureMatrix, 0x76, GX_MTX3x4);
+    }
 }
 
-bool AlwaysUseCameraRelativeCharacterLighting()
+void RestoreGameObjectShadowLighting()
 {
-    return gAlwaysUseCameraRelativeCharacterLighting;
+    if (fn_80183C54() && lbl_806DCC74 >= 0)
+    {
+        gxSetNumTexGens(gxGetNumTexGens() - 1);
+        gxSetNumTevStages(gxGetNumTevStages() - 1);
+        gxSetTexCoordGen(lbl_806DCC74, 1, lbl_806DCC74 + 4, 0x3C);
+        lbl_806DCC74 = -1;
+    }
 }
 
-extern "C"
+void SetGameObjectShadowModelMatrix(u32 matrix)
 {
-int ShouldDoubleGameObjectLighting()
-{
-    return lbl_806E1412;
+    if (!fn_80183C54())
+        return;
+
+    if (matrix == (u32)-1)
+    {
+        lbl_806DCC70 = -1;
+    }
+    else if (matrix != lbl_806DCC70)
+    {
+        lbl_806DCC70 = matrix;
+
+        nlMatrix4 transform;
+        glGetMatrix(matrix, transform);
+
+        Mtx textureMatrix;
+        glxCopyMatrix(textureMatrix, transform);
+        GXLoadTexMtxImm(textureMatrix, 0x36, GX_MTX3x4);
+    }
 }
 
-int ShouldUseGameObjectLightTexture(int character)
+void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix)
 {
-    return character ? lbl_806E1411 : lbl_806E1410;
+    if (fn_80183C54())
+        nlInvertMatrix(lbl_80570C18, *matrix);
 }
 
-int IsGameObjectLightingEnabled()
+bool fn_80183C54()
 {
-    return lbl_806DCC40;
+    if (!lbl_806DCC58)
+        return false;
+
+    if (lbl_806DCC6C == (u32)-1)
+        return false;
+
+    if (gpShadowLightingLookup == 0)
+        return false;
+
+    if (!g_bRenderWorldEffects)
+        return false;
+
+    return true;
 }
 }
 
@@ -1019,9 +961,62 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
     f32 var1 = arg0->y;
     var1 *= gShadowLookupScaleY.value;
     var1 = var1 + gShadowLookupTransY.value;
-    var0 = lbl_806E4D2C * var0 + lbl_806E4D2C;
-    var1 = lbl_806E4D40 * var1 + lbl_806E4D2C;
+    var0 = 0.5f * var0 + 0.5f;
+    var1 = -0.5f * var1 + 0.5f;
     var0 *= (f32)gpShadowLightingLookup->mWidth;
     var1 *= (f32)gpShadowLightingLookup->mHeight;
     return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
+}
+
+int fn_80183DEC(const nlVector3* arg0)
+{
+    nlColour var0 = fn_80183C9C((const nlVector2*)arg0, true);
+    return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
+}
+
+void fn_80183E4C()
+{
+    if (gpShadowLightingLookup != 0)
+    {
+        delete gpShadowLightingLookup;
+        gpShadowLightingLookup = 0;
+    }
+    lbl_806DCC6C = -1;
+}
+
+void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
+{
+    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
+    nlColour var1;
+    nlColourSet(var1, var0, var0, var0, 1);
+    unsigned long var2 = *(unsigned long*)&var1;
+    static unsigned long var3 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var4 = arg1->packets; var4 < arg1->packets + arg1->numPackets; ++var4)
+    {
+        glSetMaterialUnsignedParameter(var4, var3, var2);
+    }
+}
+
+void fn_80183F78(ImpostorModel*, glModel* arg1)
+{
+    static unsigned long var0 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
+    {
+        nlMatrix4 var2;
+        glGetMatrix(var1->matrix, var2);
+        nlVector3 var3 = var2.GetTranslation();
+        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
+        unsigned long var5 = *(unsigned long*)&var4;
+        if (glHasMaterialParameter(var1, var0))
+        {
+            glSetMaterialUnsignedParameter(var1, var0, var5);
+        }
+    }
+}
+
+GameObjectLight::GameObjectLight()
+{
+    enabled = false;
+    unknown01 = false;
+    unknown02 = false;
 }

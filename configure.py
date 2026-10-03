@@ -439,7 +439,7 @@ config.libs = [
             Object(Matching, "Game/FriendManager.cpp"),
             Object(NonMatching, "Game/Game.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/GameInfo.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/GameObjectLighting.cpp"),
+            Object(Matching, "Game/GameObjectLighting.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/GameTweaks.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/GameTweaksManager.cpp", extra_cflags=["-use_lmw_stmw off", "-sym on", "-ipa file"]),
             Object(Matching, "Game/Goalie.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
