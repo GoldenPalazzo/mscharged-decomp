@@ -547,6 +547,21 @@ cFielder* cFielder::DoFindBestHitTarget()
     return 0;
 }
 
+static inline void GetCharacterSpecialActive(
+    const cFielder* fielder, eCharacterClass character, bool& active)
+{
+    active = false;
+    if (fielder->GetCharacterClass() != character)
+    {
+        return;
+    }
+    if (!fielder->fn_8003E6EC())
+    {
+        return;
+    }
+    active = true;
+}
+
 bool cFielder::fn_8003E6EC() const
 {
     return fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
@@ -615,13 +630,9 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder)
 
 bool cFielder::fn_8003E8F4() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == LUIGI
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, LUIGI, active);
+    return active;
 }
 
 bool cFielder::fn_8003E9F0() const
@@ -648,13 +659,9 @@ bool cFielder::fn_8003EA44() const
 
 bool cFielder::fn_8003EA6C() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, TOAD, active);
+    return active;
 }
 
 bool cFielder::CanReceivePass()
@@ -702,8 +709,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition2)
     {
-        bool bExcluded = fn_8003EA6C();
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, TOAD, active);
+        if (!active)
         {
             bCondition3 = true;
         }
@@ -711,10 +719,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition3)
     {
-        bool bExcluded
-            = mUnidentified024.m_eCharacterClass == DONKEYKONG
-           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, DONKEYKONG, active);
+        if (!active)
         {
             bCondition4 = true;
         }
@@ -722,10 +729,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition4)
     {
-        bool bExcluded
-            = mUnidentified024.m_eCharacterClass == WALUIGI
-           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, WALUIGI, active);
+        if (!active)
         {
             bCondition5 = true;
         }
@@ -733,8 +739,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition5)
     {
-        bool bExcluded = fn_8003E8F4();
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, LUIGI, active);
+        if (!active)
         {
             bCondition6 = true;
         }
