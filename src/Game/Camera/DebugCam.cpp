@@ -132,7 +132,7 @@ cDebugCamera::~cDebugCamera()
     }
 }
 
-void cDebugCamera::RenderTarget() const
+void cDebugCamera::RenderTarget()
 {
     if (!m_bRenderTarget)
     {
@@ -170,8 +170,10 @@ void cDebugCamera::RenderTarget() const
         }
     }
 
-    iterator.Step();
-    iterator.Step();
+    for (int i = 0; i < 2; i++)
+    {
+        iterator.Step();
+    }
     if (target != 0)
     {
         UnidentifiedDebugCameraTarget* ballTarget = *iterator;

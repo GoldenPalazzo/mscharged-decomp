@@ -16,14 +16,14 @@ class cDebugCamera : public cBaseCamera
 public:
     cDebugCamera(bool bUnidentified);
     /* 0x08 */ virtual ~cDebugCamera();
-    /* 0x14 */ virtual const nlMatrix4& GetViewMatrix() const { return m_matView; };
-    /* 0x18 */ virtual float GetFOV() const { return sfDebugCamFOV; };
-    /* 0x24 */ virtual const nlVector3& GetCameraPosition() const { return m_vecCamera; };
-    /* 0x20 */ virtual const nlVector3& GetTargetPosition() const { return m_vecTarget; };
     /* 0x0C */ virtual eCameraType GetType() { return eCameraType_Debug; };
+    /* 0x20 */ virtual const nlVector3& GetTargetPosition() const { return m_vecTarget; };
+    /* 0x24 */ virtual const nlVector3& GetCameraPosition() const { return m_vecCamera; };
+    /* 0x18 */ virtual float GetFOV() const { return sfDebugCamFOV; };
+    /* 0x14 */ virtual const nlMatrix4& GetViewMatrix() const { return m_matView; };
     /* 0x10 */ virtual void Update(float dt);
 
-    void RenderTarget() const;
+    void RenderTarget();
     void fn_800F2A8C(float dt);
     void fn_800F2BD0(float dt, float controlSpeed);
     void fn_800F2DA8(float dt, float controlSpeed);
