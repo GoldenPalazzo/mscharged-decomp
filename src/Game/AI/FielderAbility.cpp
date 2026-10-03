@@ -51,14 +51,6 @@ float lbl_806DBA10 = 0.4f;
 float lbl_806E0C78;
 bool lbl_806E0C7C;
 
-struct UnidentifiedAbilityEvent
-{
-    /* 0x00 */ cFielder* pFielder;
-    /* 0x04 */ nlVector3 v3Position;
-    /* 0x10 */ float fParam1;
-    /* 0x14 */ float fParam2;
-};
-
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 extern "C" void fn_80319E58(void* pParam, int nAction);
@@ -121,11 +113,11 @@ void cFielder::fn_8004FA34()
             * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
         < lbl_806DBA04)
     {
-        UnidentifiedAbilityEvent event;
-        event.v3Position = mUnidentified024.m_v3Position;
-        event.fParam1 = lbl_806DB9F4;
-        event.fParam2 = lbl_806DB9F8;
-        event.pFielder = this;
+        UnidentifiedEventData_800673FC event;
+        event.mUnidentified04 = mUnidentified024.m_v3Position;
+        event.mUnidentified10 = lbl_806DB9F4;
+        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified00 = this;
         fn_80060210(g_pGame, &event);
     }
 
@@ -158,11 +150,11 @@ void cFielder::fn_8004FB04()
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 
-    UnidentifiedAbilityEvent event;
-    event.v3Position = mUnidentified024.m_v3Position;
-    event.fParam1 = lbl_806DB9F4;
-    event.fParam2 = lbl_806DB9F8;
-    event.pFielder = this;
+    UnidentifiedEventData_800673FC event;
+    event.mUnidentified04 = mUnidentified024.m_v3Position;
+    event.mUnidentified10 = lbl_806DB9F4;
+    event.mUnidentified14 = lbl_806DB9F8;
+    event.mUnidentified00 = this;
     fn_80060014(g_pGame, &event);
 
     float fParam = FMAX(lbl_806DB9F4, lbl_806DB9F8);
@@ -204,21 +196,21 @@ void cFielder::fn_8004FC90(float fDeltaT)
 
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9FC))
     {
-        UnidentifiedAbilityEvent event;
-        event.v3Position = mUnidentified024.m_v3Position;
-        event.fParam1 = lbl_806DB9F4;
-        event.fParam2 = lbl_806DB9F8;
-        event.pFielder = this;
+        UnidentifiedEventData_800673FC event;
+        event.mUnidentified04 = mUnidentified024.m_v3Position;
+        event.mUnidentified10 = lbl_806DB9F4;
+        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified00 = this;
         fn_8005FE18(g_pGame, &event);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA00))
     {
-        UnidentifiedAbilityEvent event;
-        event.v3Position = mUnidentified024.m_v3Position;
-        event.fParam1 = lbl_806DB9F4;
-        event.fParam2 = lbl_806DB9F8;
-        cField::FixOutOfBoundsPosition(event.v3Position, lbl_806DB9F4, true);
-        event.pFielder = this;
+        UnidentifiedEventData_800673FC event;
+        event.mUnidentified04 = mUnidentified024.m_v3Position;
+        event.mUnidentified10 = lbl_806DB9F4;
+        event.mUnidentified14 = lbl_806DB9F8;
+        cField::FixOutOfBoundsPosition(event.mUnidentified04, lbl_806DB9F4, true);
+        event.mUnidentified00 = this;
         fn_8005FC1C(g_pGame, &event);
 
         if (lbl_806E0C7C)
@@ -244,11 +236,11 @@ void cFielder::fn_8004FC90(float fDeltaT)
     {
         SetFlyingCameraTarget(0);
 
-        UnidentifiedAbilityEvent event;
-        event.v3Position = mUnidentified024.m_v3Position;
-        event.fParam1 = lbl_806DB9F4;
-        event.fParam2 = lbl_806DB9F8;
-        event.pFielder = this;
+        UnidentifiedEventData_800673FC event;
+        event.mUnidentified04 = mUnidentified024.m_v3Position;
+        event.mUnidentified10 = lbl_806DB9F4;
+        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified00 = this;
         fn_80060210(g_pGame, &event);
     }
 
