@@ -101,7 +101,7 @@ NisPlayer::NisPlayer()
     , mStopNisCueOnReset(true)
     , mDisplayNisInfo(false)
     , mUseViewMatrixOverride(false)
-    , mUnidentified3439C(false)
+    , mInitialCameraRotationCached(false)
     , mSavedFogStart(-1.0f)
     , mSavedFogEnd(-1.0f)
     , mLastCelebrationIndex(-1)
@@ -128,11 +128,11 @@ NisPlayer::NisPlayer()
         mCamera[i].m_LetManagerDoUpdate = false;
         mCamera[i].m_bCyclic = false;
     }
-    mOverlays[0] = new (8, false) NisPlayerOverlay_80523878(this);
-    mOverlays[1] = new (8, false) NisPlayerOverlay_8052385C(this);
-    mOverlays[4] = new (8, false) NisPlayerOverlay_80523840(this);
-    mOverlays[2] = new (8, false) NisPlayerOverlay_80523824(this);
-    mOverlays[3] = new (8, false) NisPlayerOverlay_80523808(this, 1.0f);
+    mOverlays[0] = new (8, false) NisPlayerNoOverlay(this);
+    mOverlays[1] = new (8, false) NisPlayerPIPOverlay(this);
+    mOverlays[4] = new (8, false) NisPlayerHolotronOverlay(this);
+    mOverlays[2] = new (8, false) NisPlayerCameraSwapOverlay(this);
+    mOverlays[3] = new (8, false) NisPlayerPIPExpandOverlay(this, 1.0f);
     mDisplayNisInfo = GetTweakBool("/user/DisplayNISInfo", false);
     mSuppressBlinking = false;
     mRequestedFogStart = -1.0f;
@@ -608,7 +608,7 @@ void NisPlayer::ClearLoadQueue()
 void NisPlayer::Play()
 {
     mUseViewMatrixOverride = false;
-    mUnidentified3439C = false;
+    mInitialCameraRotationCached = false;
     mActive = true;
     gBlinkingEnabled = true;
     if (mSavedFogStart != -1.0f)

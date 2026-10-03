@@ -6,9 +6,9 @@
 class NisPlayer;
 
 /**
- * Base of the five screen overlays NisPlayer allocates and owns. Each one
- * renders a 2D quad over the world view while a NIS plays; Update() returns the
- * overlay state the player should continue with. The default Reset() does nothing.
+ * Base of the five overlay states NisPlayer allocates and owns. Update()
+ * selects the next state; Render() draws the active screen or world overlay.
+ * The default Reset() does nothing.
  */
 class NisPlayerOverlay
 {
@@ -22,51 +22,51 @@ public:
     /* 0x04 */ NisPlayer* mPlayer;
 }; // size 0x08
 
-class NisPlayerOverlay_80523878 : public NisPlayerOverlay
+class NisPlayerNoOverlay : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523878(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523878();
+    NisPlayerNoOverlay(NisPlayer* player);
+    virtual ~NisPlayerNoOverlay();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
 }; // size 0x08
 
-class NisPlayerOverlay_8052385C : public NisPlayerOverlay
+class NisPlayerPIPOverlay : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_8052385C(NisPlayer* player);
-    virtual ~NisPlayerOverlay_8052385C();
+    NisPlayerPIPOverlay(NisPlayer* player);
+    virtual ~NisPlayerPIPOverlay();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
 }; // size 0x08
 
-class NisPlayerOverlay_80523840 : public NisPlayerOverlay
+class NisPlayerHolotronOverlay : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523840(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523840();
+    NisPlayerHolotronOverlay(NisPlayer* player);
+    virtual ~NisPlayerHolotronOverlay();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
 }; // size 0x08
 
-class NisPlayerOverlay_80523824 : public NisPlayerOverlay
+class NisPlayerCameraSwapOverlay : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523824(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523824();
+    NisPlayerCameraSwapOverlay(NisPlayer* player);
+    virtual ~NisPlayerCameraSwapOverlay();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
 }; // size 0x08
 
-class NisPlayerOverlay_80523808 : public NisPlayerOverlay
+class NisPlayerPIPExpandOverlay : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523808(NisPlayer* player, float duration);
-    virtual ~NisPlayerOverlay_80523808();
+    NisPlayerPIPExpandOverlay(NisPlayer* player, float duration);
+    virtual ~NisPlayerPIPExpandOverlay();
     virtual void Reset();
     virtual int Update(float dt);
     virtual void Render();
@@ -76,7 +76,7 @@ public:
     /* 0x0C */ float mDuration;
 }; // size 0x10
 
-void fn_8028468C(float x, float y, float z);
-void fn_8028469C(bool value);
+void SetHolotronDimensions(float verticalOffset, float width, float height);
+void SetHolotronCameraTrackingEnabled(bool enabled);
 
 #endif // GAME_RENDER_NIS_PLAYER_OVERLAY_H

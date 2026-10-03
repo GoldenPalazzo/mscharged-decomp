@@ -14,19 +14,19 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-u32 lbl_806E1A20 = glGetTexture("global/checkers");
-u8 lbl_806E1A24;
-u8 lbl_806E1A25;
-u32 lbl_806E1A28 = nlStringLowerHash("Holotron_Bone01");
+u32 g_NisOverlayCheckerTexture = glGetTexture("global/checkers");
+u8 g_HolotronOpaque;
+u8 g_HolotronDoubleDraw;
+u32 g_HolotronBoneHash = nlStringLowerHash("Holotron_Bone01");
 
-static bool lbl_806DEF60 = true;
-static bool lbl_806DEF61 = true;
-static float lbl_806DEF64 = 22.0f;
-static float lbl_806DEF68 = 17.0f;
-static float lbl_806DEF6C = 7.0f;
-static int lbl_806DEF70 = 0x80;
-static int lbl_806DEF74 = 0xFF;
-static int lbl_806DEF78 = 0xFF;
+static bool sHolotronFacesCamera = true;
+static bool sTrackHolotronCamera = true;
+static float sHolotronWidth = 22.0f;
+static float sHolotronHeight = 17.0f;
+static float sHolotronVerticalOffset = 7.0f;
+static int sHolotronRed = 0x80;
+static int sHolotronGreen = 0xFF;
+static int sHolotronBlue = 0xFF;
 
 static inline void CopyCameraRotation(nlMatrix4& rotation, const nlMatrix4& view)
 {
@@ -49,32 +49,32 @@ static inline void CopyCameraRotation(nlMatrix4& rotation, const nlMatrix4& view
 }
 
 /**
- * Offset/Address/Size: 0x270 | 0x8028400C | size: 0x14
+ * Offset/Address/Size: 0x0 | 0x8028400C | size: 0x14
  */
-NisPlayerOverlay_80523878::NisPlayerOverlay_80523878(NisPlayer* player)
+NisPlayerNoOverlay::NisPlayerNoOverlay(NisPlayer* player)
 {
     mPlayer = player;
 }
 
 /**
- * Offset/Address/Size: 0x284 | 0x80284020 | size: 0x4
+ * Offset/Address/Size: 0x14 | 0x80284020 | size: 0x4
  */
-void NisPlayerOverlay_80523878::Render()
+void NisPlayerNoOverlay::Render()
 {
 }
 
 /**
- * Offset/Address/Size: 0x288 | 0x80284024 | size: 0x14
+ * Offset/Address/Size: 0x18 | 0x80284024 | size: 0x14
  */
-NisPlayerOverlay_8052385C::NisPlayerOverlay_8052385C(NisPlayer* player)
+NisPlayerPIPOverlay::NisPlayerPIPOverlay(NisPlayer* player)
 {
     mPlayer = player;
 }
 
 /**
- * Offset/Address/Size: 0x29C | 0x80284038 | size: 0xB8
+ * Offset/Address/Size: 0x2C | 0x80284038 | size: 0xB8
  */
-void NisPlayerOverlay_8052385C::Render()
+void NisPlayerPIPOverlay::Render()
 {
     glSetDefaultState(false);
     glSetTextureState(GLTS_DiffuseWrap, 3);
@@ -93,9 +93,9 @@ void NisPlayerOverlay_8052385C::Render()
 }
 
 /**
- * Offset/Address/Size: 0x354 | 0x802840F0 | size: 0x14
+ * Offset/Address/Size: 0xE4 | 0x802840F0 | size: 0x14
  */
-NisPlayerOverlay_80523840::NisPlayerOverlay_80523840(NisPlayer* player)
+NisPlayerHolotronOverlay::NisPlayerHolotronOverlay(NisPlayer* player)
 {
     mPlayer = player;
 }
@@ -103,7 +103,7 @@ NisPlayerOverlay_80523840::NisPlayerOverlay_80523840(NisPlayer* player)
 /**
  * Offset/Address/Size: 0xF8 | 0x80284104 | size: 0x588
  */
-void NisPlayerOverlay_80523840::Render()
+void NisPlayerHolotronOverlay::Render()
 {
     glQuad3 quad;
     nlMatrix4 transform;
@@ -111,7 +111,7 @@ void NisPlayerOverlay_80523840::Render()
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthTest, 1);
     glSetRasterState(GLS_DepthWrite, 0);
-    if (!lbl_806E1A24)
+    if (!g_HolotronOpaque)
     {
         glSetRasterState(GLS_AlphaBlend, 2);
     }
@@ -122,18 +122,18 @@ void NisPlayerOverlay_80523840::Render()
     glSetCurrentTextureState(glHandleizeTextureState());
 
     nlMakeRotationMatrixX(transform, 1.5707964f);
-    if (lbl_806DEF60)
+    if (sHolotronFacesCamera)
     {
         nlTransposeMatrix(transform, cCameraManager::PeekCamera()->GetViewMatrix());
-        if (lbl_806DEF61)
+        if (sTrackHolotronCamera)
         {
             mPlayer->mUseViewMatrixOverride = true;
-            if (!mPlayer->mUnidentified3439C)
+            if (!mPlayer->mInitialCameraRotationCached)
             {
                 nlMatrix4 initialRotation;
                 CopyCameraRotation(initialRotation, mPlayer->mCamera[0].GetViewMatrix());
                 nlInvertMatrix(mPlayer->mInitialCameraRotationInverse, initialRotation);
-                mPlayer->mUnidentified3439C = true;
+                mPlayer->mInitialCameraRotationCached = true;
             }
 
             nlVector3 headPosition;
@@ -160,20 +160,20 @@ void NisPlayerOverlay_80523840::Render()
     }
 
     ImpostorModel* holotron = mPlayer->mPlaying[0]->FindImpostor("holotron");
-    nlVector3 position = holotron->mPoseAccumulator->GetNodeMatrixByHashID(lbl_806E1A28).GetTranslation();
-    position.z += lbl_806DEF68 + lbl_806DEF6C;
+    nlVector3 position = holotron->mPoseAccumulator->GetNodeMatrixByHashID(g_HolotronBoneHash).GetTranslation();
+    position.z += sHolotronHeight + sHolotronVerticalOffset;
     transform.SetTranslation(position);
-    quad.SetupRotatedRectangle(lbl_806DEF64, lbl_806DEF68, transform, false, true);
-    if (lbl_806E1A24)
+    quad.SetupRotatedRectangle(sHolotronWidth, sHolotronHeight, transform, false, true);
+    if (g_HolotronOpaque)
     {
         quad.SetColour(0xFF, 0xFF, 0xFF, 0xFF);
     }
     else
     {
-        quad.SetColour(lbl_806DEF70, lbl_806DEF74, lbl_806DEF78, 0x80);
+        quad.SetColour(sHolotronRed, sHolotronGreen, sHolotronBlue, 0x80);
     }
     glAttachQuad3((eGLView)GetLayerView(eCLV_Particles), 1, &quad);
-    if (lbl_806E1A25)
+    if (g_HolotronDoubleDraw)
     {
         glAttachQuad3((eGLView)GetLayerView(eCLV_Particles), 1, &quad);
     }
@@ -181,51 +181,51 @@ void NisPlayerOverlay_80523840::Render()
 }
 
 /**
- * Offset/Address/Size: 0x8F0 | 0x8028468C | size: 0x10
+ * Offset/Address/Size: 0x680 | 0x8028468C | size: 0x10
  */
-void fn_8028468C(float x, float y, float z)
+void SetHolotronDimensions(float verticalOffset, float width, float height)
 {
-    lbl_806DEF6C = x;
-    lbl_806DEF64 = y;
-    lbl_806DEF68 = z;
+    sHolotronVerticalOffset = verticalOffset;
+    sHolotronWidth = width;
+    sHolotronHeight = height;
 }
 
 /**
- * Offset/Address/Size: 0x900 | 0x8028469C | size: 0x8
+ * Offset/Address/Size: 0x690 | 0x8028469C | size: 0x8
  */
-void fn_8028469C(bool value)
+void SetHolotronCameraTrackingEnabled(bool enabled)
 {
-    lbl_806DEF61 = value;
+    sTrackHolotronCamera = enabled;
 }
 
 /**
- * Offset/Address/Size: 0x908 | 0x802846A4 | size: 0x14
+ * Offset/Address/Size: 0x698 | 0x802846A4 | size: 0x14
  */
-NisPlayerOverlay_80523824::NisPlayerOverlay_80523824(NisPlayer* player)
+NisPlayerCameraSwapOverlay::NisPlayerCameraSwapOverlay(NisPlayer* player)
 {
     mPlayer = player;
 }
 
 /**
- * Offset/Address/Size: 0x91C | 0x802846B8 | size: 0x4
+ * Offset/Address/Size: 0x6AC | 0x802846B8 | size: 0x4
  */
-void NisPlayerOverlay_80523824::Render()
+void NisPlayerCameraSwapOverlay::Render()
 {
 }
 
 /**
- * Offset/Address/Size: 0x920 | 0x802846BC | size: 0x28
+ * Offset/Address/Size: 0x6B0 | 0x802846BC | size: 0x28
  */
-int NisPlayerOverlay_80523824::Update(float dt)
+int NisPlayerCameraSwapOverlay::Update(float dt)
 {
     mPlayer->SwapCameras();
     return 1;
 }
 
 /**
- * Offset/Address/Size: 0x948 | 0x802846E4 | size: 0x4C
+ * Offset/Address/Size: 0x6D8 | 0x802846E4 | size: 0x4C
  */
-NisPlayerOverlay_80523808::NisPlayerOverlay_80523808(NisPlayer* player, float duration)
+NisPlayerPIPExpandOverlay::NisPlayerPIPExpandOverlay(NisPlayer* player, float duration)
 {
     mPlayer = player;
     mDuration = duration;
@@ -233,17 +233,17 @@ NisPlayerOverlay_80523808::NisPlayerOverlay_80523808(NisPlayer* player, float du
 }
 
 /**
- * Offset/Address/Size: 0x994 | 0x80284730 | size: 0xC
+ * Offset/Address/Size: 0x724 | 0x80284730 | size: 0xC
  */
-void NisPlayerOverlay_80523808::Reset()
+void NisPlayerPIPExpandOverlay::Reset()
 {
     mTime = 0.0f;
 }
 
 /**
- * Offset/Address/Size: 0x9A0 | 0x8028473C | size: 0xF8
+ * Offset/Address/Size: 0x730 | 0x8028473C | size: 0xF8
  */
-void NisPlayerOverlay_80523808::Render()
+void NisPlayerPIPExpandOverlay::Render()
 {
     glSetDefaultState(false);
     glSetTextureState(GLTS_DiffuseWrap, 3);
@@ -267,9 +267,9 @@ void NisPlayerOverlay_80523808::Render()
 }
 
 /**
- * Offset/Address/Size: 0xA98 | 0x80284834 | size: 0x4C
+ * Offset/Address/Size: 0x828 | 0x80284834 | size: 0x4C
  */
-int NisPlayerOverlay_80523808::Update(float dt)
+int NisPlayerPIPExpandOverlay::Update(float dt)
 {
     mTime += dt;
     if (mTime <= mDuration)
@@ -282,86 +282,86 @@ int NisPlayerOverlay_80523808::Update(float dt)
 }
 
 /**
- * Offset/Address/Size: 0xAE4 | 0x80284880 | size: 0x8
+ * Offset/Address/Size: 0x874 | 0x80284880 | size: 0x8
  */
-int NisPlayerOverlay_80523808::GetOverlayType()
+int NisPlayerPIPExpandOverlay::GetOverlayType()
 {
     return 1;
 }
 
 /**
- * Offset/Address/Size: 0xAEC | 0x80284888 | size: 0x8
+ * Offset/Address/Size: 0x87C | 0x80284888 | size: 0x8
  */
-int NisPlayerOverlay_80523824::GetOverlayType()
+int NisPlayerCameraSwapOverlay::GetOverlayType()
 {
     return 1;
 }
 
 /**
- * Offset/Address/Size: 0xAF4 | 0x80284890 | size: 0x8
+ * Offset/Address/Size: 0x884 | 0x80284890 | size: 0x8
  */
-int NisPlayerOverlay_80523840::GetOverlayType()
+int NisPlayerHolotronOverlay::GetOverlayType()
 {
     return 4;
 }
 
 /**
- * Offset/Address/Size: 0xAFC | 0x80284898 | size: 0x8
+ * Offset/Address/Size: 0x88C | 0x80284898 | size: 0x8
  */
-int NisPlayerOverlay_80523840::Update(float dt)
+int NisPlayerHolotronOverlay::Update(float dt)
 {
     return 4;
 }
 
 /**
- * Offset/Address/Size: 0xB04 | 0x802848A0 | size: 0x8
+ * Offset/Address/Size: 0x894 | 0x802848A0 | size: 0x8
  */
-int NisPlayerOverlay_8052385C::GetOverlayType()
+int NisPlayerPIPOverlay::GetOverlayType()
 {
     return 1;
 }
 
 /**
- * Offset/Address/Size: 0xB0C | 0x802848A8 | size: 0x8
+ * Offset/Address/Size: 0x89C | 0x802848A8 | size: 0x8
  */
-int NisPlayerOverlay_8052385C::Update(float dt)
+int NisPlayerPIPOverlay::Update(float dt)
 {
     return 1;
 }
 
 /**
- * Offset/Address/Size: 0xB14 | 0x802848B0 | size: 0x8
+ * Offset/Address/Size: 0x8A4 | 0x802848B0 | size: 0x8
  */
-int NisPlayerOverlay_80523878::GetOverlayType()
+int NisPlayerNoOverlay::GetOverlayType()
 {
     return 0;
 }
 
 /**
- * Offset/Address/Size: 0xB1C | 0x802848B8 | size: 0x8
+ * Offset/Address/Size: 0x8AC | 0x802848B8 | size: 0x8
  */
-int NisPlayerOverlay_80523878::Update(float dt)
+int NisPlayerNoOverlay::Update(float dt)
 {
     return 0;
 }
 
-NisPlayerOverlay_80523878::~NisPlayerOverlay_80523878()
+NisPlayerNoOverlay::~NisPlayerNoOverlay()
 {
 }
 
-NisPlayerOverlay_8052385C::~NisPlayerOverlay_8052385C()
+NisPlayerPIPOverlay::~NisPlayerPIPOverlay()
 {
 }
 
-NisPlayerOverlay_80523840::~NisPlayerOverlay_80523840()
+NisPlayerHolotronOverlay::~NisPlayerHolotronOverlay()
 {
 }
 
-NisPlayerOverlay_80523824::~NisPlayerOverlay_80523824()
+NisPlayerCameraSwapOverlay::~NisPlayerCameraSwapOverlay()
 {
 }
 
-NisPlayerOverlay_80523808::~NisPlayerOverlay_80523808()
+NisPlayerPIPExpandOverlay::~NisPlayerPIPExpandOverlay()
 {
 }
 
