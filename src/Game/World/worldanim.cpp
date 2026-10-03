@@ -256,8 +256,8 @@ void WorldAnimUpdate::Update(const unsigned long&,
     {
         spCurrentWorldAnimController = pController;
         pController->m_pPoseTree->Update(fDeltaT);
-        if (pController->m_pPoseTree->m_fPrevTime
-            != pController->m_pPoseTree->m_fTime)
+        if (pController->m_pPoseTree->get_fTime()
+            != pController->m_pPoseTree->GetPreviousTime())
         {
             fn_8030B038(pController->m_pPoseAccumulator,
                 pController->m_pPoseTree, &pController->m_worldMatrix);
