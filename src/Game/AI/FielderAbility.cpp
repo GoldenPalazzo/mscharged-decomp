@@ -53,11 +53,6 @@ bool gPeachPhotoEmitEnabled;
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
-extern "C" void fn_80319E58(void* pParam, int nAction);
-extern "C" void fn_80060014(cGame* pGame, void* pEvent);
-extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
-extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
-extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 
 
 void cFielder::fn_8004F828()
