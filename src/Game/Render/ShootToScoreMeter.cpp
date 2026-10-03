@@ -565,7 +565,7 @@ void ShootToScoreMeter::RumbleMeter(u16 angle)
     }
 }
 
-void ShootToScoreMeter::fn_801AF97C()
+void ShootToScoreMeter::TurnOffMeter()
 {
     m_bMeterVisible = false;
 }

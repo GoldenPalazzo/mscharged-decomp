@@ -11,7 +11,7 @@ public:
     ShootToScoreMeter();
 
     void TurnOnMeter();
-    void fn_801AF97C();
+    void TurnOffMeter();
     void RumbleMeter(u16 angle);
     void DrawMeter();
     void DrawIndicatorBar(float angle, const nlColour& colour,
