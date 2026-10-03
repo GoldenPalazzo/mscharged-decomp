@@ -22,35 +22,11 @@ public:
     /* 0x04 */ NisPlayer* mPlayer;
 }; // size 0x08
 
-class NisPlayerOverlay_80523808 : public NisPlayerOverlay
+class NisPlayerOverlay_80523878 : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523808(NisPlayer* player, float duration);
-    virtual ~NisPlayerOverlay_80523808();
-    virtual void Reset();
-    virtual int Update(float dt);
-    virtual void Render();
-    virtual int GetOverlayType();
-
-    /* 0x08 */ float mTime;
-    /* 0x0C */ float mDuration;
-}; // size 0x10
-
-class NisPlayerOverlay_80523824 : public NisPlayerOverlay
-{
-public:
-    NisPlayerOverlay_80523824(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523824();
-    virtual int Update(float dt);
-    virtual void Render();
-    virtual int GetOverlayType();
-}; // size 0x08
-
-class NisPlayerOverlay_80523840 : public NisPlayerOverlay
-{
-public:
-    NisPlayerOverlay_80523840(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523840();
+    NisPlayerOverlay_80523878(NisPlayer* player);
+    virtual ~NisPlayerOverlay_80523878();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
@@ -66,15 +42,39 @@ public:
     virtual int GetOverlayType();
 }; // size 0x08
 
-class NisPlayerOverlay_80523878 : public NisPlayerOverlay
+class NisPlayerOverlay_80523840 : public NisPlayerOverlay
 {
 public:
-    NisPlayerOverlay_80523878(NisPlayer* player);
-    virtual ~NisPlayerOverlay_80523878();
+    NisPlayerOverlay_80523840(NisPlayer* player);
+    virtual ~NisPlayerOverlay_80523840();
     virtual int Update(float dt);
     virtual void Render();
     virtual int GetOverlayType();
 }; // size 0x08
+
+class NisPlayerOverlay_80523824 : public NisPlayerOverlay
+{
+public:
+    NisPlayerOverlay_80523824(NisPlayer* player);
+    virtual ~NisPlayerOverlay_80523824();
+    virtual int Update(float dt);
+    virtual void Render();
+    virtual int GetOverlayType();
+}; // size 0x08
+
+class NisPlayerOverlay_80523808 : public NisPlayerOverlay
+{
+public:
+    NisPlayerOverlay_80523808(NisPlayer* player, float duration);
+    virtual ~NisPlayerOverlay_80523808();
+    virtual void Reset();
+    virtual int Update(float dt);
+    virtual void Render();
+    virtual int GetOverlayType();
+
+    /* 0x08 */ float mTime;
+    /* 0x0C */ float mDuration;
+}; // size 0x10
 
 void fn_8028468C(float x, float y, float z);
 void fn_8028469C(bool value);
