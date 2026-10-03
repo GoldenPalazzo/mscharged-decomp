@@ -29,21 +29,8 @@
 #include "NL/nlstring_tmpl.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlPrint.h"
 
-extern "C"
-{
-    void* fn_8019AE7C(void* pObject, cSHierarchy* pHierarchy, int nModel,
-        void* pPhysics, cInventory<cSAnim>* pInventory, void* pResource);
-    void fn_8019BF40(
-        PhysicsObject*, PhysicsObject*, const nlVector3&);
-
-    BirdoEggObject* __ct(BirdoEggObject* pObject, RenderObject* pDrawable);
-    BirdoEggObject* __dt(BirdoEggObject* pObject, int bDelete);
-    void Update(BirdoEggObject* pObject, float fDeltaT);
-    void Reset(BirdoEggObject* pObject);
-}
-
-int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
 float lbl_806DD000 = 0.48f;
 const float lbl_806E5210 = 0.45f;
