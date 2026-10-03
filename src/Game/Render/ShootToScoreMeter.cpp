@@ -89,42 +89,42 @@ static inline float MeterPosition(float position)
 
 void ShootToScoreMeter::SetSegment4Width(float width)
 {
-    mUnidentified58 = MeterPosition(width);
+    m_fSegment4Width = MeterPosition(width);
 }
 
 void ShootToScoreMeter::SetSegment4Position(float position)
 {
-    mUnidentified54 = MeterPosition(position);
+    m_fSegment4Angle = MeterPosition(position);
 }
 
 void ShootToScoreMeter::SetSegment3Width(float width)
 {
-    mUnidentified50 = MeterPosition(width);
+    m_fSegment3Width = MeterPosition(width);
 }
 
 void ShootToScoreMeter::SetSegment3Position(float position)
 {
-    mUnidentified4C = MeterPosition(position);
+    m_fSegment3Angle = MeterPosition(position);
 }
 
 void ShootToScoreMeter::SetSegment2Width(float width)
 {
-    mUnidentified48 = MeterPosition(width);
+    m_fSegment2Width = MeterPosition(width);
 }
 
 void ShootToScoreMeter::SetSegment2Position(float position)
 {
-    mUnidentified44 = MeterPosition(position);
+    m_fSegment2Angle = MeterPosition(position);
 }
 
 void ShootToScoreMeter::SetSegment1Width(float width)
 {
-    mUnidentified40 = MeterPosition(width);
+    m_fSegment1Width = MeterPosition(width);
 }
 
 void ShootToScoreMeter::SetSegment1Position(float position)
 {
-    mUnidentified3C = MeterPosition(position);
+    m_fSegment1Angle = MeterPosition(position);
 }
 
 void ShootToScoreMeter::SetYellowRegionWidth(float width)
@@ -399,7 +399,7 @@ void ShootToScoreMeter::DrawMeter()
     nlColour orange = lbl_806DD0AC;
     nlColour red = lbl_806DD0B0;
 
-    if (mUnidentified2E)
+    if (mbShowGreenRegion)
     {
         DrawColouredRegion(m_fGreenBarAngle - 0.5f * m_fGreenRegionWidth,
             m_fGreenBarAngle + 0.5f * m_fGreenRegionWidth, green, green,
@@ -413,57 +413,57 @@ void ShootToScoreMeter::DrawMeter()
     {
         nlColour savedColour = white;
         if (m_fSavedWhiteBarAngle
-                >= mUnidentified3C - mUnidentified40 / 2.0f
+                >= m_fSegment1Angle - m_fSegment1Width / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified3C + mUnidentified40 / 2.0f)
+                <= m_fSegment1Angle + m_fSegment1Width / 2.0f)
         {
             yellow.c[3] = (u8)lbl_806DD0B8;
-            DrawColouredRegion(mUnidentified3C - 0.5f * mUnidentified40,
-                mUnidentified3C + 0.5f * mUnidentified40, yellow, yellow,
+            DrawColouredRegion(m_fSegment1Angle - 0.5f * m_fSegment1Width,
+                m_fSegment1Angle + 0.5f * m_fSegment1Width, yellow, yellow,
                 matrix, screenWidth);
             savedColour = yellow;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified44 - mUnidentified48 / 2.0f
+                >= m_fSegment2Angle - m_fSegment2Width / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified44 + mUnidentified48 / 2.0f)
+                <= m_fSegment2Angle + m_fSegment2Width / 2.0f)
         {
             orange.c[3] = (u8)lbl_806DD0B8;
-            DrawColouredRegion(mUnidentified44 - 0.5f * mUnidentified48,
-                mUnidentified44 + 0.5f * mUnidentified48, orange, orange,
+            DrawColouredRegion(m_fSegment2Angle - 0.5f * m_fSegment2Width,
+                m_fSegment2Angle + 0.5f * m_fSegment2Width, orange, orange,
                 matrix, screenWidth);
             savedColour = orange;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified4C - mUnidentified50 / 2.0f
+                >= m_fSegment3Angle - m_fSegment3Width / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified4C + mUnidentified50 / 2.0f)
+                <= m_fSegment3Angle + m_fSegment3Width / 2.0f)
         {
             red.c[3] = (u8)lbl_806DD0B8;
-            DrawColouredRegion(mUnidentified4C - 0.5f * mUnidentified50,
-                mUnidentified4C + 0.5f * mUnidentified50, red, red, matrix,
+            DrawColouredRegion(m_fSegment3Angle - 0.5f * m_fSegment3Width,
+                m_fSegment3Angle + 0.5f * m_fSegment3Width, red, red, matrix,
                 screenWidth);
             savedColour = red;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified54 - mUnidentified58 / 2.0f
+                >= m_fSegment4Angle - m_fSegment4Width / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified54 + mUnidentified58 / 2.0f)
+                <= m_fSegment4Angle + m_fSegment4Width / 2.0f)
         {
             orange.c[3] = (u8)lbl_806DD0B8;
-            DrawColouredRegion(mUnidentified54 - 0.5f * mUnidentified58,
-                mUnidentified54 + 0.5f * mUnidentified58, orange, orange,
+            DrawColouredRegion(m_fSegment4Angle - 0.5f * m_fSegment4Width,
+                m_fSegment4Angle + 0.5f * m_fSegment4Width, orange, orange,
                 matrix, screenWidth);
             savedColour = orange;
         }
         else if (m_fSavedWhiteBarAngle
-                >= mUnidentified5C - mUnidentified60 / 2.0f
+                >= m_fSegment5Angle - m_fSegment5Width / 2.0f
             && m_fSavedWhiteBarAngle
-                <= mUnidentified5C + mUnidentified60 / 2.0f)
+                <= m_fSegment5Angle + m_fSegment5Width / 2.0f)
         {
             yellow.c[3] = (u8)lbl_806DD0B8;
-            DrawColouredRegion(mUnidentified5C - 0.5f * mUnidentified60,
-                mUnidentified5C + 0.5f * mUnidentified60, yellow, yellow,
+            DrawColouredRegion(m_fSegment5Angle - 0.5f * m_fSegment5Width,
+                m_fSegment5Angle + 0.5f * m_fSegment5Width, yellow, yellow,
                 matrix, screenWidth);
             savedColour = yellow;
         }
@@ -473,27 +473,27 @@ void ShootToScoreMeter::DrawMeter()
     }
     else
     {
-        DrawColouredRegion(mUnidentified3C - 0.5f * mUnidentified40,
-            mUnidentified3C + 0.5f * mUnidentified40, yellow, yellow,
+        DrawColouredRegion(m_fSegment1Angle - 0.5f * m_fSegment1Width,
+            m_fSegment1Angle + 0.5f * m_fSegment1Width, yellow, yellow,
             matrix, screenWidth);
-        DrawColouredRegion(mUnidentified44 - 0.5f * mUnidentified48,
-            mUnidentified44 + 0.5f * mUnidentified48, orange, orange,
+        DrawColouredRegion(m_fSegment2Angle - 0.5f * m_fSegment2Width,
+            m_fSegment2Angle + 0.5f * m_fSegment2Width, orange, orange,
             matrix, screenWidth);
-        DrawColouredRegion(mUnidentified4C - 0.5f * mUnidentified50,
-            mUnidentified4C + 0.5f * mUnidentified50, red, red, matrix,
+        DrawColouredRegion(m_fSegment3Angle - 0.5f * m_fSegment3Width,
+            m_fSegment3Angle + 0.5f * m_fSegment3Width, red, red, matrix,
             screenWidth);
-        DrawColouredRegion(mUnidentified54 - 0.5f * mUnidentified58,
-            mUnidentified54 + 0.5f * mUnidentified58, orange, orange,
+        DrawColouredRegion(m_fSegment4Angle - 0.5f * m_fSegment4Width,
+            m_fSegment4Angle + 0.5f * m_fSegment4Width, orange, orange,
             matrix, screenWidth);
-        DrawColouredRegion(mUnidentified5C - 0.5f * mUnidentified60,
-            mUnidentified5C + 0.5f * mUnidentified60, yellow, yellow,
+        DrawColouredRegion(m_fSegment5Angle - 0.5f * m_fSegment5Width,
+            m_fSegment5Angle + 0.5f * m_fSegment5Width, yellow, yellow,
             matrix, screenWidth);
         DrawIndicatorBar(
             GetWhiteBarAngle(), white, matrix, screenWidth);
     }
 
     nlColour trailColour = sWhiteBarColour;
-    if (mUnidentified2C)
+    if (mbSecondButtonPressed)
     {
         if (m_fWhiteBarAngle
                 >= m_fGreenBarAngle - m_fYellowRegionWidth / 2.0f
@@ -574,8 +574,8 @@ void ShootToScoreMeter::TurnOnMeter()
 {
     m_bMeterVisible = true;
     mbShowSavedWhiteBar = false;
-    mUnidentified2C = false;
-    mUnidentified2E = false;
+    mbSecondButtonPressed = false;
+    mbShowGreenRegion = false;
     m_fWhiteBarAngle = 0.0f;
     m_fSavedWhiteBarAngle = 0.0f;
     mfRumbleAmount = 0.0f;
@@ -589,20 +589,20 @@ ShootToScoreMeter::ShootToScoreMeter()
     m_fWhiteBarAngle = 0.0f;
     m_fWhiteBarPreviousAngle = 0.0f;
     m_fSavedWhiteBarAngle = 0.0f;
-    mUnidentified2C = false;
+    mbSecondButtonPressed = false;
     mbShowSavedWhiteBar = false;
-    mUnidentified2E = false;
+    mbShowGreenRegion = false;
     m_fGreenBarAngle = 0.0f;
     m_fGreenRegionWidth = 0.0f;
     m_fYellowRegionWidth = 0.0f;
-    mUnidentified3C = 0.0f;
-    mUnidentified40 = 0.0f;
-    mUnidentified44 = 0.0f;
-    mUnidentified48 = 0.0f;
-    mUnidentified4C = 0.0f;
-    mUnidentified50 = 0.0f;
-    mUnidentified54 = 0.0f;
-    mUnidentified58 = 0.0f;
-    mUnidentified5C = 0.0f;
-    mUnidentified60 = 0.0f;
+    m_fSegment1Angle = 0.0f;
+    m_fSegment1Width = 0.0f;
+    m_fSegment2Angle = 0.0f;
+    m_fSegment2Width = 0.0f;
+    m_fSegment3Angle = 0.0f;
+    m_fSegment3Width = 0.0f;
+    m_fSegment4Angle = 0.0f;
+    m_fSegment4Width = 0.0f;
+    m_fSegment5Angle = 0.0f;
+    m_fSegment5Width = 0.0f;
 }

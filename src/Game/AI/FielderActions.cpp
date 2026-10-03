@@ -3263,7 +3263,7 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
                 mUnidentified3A4);
             ShootToScoreMeter::instance.SetYellowRegionWidth(fSecondPhaseTime);
             ShootToScoreMeter::instance.SetGreenBarPosition(lbl_806DB93C);
-            ShootToScoreMeter::instance.mUnidentified2E = true;
+            ShootToScoreMeter::instance.mbShowGreenRegion = true;
         }
         else if (mUnidentified3A0 < 0.0f)
         {
@@ -3418,7 +3418,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 {
     tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterSecondButtonPressEvent at time %f\n", mUnidentified3AC);
 
-    ShootToScoreMeter::instance.mUnidentified2C = true;
+    ShootToScoreMeter::instance.mbSecondButtonPressed = true;
     ShootToScoreMeter::instance.m_v3MeterPosition
         = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 
