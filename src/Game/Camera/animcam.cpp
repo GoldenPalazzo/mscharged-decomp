@@ -15,13 +15,13 @@
 #include "NL/nlstring_tmpl.h"
 
 static float dofBehindTarget = 2.0f;
-static float lbl_806DC464 = 45.0f;
-static float lbl_806DC468 = 1.0f;
-static float lbl_806DC46C = 1.0f;
+static float dofReferenceFOV = 45.0f;
+static float dofFOVScaleWeight = 1.0f;
+static float dofFOVScale = 1.0f;
 
 cCameraData* cAnimCamera::m_cameraDataList;
 
-static void EnableDofDebug()
+static void ToggleDofDebug()
 {
     if (DepthOfFieldManager::instance.m_bDebugView)
     {
@@ -38,14 +38,14 @@ struct DofDebugFlag
     DofDebugFlag()
     {
         m_active = false;
-        m_callback = EnableDofDebug;
+        m_callback = ToggleDofDebug;
     }
 
     bool m_active;
     void (*m_callback)();
 };
 
-static DofDebugFlag g_EnableDofDebug;
+static DofDebugFlag g_DofDebugFlag;
 
 template <class T>
 static inline void nlGetChunkDataAs(nlChunk* chunk, T*& out)
@@ -65,7 +65,7 @@ cCameraData::cCameraData()
     next = NULL;
     m_uHashID = 0;
     m_uKeyCount = 0;
-    field_0x0C = NULL;
+    m_szName = NULL;
     cameraPos = NULL;
     targetPos = NULL;
     cameraRot = NULL;
@@ -82,7 +82,7 @@ cCameraData::~cCameraData()
         delete[] cameraRot;
         delete[] fFOV;
         delete[] fFocalLength;
-        delete[] field_0x0C;
+        delete[] m_szName;
     }
 }
 
@@ -216,12 +216,12 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
         case 0x25000:
             if (ownsKeyData)
             {
-                pAnimCameraData->field_0x0C = (char*)nlMalloc(32, 8, false);
-                nlStrNCpy(pAnimCameraData->field_0x0C, GetCameraName(outerChunk), 32);
+                pAnimCameraData->m_szName = (char*)nlMalloc(32, 8, false);
+                nlStrNCpy(pAnimCameraData->m_szName, GetCameraName(outerChunk), 32);
             }
             else
             {
-                pAnimCameraData->field_0x0C = (char*)outerChunk->GetData();
+                pAnimCameraData->m_szName = (char*)outerChunk->GetData();
             }
             break;
         }
@@ -230,7 +230,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
     return true;
 }
 
-bool cAnimCamera::LoadCameraAnimation(nlChunk* begin, unsigned long, const char* cameraName, bool ownsKeyData)
+bool cAnimCamera::LoadCameraAnimation(nlChunk* begin, unsigned long fileSize, const char* cameraName, bool ownsKeyData)
 {
     nlChunk* end = begin->GetLastChunk();
     nlChunk* first = begin->GetFirstChunk();
@@ -256,7 +256,7 @@ cAnimCamera::cAnimCamera()
 {
     m_bUseSimulationTime = false;
     m_LetManagerDoUpdate = true;
-    m_bUnusedPad = false;
+    m_bUseLookAt = false;
     m_fAnimationTime = 0.0f;
     m_fAnimationSpeed = 1.0f;
     m_fLastSimulationTime = -1.0f;
@@ -373,7 +373,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     nlVec3Add(m_vecTarget, targetPos, m_OffsetPos);
     GetLocalPoint(m_vecCamera, m_vecCamera, m_OffsetPos, 0);
     GetWorldPoint(m_vecCamera, m_vecCamera, m_OffsetPos, mFacingAngle);
-    if (m_bUnusedPad)
+    if (m_bUseLookAt)
     {
         static const nlVector3 kUp = { 0.0f, 0.0f, 1.0f };
         up = kUp;
@@ -392,9 +392,9 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
         nlInvertMatrix(mView, viewMatrix);
     }
 
-    float fScale = BlendCameraValue(1.0f, lbl_806DC464 / m_Fov, lbl_806DC468);
+    float fScale = BlendCameraValue(1.0f, dofReferenceFOV / m_Fov, dofFOVScaleWeight);
     fScale *= fScale;
-    lbl_806DC46C = fScale;
+    dofFOVScale = fScale;
     m_FocalLength = dofBehindTarget * fScale + focalLength;
     DepthOfFieldManager::instance.m_fDistanceFromCamera = m_FocalLength;
 }
@@ -447,20 +447,20 @@ float cAnimCamera::ManualUpdate(float dt)
             FixedUpdateTask* provider = GetFixedUpdateTask();
             float simTime = provider->mSimulationTime;
             float delta = simTime - m_fLastSimulationTime;
-            float duration = GetUnidentifiedDuration();
+            float duration = GetDuration();
             m_fAnimationTime += (delta * m_fAnimationSpeed) / duration;
             m_fLastSimulationTime = simTime;
         }
     }
     else
     {
-        float duration = GetUnidentifiedDuration();
+        float duration = GetDuration();
         m_fAnimationTime += (dt * m_fAnimationSpeed) / duration;
     }
 
     if (m_fAnimationTime >= 1.0f)
     {
-        float duration = GetUnidentifiedDuration();
+        float duration = GetDuration();
         overrun = (m_fAnimationTime - 1.0f) * duration;
         if (m_bCyclic)
         {
