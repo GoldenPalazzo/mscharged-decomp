@@ -152,7 +152,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
     }
 
     cTeam* pTeam = pDesire->m_pFielder->m_pTeam;
-    pDesire->fn_800D3A50(pTeam->GetCurrentPowerUp().eType,
+    pDesire->SetPowerup(pTeam->GetCurrentPowerUp().eType,
         pTeam->GetCurrentPowerUp().nnumOfPowerups, NULL);
 }
 
@@ -179,14 +179,14 @@ void DesireUsePowerup::fn_800D3968(
         pTeam->TogglePowerup(false);
     }
 
-    fn_800D3A50(pTeam->GetCurrentPowerUp().eType,
+    SetPowerup(pTeam->GetCurrentPowerUp().eType,
         pTeam->GetCurrentPowerUp().nnumOfPowerups, pTarget);
 }
 
 /**
  * Offset/Address/Size: 0x19DC | 0x800D3A50 | size: 0x26C
  */
-void DesireUsePowerup::fn_800D3A50(
+void DesireUsePowerup::SetPowerup(
     ePowerUpType ePowerup, int nNumPowerups, cFielder* pTarget)
 {
     mePowerup = POWER_UP_NONE;
@@ -248,7 +248,7 @@ void DesireUsePowerup::fn_800D3A50(
     case (ePowerUpType)17:
     case (ePowerUpType)18:
     case (ePowerUpType)19:
-        fn_800D3CBC(this);
+        ThrowPowerup(this);
         break;
     default:
         int nDirection = 0;
@@ -306,7 +306,7 @@ void DesireUsePowerup::fn_800D3A50(
     }
 }
 
-inline void DesireUsePowerup::UnidentifiedResetPowerupState()
+inline void DesireUsePowerup::ResetPowerupState()
 {
     mePowerup = POWER_UP_NONE;
     mnNumPowerups = 0;
@@ -320,11 +320,11 @@ inline void DesireUsePowerup::UnidentifiedResetPowerupState()
 /**
  * Offset/Address/Size: 0x1C48 | 0x800D3CBC | size: 0x518
  */
-extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
+void ThrowPowerup(DesireUsePowerup* pDesire)
 {
     if (g_pGame->mbCaptainShotToScoreOn)
     {
-        pDesire->UnidentifiedResetPowerupState();
+        pDesire->ResetPowerupState();
         return;
     }
 
@@ -359,20 +359,20 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
                 = transition.mValue.mFuncHash;
             pDesire->mOverrideTransition.mValue.mNativeFunc
                 = transition.mValue.mNativeFunc;
-            pDesire->UnidentifiedResetPowerupState();
+            pDesire->ResetPowerupState();
         }
         break;
     }
     case POWER_UP_STAR:
     {
         fn_80319E84(pDesire->mScriptMachine, 24, NULL, true);
-        pDesire->UnidentifiedResetPowerupState();
+        pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_MUSHROOM:
     {
         fn_80319E84(pDesire->mScriptMachine, 25, NULL, true);
-        pDesire->UnidentifiedResetPowerupState();
+        pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_GREEN_SHELL:
@@ -403,14 +403,14 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             event->Target = pDesire->mpTarget;
             QueuePowerupUsed(event);
         }
-        pDesire->UnidentifiedResetPowerupState();
+        pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_CHAIN_CHOMP:
     {
         gNPCManager->GetChainChomp()->Spawn(
             pDesire->m_pFielder, NULL);
-        pDesire->UnidentifiedResetPowerupState();
+        pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_NONE:
