@@ -19,6 +19,12 @@ static inline void PoseAccumulatorMultiplyScale(
     result.z = parent.z * scale.z;
 }
 
+static inline void PoseAccumulatorNormalizeWorldAxis(nlVector3& result,
+    const nlVector3& axis, const float& scale)
+{
+    nlVec3Scale(result, axis, 1.0f / scale);
+}
+
 /**
  * Offset/Address/Size: 0x0 | 0x8030A9D0 | size: 0x228
  */
@@ -259,8 +265,8 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
     }
 
     int ParentStack[32];
-    bool ScaleIdentityStack[32];
-    nlVector3 ScaleStack[32];
+    bool ScaleIdentityStack[33];
+    nlVector3 ScaleStack[33];
     int nStackIndex = -1;
     int nScaleIndex = 0;
 
@@ -381,28 +387,22 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 float fWorldScaleY = nlSqrt(v3WorldScaleSquared.y, true);
                 float fWorldScaleZ = nlSqrt(v3WorldScaleSquared.z, true);
 
-                float fRightScale = 1.0f / fWorldScaleX;
-                float fForwardScale = 1.0f / fWorldScaleZ;
-                float rightX = fRightScale * pWorldMatrix.m11;
-                float rightY = fRightScale * pWorldMatrix.m12;
-                float rightZ = fRightScale * pWorldMatrix.m13;
-                float forwardX = fForwardScale * pWorldMatrix.m31;
-                float forwardY = fForwardScale * pWorldMatrix.m32;
-                float forwardZ = fForwardScale * pWorldMatrix.m33;
-                float upX = forwardY * rightZ - forwardZ * rightY;
-                float upY = -forwardX * rightZ + forwardZ * rightX;
-                float upZ = forwardX * rightY - forwardY * rightX;
-
                 nlMatrix4 mWorldNoScale;
-                mWorldNoScale.SetRow4_(0, rightX, rightY, rightZ, 0.0f);
-                mWorldNoScale.SetRow4_(2, forwardX, forwardY, forwardZ, 0.0f);
-                mWorldNoScale.SetRow4_(1, upX, upY, upZ, 0.0f);
-                mWorldNoScale.SetRow4_(3, pWorldMatrix.m41, pWorldMatrix.m42,
-                    pWorldMatrix.m43, 1.0f);
+                mWorldNoScale.m14 = 0.0f;
+                mWorldNoScale.m24 = 0.0f;
+                mWorldNoScale.m34 = 0.0f;
+                PoseAccumulatorNormalizeWorldAxis(*(nlVector3*)&mWorldNoScale.e2[0][0],
+                    *(const nlVector3*)&pWorldMatrix.e2[0][0], fWorldScaleX);
+                nlVec3Scale(*(nlVector3*)&mWorldNoScale.e2[2][0],
+                    *(const nlVector3*)&pWorldMatrix.e2[2][0], 1.0f / fWorldScaleZ);
                 ScaleIdentityStack[0] = false;
-                ScaleStack[0].x *= fWorldScaleX;
-                ScaleStack[0].y *= fWorldScaleY;
                 ScaleStack[0].z *= fWorldScaleZ;
+                ScaleStack[0].y *= fWorldScaleY;
+                ScaleStack[0].x *= fWorldScaleX;
+                nlVec3CrossProduct(*(nlVector3*)&mWorldNoScale.e2[1][0],
+                    *(const nlVector3*)&mWorldNoScale.e2[2][0],
+                    *(const nlVector3*)&mWorldNoScale.e2[0][0]);
+                mWorldNoScale.SetTranslation(pWorldMatrix.GetTranslation());
                 nlMatrixToQuat(qWorld, mWorldNoScale);
             }
             else
