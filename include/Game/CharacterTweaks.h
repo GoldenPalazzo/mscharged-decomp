@@ -202,7 +202,6 @@ private:
 
 
 // Shared functions and data from Game/CharacterTweaks.cpp.
-extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
@@ -222,6 +221,7 @@ extern "C" float fn_8002CF10(PlayerTweaks*);
 extern "C" float fn_8002CF24(PlayerTweaks*);
 
 // C++ accessors from Game/CharacterTweaks.cpp.
+void InitPlayerTweaks(PlayerTweaks*, const char*, const char*, bool);
 float GetOffensiveRating(PlayerTweaks*);
 float GetPlaymakerRating(PlayerTweaks*);
 float GetRunSpeed(PlayerTweaks*);

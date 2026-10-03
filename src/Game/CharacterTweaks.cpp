@@ -130,14 +130,14 @@ void FielderTweaks::Init()
 
 PlayerTweaks::PlayerTweaks(const char* name, const char* category)
 {
-    fn_8002B934(this, name, category, true);
+    InitPlayerTweaks(this, name, category, true);
 }
 
 PlayerTweaks::~PlayerTweaks()
 {
 }
 
-void fn_8002B934(PlayerTweaks* tweaks, const char* name,
+void InitPlayerTweaks(PlayerTweaks* tweaks, const char* name,
     const char* category, bool registerTweaks)
 {
     tweaks->mUnidentified004.BindWithDefault("mfHeight", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
