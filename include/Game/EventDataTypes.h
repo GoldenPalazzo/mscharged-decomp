@@ -352,7 +352,7 @@ extern SlotPool<NISData> g_NISDataPool;
 extern SlotPool<PowerupUsedEventData> g_PowerupUsedEventDataPool;
 extern SlotPool<PowerupHitPlayerEventData> g_PowerupHitPlayerEventDataPool;
 
-extern "C" inline void fn_80025A14(CollisionPowerupStatsData* data)
+inline void FreeCollisionPowerupStatsData(CollisionPowerupStatsData* data)
 {
     g_CollisionPowerupStatsDataPool.Free(data);
 }

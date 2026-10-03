@@ -438,7 +438,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                         bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
                     g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
                         Function<CollisionPowerupStatsData*>(
-                            fn_80025A14));
+                            FreeCollisionPowerupStatsData));
                 }
                 break;
             case SHOCKWAVE_LIGHTNING:

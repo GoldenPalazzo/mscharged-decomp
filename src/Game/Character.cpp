@@ -2082,7 +2082,7 @@ extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData)
                 pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
-                Function<CollisionPowerupStatsData*>(fn_80025A14));
+                Function<CollisionPowerupStatsData*>(FreeCollisionPowerupStatsData));
         }
     }
 }
@@ -2114,7 +2114,7 @@ extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData)
                 pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
-                Function<CollisionPowerupStatsData*>(fn_80025A14));
+                Function<CollisionPowerupStatsData*>(FreeCollisionPowerupStatsData));
         }
     }
 }
@@ -2144,7 +2144,7 @@ extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData)
                 pStatsData->nPlayerPadID = -1;
             }
             g_pGame->mUnidentified49C.mEvent31.Queue(pStatsData,
-                Function<CollisionPowerupStatsData*>(fn_80025A14));
+                Function<CollisionPowerupStatsData*>(FreeCollisionPowerupStatsData));
         }
     }
 }
