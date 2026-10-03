@@ -15,7 +15,7 @@
 #include "Game/Task/FixedUpdateTask.h"
 
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" bool fn_8003E948(cFielder*);
+extern "C" bool fn_8003E948(const cFielder*);
 
 
 static unsigned short sDesireUserControlledType = 0xFFFF;
@@ -36,9 +36,9 @@ bool DesireUserControlled::Initialize(void* context)
 
     mMaxDuration = -1.0f;
 
-    UnidentifiedVariant_80054AB8 update;
+    DesireUpdate update;
     Update(
-        (DesireUpdate*)&update, g_fSimulationTick);
+        &update, g_fSimulationTick);
 
     return result;
 }
