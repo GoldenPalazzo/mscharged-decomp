@@ -63,7 +63,7 @@ struct MegaStrikeEndData
     /* 0x08 */ u32 unknown_08;
 }; // total size: 0x0C
 
-struct UnidentifiedEventData_8006701C
+struct MegaStrikeMeterData
 {
     /* 0x00 */ cFielder* pFielder;
     /* 0x04 */ float fMeterValue;

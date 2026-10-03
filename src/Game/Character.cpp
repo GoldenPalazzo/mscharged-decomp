@@ -170,7 +170,7 @@ extern "C" void fn_8002268C(CollisionPlayerWallData* pEventData);
 extern "C" void fn_800226B4(CollisionPlayerBallData* pEventData);
 extern "C" void fn_8002276C();
 extern "C" void fn_800227C8();
-extern "C" void fn_80022810(UnidentifiedEventData_8006701C*);
+extern "C" void fn_80022810(MegaStrikeMeterData*);
 extern "C" void fn_80022824(cPlayer*);
 extern "C" void fn_80022908();
 extern "C" void fn_80022968(CollisionChainPlayerData* pEventData);
@@ -1768,7 +1768,7 @@ extern "C" void fn_8001FE80()
     UnidentifiedFindEvent<cFielder>("KnockYoshiTongue", -1)->Add(Function<cFielder*>(fn_80020B8C), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8002276C), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800227C8), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(Function<UnidentifiedEventData_8006701C*>(fn_80022810), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(fn_80022810), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(fn_80022908), 0, -1);
     UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(fn_80022824), 0, -1);
     UnidentifiedFindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(fn_80022664), 0, -1);
@@ -2440,7 +2440,7 @@ extern "C" void fn_800227C8()
     }
 }
 
-extern "C" void fn_80022810(UnidentifiedEventData_8006701C*)
+extern "C" void fn_80022810(MegaStrikeMeterData*)
 {
     if (g_pGame != NULL)
     {

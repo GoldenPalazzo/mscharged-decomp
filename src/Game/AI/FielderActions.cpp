@@ -3128,7 +3128,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
             PlaySound(0, 0xC4534945, 0, 0);
         }
 
-        UnidentifiedEventData_8006701C event;
+        MegaStrikeMeterData event;
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
@@ -3381,7 +3381,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     PlayRumbleAction(1, GetGlobalPad());
 
-    UnidentifiedEventData_8006701C event;
+    MegaStrikeMeterData event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
@@ -3454,7 +3454,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
         }
     }
 
-    UnidentifiedEventData_8006701C event;
+    MegaStrikeMeterData event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;
