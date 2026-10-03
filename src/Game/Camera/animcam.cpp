@@ -4,6 +4,8 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Render/depthoffield.h"
+#include "Game/Render/Presentation.h"
+#include "Game/Task/FixedUpdateTask.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
@@ -11,7 +13,6 @@
 #include "NL/platqmath.h"
 #include "NL/platvmath.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/Render/RLViewLayers.h"
 
 static float dofBehindTarget = 2.0f;
 static float lbl_806DC464 = 45.0f;
@@ -19,23 +20,6 @@ static float lbl_806DC468 = 1.0f;
 static float lbl_806DC46C = 1.0f;
 
 cCameraData* cAnimCamera::m_cameraDataList;
-
-
-struct UnidentifiedCameraDisplayState
-{
-    u8 padding_0x00[0xC4];
-    bool field_0xC4;
-};
-
-UnidentifiedCameraDisplayState* GetPresentation();
-
-struct UnidentifiedSimulationTimeProvider
-{
-    u8 padding_0x00[0x2C];
-    float mSimulationTime;
-};
-
-UnidentifiedSimulationTimeProvider* GetFixedUpdateTask();
 
 static void EnableDofDebug()
 {
@@ -67,6 +51,13 @@ template <class T>
 static inline void nlGetChunkDataAs(nlChunk* chunk, T*& out)
 {
     out = (T*)chunk->GetData();
+}
+
+static inline const char* GetCameraName(nlChunk* chunk)
+{
+    const char* name;
+    nlGetChunkDataAs(chunk, name);
+    return name;
 }
 
 cCameraData::cCameraData()
@@ -125,8 +116,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             break;
         case 0x25003:
         {
-            nlVector3* v3Pos;
-            nlGetChunkDataAs(outerChunk, v3Pos);
+            nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -145,8 +135,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
         }
         case 0x25006:
         {
-            nlVector3* v3Pos;
-            nlGetChunkDataAs(outerChunk, v3Pos);
+            nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -165,8 +154,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
         }
         case 0x25004:
         {
-            nlQuaternion* rot;
-            nlGetChunkDataAs(outerChunk, rot);
+            nlQuaternion* rot = (nlQuaternion*)outerChunk->GetData();
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -200,8 +188,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             }
             else
             {
-                float* data;
-                nlGetChunkDataAs(outerChunk, data);
+                float* data = (float*)outerChunk->GetData();
                 pAnimCameraData->fFOV = data;
             }
             break;
@@ -222,8 +209,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             }
             else
             {
-                float* data;
-                nlGetChunkDataAs(outerChunk, data);
+                float* data = (float*)outerChunk->GetData();
                 pAnimCameraData->fFocalLength = data;
             }
             break;
@@ -231,9 +217,7 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             if (ownsKeyData)
             {
                 pAnimCameraData->field_0x0C = (char*)nlMalloc(32, 8, false);
-                char* data;
-                nlGetChunkDataAs(outerChunk, data);
-                nlStrNCpy(pAnimCameraData->field_0x0C, data, 32);
+                nlStrNCpy(pAnimCameraData->field_0x0C, GetCameraName(outerChunk), 32);
             }
             else
             {
@@ -300,6 +284,13 @@ void cAnimCamera::SetAnimationTime(float fTime, bool bUpdateView)
     }
 }
 
+static inline float CameraKeyDistanceSquared(const nlVector3& first, const nlVector3& second)
+{
+    nlVector3 delta;
+    nlVec3Sub(delta, first, second);
+    return delta.GetLengthSq3D();
+}
+
 void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
 {
     float fRealIndex = m_fAnimationTime * (float)(m_pActiveCameraData->m_uKeyCount - 1);
@@ -316,6 +307,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     if (m_fAnimationTime >= 1.0f)
     {
         nIndex = m_pActiveCameraData->m_uKeyCount - 1;
+        fRealIndex = (float)(m_pActiveCameraData->m_uKeyCount - 1);
         m_Fov = m_pActiveCameraData->fFOV[nIndex];
         cameraPos = m_pActiveCameraData->cameraPos[nIndex];
         targetPos = m_pActiveCameraData->targetPos[nIndex];
@@ -326,9 +318,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     {
         nlVector3& cpN = m_pActiveCameraData->cameraPos[nIndex + 1];
         nlVector3& cpK = m_pActiveCameraData->cameraPos[nIndex];
-        nlVector3 delta;
-        nlVec3Sub(delta, cpK, cpN);
-        float distSq = delta.GetLengthSq3D();
+        float distSq = CameraKeyDistanceSquared(cpK, cpN);
         if (distSq > 16.0f)
         {
             if (fWeightB < 0.5f)
@@ -360,8 +350,8 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
 
     if (IsWidescreen())
     {
-        UnidentifiedCameraDisplayState* state = GetPresentation();
-        if (state->field_0xC4)
+        Presentation* state = GetPresentation();
+        if (state->mLetterBoxEnabled)
         {
             m_Fov = AdjustFOVForWidescreen(m_Fov);
         }
@@ -454,7 +444,7 @@ float cAnimCamera::ManualUpdate(float dt)
         }
         else
         {
-            UnidentifiedSimulationTimeProvider* provider = GetFixedUpdateTask();
+            FixedUpdateTask* provider = GetFixedUpdateTask();
             float simTime = provider->mSimulationTime;
             float delta = simTime - m_fLastSimulationTime;
             float duration = GetUnidentifiedDuration();

@@ -613,7 +613,7 @@ config.libs = [
             Object(Matching, "Game/Audio/XSoundHandle.cpp"),
 
             # Game/Camera
-            Object(NonMatching, "Game/Camera/animcam.cpp", cflags=cflags_game),
+            Object(Matching, "Game/Camera/animcam.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Camera/AnimViewerCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/BaseCam.cpp"),
             Object(Matching, "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),

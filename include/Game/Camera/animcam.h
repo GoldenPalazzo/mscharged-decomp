@@ -30,13 +30,13 @@ public:
     cAnimCamera();
     virtual ~cAnimCamera();
 
-    virtual eCameraType GetType();
     virtual void Update(float dt);
-    virtual const nlMatrix4& GetViewMatrix() const;
-    virtual float GetFOV() const;
-    virtual const nlVector3& GetTargetPosition() const;
-    virtual const nlVector3& GetCameraPosition() const;
-    virtual float GetFocalLength() const;
+    virtual eCameraType GetType() { return eCameraType_Animated; }
+    virtual const nlVector3& GetTargetPosition() const { return m_vecTarget; }
+    virtual const nlVector3& GetCameraPosition() const { return m_vecCamera; }
+    virtual float GetFOV() const { return m_Fov; }
+    virtual float GetFocalLength() const { return m_FocalLength; }
+    virtual const nlMatrix4& GetViewMatrix() const { return m_matView; }
 
     static bool LoadCameraAnimation(nlChunk* begin, unsigned long, const char* cameraName, bool ownsKeyData);
     static void FreeCameraAnimations();
@@ -93,35 +93,5 @@ public:
     /* 0xAC */ float m_FocalLength;
     /* 0xB0 */ void (*m_EndOfAnimationCallback)();
 }; // total size: 0xB4
-
-inline eCameraType cAnimCamera::GetType()
-{
-    return eCameraType_Animated;
-}
-
-inline const nlVector3& cAnimCamera::GetTargetPosition() const
-{
-    return m_vecTarget;
-}
-
-inline const nlVector3& cAnimCamera::GetCameraPosition() const
-{
-    return m_vecCamera;
-}
-
-inline float cAnimCamera::GetFOV() const
-{
-    return m_Fov;
-}
-
-inline float cAnimCamera::GetFocalLength() const
-{
-    return m_FocalLength;
-}
-
-inline const nlMatrix4& cAnimCamera::GetViewMatrix() const
-{
-    return m_matView;
-}
 
 #endif // GAME_CAMERA_ANIMCAM_H
