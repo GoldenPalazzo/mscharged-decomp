@@ -2476,7 +2476,7 @@ extern "C" void fn_80022824(cPlayer*)
                 }
             }
         }
-        gNPCManager->fn_801AA348();
+        gNPCManager->ResetActiveHammers();
     }
 }
 

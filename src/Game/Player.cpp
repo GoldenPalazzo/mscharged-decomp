@@ -1498,7 +1498,7 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
 {
     if (gNPCManager != NULL)
     {
-        gNPCManager->fn_801AA348();
+        gNPCManager->ResetActiveHammers();
         if (gNPCManager->mUnidentified024 != NULL)
         {
             gNPCManager->mUnidentified024->Deactivate(true);

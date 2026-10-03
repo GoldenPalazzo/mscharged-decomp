@@ -266,7 +266,7 @@ int NPCManager::GetNumHammers()
     return mUnidentified070[0] == 0 ? 0 : 15;
 }
 
-void NPCManager::fn_801AA348()
+void NPCManager::ResetActiveHammers()
 {
     for (int i = 0; i < 15; ++i)
     {
@@ -549,7 +549,7 @@ void NPCManager::DestroyNPCs()
     ::DestroyNPCs(this);
 }
 
-NPCTemplate* NPCManager::fn_801ABBDC(const char* pName)
+NPCTemplate* NPCManager::FindNPCTemplate(const char* pName)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -645,7 +645,7 @@ void NPCManager::UpdateAINPCs(float dt)
     UpdateFlyingCameras(dt);
 }
 
-void NPCManager::fn_801ABF8C()
+void NPCManager::ResetNPCs()
 {
     if (mpChainChomp != 0)
     {

@@ -81,7 +81,7 @@ public:
     void CreateDiddyBanana();
     void CreateHammers();
     int GetNumHammers();
-    void fn_801AA348();
+    void ResetActiveHammers();
     HammerObject* GetHammer(int nIndex);
     void CreateThwomps();
     ThwompObject* GetThwomp(int nIndex);
@@ -89,7 +89,7 @@ public:
     bool FinishLoadNPCTemplate();
     void UnloadTransientNPCTemplates();
     void DestroyNPCs();
-    NPCTemplate* fn_801ABBDC(const char* pName);
+    NPCTemplate* FindNPCTemplate(const char* pName);
 
     NPCTemplate* fn_801ABBDC_inline(const char* pName)
     {
@@ -120,7 +120,7 @@ public:
     void UpdateNPCs(float dt);
     void RenderNPCs();
     void UpdateAINPCs(float dt);
-    void fn_801ABF8C();
+    void ResetNPCs();
 
     /* 0x04 */ cInventory<cSHierarchy>* mPersistentHierarchies;
     /* 0x08 */ cInventory<cSHierarchy>* mTransientHierarchies;
