@@ -147,13 +147,12 @@ struct CollisionBallWallData
     /* 0x20 */ float fCollisionVecLen;
 }; // total size: 0x24
 
-struct UnidentifiedEventData_80066B08
+struct CollisionCrowdData
 {
-    /* 0x00 */ nlVector3 mUnidentified00;
-    /* 0x0C */ PhysicsObject* mUnidentified0C;
-    /* 0x10 */ CrowdRiot* mUnidentified10;
+    /* 0x00 */ nlVector3 v3Position;
+    /* 0x0C */ PhysicsObject* pObject;
+    /* 0x10 */ CrowdRiot* pCrowdRiot;
 }; // total size: 0x14
-typedef UnidentifiedEventData_80066B08 CollisionCrowdData;
 
 struct CollisionPowerupGroundData
 {
