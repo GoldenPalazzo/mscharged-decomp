@@ -7,6 +7,8 @@
 #include <stddef.h>
 
 #include "Game/AI/DesireUpdate.inl"
+#include "Game/AI/Variant.inl"
+#include "Game/AI/FuzzyRuntimeCall.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIPad.h"
@@ -51,7 +53,7 @@ static const LooseBallContactAnimInfo lbl_804DC1F0[4] = {
     { 0x2A, 9.0f, 0x0000, 0xFFFF },
     { 0x2F, 10.0f, 0xE000, 0x2000 },
     { 0x33, 9.0f, 0x2000, 0x8000 },
-    { 0x31, 9.0f, 0x0000, 0x0000 },
+    { 0x31, 9.0f, 0x8000, 0xE000 },
 };
 
 static const LooseBallContactAnimInfo lbl_804DC220[8] = {
@@ -84,7 +86,7 @@ static const LooseBallContactAnimInfo lbl_804DC2E0[4] = {
 };
 
 static const LooseBallContactAnimInfo lbl_804DC310[2] = {
-    { 0x32, 4.0f, 0x0000, 0x0000 },
+    { 0x32, 4.0f, 0x8000, 0xE000 },
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
@@ -101,15 +103,8 @@ extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" void fn_8005C650(cGame*);
-extern "C" UnidentifiedVariant_80054AB8 fn_800C33C8(
-    InterpreterCore*, const char*, cPlayer*, cPlayer*);
-extern "C" UnidentifiedVariant_80054AB8 fn_800C33D8(
-    InterpreterCore*, cPlayer*, const char*, cPlayer*);
-extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
-    InterpreterCore*, const unsigned int&, cPlayer*, cPlayer*);
-
 static float lbl_806DC190 = 5.0f;
-static unsigned short sDesireReceivePassType = 0xFFFF;
+unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
 bool lbl_806DC196 = true;
 float lbl_806DC198 = 0.66f;
 float lbl_806DC19C = 30.0f;
@@ -134,12 +129,6 @@ float lbl_806DC1E4 = 0.02f;
 float lbl_806DC1E8 = 0.02f;
 float lbl_806DC1EC = 0.02f;
 float lbl_806DC1F0 = 0.02f;
-extern float lbl_806E4008;
-extern float lbl_806E4018;
-extern float lbl_806E4024;
-extern float lbl_806E4038;
-extern float lbl_806E403C;
-extern float lbl_806E4040;
 float lbl_806E0E48 = lbl_806DC1E4 + lbl_806DC1E8
     + lbl_806DC1EC + lbl_806DC1F0;
 static TweakFloatBinding lbl_8056DA88("sfSpeedAdjustChargeLevel1",
@@ -208,7 +197,7 @@ bool DesireReceivePass::Initialize(void* context)
 
     UnidentifiedVariantCollection* params =
         (UnidentifiedVariantCollection*)context;
-    meReceiveAnimType = params->Get(11)->mData.i;
+    meReceiveAnimType = params->Get(11)->fn_800C2BD4();
     mbValidPassIntercept = params->IsSet(14);
     if (mbValidPassIntercept)
     {
@@ -938,7 +927,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             float fBlend = NormalizeVal(
                 nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity)
                     / mUnidentifiedB4,
-                lbl_806E4024, lbl_806E4018);
+                0.5f, 1.0f);
             nlVecLerp(estimated.v3BallContactPos,
                 v3FirstBallPosition, v3ClosestPoint, fBlend);
             goto BallContactPositionReady;
@@ -955,7 +944,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity);
         estimated.fBallContactTime = fBallDistance / fBallSpeed;
         estimated.fBallContactTime = nlMaxEquals(
-            lbl_806E4008, estimated.fBallContactTime);
+            0.0f, estimated.fBallContactTime);
     }
 
     if (mEstimated.fBallContactTime > 0.0f
@@ -1182,7 +1171,7 @@ bool DesireReceivePass::StartPickupAnimation()
 
     float fAnimTime =
         mEstimated.mUnidentifiedAnimInfo->fAnimContactFrame
-        / lbl_806E403C;
+        / 30.0f;
     float fTimeToIntercept =
         g_pBall->m_tPassTargetTimer.GetSeconds();
     if (fTimeToIntercept < FixedUpdateTask::GetPhysicsUpdateTick())
@@ -1252,7 +1241,7 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
 
     const LooseBallContactAnimInfo* pBestAnimInfo = 0;
     const LooseBallContactAnimInfo* pReachableAnimInfo = 0;
-    float fBestContactOffset = lbl_806E4040;
+    float fBestContactOffset = 1e11f;
     float fDistanceToContact = nlSqrt(nlVec3DistanceSquared2D(
         m_pFielder->mUnidentified024.m_v3Position,
         v3BallContactPos), true);
@@ -1336,6 +1325,35 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
     return pBestAnimInfo;
 }
 
+void DesireReceivePass::FindPassPosition(cPlayer* pPasser,
+    bool bVolleyPass, bool bPerfectPass, float fPassSpeed,
+    nlVector3& v3Position, float* pfRadius)
+{
+    cFielder* pFielder = m_pFielder;
+    eFieldDirection eSearchDirection;
+    InterpreterCore* pInterpreter =
+        (InterpreterCore*)GetFuzzyRuntime();
+    eSearchDirection = (eFieldDirection)
+        fn_800C33C8(pInterpreter, "PassDirection", pPasser,
+            pFielder).fn_800C2BD4();
+
+    m_pSpaceSearch = new (8, false)
+        SSearchBestPass(pPasser, pFielder,
+            bVolleyPass, bPerfectPass, fPassSpeed);
+    pFielder->SetSpaceSearch(m_pSpaceSearch);
+    pFielder->m_pSpaceSearch->m_bDebugOn = false;
+    pFielder->m_pSpaceSearch->FindBestPosition(
+        v3Position,
+        pFielder->mUnidentified024.m_v3Position,
+        eSearchDirection, &pPasser->mUnidentified024.m_v3Position,
+        6.0f, 0xAAAA);
+
+    pFielder->m_pPhysicsCharacter->GetRadius(pfRadius);
+    *pfRadius += 0.25f;
+    cField::FixOutOfBoundsPosition(
+        v3Position, *pfRadius, true);
+}
+
 void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFindPosition,
     bool bPerfectPass, const nlVector3* pv3PassPosition,
     float fMinPassSpeed, float fMaxPassSpeed)
@@ -1371,30 +1389,9 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         }
         else
         {
-            eFieldDirection eSearchDirection;
-            cFielder* pFielder = m_pFielder;
-            InterpreterCore* pInterpreter =
-                (InterpreterCore*)GetFuzzyRuntime();
-            eSearchDirection = (eFieldDirection)
-                fn_800C33C8(pInterpreter, "PassDirection", pPasser,
-                    pFielder).fn_800C2BD4();
-
-            m_pSpaceSearch = new (8, false)
-                SSearchBestPass(pPasser, pFielder,
-                    bVolleyPass, bPerfectPass, fPassSpeed);
-            pFielder->SetSpaceSearch(m_pSpaceSearch);
-            pFielder->m_pSpaceSearch->m_bDebugOn = false;
-            pFielder->m_pSpaceSearch->FindBestPosition(
-                v3FoundPassPosition,
-                pFielder->mUnidentified024.m_v3Position,
-                eSearchDirection, &pPasser->mUnidentified024.m_v3Position,
-                6.0f, 0xAAAA);
-
             float fRadius;
-            pFielder->m_pPhysicsCharacter->GetRadius(&fRadius);
-            fRadius += 0.25f;
-            cField::FixOutOfBoundsPosition(
-                v3FoundPassPosition, fRadius, true);
+            FindPassPosition(pPasser, bVolleyPass, bPerfectPass, fPassSpeed,
+                v3FoundPassPosition, &fRadius);
         }
         v3PassPosition = v3FoundPassPosition;
     }
@@ -1520,142 +1517,4 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
         fn_80015B38(g_pBall, false);
     }
-}
-
-void DesireReceivePass::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field =
-        cache->BeginType("DesireReceivePass");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbValidPassIntercept - (u8*)&mvDesiredPosition,
-        "mbValidPassIntercept");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&mv3PassIntercept - (u8*)&mvDesiredPosition,
-        "mv3PassIntercept");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&meReceiveAnimType - (u8*)&mvDesiredPosition,
-        "meReceiveAnimType");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&meDesireSubState - (u8*)&mvDesiredPosition,
-        "meDesireSubState");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbOneTouchVolley - (u8*)&mvDesiredPosition,
-        "mbOneTouchVolley");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbOneTouchShot - (u8*)&mvDesiredPosition,
-        "mbOneTouchShot");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbOneTouchShotLate - (u8*)&mvDesiredPosition,
-        "mbOneTouchShotLate");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbOneTouchPass - (u8*)&mvDesiredPosition,
-        "mbOneTouchPass");
-    cache->AddField(15, gDebugFieldTypes[15].size,
-        (u8*)&mpOneTouchPassTarget - (u8*)&mvDesiredPosition,
-        "mpOneTouchPassTarget");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mEstimated.bLocked - (u8*)&mvDesiredPosition,
-        "mEstimated.bLocked");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&mEstimated.v3BallContactPos - (u8*)&mvDesiredPosition,
-        "mEstimated.v3BallContactPos");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        (u8*)&mEstimated.v3AnimStartPos - (u8*)&mvDesiredPosition,
-        "mEstimated.v3AnimStartPos");
-    cache->AddField(19, gDebugFieldTypes[19].size,
-        (u8*)&mEstimated.aFacingDirection - (u8*)&mvDesiredPosition,
-        "mEstimated.aFacingDirection");
-    cache->AddField(19, gDebugFieldTypes[19].size,
-        (u8*)&mEstimated.aFacingTargetDirection - (u8*)&mvDesiredPosition,
-        "mEstimated.aFacingTargetDirection");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&mEstimated.fBallContactTime - (u8*)&mvDesiredPosition,
-        "mEstimated.fBallContactTime");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&mEstimated.fAnimStartOffset - (u8*)&mvDesiredPosition,
-        "mEstimated.fAnimStartOffset");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&mEstimated.fAnimStartTime - (u8*)&mvDesiredPosition,
-        "mEstimated.fAnimStartTime");
-    cache->AddField(8, gDebugFieldTypes[8].size,
-        (u8*)&mEstimated.nReceivePassAnim - (u8*)&mvDesiredPosition,
-        "mEstimated.nReceivePassAnim");
-    cache->AddField(17, gDebugFieldTypes[17].size,
-        (u8*)&mEstimated.fReceivePassAnimTime - (u8*)&mvDesiredPosition,
-        "mEstimated.fReceivePassAnimTime");
-    cache->EndType();
-}
-
-void DesireReceivePass::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireReceivePassType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireReceivePassType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = cache->WriteData(sDesireReceivePassType,
-        (u8*)this + offset, sizeof(DesireReceivePass) - offset);
-    if (data != 0)
-    {
-        DesireReceivePass* desire =
-            (DesireReceivePass*)((u8*)data - offset);
-        desire->mpOneTouchPassTarget =
-            (cPlayer*)(mpOneTouchPassTarget == 0
-                    ? -1
-                    : mpOneTouchPassTarget->mUnidentified120);
-        cache->ChecksumData(sDesireReceivePassType, data, context);
-    }
-}
-
-int Variant::fn_800C2BD4() const
-{
-    return mData.i;
-}
-
-bool Variant::fn_800C2BF8() const
-{
-    return mData.b;
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_800C33C8(
-    InterpreterCore* pInterpreter, const char* pFunctionName,
-    cPlayer* pPlayer, cPlayer* pTarget)
-{
-    return fn_800C33D8(
-        pInterpreter, pPlayer, pFunctionName, pTarget);
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_800C33D8(
-    InterpreterCore* pInterpreter, cPlayer* pPlayer,
-    const char* pFunctionName, cPlayer* pTarget)
-{
-    unsigned int functionHash = nlStringHash(pFunctionName);
-    return fn_800C3448(
-        pInterpreter, functionHash, pPlayer, pTarget);
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
-    InterpreterCore* pInterpreter, const unsigned int& functionHash,
-    cPlayer* pPlayer, cPlayer* pTarget)
-{
-    unsigned int localHash = functionHash;
-    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(pInterpreter);
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash),
-        2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
-}
-
-DesireReceivePass::~DesireReceivePass()
-{
 }
