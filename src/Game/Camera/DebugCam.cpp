@@ -21,6 +21,8 @@
 #include "Game/UnidentifiedTweakAction.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
+static void ApplyDebugCameraFOV();
+
 struct DebugCameraTarget
 {
     u8 mUnidentified00[0x20];
@@ -78,7 +80,7 @@ static TweakFloatBinding sWeight2(
 static u32 sSightTexture = nlStringLowerHash("global/sight");
 static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
 
-void ApplyDebugCameraFOV()
+static void ApplyDebugCameraFOV()
 {
     sfDebugCamFOV = sDebugCamFOVTweak;
 }

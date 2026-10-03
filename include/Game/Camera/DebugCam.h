@@ -9,7 +9,6 @@ class cGlobalPad;
 struct DebugCameraTarget;
 
 extern float sfDebugCamFOV;
-void ApplyDebugCameraFOV();
 
 class cDebugCamera : public cBaseCamera
 {
