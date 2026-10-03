@@ -924,7 +924,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uGREEN_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->fShellTime);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -939,7 +939,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uRED_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->fShellTime);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -954,7 +954,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uSPINY_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->fShellTime);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
@@ -969,7 +969,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         pObj->m_pTriggerCallbackFunc = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))CollisionCallback;
         pObj->m_pCallbackParam = this;
         m_szStreakTexture = uFREEZE_SHELL_STREAK_TEXTURE;
-        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->mUnidentified404);
+        mtActiveTimer.SetSeconds(gGameTweaks.mFielderTweaks->fShellTime);
         m_fBlurWidth = 2.0f * (fRadius / 3.0f);
         m_fBlurLength = (f32)(2.0 * fRadius);
         break;
