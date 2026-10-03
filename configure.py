@@ -503,7 +503,7 @@ config.libs = [
             Object(Matching, "Game/Terrain.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/TerrainTweaks.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/TrophyInfo.cpp"),
-            Object(NonMatching, "Game/tu_80009B34.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/CharacterLoader.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/tu_8013E2EC.cpp"),
             Object(Matching, "Game/TweakCallback.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/TweakConfig.cpp", extra_cflags=["-ipa file"]),
