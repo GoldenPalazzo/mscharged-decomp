@@ -39,14 +39,14 @@ int s_nConnectServerTimeoutMS = 10000;
 int s_nClosingTimeoutMS = 500;
 int s_nSendEveryNthFrame = 1;
 int s_nBWWindowMS = 200;
-u32 lbl_806DF6E8 = 0x544C4159;
+u32 sTransportChecksumKey = 0x544C4159;
 bool s_bLogTL = false;
 bool s_bLogTLUseCache = false;
 bool s_bDisplayBW = false;
 bool s_bDisplayScreenPrinter = false;
-float lbl_806E20EC;
-float lbl_806E20F0;
-int lbl_806E20F4;
+float sSendBytesPerSecond;
+float sReceiveBytesPerSecond;
+int sLoggedMessageCount;
 
 int sPayloadRedundancySteps[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
@@ -98,8 +98,8 @@ void ReliableSocket::LogMessage(int size, TransportMessage* message)
             nlBufferedWriterWriteText(&mLogWriter, text);
         }
         nlBufferedWriterWriteText(&mLogWriter, "\n");
-        lbl_806E20F4++;
-        if (lbl_806E20F4 % 10 == 0)
+        sLoggedMessageCount++;
+        if (sLoggedMessageCount % 10 == 0)
         {
             nlBufferedWriterFlushIfNeeded(&mLogWriter);
         }
@@ -225,9 +225,9 @@ void ReliableSocket::DebugDraw(int column, int* row, bool showBandwidth)
     if (showBandwidth)
     {
         glFontPrintf(GetDebugFontView(), column, (*row)++,
-            "Recv %d bytes/s", (int)lbl_806E20F0);
+            "Recv %d bytes/s", (int)sReceiveBytesPerSecond);
         glFontPrintf(GetDebugFontView(), column, (*row)++,
-            "Send %d bytes/s", (int)lbl_806E20EC);
+            "Send %d bytes/s", (int)sSendBytesPerSecond);
     }
     for (int i = 0; i < mConnectionCount; i++)
     {
@@ -236,15 +236,15 @@ void ReliableSocket::DebugDraw(int column, int* row, bool showBandwidth)
     }
 }
 
-int lbl_806DF6F0 = 5;
-int lbl_806DF6F4 = 5;
+int sScreenPrinterRow = 5;
+int sScreenPrinterColumn = 5;
 inline void TransportScreenPrinter::Draw()
 {
     for (int i = 0; i < 10; i++)
     {
         if (mLines[i][0] != '\0')
         {
-            nlScreenPrintf(lbl_806DF6F4, i + lbl_806DF6F0, true, 0, mLines[i]);
+            nlScreenPrintf(sScreenPrinterColumn, i + sScreenPrinterRow, true, 0, mLines[i]);
         }
     }
 }
@@ -286,8 +286,8 @@ inline void ReliableSocket::UpdateBandwidth()
     float elapsed = nlGetTickerDifference(mLastUpdateTick, tick);
     if ((int)elapsed > s_nBWWindowMS)
     {
-        lbl_806E20F0 = 1000.0f * mReceivedBytes / elapsed;
-        lbl_806E20EC = 1000.0f * mSentBytes / elapsed;
+        sReceiveBytesPerSecond = 1000.0f * mReceivedBytes / elapsed;
+        sSendBytesPerSecond = 1000.0f * mSentBytes / elapsed;
         mLastUpdateTick = tick;
         mSentBytes = 0;
         mReceivedBytes = 0;
@@ -344,7 +344,7 @@ void ReliableSocket::SendMessage(TransportMessage* message, const u8* address,
     if (payloadSize > 0)
     {
         u32 checksum = nlChecksum32(mSendBuffer + sizeof(u32), payloadSize);
-        checksum ^= lbl_806DF6E8;
+        checksum ^= sTransportChecksumKey;
         memcpy(mSendBuffer, &checksum, sizeof(checksum));
     }
     mSentBytes += size + 28;
@@ -428,7 +428,7 @@ static inline bool CheckTransportChecksum(const void* buffer, int size)
     u32 checksum;
     memcpy(&checksum, buffer, sizeof(checksum));
     u32 calculated = nlChecksum32((const u8*)buffer + sizeof(u32), size - sizeof(u32));
-    calculated ^= lbl_806DF6E8;
+    calculated ^= sTransportChecksumKey;
     return checksum == calculated;
 }
 
