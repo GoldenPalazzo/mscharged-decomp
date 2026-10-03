@@ -236,7 +236,7 @@ bool DesireSuperPower::Initialize(void* context)
         mpDKShockAvoidable = new (nlMalloc(sizeof(AvoidablePoint), 8, false))
             AvoidablePoint(AVOID_BOWSER,
                 (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
-                4.0f + lbl_806DB9D8);
+                4.0f + gDKSuperShockwaveRadius);
         m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;

@@ -33,7 +33,7 @@ float gDKSuperDeceleration = 0.25f;
 float gDKSuperChargeEndFrame = 15.0f;
 float gDKSuperHitNoiseFrequency = 30.0f;
 float gDKSuperHitNoiseDuration = 1.0f;
-float lbl_806DB9D8 = 9.0f;
+float gDKSuperShockwaveRadius = 9.0f;
 float gWaluigiTankCapacity = 2.5f;
 float gWaluigiWallMinSegmentTime = 0.3f;
 float gBowserTankCapacity = 3.5f;
@@ -76,7 +76,7 @@ void cFielder::DoDKSuperHit()
     fn_80061B1C(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
         gDKSuperHitTiltScale * mUnidentified024.m_v3Position.x);
     CreateHitShockwave(
-        this, &GetJointPosition(m_nHeadJointIndex), lbl_806DB9D8);
+        this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);
     PlayRumbleAction(4, GetGlobalPad());
 }
 

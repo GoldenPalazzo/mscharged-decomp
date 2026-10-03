@@ -35,6 +35,6 @@ struct WaluigiWallState
 }; // size: 0xC
 
 
-extern float lbl_806DB9D8;
+extern float gDKSuperShockwaveRadius;
 
 #endif // GAME_AI_FIELDER_ABILITY_H
