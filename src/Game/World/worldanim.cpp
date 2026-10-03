@@ -1,24 +1,7 @@
-#include "Game/World/WorldVisibility.h"
 #include "Game/World/worldanim.h"
 #include "Game/World/WorldAnimObjects.h"
 
-#include "Game/Debug/ShapeRender.h"
-#include "Game/Drawable/DrawableObj.h"
-#include "Game/Effects/EmissionController.h"
-#include "Game/Effects/EmissionManager.h"
-#include "Game/GL/GLInventory.h"
-#include "Game/GL/GLVertexAnim.h"
-#include "Game/World.h"
-#include "Game/World/WorldEffect.h"
-#include "Game/Render/Frustum.h"
-#include "NL/gl/glMemory.h"
-#include "NL/gl/glModel.h"
-#include "NL/gl/glState.h"
-#include "NL/gl/glView.h"
 #include "NL/nlMemory.h"
-#include "NL/nlString.h"
-
-#include <math.h>
 
 extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
