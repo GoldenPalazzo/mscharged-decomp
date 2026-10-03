@@ -20,10 +20,6 @@
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
-extern "C" void fn_8009A5D8(
-    cFielder*, ePowerUpType, int, unk_8009A5D8*);
-extern "C" bool fn_80099C80(ePowerUpType);
-extern "C" bool fn_80099CE8(ePowerUpType);
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
 static int lbl_806DC39C = 0;
