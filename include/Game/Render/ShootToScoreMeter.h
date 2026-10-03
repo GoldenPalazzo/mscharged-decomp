@@ -24,15 +24,15 @@ public:
     void SetSavedWhiteBarPosition(float position);
     void SetGreenBarPosition(float position);
     void SetGreenRegionWidth(float width);
-    void fn_801B0FE4(float value);
-    void fn_801B1004(float value);
-    void fn_801B1024(float value);
-    void fn_801B1044(float value);
-    void fn_801B1064(float value);
-    void fn_801B1084(float value);
-    void fn_801B10A4(float value);
-    void fn_801B10C4(float value);
-    void fn_801B10E4(float value);
+    void SetYellowRegionWidth(float width);
+    void SetSegment1Position(float position);
+    void SetSegment1Width(float width);
+    void SetSegment2Position(float position);
+    void SetSegment2Width(float width);
+    void SetSegment3Position(float position);
+    void SetSegment3Width(float width);
+    void SetSegment4Position(float position);
+    void SetSegment4Width(float width);
 
     float GetWhiteBarAngle() const { return m_fWhiteBarAngle; }
 

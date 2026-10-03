@@ -87,49 +87,49 @@ static inline float MeterPosition(float position)
     return oneMinusPosition * sfMeterStart + position;
 }
 
-void ShootToScoreMeter::fn_801B10E4(float value)
+void ShootToScoreMeter::SetSegment4Width(float width)
 {
-    mUnidentified58 = MeterPosition(value);
+    mUnidentified58 = MeterPosition(width);
 }
 
-void ShootToScoreMeter::fn_801B10C4(float value)
+void ShootToScoreMeter::SetSegment4Position(float position)
 {
-    mUnidentified54 = MeterPosition(value);
+    mUnidentified54 = MeterPosition(position);
 }
 
-void ShootToScoreMeter::fn_801B10A4(float value)
+void ShootToScoreMeter::SetSegment3Width(float width)
 {
-    mUnidentified50 = MeterPosition(value);
+    mUnidentified50 = MeterPosition(width);
 }
 
-void ShootToScoreMeter::fn_801B1084(float value)
+void ShootToScoreMeter::SetSegment3Position(float position)
 {
-    mUnidentified4C = MeterPosition(value);
+    mUnidentified4C = MeterPosition(position);
 }
 
-void ShootToScoreMeter::fn_801B1064(float value)
+void ShootToScoreMeter::SetSegment2Width(float width)
 {
-    mUnidentified48 = MeterPosition(value);
+    mUnidentified48 = MeterPosition(width);
 }
 
-void ShootToScoreMeter::fn_801B1044(float value)
+void ShootToScoreMeter::SetSegment2Position(float position)
 {
-    mUnidentified44 = MeterPosition(value);
+    mUnidentified44 = MeterPosition(position);
 }
 
-void ShootToScoreMeter::fn_801B1024(float value)
+void ShootToScoreMeter::SetSegment1Width(float width)
 {
-    mUnidentified40 = MeterPosition(value);
+    mUnidentified40 = MeterPosition(width);
 }
 
-void ShootToScoreMeter::fn_801B1004(float value)
+void ShootToScoreMeter::SetSegment1Position(float position)
 {
-    mUnidentified3C = MeterPosition(value);
+    mUnidentified3C = MeterPosition(position);
 }
 
-void ShootToScoreMeter::fn_801B0FE4(float value)
+void ShootToScoreMeter::SetYellowRegionWidth(float width)
 {
-    m_fYellowRegionWidth = MeterPosition(value);
+    m_fYellowRegionWidth = MeterPosition(width);
 }
 
 void ShootToScoreMeter::SetGreenRegionWidth(float width)
