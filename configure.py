@@ -989,7 +989,7 @@ config.libs = [
             Object(Matching, "NL/math.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "NL/plane.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "NL/polar.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
-            Object(NonMatching, "NL/MemAlloc.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "NL/MemAlloc.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlAllocatorStack.cpp"),
             Object(Matching, "NL/nlAsyncFileBuffer.cpp"),
             Object(Matching, "NL/nlAVLTree.cpp", extra_cflags=["-ipa file"]),
