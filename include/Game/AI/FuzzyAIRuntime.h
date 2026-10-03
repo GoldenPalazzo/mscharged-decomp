@@ -9,7 +9,6 @@
 class FuzzyRuntimeBase;
 class ScriptQuestionCache;
 struct FuzzyFielderIterator;
-struct FuzzyFielderReference;
 class shdStateMachine;
 
 struct FuzzyActionQueueEntry
@@ -220,9 +219,9 @@ extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase*, int, unsigned
 extern "C" void FuzzyAISetIntParameter_800E8D6C(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void FuzzyAISetIntParameter_800E8D70(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void FuzzyAISetFielderParameter(void*, FuzzyFielderReference*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetFielderParameter(void*, FuzzyFielderIterator*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(FuzzyAIRuntime*, cPlayer*, float);
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(FuzzyAIRuntime*, FuzzyFielderReference*, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(FuzzyAIRuntime*, FuzzyFielderIterator*, float);
 extern "C" bool FuzzyAITryCachedPlayerQuestion_800E90EC(FuzzyRuntimeBase*, cPlayer*);
 extern "C" bool FuzzyAITryCachedPlayerQuestion_800E9194(FuzzyRuntimeBase*, cPlayer*);
 extern "C" bool FuzzyAITryCachedTeamQuestion(FuzzyRuntimeBase*, cTeam*);

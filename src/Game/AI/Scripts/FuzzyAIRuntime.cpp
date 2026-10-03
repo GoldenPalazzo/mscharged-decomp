@@ -27,13 +27,6 @@ struct FuzzyFielderIterator
     cFielder* mSkip;
 };
 
-struct FuzzyFielderReference
-{
-    int mIndex;
-    u8 mUnidentified004[0x04];
-    cTeam* mTeam;
-};
-
 
 SlotPool<FuzzyFielderIterator> g_FuzzyFielderIteratorPool(16, 16);
 

@@ -1243,7 +1243,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     {
         UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
-        FuzzyFielderReference* arg0 = (FuzzyFielderReference*)m_SP[-3];
+        FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-3];
         m_SP -= 3;
         FuzzyAISetFielderParameter(this, arg0, arg1, arg2);
         break;
@@ -1423,7 +1423,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 137:
     {
         float arg1 = ((float*)m_SP)[-1];
-        FuzzyFielderReference* arg0 = (FuzzyFielderReference*)m_SP[-2];
+        FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-2];
         m_SP -= 1;
         m_SP[-1] = (u32)FuzzyAIReturnFielder(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
@@ -3252,10 +3252,10 @@ extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase* runtime, int v
 }
 
 extern "C" void FuzzyAISetFielderParameter(
-    void*, FuzzyFielderReference* value,
+    void*, FuzzyFielderIterator* value,
     unsigned long parameterHash, UnidentifiedVariant_80054AB8* action)
 {
-    cFielder* fielder = value->mTeam->GetFielder(value->mIndex);
+    cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant((cPlayer*)fielder));
 }
@@ -3272,9 +3272,9 @@ extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(
 
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(
     FuzzyAIRuntime* runtime,
-    FuzzyFielderReference* value, float confidence)
+    FuzzyFielderIterator* value, float confidence)
 {
-    cFielder* fielder = value->mTeam->GetFielder(value->mIndex);
+    cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(fielder);
     result->SetParameter(4, FuzzyVariant(confidence));
