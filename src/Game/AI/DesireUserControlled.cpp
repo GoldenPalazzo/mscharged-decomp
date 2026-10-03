@@ -19,7 +19,7 @@ extern "C" bool fn_8003E948(cFielder*);
 
 
 static unsigned short sDesireUserControlledType = 0xFFFF;
-static unsigned int lbl_806DC3AC = 0x20;
+static unsigned int sMegaStrikeDesireState = 0x20;
 
 /**
  * Offset/Address/Size: 0x0 | 0x800D448C | size: 0x100
@@ -141,7 +141,7 @@ void DesireUserControlled::Update(
                 == SHOT_METER_STS_TRANSISTION)
             {
                 *update = 3;
-                update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC3AC));
+                update->SetParameter(8, FuzzyVariant(FT_INT, sMegaStrikeDesireState));
             }
             return;
         }
