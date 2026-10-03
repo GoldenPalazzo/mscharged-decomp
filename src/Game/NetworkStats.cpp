@@ -368,12 +368,20 @@ void NetworkRanking::Reset()
     mCategory = 0;
 }
 
+static inline void ShutdownRankingSession(bool& initialized)
+{
+    if (initialized)
+    {
+        DWC_RnkShutdown();
+        initialized = false;
+    }
+}
+
 void NetworkRanking::ShutdownRanking()
 {
     if (mInitialized)
     {
-        DWC_RnkShutdown();
-        mInitialized = false;
+        ShutdownRankingSession(mInitialized);
     }
 }
 
