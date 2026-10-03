@@ -126,7 +126,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 mImpostors[i] = new (8, false) ImpostorModel(*npcTemplate->hierarchy, npcTemplate->modelID, npcTemplate->mResourcePool);
                 mImpostors[i]->PlayAnimation(*anim, PM_HOLD, 0);
                 mImpostors[i]->mVisible = true;
-                mImpostors[i]->mModelCallback = fn_80183F78;
+                mImpostors[i]->mModelCallback = SetImpostorPacketShadowLevels;
                 mImpostorNames[i] = npcTemplate->mName;
                 int lastIndex = nlStrLen(anim->m_szName) - 1;
                 mImpostorSuffixes[i] = anim->m_szName[lastIndex];

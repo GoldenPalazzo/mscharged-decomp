@@ -22,18 +22,18 @@ class nlVector2;
 class nlVector3;
 struct glModel;
 u32 GetGameObjectLightRamp();
-nlColour fn_80183C9C(const nlVector2* arg0, bool arg1);
-int fn_80183DEC(const nlVector3*);
-void fn_80183E4C();
-void fn_80183E8C(ImpostorModel*, glModel*);
-void fn_80183F78(ImpostorModel*, glModel*);
+nlColour SampleShadowLookup(const nlVector2* arg0, bool arg1);
+int GetShadowLookupLevel(const nlVector3*);
+void ReleaseShadowLightingLookup();
+void SetImpostorShadowLevel(ImpostorModel*, glModel*);
+void SetImpostorPacketShadowLevels(ImpostorModel*, glModel*);
 void UpdateGameObjectLighting();
 void InitializeGameObjectLighting();
 void PrepareStadiumLight(StadiumLight* light);
 bool AlwaysUseCameraRelativeCharacterLighting();
 
 // Shared lighting hooks used by the material programs.
-bool fn_80183C54();
+bool IsShadowLookupActive();
 int IsGameObjectLightingEnabled();
 int ShouldUseGameObjectLightTexture(int character);
 int ShouldDoubleGameObjectLighting();
@@ -52,6 +52,6 @@ void RestoreGameObjectShadowLighting();
 void SetGameObjectShadowModelMatrix(unsigned long matrix);
 void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix);
 void fn_80182164();
-void fn_80183764(unsigned long texture);
+void LoadShadowLightingLookup(unsigned long texture);
 
 #endif // _GAMEOBJECTLIGHTING_H_

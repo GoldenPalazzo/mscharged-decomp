@@ -150,20 +150,20 @@ TweakValueInt lbl_80570BB0(
 TweakValueInt lbl_80570BD0("siCharacterLightGreen", gLastTweakCategory, 0);
 TweakValueInt lbl_80570BF0("siCharacterLightBlue", gLastTweakCategory, 0);
 
-void fn_80182128();
+void UpdateCharacterLightColour();
 
 UnidentifiedTweakAction lbl_806E1430(
-    "Character Light Red", gLastTweakCategory, Function0<void>(fn_80182128));
+    "Character Light Red", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
 UnidentifiedTweakAction lbl_806E1434(
-    "Character Light Green", gLastTweakCategory, Function0<void>(fn_80182128));
+    "Character Light Green", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
 UnidentifiedTweakAction lbl_806E1438(
-    "Character Light Blue", gLastTweakCategory, Function0<void>(fn_80182128));
+    "Character Light Blue", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
 
 static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };
 
 void FillInGameObjectLightRamp();
 void SetCameraRelativeLightData(void* pLightData);
-void fn_80182F74(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview);
+void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview);
 
 int IsGameObjectLightingEnabled()
 {
@@ -185,7 +185,7 @@ bool AlwaysUseCameraRelativeCharacterLighting()
     return gAlwaysUseCameraRelativeCharacterLighting;
 }
 
-void fn_80182128()
+void UpdateCharacterLightColour()
 {
     lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
     lbl_80570B80.colour.c[1] = lbl_80570BD0.value;
@@ -543,11 +543,11 @@ void LoadGameObjectLights(int arg0, GLView* arg1, bool arg2)
     for (var0 = 0; var0 < arg0; var0++)
     {
         GameObjectLight* var3 = GetGameObjectLight(var0, arg2);
-        fn_80182F74(var0, var3, var1);
+        LoadGameObjectLight(var0, var3, var1);
     }
 }
 
-void fn_80182F74(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
+void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
 {
     GXLightObj light;
     nlVector3 var1;
@@ -799,7 +799,7 @@ void SetGameObjectAmbientLightingEnabled(int enabled)
     }
 }
 
-void fn_80183764(unsigned long textureHandle)
+void LoadShadowLightingLookup(unsigned long textureHandle)
 {
     if (textureHandle != (u32)-1 && glTextureLoad(textureHandle))
     {
@@ -815,7 +815,7 @@ void fn_80183764(unsigned long textureHandle)
 
 void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
 {
-    if (!fn_80183C54())
+    if (!IsShadowLookupActive())
         return;
 
     u32 numTevStages;
@@ -877,7 +877,7 @@ void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
 
 void RestoreGameObjectShadowLighting()
 {
-    if (fn_80183C54() && lbl_806DCC74 >= 0)
+    if (IsShadowLookupActive() && lbl_806DCC74 >= 0)
     {
         gxSetNumTexGens(gxGetNumTexGens() - 1);
         gxSetNumTevStages(gxGetNumTevStages() - 1);
@@ -888,7 +888,7 @@ void RestoreGameObjectShadowLighting()
 
 void SetGameObjectShadowModelMatrix(unsigned long matrix)
 {
-    if (!fn_80183C54())
+    if (!IsShadowLookupActive())
         return;
 
     if (matrix == (u32)-1)
@@ -910,11 +910,11 @@ void SetGameObjectShadowModelMatrix(unsigned long matrix)
 
 void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix)
 {
-    if (fn_80183C54())
+    if (IsShadowLookupActive())
         nlInvertMatrix(lbl_80570C18, *matrix);
 }
 
-bool fn_80183C54()
+bool IsShadowLookupActive()
 {
     if (!lbl_806DCC58)
         return false;
@@ -931,9 +931,9 @@ bool fn_80183C54()
     return true;
 }
 
-nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
+nlColour SampleShadowLookup(const nlVector2* arg0, bool arg1)
 {
-    if (!fn_80183C54())
+    if (!IsShadowLookupActive())
     {
         nlColour var0;
         nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -960,13 +960,13 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
     return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
 }
 
-int fn_80183DEC(const nlVector3* arg0)
+int GetShadowLookupLevel(const nlVector3* arg0)
 {
-    nlColour var0 = fn_80183C9C((const nlVector2*)arg0, true);
+    nlColour var0 = SampleShadowLookup((const nlVector2*)arg0, true);
     return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
 }
 
-void fn_80183E4C()
+void ReleaseShadowLightingLookup()
 {
     if (gpShadowLightingLookup != 0)
     {
@@ -976,9 +976,9 @@ void fn_80183E4C()
     lbl_806DCC6C = -1;
 }
 
-void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
+void SetImpostorShadowLevel(ImpostorModel* arg0, glModel* arg1)
 {
-    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
+    int var0 = GetShadowLookupLevel(&arg0->mWorldMatrix.GetTranslation());
     nlColour var1;
     nlColourSet(var1, var0, var0, var0, 1);
     unsigned long var2 = *(unsigned long*)&var1;
@@ -989,7 +989,7 @@ void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
     }
 }
 
-void fn_80183F78(ImpostorModel*, glModel* arg1)
+void SetImpostorPacketShadowLevels(ImpostorModel*, glModel* arg1)
 {
     static unsigned long var0 = nlStringLowerHash("shadowLevel");
     for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
@@ -997,7 +997,7 @@ void fn_80183F78(ImpostorModel*, glModel* arg1)
         nlMatrix4 var2;
         glGetMatrix(var1->matrix, var2);
         nlVector3 var3 = var2.GetTranslation();
-        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
+        nlColour var4 = SampleShadowLookup((const nlVector2*)&var3, false);
         unsigned long var5 = *(unsigned long*)&var4;
         if (glHasMaterialParameter(var1, var0))
         {
