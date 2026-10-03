@@ -31,7 +31,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlPrint.h"
 
-
 float gHammerRadius = 0.48f;
 const float sBulletBillRadius = 0.45f;
 const float lbl_806E5214 = 1.0f;

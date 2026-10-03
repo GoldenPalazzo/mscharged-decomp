@@ -69,7 +69,6 @@ void PhysicsWorld::DoCollide(CollisionSpace* collisionSpace)
     collisionSpace->DoCollide(this, SpaceCollideCallback);
 }
 
-
 PhysicsWorld::PhysicsObjectCallback s_PreCollideObjectCallback = &PhysicsWorld::PreCollide;
 PhysicsWorld::CollisionSpaceCallback s_PreCollideSpaceCallback = &PhysicsWorld::PreCollide;
 PhysicsWorld::CollisionSpaceCallback s_DoCollideCallback = &PhysicsWorld::DoCollide;
@@ -254,8 +253,6 @@ void PhysicsWorld::LogSpace(CollisionSpace* collisionSpace)
     collisionSpace->SyncLogSpace();
 }
 
-
-
 struct GenGeomTypeState
 {
     unsigned short type;
@@ -351,4 +348,3 @@ void PhysicsWorld::DoCollisions(
         dGeomCollideAABBs(geom, entry->entry->m_geomID, this, SpaceCollideCallback);
     }
 }
-
