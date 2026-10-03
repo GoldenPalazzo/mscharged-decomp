@@ -32,21 +32,21 @@ ShootToScoreMeter ShootToScoreMeter::instance;
 static nlColour sWhiteBarColour = { 255, 255, 255, 255 };
 static nlColour sGreenRegionColour = { 5, 150, 5, 255 };
 static nlColour sYellowRegionColour = { 255, 255, 0, 255 };
-static nlColour lbl_806DD0AC = { 255, 175, 0, 255 };
-static nlColour lbl_806DD0B0 = { 255, 100, 0, 255 };
+static nlColour sOrangeRegionColour = { 255, 175, 0, 255 };
+static nlColour sRedRegionColour = { 255, 100, 0, 255 };
 float ShootToScoreMeter::MeterWidth = 0.315f;
-static s32 lbl_806DD0B8 = 150;
-static float lbl_806DD0BC = 0.008f;
-static float lbl_806DD0C0 = 0.05f;
-static float lbl_806DD0C4 = 0.04f;
-static float lbl_806DD0C8 = 0.388f;
-static float lbl_806DD0CC = 180.0f;
+static s32 sSavedSegmentAlpha = 150;
+static float sfIndicatorBarHeight = 0.008f;
+static float sfRegionBandWidth = 0.05f;
+static float sfIndicatorBarOverhang = 0.04f;
+static float sfMeterRadiusScale = 0.388f;
+static float sfMeterEnd = 180.0f;
 static float sfTrailIntensity = 0.33f;
 static float sfTrailLengthScale = 0.33f;
 static s32 sfNumBarsInTrail = 12;
-static float lbl_806DD0DC = 0.005f;
-static float lbl_806DD0E0 = 0.165f;
-static float lbl_806DD0E4 = 8.0f;
+static float sfRumbleDuration = 0.005f;
+static float sfRumbleOffset = 0.165f;
+static float sfRumbleMaxRotation = 8.0f;
 
 static inline void InterpolateColours(const nlColour& colour0,
     const nlColour& colour1, float alpha, nlColour& result)
@@ -83,7 +83,7 @@ static inline float clamp_le(float x, float limit)
 static inline float MeterPosition(float position)
 {
     float oneMinusPosition = 1.0f - position;
-    position *= lbl_806DD0CC;
+    position *= sfMeterEnd;
     return oneMinusPosition * sfMeterStart + position;
 }
 
@@ -173,7 +173,7 @@ void ShootToScoreMeter::UpdateAndRender(float fDeltaT)
         }
         else
         {
-            float amount = mfRumbleAmount / lbl_806DD0DC;
+            float amount = mfRumbleAmount / sfRumbleDuration;
             m_v3MeterPosition.x = (1.0f - amount) * m_v3MeterPosition.x
                 + amount * m_v3OriginalMeterPosition.x;
             m_v3MeterPosition.y = (1.0f - amount) * m_v3MeterPosition.y
@@ -205,9 +205,9 @@ void ShootToScoreMeter::DrawColouredRegion(float startAngle,
     float outerRadius;
 
     scaledMeterWidth = MeterWidth * scale;
-    scaledWhiteBarWidth = lbl_806DD0C0 * scale;
+    scaledWhiteBarWidth = sfRegionBandWidth * scale;
     widthAngle = endAngle - startAngle;
-    radius = scaledMeterWidth * lbl_806DD0C8;
+    radius = scaledMeterWidth * sfMeterRadiusScale;
 
     for (i = 0; i < 8; i++)
     {
@@ -282,15 +282,15 @@ void ShootToScoreMeter::DrawIndicatorBar(float angle,
     float scaledMeterWidth = MeterWidth * scale;
     float angleRadians;
     float scaledWhiteBarWidth
-        = (lbl_806DD0C0 + lbl_806DD0C4) * scale;
-    float scaledWhiteBarHeight = lbl_806DD0BC * scale;
+        = (sfRegionBandWidth + sfIndicatorBarOverhang) * scale;
+    float scaledWhiteBarHeight = sfIndicatorBarHeight * scale;
     angleRadians = (3.1415927f * angle) / 180.0f;
 
     nlMatrix4 barMatrix;
     nlMakeRotationMatrixZ(barMatrix, angleRadians);
 
     float sine;
-    float radius = scaledMeterWidth * lbl_806DD0C8;
+    float radius = scaledMeterWidth * sfMeterRadiusScale;
     sine = radius * nlSin((u16)(s32)(10430.378f * angleRadians));
     float cosine = radius
         * nlSin(
@@ -329,15 +329,15 @@ void ShootToScoreMeter::DrawMeter()
     nlMatrix4 matrix;
     matrix.SetIdentity();
 
-    float rumbleScale = mfRumbleAmount / lbl_806DD0DC;
+    float rumbleScale = mfRumbleAmount / sfRumbleDuration;
     float rotation;
     if (nlRandomf(1.0f, &nlDefaultSeed) < 0.5f)
     {
-        rotation = lbl_806DD0E4;
+        rotation = sfRumbleMaxRotation;
     }
     else
     {
-        rotation = -lbl_806DD0E4;
+        rotation = -sfRumbleMaxRotation;
     }
     rotation = InterpolateRangeClamped(
         0.0f, rotation, 0.0f, 1.0f, rumbleScale);
@@ -396,8 +396,8 @@ void ShootToScoreMeter::DrawMeter()
     nlColour green = sGreenRegionColour;
     nlColour white = sWhiteBarColour;
     nlColour yellow = sYellowRegionColour;
-    nlColour orange = lbl_806DD0AC;
-    nlColour red = lbl_806DD0B0;
+    nlColour orange = sOrangeRegionColour;
+    nlColour red = sRedRegionColour;
 
     if (mbShowGreenRegion)
     {
@@ -417,7 +417,7 @@ void ShootToScoreMeter::DrawMeter()
             && m_fSavedWhiteBarAngle
                 <= m_fSegment1Angle + m_fSegment1Width / 2.0f)
         {
-            yellow.c[3] = (u8)lbl_806DD0B8;
+            yellow.c[3] = (u8)sSavedSegmentAlpha;
             DrawColouredRegion(m_fSegment1Angle - 0.5f * m_fSegment1Width,
                 m_fSegment1Angle + 0.5f * m_fSegment1Width, yellow, yellow,
                 matrix, screenWidth);
@@ -428,7 +428,7 @@ void ShootToScoreMeter::DrawMeter()
             && m_fSavedWhiteBarAngle
                 <= m_fSegment2Angle + m_fSegment2Width / 2.0f)
         {
-            orange.c[3] = (u8)lbl_806DD0B8;
+            orange.c[3] = (u8)sSavedSegmentAlpha;
             DrawColouredRegion(m_fSegment2Angle - 0.5f * m_fSegment2Width,
                 m_fSegment2Angle + 0.5f * m_fSegment2Width, orange, orange,
                 matrix, screenWidth);
@@ -439,7 +439,7 @@ void ShootToScoreMeter::DrawMeter()
             && m_fSavedWhiteBarAngle
                 <= m_fSegment3Angle + m_fSegment3Width / 2.0f)
         {
-            red.c[3] = (u8)lbl_806DD0B8;
+            red.c[3] = (u8)sSavedSegmentAlpha;
             DrawColouredRegion(m_fSegment3Angle - 0.5f * m_fSegment3Width,
                 m_fSegment3Angle + 0.5f * m_fSegment3Width, red, red, matrix,
                 screenWidth);
@@ -450,7 +450,7 @@ void ShootToScoreMeter::DrawMeter()
             && m_fSavedWhiteBarAngle
                 <= m_fSegment4Angle + m_fSegment4Width / 2.0f)
         {
-            orange.c[3] = (u8)lbl_806DD0B8;
+            orange.c[3] = (u8)sSavedSegmentAlpha;
             DrawColouredRegion(m_fSegment4Angle - 0.5f * m_fSegment4Width,
                 m_fSegment4Angle + 0.5f * m_fSegment4Width, orange, orange,
                 matrix, screenWidth);
@@ -461,7 +461,7 @@ void ShootToScoreMeter::DrawMeter()
             && m_fSavedWhiteBarAngle
                 <= m_fSegment5Angle + m_fSegment5Width / 2.0f)
         {
-            yellow.c[3] = (u8)lbl_806DD0B8;
+            yellow.c[3] = (u8)sSavedSegmentAlpha;
             DrawColouredRegion(m_fSegment5Angle - 0.5f * m_fSegment5Width,
                 m_fSegment5Angle + 0.5f * m_fSegment5Width, yellow, yellow,
                 matrix, screenWidth);
@@ -548,11 +548,11 @@ void ShootToScoreMeter::RumbleMeter(u16 angle)
         float amount;
         if (nlRandomf(1.0f, &nlDefaultSeed) < 0.5f)
         {
-            amount = lbl_806DD0E0;
+            amount = sfRumbleOffset;
         }
         else
         {
-            amount = -lbl_806DD0E0;
+            amount = -sfRumbleOffset;
         }
 
         nlVector3 offset;
@@ -561,7 +561,7 @@ void ShootToScoreMeter::RumbleMeter(u16 angle)
         m_v3MeterPosition.x = m_v3OriginalMeterPosition.x + offset.x;
         m_v3MeterPosition.y = m_v3OriginalMeterPosition.y;
         m_v3MeterPosition.z = m_v3OriginalMeterPosition.z + offset.y;
-        mfRumbleAmount = lbl_806DD0DC;
+        mfRumbleAmount = sfRumbleDuration;
     }
 }
 
