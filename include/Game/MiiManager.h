@@ -2,10 +2,11 @@
 #define GAME_MII_MANAGER_H
 
 #include <RVLFaceLib/RFL_MiddleDatabase.h>
+#include "NL/nlSingleton.h"
 
 class PlatTexture;
 
-struct MiiManager
+struct MiiManager : nlSingleton<MiiManager>
 {
     MiiManager();
     virtual ~MiiManager();
@@ -30,7 +31,5 @@ struct MiiManager
     /* 0x64 */ PlatTexture* mIconTextures[10];
     /* 0x8C */ RFLMiddleDB mMiddleDB;
 };
-
-extern MiiManager* g_pMiiManager;
 
 #endif // GAME_MII_MANAGER_H

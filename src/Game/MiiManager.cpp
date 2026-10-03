@@ -16,7 +16,8 @@
 #include <revolution/arc.h>
 #include "NL/gl/glTexture.h"
 
-MiiManager* g_pMiiManager;
+template <>
+MiiManager* nlSingleton<MiiManager>::s_pInstance = 0;
 
 inline void MiiManager::LoadResources(void* buffer)
 {
@@ -50,7 +51,7 @@ inline void MiiManager::LoadResources(void* buffer)
 
 void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData)
 {
-    g_pMiiManager->LoadResources(buffer);
+    MiiManager::s_pInstance->LoadResources(buffer);
 }
 
 static inline void InitializeIconTextures(MiiManager& manager)

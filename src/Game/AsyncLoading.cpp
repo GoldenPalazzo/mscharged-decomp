@@ -550,15 +550,15 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 34:
         SetLoadingComment("AsyncMiiLoadingBegin");
-        if (g_pMiiManager == 0)
+        if (MiiManager::s_pInstance == 0)
         {
-            CreateInstance(g_pMiiManager);
+            CreateInstance(MiiManager::s_pInstance);
         }
-        g_pMiiManager->LoadResources();
+        MiiManager::s_pInstance->LoadResources();
         break;
     case 35:
         SetLoadingComment("AsyncMiiLoadingFinalize");
-        FinishLoadingStepOrUndo(this, g_pMiiManager->mResourcesLoaded);
+        FinishLoadingStepOrUndo(this, MiiManager::s_pInstance->mResourcesLoaded);
         break;
     case 36:
     {
@@ -1612,10 +1612,10 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
         GameSceneManager::s_pInstance = 0;
     }
 
-    if (g_pMiiManager != 0)
+    if (MiiManager::s_pInstance != 0)
     {
-        delete g_pMiiManager;
-        g_pMiiManager = 0;
+        delete MiiManager::s_pInstance;
+        MiiManager::s_pInstance = 0;
     }
     FESceneManager::Instance()->ForceImmediateStackProcessing();
     FEResourceManager::Instance()->UnloadPermanentResourceBundle();
