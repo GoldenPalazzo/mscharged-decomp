@@ -684,7 +684,7 @@ extern "C" float fn_800D7734(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        return FMIN(FMAX(pFielder->GetTweaks()->mUnidentified074,
+        return FMIN(FMAX(pFielder->GetTweaks()->fDefenseHittingDistance,
             0.0f), 1.0f);
     }
 
@@ -700,7 +700,7 @@ extern "C" float fn_800D77B0(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        return FMIN(FMAX(pFielder->GetTweaks()->mUnidentified054,
+        return FMIN(FMAX(pFielder->GetTweaks()->fDefenseSlideTackle,
             0.0f), 1.0f);
     }
 

@@ -255,7 +255,7 @@ void cFielder::asmRunning()
     s16 nAbsActualToDesiredMovementDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredMovementDirection - mUnidentified024.m_aActualMovementDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->fMovementSpeed);
     bool bFirstTime;
 
     do
@@ -725,7 +725,7 @@ void cFielder::asmRunningWB(float fDeltaT)
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->fMovementSpeed);
     bool bFirstTime;
 
     do
@@ -4111,7 +4111,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 
         if (gbUseTurboCharging != 0)
         {
-            float fValue = this->GetTweaks()->mUnidentified034;
+            float fValue = this->GetTweaks()->fMovementSpeed;
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
             float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);

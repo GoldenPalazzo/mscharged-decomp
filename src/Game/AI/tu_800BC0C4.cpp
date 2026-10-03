@@ -312,7 +312,7 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->fn_8003063C(source->mUnidentified328);
     m_pFielder->m_pTweaks->mUnidentified004
         = m_pFielder->mUnidentified32C->mUnidentified004.GetValue();
-    m_pFielder->m_pTweaks->mUnidentified014
+    m_pFielder->m_pTweaks->fWidth
         = fn_8002BFA8(m_pFielder->mUnidentified32C, 1.0f);
     CreateMushroomEffect(m_pFielder);
 

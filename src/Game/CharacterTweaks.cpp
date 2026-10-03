@@ -141,15 +141,15 @@ void fn_8002B934(PlayerTweaks* tweaks, const char* name,
     const char* category, bool registerTweaks)
 {
     tweaks->mUnidentified004.BindWithDefault("mfHeight", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
-    tweaks->mUnidentified014.BindWithDefault("mfWidth", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
-    tweaks->mUnidentified024.BindWithDefault("mfMovement_TurningRadius", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified034.BindWithDefault("mfMovement_Speed", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified044.BindWithDefault("mfMovement_Acceleration", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified054.BindWithDefault("mfDefense_SlideTackle", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fWidth.BindWithDefault("mfWidth", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
+    tweaks->fMovementTurningRadius.BindWithDefault("mfMovement_TurningRadius", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fMovementSpeed.BindWithDefault("mfMovement_Speed", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fMovementAcceleration.BindWithDefault("mfMovement_Acceleration", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fDefenseSlideTackle.BindWithDefault("mfDefense_SlideTackle", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->mUnidentified064.BindWithDefault("mfDefense_Size", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified074.BindWithDefault("mfDefense_HittingDistance", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified084.BindWithDefault("mfOffense_ShootingWindupTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified094.BindWithDefault("mfOffense_ShootingWindupTotalTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
+    tweaks->fDefenseHittingDistance.BindWithDefault("mfDefense_HittingDistance", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fOffenseShootingWindupTime.BindWithDefault("mfOffense_ShootingWindupTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
+    tweaks->fOffenseShootingWindupTotalTime.BindWithDefault("mfOffense_ShootingWindupTotalTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
     tweaks->fShooting.BindWithDefault("mfOffense_Shooting", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fPassing.BindWithDefault("mfOffense_Passing", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
 
@@ -172,22 +172,22 @@ extern "C" float fn_8002BE18(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002BE38(PlayerTweaks* tweaks)
 {
-    float result = tweaks->mUnidentified054.GetValue()
-                 + tweaks->mUnidentified034.GetValue();
-    return (result + tweaks->mUnidentified074.GetValue()) / 3.0f;
+    float result = tweaks->fDefenseSlideTackle.GetValue()
+                 + tweaks->fMovementSpeed.GetValue();
+    return (result + tweaks->fDefenseHittingDistance.GetValue()) / 3.0f;
 }
 
 extern "C" float fn_8002BE64(PlayerTweaks* tweaks)
 {
     return (tweaks->fPassing.GetValue()
-               + tweaks->mUnidentified034.GetValue())
+               + tweaks->fMovementSpeed.GetValue())
          / 2.0f;
 }
 
 extern "C" float fn_8002BE84(const PlayerTweaks* tweaks)
 {
-    float result = tweaks->mUnidentified074.GetValue()
-                 + tweaks->mUnidentified054.GetValue();
+    float result = tweaks->fDefenseHittingDistance.GetValue()
+                 + tweaks->fDefenseSlideTackle.GetValue();
     return (result + tweaks->fShooting.GetValue()) / 3.0f;
 }
 
@@ -197,13 +197,13 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
     switch (index)
     {
     case 1:
-        result = mUnidentified034;
+        result = fMovementSpeed;
         break;
     case 2:
-        result = mUnidentified054;
+        result = fDefenseSlideTackle;
         break;
     case 3:
-        result = mUnidentified074;
+        result = fDefenseHittingDistance;
         break;
     case 4:
         result = fShooting;
@@ -212,9 +212,9 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
         result = fPassing;
         break;
     case 6:
-        result = mUnidentified054.GetValue()
-               + mUnidentified034.GetValue();
-        result = (result + mUnidentified074.GetValue())
+        result = fDefenseSlideTackle.GetValue()
+               + fMovementSpeed.GetValue();
+        result = (result + fDefenseHittingDistance.GetValue())
                / 3.0f;
         break;
     case 7:
@@ -224,12 +224,12 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
         break;
     case 8:
         result = (fPassing.GetValue()
-                     + mUnidentified034.GetValue())
+                     + fMovementSpeed.GetValue())
                / 2.0f;
         break;
     case 9:
-        result = mUnidentified074.GetValue()
-               + mUnidentified054.GetValue();
+        result = fDefenseHittingDistance.GetValue()
+               + fDefenseSlideTackle.GetValue();
         result = (result + fShooting.GetValue()) / 3.0f;
         break;
     }
@@ -238,12 +238,12 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
 
 extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value)
 {
-    return value * tweaks->mUnidentified014;
+    return value * tweaks->fWidth;
 }
 
 extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunSpeedMax;
     float minimum = fielderTweaks->fRunSpeedMin;
@@ -256,7 +256,7 @@ extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified024;
+    float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     return Interpolate(fielderTweaks->fJogTurnSpeedMin,
         fielderTweaks->fJogTurnSpeedMax,
@@ -265,7 +265,7 @@ extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified024;
+    float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunTurnSpeedMax;
     float minimum = fielderTweaks->fRunTurnSpeedMin;
@@ -278,7 +278,7 @@ extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C180(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified044;
+    float playerValue = tweaks->fMovementAcceleration;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunAccelMax;
     float minimum = fielderTweaks->fRunAccelMin;
@@ -291,7 +291,7 @@ extern "C" float fn_8002C180(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C254(const PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fTurboSpeedMax;
     float minimum = fielderTweaks->fTurboSpeedMin;
@@ -304,7 +304,7 @@ extern "C" float fn_8002C254(const PlayerTweaks* tweaks)
 
 float PlayerTweaks::GetRunningSpeed()
 {
-    float playerValue = mUnidentified034;
+    float playerValue = fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunWBSpeedMax;
     float minimum = fielderTweaks->fRunWBSpeedMin;
@@ -317,7 +317,7 @@ float PlayerTweaks::GetRunningSpeed()
 
 extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified044;
+    float playerValue = tweaks->fMovementAcceleration;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunWBAccelMax;
     float minimum = fielderTweaks->fRunWBAccelMin;
@@ -330,7 +330,7 @@ extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified024;
+    float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunWBTurnSpeedMax;
     float minimum = fielderTweaks->fRunWBTurnSpeedMin;
@@ -343,7 +343,7 @@ extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C5A4(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fTurboWBMax;
     float minimum = fielderTweaks->fTurboWBMin;
@@ -406,17 +406,17 @@ extern "C" float fn_8002C7D0(PlayerTweaks*)
 
 extern "C" float fn_8002C7E8(PlayerTweaks* tweaks)
 {
-    return tweaks->mUnidentified084;
+    return tweaks->fOffenseShootingWindupTime;
 }
 
 extern "C" float fn_8002C7F4(PlayerTweaks* tweaks)
 {
-    return tweaks->mUnidentified094;
+    return tweaks->fOffenseShootingWindupTotalTime;
 }
 
 extern "C" float fn_8002C800(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified054;
+    float playerValue = tweaks->fDefenseSlideTackle;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fSlideTimeMax;
     float minimum = fielderTweaks->fSlideTimeMin;
@@ -429,7 +429,7 @@ extern "C" float fn_8002C800(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified054;
+    float playerValue = tweaks->fDefenseSlideTackle;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fSlideDecelTimeMax;
     float minimum = fielderTweaks->fSlideDecelTimeMin;
@@ -445,7 +445,7 @@ extern "C" float fn_8002C9A8(const PlayerTweaks* tweaks)
     float result = fn_8002C254(tweaks);
     result *= Interpolate(gGameTweaks.mFielderTweaks->fSlideSpeedMin,
         gGameTweaks.mFielderTweaks->fSlideSpeedMax,
-        tweaks->mUnidentified054);
+        tweaks->fDefenseSlideTackle);
     if (fn_8002BE84(tweaks) > 0.9f)
     {
         result *= 1.175f;
@@ -475,7 +475,7 @@ extern "C" float fn_8002CBB8(PlayerTweaks*)
 
 extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunSpeedMax;
     float minimum = fielderTweaks->fRunSpeedMin;
@@ -489,7 +489,7 @@ extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
 
 extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fRunSpeedMax;
     float minimum = fielderTweaks->fRunSpeedMin;
@@ -503,7 +503,7 @@ extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
 
 extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->fJogSpeedMax;
     float minimum = fielderTweaks->fJogSpeedMin;
@@ -603,5 +603,5 @@ extern "C" float fn_8002D050(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fHitEffectiveLastFrameMin,
         gGameTweaks.mFielderTweaks->fHitEffectiveLastFrameMax,
-        tweaks->mUnidentified074);
+        tweaks->fDefenseHittingDistance);
 }

@@ -120,15 +120,15 @@ public:
     virtual ~PlayerTweaks();
 
     /* 0x004 */ TweakFloatBinding mUnidentified004;
-    /* 0x014 */ TweakFloatBinding mUnidentified014;
-    /* 0x024 */ TweakFloatBinding mUnidentified024;
-    /* 0x034 */ TweakFloatBinding mUnidentified034;
-    /* 0x044 */ TweakFloatBinding mUnidentified044;
-    /* 0x054 */ TweakFloatBinding mUnidentified054;
+    /* 0x014 */ TweakFloatBinding fWidth;
+    /* 0x024 */ TweakFloatBinding fMovementTurningRadius;
+    /* 0x034 */ TweakFloatBinding fMovementSpeed;
+    /* 0x044 */ TweakFloatBinding fMovementAcceleration;
+    /* 0x054 */ TweakFloatBinding fDefenseSlideTackle;
     /* 0x064 */ TweakFloatBinding mUnidentified064;
-    /* 0x074 */ TweakFloatBinding mUnidentified074;
-    /* 0x084 */ TweakFloatBinding mUnidentified084;
-    /* 0x094 */ TweakFloatBinding mUnidentified094;
+    /* 0x074 */ TweakFloatBinding fDefenseHittingDistance;
+    /* 0x084 */ TweakFloatBinding fOffenseShootingWindupTime;
+    /* 0x094 */ TweakFloatBinding fOffenseShootingWindupTotalTime;
     /* 0x0A4 */ TweakFloatBinding fShooting;
     /* 0x0B4 */ TweakFloatBinding fPassing;
 }; // total size: 0xC4
