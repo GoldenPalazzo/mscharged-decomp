@@ -55,7 +55,7 @@ extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 
 
-void cFielder::fn_8004F828()
+void cFielder::InitActionDKSuper()
 {
     fn_8002E3F8(this);
     SetAction((eFielderActionState)0x1D);
@@ -69,7 +69,7 @@ void cFielder::fn_8004F828()
     EmitDKSuperCharge(this);
 }
 
-void cFielder::fn_8004F8E8()
+void cFielder::DoDKSuperHit()
 {
     EmitDKSuperHit(this);
     FireCameraNoiseFilter(*(nlVector3*)sDKSuperHitNoiseAmplitude, gDKSuperHitNoiseFrequency, gDKSuperHitNoiseDuration);
@@ -80,7 +80,7 @@ void cFielder::fn_8004F8E8()
     PlayRumbleAction(4, GetGlobalPad());
 }
 
-void cFielder::fn_8004F974(float fDeltaT)
+void cFielder::ActionDKSuper(float fDeltaT)
 {
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 
@@ -100,7 +100,7 @@ void cFielder::fn_8004F974(float fDeltaT)
     }
 }
 
-void cFielder::fn_8004FA34()
+void cFielder::CleanUpPeachSuper()
 {
     fn_80038158(this, 0);
 
@@ -122,7 +122,7 @@ void cFielder::fn_8004FA34()
     }
 }
 
-void cFielder::fn_8004FB04()
+void cFielder::InitActionPeachSuper()
 {
     fn_8002E3F8(this);
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -157,7 +157,7 @@ void cFielder::fn_8004FB04()
     SetFlyingCameraCount(gPeachFlyingCameraCount, this, fParam);
 }
 
-void cFielder::fn_8004FC90(float fDeltaT)
+void cFielder::ActionPeachSuper(float fDeltaT)
 {
     float fFrame = m_pCurrentAnimController->get_fTime()
         * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys

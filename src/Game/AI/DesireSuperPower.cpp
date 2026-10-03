@@ -237,7 +237,7 @@ bool DesireSuperPower::Initialize(void* context)
             AvoidablePoint(AVOID_BOWSER,
                 (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
                 4.0f + lbl_806DB9D8);
-        m_pFielder->fn_8004F828();
+        m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
@@ -258,7 +258,7 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     case LUIGI:
-        m_pFielder->fn_8004FB04();
+        m_pFielder->InitActionPeachSuper();
         mMaxDuration = gPeachSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
@@ -449,7 +449,7 @@ void DesireSuperPower::Cleanup()
         EmitSuperShrink(m_pFielder);
         break;
     case LUIGI:
-        m_pFielder->fn_8004FA34();
+        m_pFielder->CleanUpPeachSuper();
         SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
@@ -812,7 +812,7 @@ void DesireSuperPower::UpdateDiddy(DesireUpdate* update, float fDeltaT)
  */
 void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_8004F974(fDeltaT);
+    m_pFielder->ActionDKSuper(fDeltaT);
 
     if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
@@ -918,7 +918,7 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
  */
 void DesireSuperPower::UpdatePeach(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_8004FC90(fDeltaT);
+    m_pFielder->ActionPeachSuper(fDeltaT);
 
     if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {

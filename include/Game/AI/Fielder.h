@@ -391,12 +391,12 @@ public:
     bool InitActionPass(
         cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass);
     void ActionPass(float fDeltaT);
-    void fn_8004F828();
-    void fn_8004F8E8();
-    void fn_8004F974(float fDeltaT);
-    void fn_8004FA34();
-    void fn_8004FB04();
-    void fn_8004FC90(float fDeltaT);
+    void InitActionDKSuper();
+    void DoDKSuperHit();
+    void ActionDKSuper(float fDeltaT);
+    void CleanUpPeachSuper();
+    void InitActionPeachSuper();
+    void ActionPeachSuper(float fDeltaT);
     void fn_8004FF40();
     float GetSuperPowerTankFraction();
     void fn_80050008();
