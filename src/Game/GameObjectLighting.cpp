@@ -211,19 +211,19 @@ void PrepareStadiumLight(StadiumLight* pLight)
     light.intensity = pLight->GetIntensity();
 }
 
-int GetGameObjectLightCount(bool arg0, bool arg1)
+int GetGameObjectLightCount(bool character, bool includeEffects)
 {
-    bool var0 = arg1 && gEffectsLightsEnabled;
-    int var1 = var0 ? GetEmissionManager()->GetNumLights() : 0;
+    bool useEffectsLights = includeEffects && gEffectsLightsEnabled;
+    int numEffectsLights = useEffectsLights ? GetEmissionManager()->GetNumLights() : 0;
 
     switch (gGameObjectLightingMode)
     {
     case 0:
-        if (arg0)
-            return var1 + gNumCharacterInGameLights.value;
-        return gNumInGameLights + var1;
+        if (character)
+            return numEffectsLights + gNumCharacterInGameLights.value;
+        return gNumInGameLights + numEffectsLights;
     case 1:
-        return gNumInGameLights + var1;
+        return gNumInGameLights + numEffectsLights;
     case 2:
         return 1;
     default:
@@ -232,9 +232,9 @@ int GetGameObjectLightCount(bool arg0, bool arg1)
     }
 }
 
-GameObjectLight* GetGameObjectLight(int arg0, bool arg1)
+GameObjectLight* GetGameObjectLight(int index, bool character)
 {
-    s32 var0 = arg1 ? gNumCharacterInGameLights.value : gNumInGameLights;
+    s32 numLights = character ? gNumCharacterInGameLights.value : gNumInGameLights;
     if (!gCameraRelativeLightingAllowed && gGameObjectLightingMode == 1)
     {
         gGameObjectLightingMode = 0;
@@ -243,53 +243,53 @@ GameObjectLight* GetGameObjectLight(int arg0, bool arg1)
     switch (gGameObjectLightingMode)
     {
     case 0:
-        if (arg0 >= var0)
+        if (index >= numLights)
         {
-            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - gNumInGameLights);
-            GameObjectLight* var1 = &gInGameLights[arg0];
-            var1->useWorldPosition = true;
-            var1->useColour = true;
-            var1->isPointLight = true;
-            var1->intensity = 1.0f;
-            var1->worldPosition = pLight->m_v3Position;
-            var1->colour.c[0] = pLight->m_Colour.c[0];
-            var1->colour.c[1] = pLight->m_Colour.c[1];
-            var1->colour.c[2] = pLight->m_Colour.c[2];
-            var1->colour.c[3] = pLight->m_Colour.c[3];
-            var1->radius = pLight->m_fRadius;
-            return var1;
+            EffectsLight* pLight = GetEmissionManager()->GetLight(index - gNumInGameLights);
+            GameObjectLight* pResult = &gInGameLights[index];
+            pResult->useWorldPosition = true;
+            pResult->useColour = true;
+            pResult->isPointLight = true;
+            pResult->intensity = 1.0f;
+            pResult->worldPosition = pLight->m_v3Position;
+            pResult->colour.c[0] = pLight->m_Colour.c[0];
+            pResult->colour.c[1] = pLight->m_Colour.c[1];
+            pResult->colour.c[2] = pLight->m_Colour.c[2];
+            pResult->colour.c[3] = pLight->m_Colour.c[3];
+            pResult->radius = pLight->m_fRadius;
+            return pResult;
         }
-        if (arg1)
+        if (character)
         {
-            if (arg0 == 0)
+            if (index == 0)
                 return &gCharacterLight;
             s32 characterLightCount = gNumCharacterInGameLights.value;
-            s32 lightIndex = arg0;
+            s32 lightIndex = index;
             if (lightIndex < characterLightCount)
                 return &gInGameLights[lightIndex];
             lightIndex -= characterLightCount;
             return &gInGameLights[lightIndex + gNumInGameLights];
         }
-        return &gInGameLights[arg0];
+        return &gInGameLights[index];
 
     case 1:
-        if (arg0 >= var0)
+        if (index >= numLights)
         {
-            EffectsLight* pLight = GetEmissionManager()->GetLight(arg0 - gNumInGameLights);
-            GameObjectLight* var1 = &gInGameLights[arg0];
-            var1->useWorldPosition = true;
-            var1->useColour = true;
-            var1->isPointLight = true;
-            var1->intensity = 1.0f;
-            var1->worldPosition = pLight->m_v3Position;
-            var1->colour.c[0] = pLight->m_Colour.c[0];
-            var1->colour.c[1] = pLight->m_Colour.c[1];
-            var1->colour.c[2] = pLight->m_Colour.c[2];
-            var1->colour.c[3] = pLight->m_Colour.c[3];
-            var1->radius = pLight->m_fRadius;
-            return var1;
+            EffectsLight* pLight = GetEmissionManager()->GetLight(index - gNumInGameLights);
+            GameObjectLight* pResult = &gInGameLights[index];
+            pResult->useWorldPosition = true;
+            pResult->useColour = true;
+            pResult->isPointLight = true;
+            pResult->intensity = 1.0f;
+            pResult->worldPosition = pLight->m_v3Position;
+            pResult->colour.c[0] = pLight->m_Colour.c[0];
+            pResult->colour.c[1] = pLight->m_Colour.c[1];
+            pResult->colour.c[2] = pLight->m_Colour.c[2];
+            pResult->colour.c[3] = pLight->m_Colour.c[3];
+            pResult->radius = pLight->m_fRadius;
+            return pResult;
         }
-        return &gCameraRelativeLights[arg0];
+        return &gCameraRelativeLights[index];
 
     case 2:
         return &gSTSLight;
@@ -525,33 +525,33 @@ void SetGameObjectLightingMode(int mode)
     gGameObjectLightingMode = mode;
 }
 
-void LoadGameObjectLights(int arg0, GLView* arg1, bool arg2)
+void LoadGameObjectLights(int count, GLView* pView, bool character)
 {
     static GLView* sLastView;
     static bool sLastCharacter;
-    s32 var0;
-    nlMatrix4 var1;
+    s32 i;
+    nlMatrix4 viewMatrix;
 
-    if (sLastView == arg1 && arg2 == sLastCharacter)
+    if (sLastView == pView && character == sLastCharacter)
         return;
 
-    GLViewInterface* var2 = arg1->m_Interface;
-    sLastView = arg1;
-    var2->GetViewMatrix(var1);
-    sLastCharacter = arg2;
+    GLViewInterface* pInterface = pView->m_Interface;
+    sLastView = pView;
+    pInterface->GetViewMatrix(viewMatrix);
+    sLastCharacter = character;
 
-    for (var0 = 0; var0 < arg0; var0++)
+    for (i = 0; i < count; i++)
     {
-        GameObjectLight* var3 = GetGameObjectLight(var0, arg2);
-        LoadGameObjectLight(var0, var3, var1);
+        GameObjectLight* pLight = GetGameObjectLight(i, character);
+        LoadGameObjectLight(i, pLight, viewMatrix);
     }
 }
 
 void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
 {
     GXLightObj light;
-    nlVector3 var1;
-    nlVector3 var0;
+    nlVector3 rotated;
+    nlVector3 direction;
     nlVector3 initialDirection;
     nlVector3 viewPos;
     nlVector3 viewDir;
@@ -560,14 +560,14 @@ void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMat
     if (pLight->useColour)
     {
         f32 brightness = 255.0f * pLight->intensity;
-        s32 var3 = (s32)(brightness * gGameObjectLightBrightness);
-        if (var3 > 255)
-            var3 = 255;
+        s32 level = (s32)(brightness * gGameObjectLightBrightness);
+        if (level > 255)
+            level = 255;
 
         GXColor colour = {
-            (u8)((var3 * pLight->colour.c[0]) >> 8),
-            (u8)((var3 * pLight->colour.c[1]) >> 8),
-            (u8)((var3 * pLight->colour.c[2]) >> 8),
+            (u8)((level * pLight->colour.c[0]) >> 8),
+            (u8)((level * pLight->colour.c[1]) >> 8),
+            (u8)((level * pLight->colour.c[2]) >> 8),
             0xFF,
         };
         GXInitLightColor(&light, colour);
@@ -575,17 +575,17 @@ void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMat
     else
     {
         f32 brightness = 255.0f * pLight->intensity;
-        s32 var3 = (s32)(brightness * gGameObjectLightBrightness);
-        if (var3 > 255)
-            var3 = 255;
+        s32 level = (s32)(brightness * gGameObjectLightBrightness);
+        if (level > 255)
+            level = 255;
 
-        GXColor colour = { (u8)var3, (u8)var3, (u8)var3, 0xFF };
+        GXColor colour = { (u8)level, (u8)level, (u8)level, 0xFF };
         GXInitLightColor(&light, colour);
     }
 
     if (pLight->useWorldPosition)
     {
-        var0 = pLight->worldPosition;
+        direction = pLight->worldPosition;
     }
     else
     {
@@ -600,15 +600,15 @@ void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMat
         float angleZ = pLight->rotZDeg;
         nlMakeRotationMatrixZ(
             matZ, (3.1415927f * angleZ) / 180.0f);
-        nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var1, matZ);
+        nlMultDirVectorMatrix(rotated, initialDirection, matY);
+        nlMultDirVectorMatrix(rotated, matZ);
 
-        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
+        nlVec3Set(direction, -rotated.x, -rotated.y, -rotated.z);
     }
 
     if (pLight->isPointLight)
     {
-        nlMultPosVectorMatrix(viewPos, var0, mview);
+        nlMultPosVectorMatrix(viewPos, direction, mview);
         GXInitLightPos(&light, viewPos.x, viewPos.y, viewPos.z);
         GXInitLightAttnA(&light, 1.0f, 0.0f, 0.0f);
         GXInitLightDistAttn(
@@ -622,9 +622,9 @@ void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMat
             0.0f,
         };
 
-        float worldY = var0.y - origin.y;
-        float worldX = var0.x - origin.x;
-        float worldZ = var0.z - origin.z;
+        float worldY = direction.y - origin.y;
+        float worldX = direction.x - origin.x;
+        float worldZ = direction.z - origin.z;
 
         worldDir.x = worldX;
         worldDir.y = worldY;
@@ -651,11 +651,11 @@ void LoadGameObjectLight(int lightId, const GameObjectLight* pLight, const nlMat
     GXLoadLightObjImm(&light, sGameObjectLightIDs[lightId]);
 }
 
-void SetGameObjectLightingEnabled(bool arg0, int arg1, bool arg2)
+void SetGameObjectLightingEnabled(bool enabled, int count, bool useVertexColour)
 {
-    if (arg0)
+    if (enabled)
     {
-        if (!arg2)
+        if (!useVertexColour)
         {
             nlColour colour = {
                 0xFF,
@@ -666,15 +666,15 @@ void SetGameObjectLightingEnabled(bool arg0, int arg1, bool arg2)
             gxSetChanMatColour(0, colour);
         }
 
-        s32 var0 = arg1 - 1;
-        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, (GXColorSrc)(arg2 != 0),
-            (GXLightID)sGameObjectLightMasks[var0], GX_DF_CLAMP, GX_AF_SPOT);
+        s32 maskIndex = count - 1;
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, (GXColorSrc)(useVertexColour != 0),
+            (GXLightID)sGameObjectLightMasks[maskIndex], GX_DF_CLAMP, GX_AF_SPOT);
     }
     else
     {
-        s32 var0 = arg1 - 1;
+        s32 maskIndex = count - 1;
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX,
-            (GXLightID)sGameObjectLightMasks[var0], GX_DF_NONE, GX_AF_NONE);
+            (GXLightID)sGameObjectLightMasks[maskIndex], GX_DF_NONE, GX_AF_NONE);
     }
 }
 
@@ -684,22 +684,22 @@ void LoadGameObjectSpecularLight(int index, GameObjectLight* lightData, float ex
         return;
 
     GXLightObj light;
-    nlVector3 var1;
-    nlVector3 var0;
+    nlVector3 rotated;
+    nlVector3 direction;
     nlVector3 initialDirection;
     nlVector3 viewDir;
     nlVector3 worldDir;
 
-    s32 var3 = (s32)(255.0f * lightData->intensity);
-    if (var3 > 255)
-        var3 = 255;
+    s32 level = (s32)(255.0f * lightData->intensity);
+    if (level > 255)
+        level = 255;
 
-    GXColor colour = { (u8)var3, (u8)var3, (u8)var3, 0xFF };
+    GXColor colour = { (u8)level, (u8)level, (u8)level, 0xFF };
     GXInitLightColor(&light, colour);
 
     if (lightData->useWorldPosition)
     {
-        var0 = lightData->worldPosition;
+        direction = lightData->worldPosition;
     }
     else
     {
@@ -714,10 +714,10 @@ void LoadGameObjectSpecularLight(int index, GameObjectLight* lightData, float ex
         float angleZ = lightData->rotZDeg;
         nlMakeRotationMatrixZ(
             matZ, (3.1415927f * angleZ) / 180.0f);
-        nlMultDirVectorMatrix(var1, initialDirection, matY);
-        nlMultDirVectorMatrix(var1, matZ);
+        nlMultDirVectorMatrix(rotated, initialDirection, matY);
+        nlMultDirVectorMatrix(rotated, matZ);
 
-        nlVec3Set(var0, -var1.x, -var1.y, -var1.z);
+        nlVec3Set(direction, -rotated.x, -rotated.y, -rotated.z);
     }
 
     nlVector3 origin = {
@@ -726,9 +726,9 @@ void LoadGameObjectSpecularLight(int index, GameObjectLight* lightData, float ex
         0.0f,
     };
 
-    float worldY = var0.y - origin.y;
-    float worldX = var0.x - origin.x;
-    float worldZ = var0.z - origin.z;
+    float worldY = direction.y - origin.y;
+    float worldX = direction.x - origin.x;
+    float worldZ = direction.z - origin.z;
 
     worldDir.x = worldX;
     worldDir.y = worldY;
@@ -813,7 +813,7 @@ void LoadShadowLightingLookup(unsigned long textureHandle)
     }
 }
 
-void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
+void ApplyGameObjectShadowLighting(int skinned, unsigned long shadowLevel)
 {
     if (!IsShadowLookupActive())
         return;
@@ -826,19 +826,19 @@ void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
     gxSetNumTevStages(numTevStages + 1);
     gShadowTexGen = numTexGens;
 
-    if (arg1 != 0)
+    if (shadowLevel != 0)
     {
         gxSetTevOrder(numTevStages, 0xFF, 0xFF, 0xFF);
         gxSetTevColourIn(numTevStages, 15, 0, 6, 15);
         gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
 
-        GXColor colour = *(GXColor*)&arg1;
+        GXColor colour = *(GXColor*)&shadowLevel;
         GXSetTevColor(GX_TEVREG2, colour);
     }
     else
     {
         gxSetTevOrder(numTevStages, numTexGens, numTexGens, 0xFF);
-        if (arg0 && gShadowLookupSkinnedUsesInverseView)
+        if (skinned && gShadowLookupSkinnedUsesInverseView)
             gxSetTexCoordGen(numTexGens, 1, 0, 0, false, 0x76);
         else
             gxSetTexCoordGen(numTexGens, 1, 0, 0x36, false, 0x76);
@@ -861,7 +861,7 @@ void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
         Mtx textureMatrix;
         PSMTXConcat(gShadowLookupBiasMatrix, gxTransform, textureMatrix);
 
-        if (arg0 && gShadowLookupSkinnedUsesInverseView)
+        if (skinned && gShadowLookupSkinnedUsesInverseView)
         {
             Mtx inverse;
             glxCopyMatrix(inverse, gShadowInverseViewMatrix);
@@ -931,39 +931,39 @@ bool IsShadowLookupActive()
     return true;
 }
 
-nlColour SampleShadowLookup(const nlVector2* arg0, bool arg1)
+nlColour SampleShadowLookup(const nlVector2* pPosition, bool tint)
 {
     if (!IsShadowLookupActive())
     {
-        nlColour var0;
-        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
-        return var0;
+        nlColour white;
+        nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
+        return white;
     }
 
     if (lbl_806DCC5C <= 0xFF)
     {
-        nlColour var0;
-        nlColourSet(var0, 0xFF, 0xFF, 0xFF, 0xFF);
-        return var0;
+        nlColour white;
+        nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
+        return white;
     }
 
-    f32 var0 = arg0->x;
-    var0 *= gShadowLookupScaleX.value;
-    var0 = var0 + gShadowLookupTransX.value;
-    f32 var1 = arg0->y;
-    var1 *= gShadowLookupScaleY.value;
-    var1 = var1 + gShadowLookupTransY.value;
-    var0 = 0.5f * var0 + 0.5f;
-    var1 = -0.5f * var1 + 0.5f;
-    var0 *= (f32)gpShadowLightingLookup->mWidth;
-    var1 *= (f32)gpShadowLightingLookup->mHeight;
-    return gpShadowLightingLookup->SampleFilteredColour(var0, var1, arg1);
+    f32 u = pPosition->x;
+    u *= gShadowLookupScaleX.value;
+    u = u + gShadowLookupTransX.value;
+    f32 v = pPosition->y;
+    v *= gShadowLookupScaleY.value;
+    v = v + gShadowLookupTransY.value;
+    u = 0.5f * u + 0.5f;
+    v = -0.5f * v + 0.5f;
+    u *= (f32)gpShadowLightingLookup->mWidth;
+    v *= (f32)gpShadowLightingLookup->mHeight;
+    return gpShadowLightingLookup->SampleFilteredColour(u, v, tint);
 }
 
-int GetShadowLookupLevel(const nlVector3* arg0)
+int GetShadowLookupLevel(const nlVector3* pPosition)
 {
-    nlColour var0 = SampleShadowLookup((const nlVector2*)arg0, true);
-    return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
+    nlColour colour = SampleShadowLookup((const nlVector2*)pPosition, true);
+    return (colour.c[0] * 140 + colour.c[1] * 88 + colour.c[2] * 29) >> 8;
 }
 
 void ReleaseShadowLightingLookup()
