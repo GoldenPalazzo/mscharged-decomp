@@ -22,9 +22,9 @@ extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
-static int lbl_806DC39C = 0;
+static int sTransDesireUsePowerupContinue = 0;
 #pragma explicit_zero_data off
-static int lbl_806DC3A0 = 17;
+static int sUsePowerupDesireState = 17;
 static bool lbl_806DC3A4 = true;
 
 /**
@@ -33,7 +33,7 @@ static bool lbl_806DC3A4 = true;
 DesireUpdate TransDesireUsePowerup(
     AIContext* input)
 {
-    DesireUpdate result(FT_INT, lbl_806DC39C);
+    DesireUpdate result(FT_INT, sTransDesireUsePowerupContinue);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
     unsigned long key = input->GetTimerKey(
         (unsigned long)TransDesireUsePowerup, 1);
@@ -54,7 +54,7 @@ DesireUpdate TransDesireUsePowerup(
     return DesireUpdate(result, -1.0f, -1.0f);
 }
 
-static int lbl_80502B10[4] = { 0x59, 0x5C, 0x5B, 0x5A };
+static int sPowerupThrowAnims[4] = { 0x59, 0x5C, 0x5B, 0x5A };
 
 /**
  * Offset/Address/Size: 0xF48 | 0x800D2FBC | size: 0x128
@@ -98,7 +98,7 @@ void DesireUsePowerup::Update(
 {
     if (update->mData.i == 3)
     {
-        update->SetParameter(8, FuzzyVariant(lbl_806DC3A0));
+        update->SetParameter(8, FuzzyVariant(sUsePowerupDesireState));
         update->SetParameter(9, FuzzyVariant(lbl_806DC3A4));
         return;
     }
@@ -294,8 +294,8 @@ void DesireUsePowerup::SetPowerup(
             break;
         }
 
-        m_pFielder->SetPowerupAnimState(lbl_80502B10[nDirection]);
-        m_pFielder->m_nPowerupAnimID = lbl_80502B10[nDirection];
+        m_pFielder->SetPowerupAnimState(sPowerupThrowAnims[nDirection]);
+        m_pFielder->m_nPowerupAnimID = sPowerupThrowAnims[nDirection];
         m_pFielder->mtPowerupThrowTime.SetSeconds(0.2f);
         break;
     }
