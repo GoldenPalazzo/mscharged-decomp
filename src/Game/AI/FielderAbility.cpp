@@ -27,29 +27,29 @@
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-static float gUnidentified804FAD80[4] = { 0.15f, 0.4f, 0.0f, 0.0f };
+static float sDKSuperHitNoiseAmplitude[4] = { 0.15f, 0.4f, 0.0f, 0.0f };
 
-float lbl_806DB9C8 = 0.25f;
-float lbl_806DB9CC = 15.0f;
-float lbl_806DB9D0 = 30.0f;
-float lbl_806DB9D4 = 1.0f;
+float gDKSuperDeceleration = 0.25f;
+float gDKSuperChargeEndFrame = 15.0f;
+float gDKSuperHitNoiseFrequency = 30.0f;
+float gDKSuperHitNoiseDuration = 1.0f;
 float lbl_806DB9D8 = 9.0f;
-float lbl_806DB9DC = 2.5f;
-float lbl_806DB9E0 = 0.3f;
-float lbl_806DB9E4 = 3.5f;
-float lbl_806DB9E8 = 0.3f;
-float lbl_806DB9EC = 1.5f;
-float lbl_806DB9F0 = 0.5f;
-float lbl_806DB9F4 = 5.4f;
-float lbl_806DB9F8 = 5.15f;
-float lbl_806DB9FC = 1.0f;
-float lbl_806DBA00 = 10.0f;
-float lbl_806DBA04 = 15.0f;
-float lbl_806DBA08 = 0.5f;
-int lbl_806DBA0C = 4;
-float lbl_806DBA10 = 0.4f;
-float lbl_806E0C78;
-bool lbl_806E0C7C;
+float gWaluigiTankCapacity = 2.5f;
+float gWaluigiWallMinSegmentTime = 0.3f;
+float gBowserTankCapacity = 3.5f;
+float gBowserTankOffCost = 0.3f;
+float gWarioTankCapacity = 1.5f;
+float gPeachFlashFrameLockTime = 0.5f;
+float gPeachPhotoHalfWidth = 5.4f;
+float gPeachPhotoHalfHeight = 5.15f;
+float gPeachCameraFlashFrame = 1.0f;
+float gPeachFlashFrame = 10.0f;
+float gPeachCamerasAwayFrame = 15.0f;
+float gPeachSuperFacing = 0.5f;
+int gPeachFlyingCameraCount = 4;
+float gDKSuperHitTiltScale = 0.4f;
+float gWaluigiTankOffCost;
+bool gPeachPhotoEmitEnabled;
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
@@ -67,7 +67,7 @@ void cFielder::fn_8004F828()
     SetAnimState(0x68, true, 0.2f, false, false);
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    InitMovementDecelerateExponential(lbl_806DB9C8);
+    InitMovementDecelerateExponential(gDKSuperDeceleration);
     Unknown8(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
@@ -77,9 +77,9 @@ void cFielder::fn_8004F828()
 void cFielder::fn_8004F8E8()
 {
     EmitDKSuperHit(this);
-    FireCameraNoiseFilter(*(nlVector3*)gUnidentified804FAD80, lbl_806DB9D0, lbl_806DB9D4);
-    fn_80061B1C(1, lbl_806DBA10 * mUnidentified024.m_v3Position.y,
-        lbl_806DBA10 * mUnidentified024.m_v3Position.x);
+    FireCameraNoiseFilter(*(nlVector3*)sDKSuperHitNoiseAmplitude, gDKSuperHitNoiseFrequency, gDKSuperHitNoiseDuration);
+    fn_80061B1C(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
+        gDKSuperHitTiltScale * mUnidentified024.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), lbl_806DB9D8);
     PlayRumbleAction(4, GetGlobalPad());
@@ -89,7 +89,7 @@ void cFielder::fn_8004F974(float fDeltaT)
 {
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 
-    if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9CC))
+    if (m_pCurrentAnimController->TestFrameTrigger(gDKSuperChargeEndFrame))
     {
         KillDKSuperCharge(this);
         mUnidentified024.m_fActualSpeed = 0.0f;
@@ -111,12 +111,12 @@ void cFielder::fn_8004FA34()
 
     if (m_pCurrentAnimController->m_fTime
             * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
-        < lbl_806DBA04)
+        < gPeachCamerasAwayFrame)
     {
         UnidentifiedEventData_800673FC event;
         event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = lbl_806DB9F4;
-        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified10 = gPeachPhotoHalfWidth;
+        event.mUnidentified14 = gPeachPhotoHalfHeight;
         event.mUnidentified00 = this;
         fn_80060210(g_pGame, &event);
     }
@@ -135,7 +135,7 @@ void cFielder::fn_8004FB04()
     muInvincibleStatus |= 1;
 
     if ((u16)abs_s16((s16)(mUnidentified024.m_aActualFacingDirection
-            - (u16)(s32)(65536.0f * lbl_806DBA08)))
+            - (u16)(s32)(65536.0f * gPeachSuperFacing)))
         < 0x4000)
     {
         SetAnimState(0x68, true, 0.2f, false, false);
@@ -152,21 +152,21 @@ void cFielder::fn_8004FB04()
 
     UnidentifiedEventData_800673FC event;
     event.mUnidentified04 = mUnidentified024.m_v3Position;
-    event.mUnidentified10 = lbl_806DB9F4;
-    event.mUnidentified14 = lbl_806DB9F8;
+    event.mUnidentified10 = gPeachPhotoHalfWidth;
+    event.mUnidentified14 = gPeachPhotoHalfHeight;
     event.mUnidentified00 = this;
     fn_80060014(g_pGame, &event);
 
-    float fParam = FMAX(lbl_806DB9F4, lbl_806DB9F8);
+    float fParam = FMAX(gPeachPhotoHalfWidth, gPeachPhotoHalfHeight);
     fParam += 0.5f;
-    SetFlyingCameraCount(lbl_806DBA0C, this, fParam);
+    SetFlyingCameraCount(gPeachFlyingCameraCount, this, fParam);
 }
 
 void cFielder::fn_8004FC90(float fDeltaT)
 {
     float fFrame = m_pCurrentAnimController->get_fTime()
         * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
-        / lbl_806DB9FC;
+        / gPeachCameraFlashFrame;
 
     if (fFrame <= 1.0f)
     {
@@ -174,7 +174,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
         float fBlend = fFrame * (-2.0f * fFrame + 3.0f);
         fBlend = fFrame * fBlend;
         float fTurn = (float)aFacing / 65536.0f;
-        fTurn = lbl_806DBA08 - fTurn;
+        fTurn = gPeachSuperFacing - fTurn;
         if (m_eAnimID == 0x69)
         {
             fTurn += 0.5f;
@@ -194,26 +194,26 @@ void cFielder::fn_8004FC90(float fDeltaT)
         SetFacingDirection(newFacing, true);
     }
 
-    if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9FC))
+    if (m_pCurrentAnimController->TestFrameTrigger(gPeachCameraFlashFrame))
     {
         UnidentifiedEventData_800673FC event;
         event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = lbl_806DB9F4;
-        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified10 = gPeachPhotoHalfWidth;
+        event.mUnidentified14 = gPeachPhotoHalfHeight;
         event.mUnidentified00 = this;
         fn_8005FE18(g_pGame, &event);
     }
-    else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA00))
+    else if (m_pCurrentAnimController->TestFrameTrigger(gPeachFlashFrame))
     {
         UnidentifiedEventData_800673FC event;
         event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = lbl_806DB9F4;
-        event.mUnidentified14 = lbl_806DB9F8;
-        cField::FixOutOfBoundsPosition(event.mUnidentified04, lbl_806DB9F4, true);
+        event.mUnidentified10 = gPeachPhotoHalfWidth;
+        event.mUnidentified14 = gPeachPhotoHalfHeight;
+        cField::FixOutOfBoundsPosition(event.mUnidentified04, gPeachPhotoHalfWidth, true);
         event.mUnidentified00 = this;
         fn_8005FC1C(g_pGame, &event);
 
-        if (lbl_806E0C7C)
+        if (gPeachPhotoEmitEnabled)
         {
             EmitPeachPhoto(this);
         }
@@ -224,22 +224,22 @@ void cFielder::fn_8004FC90(float fDeltaT)
         }
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(
-                 1.0f + lbl_806DBA00))
+                 1.0f + gPeachFlashFrame))
     {
         if (!IsNetworkOrRecordedGame())
         {
-            FixedUpdateTask::SetFrameLock(lbl_806DB9F0);
+            FixedUpdateTask::SetFrameLock(gPeachFlashFrameLockTime);
         }
         fn_80038158(this, 0);
     }
-    else if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DBA04))
+    else if (m_pCurrentAnimController->TestFrameTrigger(gPeachCamerasAwayFrame))
     {
         SetFlyingCameraTarget(0);
 
         UnidentifiedEventData_800673FC event;
         event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = lbl_806DB9F4;
-        event.mUnidentified14 = lbl_806DB9F8;
+        event.mUnidentified10 = gPeachPhotoHalfWidth;
+        event.mUnidentified14 = gPeachPhotoHalfHeight;
         event.mUnidentified00 = this;
         fn_80060210(g_pGame, &event);
     }
@@ -287,7 +287,7 @@ void cFielder::fn_8005001C(bool bForce)
         if (mUnidentified3DC || bForce)
         {
             mUnidentified3DC = false;
-            float fDecay = lbl_806DB9E8;
+            float fDecay = gBowserTankOffCost;
             mUnidentified3E0 = mUnidentified3E0 - fDecay;
             bool bRunning = mUnidentified3E0 > 0.0f;
             if (bRunning)
@@ -310,7 +310,7 @@ void cFielder::fn_8005001C(bool bForce)
             {
                 mUnidentified3DC = false;
                 mUnidentified3DD = false;
-                float fDecay = lbl_806E0C78;
+                float fDecay = gWaluigiTankOffCost;
                 mUnidentified3E0 = mUnidentified3E0 - fDecay;
                 bool bRunning = mUnidentified3E0 > 0.0f;
                 if (bRunning)
@@ -357,16 +357,16 @@ void cFielder::fn_800501F0(bool bParam)
     switch (mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
-        mUnidentified3E4 = lbl_806DB9E4;
+        mUnidentified3E4 = gBowserTankCapacity;
         mUnidentified3E8.nextFireballTime = 0.0f;
         break;
     case MARIO:
-        mUnidentified3E4 = lbl_806DB9DC;
+        mUnidentified3E4 = gWaluigiTankCapacity;
         mUnidentified3F8.mUnidentified00
-            = mUnidentified3F8.mUnidentified04 = lbl_806DB9E0;
+            = mUnidentified3F8.mUnidentified04 = gWaluigiWallMinSegmentTime;
         break;
     case PEACH:
-        mUnidentified3E4 = lbl_806DB9EC;
+        mUnidentified3E4 = gWarioTankCapacity;
         mUnidentified3F4 = 0.0f;
         break;
     case YOSHI:
