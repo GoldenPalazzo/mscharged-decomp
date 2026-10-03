@@ -32,8 +32,8 @@
 #include "NL/nlPrint.h"
 
 
-float lbl_806DD000 = 0.48f;
-const float lbl_806E5210 = 0.45f;
+float gHammerRadius = 0.48f;
+const float sBulletBillRadius = 0.45f;
 const float lbl_806E5214 = 1.0f;
 
 NPCManager* gNPCManager;
@@ -205,7 +205,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
         if (mBulletBills[i] == 0)
         {
             pObject = new (8, false) BulletBillObject(
-                GetRenderObject(1, i), i, lbl_806E5210, lbl_806E5214);
+                GetRenderObject(1, i), i, sBulletBillRadius, lbl_806E5214);
             mBulletBills[i] = pObject;
             mNumBulletBills = i + 1;
             break;
@@ -256,7 +256,7 @@ void NPCManager::CreateHammers()
     {
         HammerObject* pObject
             = (HammerObject*)nlMalloc(sizeof(HammerObject), 8, false);
-        pObject = new (pObject) HammerObject(i, lbl_806DD000);
+        pObject = new (pObject) HammerObject(i, gHammerRadius);
         mHammers[i] = pObject;
     }
 }
