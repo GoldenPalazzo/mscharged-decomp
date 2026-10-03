@@ -53,7 +53,7 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" unsigned long OSGetConsoleType(void);
+#include <revolution/os/OS_fwd.h>
 
 void OnNisTriggersLoaded(void*, unsigned long, void*);
 void OnNisAnimProxyLoaded(void*, unsigned long, void*);
