@@ -19,7 +19,7 @@
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
 #include "Game/Triggers/SebringAnimScript.h"
-#include "Game/TweakRegistry.h"
+#include "Game/TweakQuery.h"
 #include "Game/TweakValue.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
@@ -38,6 +38,7 @@
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
+#include "NL/nlstring_impl.h"
 
 static bool g_bLoadAnimsCached;
 
@@ -1171,5 +1172,3 @@ static TweakBoolBinding sLoadAnimsCachedTweak(
     "g_bLoadAnimsCached", "FileCache", &g_bLoadAnimsCached, true);
 
 CharacterLoader CharacterLoader::sInstance;
-
-#include "NL/nlstring_impl.h"
