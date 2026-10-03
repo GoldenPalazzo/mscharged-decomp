@@ -359,12 +359,12 @@ inline void FreeCollisionPowerupStatsData(CollisionPowerupStatsData* data)
 
 void FreeEventDataPools();
 
-struct UnidentifiedEventData_800673FC
+struct PeachPhotoData
 {
-    /* 0x00 */ cPlayer* mUnidentified00;
-    /* 0x04 */ nlVector3 mUnidentified04;
-    /* 0x10 */ float mUnidentified10;
-    /* 0x14 */ float mUnidentified14;
+    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x04 */ nlVector3 v3Position;
+    /* 0x10 */ float fHalfWidth;
+    /* 0x14 */ float fHalfHeight;
 }; // total size: 0x18
 
 struct UnidentifiedEventData00;

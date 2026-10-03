@@ -21,7 +21,7 @@ struct UnidentifiedEventData_80066F18;
 struct MegaStrikeMeterData;
 struct LightningStrikeData;
 struct MegaStrikeEndData;
-struct UnidentifiedEventData_800673FC;
+struct PeachPhotoData;
 struct UnidentifiedEventData_800676D8;
 struct UnidentifiedEventData_800678D0;
 
@@ -84,10 +84,10 @@ public:
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent51;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent52;
     UnidentifiedEvent<UnidentifiedEventNoData> mEvent53;
-    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent54;
-    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent55;
-    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent56;
-    UnidentifiedEvent<UnidentifiedEventData_800673FC> mEvent57;
+    UnidentifiedEvent<PeachPhotoData> mEvent54;
+    UnidentifiedEvent<PeachPhotoData> mEvent55;
+    UnidentifiedEvent<PeachPhotoData> mEvent56;
+    UnidentifiedEvent<PeachPhotoData> mEvent57;
     UnidentifiedEvent<cPlayer> mEvent58;
     UnidentifiedEvent<cPlayer> mEvent59;
     UnidentifiedEvent<cPlayer> mEvent60;

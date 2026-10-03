@@ -1313,16 +1313,16 @@ void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
     InitActionPostWhistle();
 }
 
-extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
-extern "C" void fn_80098A68(UnidentifiedEventData_800673FC*);
-extern "C" void fn_80098A84(UnidentifiedEventData_800673FC*);
+extern "C" void fn_80098AA0(PeachPhotoData*);
+extern "C" void fn_80098A68(PeachPhotoData*);
+extern "C" void fn_80098A84(PeachPhotoData*);
 extern "C" void fn_80099030(UnidentifiedEventData00*);
 
 extern "C" void fn_80098750()
 {
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachFlash", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098AA0), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasDown", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A68), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasAway", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A84), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(fn_80098AA0), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(fn_80098A68), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(fn_80098A84), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
 }
 
@@ -1338,48 +1338,48 @@ static nlVector3 lbl_804FF5C8[] = {
     { 0.824f, 0.972f, 0.0f },
 };
 
-extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
+extern "C" void fn_80098A68(PeachPhotoData* pData)
 {
     PlaySound(
-        pData->mUnidentified00->m_uSoundSlotId,
+        pData->pPlayer->m_uSoundSlotId,
         0x9F35CA0F,
         NULL,
         NULL);
 }
 
-extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
+extern "C" void fn_80098A84(PeachPhotoData* pData)
 {
     PlaySound(
-        pData->mUnidentified00->m_uSoundSlotId,
+        pData->pPlayer->m_uSoundSlotId,
         0x85EF26D0,
         NULL,
         NULL);
 }
 
-extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
+extern "C" void fn_80098AA0(PeachPhotoData* pData)
 {
     nlPolygonRegion region;
     nlVector3 points[9];
     region.Allocate(9);
-    float width = 2.0f * pData->mUnidentified10;
-    float height = 2.0f * pData->mUnidentified14;
+    float width = 2.0f * pData->fHalfWidth;
+    float height = 2.0f * pData->fHalfHeight;
     for (int i = 0; i < 9; i++)
     {
         nlVector3& point = points[i];
         point = lbl_804FF5C8[i];
         point.x *= width;
         point.x -= width / 2.0f;
-        point.x += pData->mUnidentified04.x;
+        point.x += pData->v3Position.x;
         point.y = (1.0f - point.y) * height;
         point.y -= height / 2.0f;
-        point.y += pData->mUnidentified04.y;
+        point.y += pData->v3Position.y;
         region.AddPoint(point);
     }
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
         if (lbl_806DBD8C)
         {
-            StartPeachPhoto(&gPeachPhotoState, &pData->mUnidentified04, lbl_806DBD88, pData->mUnidentified10, pData->mUnidentified14);
+            StartPeachPhoto(&gPeachPhotoState, &pData->v3Position, lbl_806DBD88, pData->fHalfWidth, pData->fHalfHeight);
         }
         for (int i = 0; i < 2; i++)
         {
@@ -1487,12 +1487,12 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                 }
             }
         }
-        if (pData->mUnidentified00->m_pBall == NULL)
-            PlaySound(pData->mUnidentified00->m_uSoundSlotId, 0xBCA543B2, NULL, NULL);
+        if (pData->pPlayer->m_pBall == NULL)
+            PlaySound(pData->pPlayer->m_uSoundSlotId, 0xBCA543B2, NULL, NULL);
     }
 }
 
-extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
+extern "C" void fn_80098AA0(PeachPhotoData*);
 
 extern "C" void fn_80099030(UnidentifiedEventData00*)
 {

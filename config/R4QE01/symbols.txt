@@ -1662,7 +1662,7 @@ __dt__32UnidentifiedTypedEvent<7cPlayer>Fv = .text:0x800672C8; // type:function 
 fn_80067308 = .text:0x80067308; // type:function size:0xB4
 __dt__43UnidentifiedTypedEvent<17MegaStrikeEndData>Fv = .text:0x800673BC; // type:function size:0x40
 fn_800673FC = .text:0x800673FC; // type:function size:0xB4
-__dt__56UnidentifiedTypedEvent<30UnidentifiedEventData_800673FC>Fv = .text:0x800674B0; // type:function size:0x40
+__dt__40UnidentifiedTypedEvent<14PeachPhotoData>Fv = .text:0x800674B0; // type:function size:0x40
 fn_800674F0 = .text:0x800674F0; // type:function size:0xB4
 __dt__49UnidentifiedTypedEvent<23CollisionBulletBillData>Fv = .text:0x800675A4; // type:function size:0x40
 fn_800675E4 = .text:0x800675E4; // type:function size:0xB4
@@ -1826,7 +1826,7 @@ DeleteEntry__141DLListContainerBase<44UnidentifiedListener<20CharacterImpactEven
 DeleteEntry__161DLListContainerBase<54UnidentifiedListener<30UnidentifiedEventData_800676D8>,81SlotPool<69DLListEntry<54UnidentifiedListener<30UnidentifiedEventData_800676D8>>>>FP69DLListEntry<54UnidentifiedListener<30UnidentifiedEventData_800676D8>> = .text:0x80072388; // type:function size:0x9C
 DeleteEntry__115DLListContainerBase<31UnidentifiedListener<8cFielder>,58SlotPool<46DLListEntry<31UnidentifiedListener<8cFielder>>>>FP46DLListEntry<31UnidentifiedListener<8cFielder>> = .text:0x80072424; // type:function size:0x9C
 DeleteEntry__147DLListContainerBase<47UnidentifiedListener<23CollisionBulletBillData>,74SlotPool<62DLListEntry<47UnidentifiedListener<23CollisionBulletBillData>>>>FP62DLListEntry<47UnidentifiedListener<23CollisionBulletBillData>> = .text:0x800724C0; // type:function size:0x9C
-DeleteEntry__161DLListContainerBase<54UnidentifiedListener<30UnidentifiedEventData_800673FC>,81SlotPool<69DLListEntry<54UnidentifiedListener<30UnidentifiedEventData_800673FC>>>>FP69DLListEntry<54UnidentifiedListener<30UnidentifiedEventData_800673FC>> = .text:0x8007255C; // type:function size:0x9C
+DeleteEntry__129DLListContainerBase<38UnidentifiedListener<14PeachPhotoData>,65SlotPool<53DLListEntry<38UnidentifiedListener<14PeachPhotoData>>>>FP53DLListEntry<38UnidentifiedListener<14PeachPhotoData>> = .text:0x8007255C; // type:function size:0x9C
 DeleteEntry__135DLListContainerBase<41UnidentifiedListener<17MegaStrikeEndData>,68SlotPool<56DLListEntry<41UnidentifiedListener<17MegaStrikeEndData>>>>FP56DLListEntry<41UnidentifiedListener<17MegaStrikeEndData>> = .text:0x800725F8; // type:function size:0x9C
 DeleteEntry__113DLListContainerBase<30UnidentifiedListener<7cPlayer>,57SlotPool<45DLListEntry<30UnidentifiedListener<7cPlayer>>>>FP45DLListEntry<30UnidentifiedListener<7cPlayer>> = .text:0x80072694; // type:function size:0x9C
 DeleteEntry__139DLListContainerBase<43UnidentifiedListener<19LightningStrikeData>,70SlotPool<58DLListEntry<43UnidentifiedListener<19LightningStrikeData>>>>FP58DLListEntry<43UnidentifiedListener<19LightningStrikeData>> = .text:0x80072730; // type:function size:0x9C
