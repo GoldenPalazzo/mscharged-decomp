@@ -163,7 +163,7 @@ void fn_8002B934(PlayerTweaks* tweaks, const char* name,
     }
 }
 
-extern "C" float fn_8002BE18(PlayerTweaks* tweaks)
+float GetOffensiveRating(PlayerTweaks* tweaks)
 {
     return (tweaks->fPassing.GetValue()
                + tweaks->fShooting.GetValue())
@@ -177,7 +177,7 @@ extern "C" float fn_8002BE38(PlayerTweaks* tweaks)
     return (result + tweaks->fDefenseHittingDistance.GetValue()) / 3.0f;
 }
 
-extern "C" float fn_8002BE64(PlayerTweaks* tweaks)
+float GetPlaymakerRating(PlayerTweaks* tweaks)
 {
     return (tweaks->fPassing.GetValue()
                + tweaks->fMovementSpeed.GetValue())

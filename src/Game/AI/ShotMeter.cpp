@@ -57,7 +57,7 @@ void ShotMeter::Update(float fDeltaT)
             }
 
             float fDelta = fCurrent - fPrevious;
-            float fRange = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18((g_pBall->GetOwnerFielder())->GetTweaks()));
+            float fRange = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetOffensiveRating((g_pBall->GetOwnerFielder())->GetTweaks()));
             float fValue = Interpolate(fDelta * lbl_806DBE58,
                 fDelta * lbl_806DBE5C,
                 fRange);

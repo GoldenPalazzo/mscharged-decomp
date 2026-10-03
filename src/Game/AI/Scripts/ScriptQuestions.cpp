@@ -715,7 +715,7 @@ extern "C" float fn_800D782C(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE64(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetPlaymakerRating(pTweaks));
 }
 
 extern "C" float fn_800D7878(cFielder* fielder)
@@ -737,7 +737,7 @@ extern "C" float fn_800D78C4(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetOffensiveRating(pTweaks));
 }
 
 extern "C" float fn_800D7910(cFielder* fielder)

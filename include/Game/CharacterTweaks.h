@@ -222,9 +222,7 @@ extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
 
 
-extern "C" float fn_8002BE18(PlayerTweaks* tweaks);
 extern "C" float fn_8002BE38(PlayerTweaks* tweaks);
-extern "C" float fn_8002BE64(PlayerTweaks* tweaks);
 extern "C" float fn_8002BE84(const PlayerTweaks* tweaks);
 extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value);
 extern "C" float fn_8002BFB8(PlayerTweaks* tweaks);
@@ -239,5 +237,9 @@ extern "C" float fn_8002C800(PlayerTweaks* tweaks);
 extern "C" float fn_8002CF10(PlayerTweaks*);
 extern "C" float fn_8002CF24(PlayerTweaks*);
 extern "C" float fn_8002CFC4(PlayerTweaks*);
+
+// C++ accessors from Game/CharacterTweaks.cpp.
+float GetOffensiveRating(PlayerTweaks*);
+float GetPlaymakerRating(PlayerTweaks*);
 
 #endif // GAME_CHARACTER_TWEAKS_H
