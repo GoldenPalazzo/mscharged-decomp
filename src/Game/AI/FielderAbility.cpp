@@ -12,6 +12,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
+#include "Game/InputManager.h"
 #include "Game/MathHelpers.h"
 #include "Game/SAnim.h"
 #include "Game/SAnim/pnSAnimController.h"
@@ -66,7 +67,6 @@ extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
 extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 
-bool IsNetworkOrRecordedGame(void);
 
 void cFielder::fn_8004F828()
 {
