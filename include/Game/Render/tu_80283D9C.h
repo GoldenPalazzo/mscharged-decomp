@@ -8,8 +8,7 @@ class NisPlayer;
 /**
  * Base of the five screen overlays NisPlayer allocates and owns. Each one
  * renders a 2D quad over the world view while a NIS plays; Update() returns the
- * overlay state the player should continue with. The empty Reset() body is
- * defined in Game/NisPlayer.cpp.
+ * overlay state the player should continue with. The default Reset() does nothing.
  */
 class NisPlayerOverlay
 {

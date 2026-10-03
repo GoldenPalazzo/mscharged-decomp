@@ -259,3 +259,5 @@ int NisPlayerOverlay_80523878::GetOverlayType()
 {
     return 0;
 }
+
+#include "Game/Render/NisPlayerOverlay.inl"

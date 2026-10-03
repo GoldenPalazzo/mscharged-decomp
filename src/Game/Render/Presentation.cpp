@@ -1937,3 +1937,5 @@ static inline void DrawPresentationOverlay(RLView* view, RLView* previous)
         glGetOrthographicHeight(), depth, colour, 0);
     g_ShapeRenderer.m_eView = (GLView*)previous;
 }
+
+#include "Game/Render/NisPlayerOverlay.inl"
