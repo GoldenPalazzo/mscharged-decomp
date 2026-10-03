@@ -4570,5 +4570,5 @@ extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunctionByHash(
     FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(interpreter);
     unsigned int functionHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(functionHash), 1, player, NULL));
+        runtime, runtime->FindFunctionEntryPoint(functionHash), 1, FuzzyArgumentBits(player), 0));
 }

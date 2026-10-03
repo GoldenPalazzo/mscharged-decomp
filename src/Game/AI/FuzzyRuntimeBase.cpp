@@ -293,7 +293,7 @@ extern "C" char FuzzyPassThrough_80312358(void*, char value)
 extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
     FuzzyRuntimeBase* runtime,
     FunctionEntryPoint* function, int argumentCount,
-    void* arg1, void* arg2)
+    u32 arg1, u32 arg2)
 {
     runtime->mCaptureReturnValue = true;
     switch (argumentCount)
@@ -304,11 +304,11 @@ extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
         break;
     case 1:
         runtime->ExecuteFunction(
-            function, 1, (u32)arg1, 0, 0, 0);
+            function, 1, arg1, 0, 0, 0);
         break;
     case 2:
         runtime->ExecuteFunction(
-            function, 2, (u32)arg1, (u32)arg2, 0, 0);
+            function, 2, arg1, arg2, 0, 0);
         break;
     }
 

@@ -230,7 +230,16 @@ extern "C" void FuzzyAISetTransition(UnidentifiedScriptMachine*, const char*);
 
 
 extern "C" void LoadFuzzyByteCode(const char* filename, bool async);
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(FuzzyRuntimeBase* runtime, FunctionEntryPoint* function, int argumentCount, void* arg1, void* arg2);
+
+// Script arguments occupy one stack word, including the bits of float values.
+template <typename T>
+inline u32 FuzzyArgumentBits(const T& value)
+{
+    typedef char ArgumentMustFitWord[sizeof(T) == sizeof(u32) ? 1 : -1];
+    return *reinterpret_cast<const u32*>(&value);
+}
+
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(FuzzyRuntimeBase* runtime, FunctionEntryPoint* function, int argumentCount, u32 arg1, u32 arg2);
 extern "C" bool ApplyFuzzyByteCode();
 extern "C" char FuzzyPassThrough_80312358(void*, char value);
 extern "C" float FuzzyGetQueueConfidence( FuzzyRuntimeBase* runtime);

@@ -104,7 +104,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
 {
     u32 localHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 1, argument, 0));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(argument), 0));
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
@@ -112,9 +112,8 @@ extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
     float value)
 {
     u32 localHash = hash;
-    u32 valueBits = *(u32*)&value;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 2, argument, (void*)valueBits));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 2, FuzzyArgumentBits(argument), FuzzyArgumentBits(value)));
 }
 
 UnidentifiedScriptMachine::UnidentifiedScriptMachine(

@@ -1668,10 +1668,10 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
     cPlayer* pPlayer, cPlayer* pTarget)
 {
     unsigned int localHash = functionHash;
+    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(pInterpreter);
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        static_cast<FuzzyRuntimeBase*>(pInterpreter),
-        pInterpreter->FindFunctionEntryPoint(localHash),
-        2, pPlayer, pTarget));
+        runtime, runtime->FindFunctionEntryPoint(localHash),
+        2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
 DesireReceivePass::~DesireReceivePass()
