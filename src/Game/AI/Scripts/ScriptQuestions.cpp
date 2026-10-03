@@ -371,7 +371,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
     }
     else
     {
-        fAttribute = fn_8002BFB8(pFielder->GetTweaks());
+        fAttribute = GetRunSpeed(pFielder->GetTweaks());
     }
 
     float fInterpolated = Interpolate(fBaseSpeed, fAttribute, 0.3f);
@@ -401,7 +401,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
     }
     else
     {
-        fAttribute = fn_8002BFB8(pFielder->GetTweaks());
+        fAttribute = GetRunSpeed(pFielder->GetTweaks());
     }
 
     float fSecondary = fn_8002C254(pFielder->GetTweaks());

@@ -283,7 +283,7 @@ void cFielder::asmRunning()
                 }
                 else
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BA94(this, lbl_806E3538[0]);
                 }
             }
@@ -303,7 +303,7 @@ void cFielder::asmRunning()
             case 0:
             case 3:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
                     {
@@ -434,7 +434,7 @@ void cFielder::asmRunning()
             case 0:
             case 1:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B664(this);
                 }
@@ -463,7 +463,7 @@ void cFielder::asmRunning()
             case 0:
             case 2:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B5FC(this);
                 }
@@ -513,7 +513,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                        < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -555,7 +555,7 @@ void cFielder::asmRunning()
             case 0:
                 mUnidentified024.m_fDesiredSpeed = 0.0f;
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -568,7 +568,7 @@ void cFielder::asmRunning()
                 break;
             case 3:
                 if (mUnidentified024.m_fActualSpeed
-                    < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                    < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003A2D0(this, -1);
                 }
@@ -592,7 +592,7 @@ void cFielder::asmRunning()
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                        > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -616,7 +616,7 @@ void cFielder::asmRunning()
             {
             case 0:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -629,7 +629,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                        < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -696,7 +696,7 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BA94(this, lbl_806E3538[0]);
                 }
                 else
@@ -768,7 +768,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
                 else
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BE14(this, lbl_806E3538[0]);
                 }
             }
@@ -845,7 +845,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                        > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -937,7 +937,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 else if (mUnidentified024.m_fDesiredSpeed
                          >= fn_8002CE14(this->GetTweaks()))
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BE14(this, lbl_806E3538[0]);
                 }
                 else
@@ -4051,9 +4051,9 @@ void cFielder::fn_8004B148()
         }
     }
 
-    if (mUnidentified024.m_fActualSpeed < fn_8002C5A4(this->GetTweaks()))
+    if (mUnidentified024.m_fActualSpeed < GetTurboWBSpeed(this->GetTweaks()))
     {
-        float fMinSpeed = fn_8002C5A4(this->GetTweaks());
+        float fMinSpeed = GetTurboWBSpeed(this->GetTweaks());
         mUnidentified024.m_fActualSpeed = fMinSpeed;
         mUnidentified024.m_fDesiredSpeed = fMinSpeed;
     }

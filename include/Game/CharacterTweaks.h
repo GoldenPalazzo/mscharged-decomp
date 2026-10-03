@@ -203,7 +203,6 @@ private:
 
 // Shared functions and data from Game/CharacterTweaks.cpp.
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
-extern "C" float fn_8002C5A4(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C7A8(PlayerTweaks*);
@@ -225,7 +224,6 @@ extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE38(PlayerTweaks* tweaks);
 extern "C" float fn_8002BE84(const PlayerTweaks* tweaks);
 extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value);
-extern "C" float fn_8002BFB8(PlayerTweaks* tweaks);
 extern "C" float fn_8002C0AC(PlayerTweaks* tweaks);
 extern "C" float fn_8002C180(PlayerTweaks* tweaks);
 extern "C" float fn_8002C254(const PlayerTweaks* tweaks);
@@ -241,5 +239,16 @@ extern "C" float fn_8002CFC4(PlayerTweaks*);
 // C++ accessors from Game/CharacterTweaks.cpp.
 float GetOffensiveRating(PlayerTweaks*);
 float GetPlaymakerRating(PlayerTweaks*);
+float GetRunSpeed(PlayerTweaks*);
+float GetJogTurnSpeed(PlayerTweaks*);
+float GetRunWBAccel(PlayerTweaks*);
+float GetRunWBTurnSpeed(PlayerTweaks*);
+float GetTurboWBSpeed(PlayerTweaks*);
+float GetStrafeAccel(PlayerTweaks*);
+float GetStrafeTurnSpeed(PlayerTweaks*);
+float GetStrafeTurnFalloff(PlayerTweaks*);
+float GetStrafeDecel(PlayerTweaks*);
+float GetRunWBTurnFalloff(PlayerTweaks*);
+float GetRunWBDecel(PlayerTweaks*);
 
 #endif // GAME_CHARACTER_TWEAKS_H

@@ -241,7 +241,7 @@ extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value)
     return value * tweaks->fWidth;
 }
 
-extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
+float GetRunSpeed(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -254,7 +254,7 @@ extern "C" float fn_8002BFB8(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
+float GetJogTurnSpeed(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -315,7 +315,7 @@ float PlayerTweaks::GetRunningSpeed()
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
+float GetRunWBAccel(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementAcceleration;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -328,7 +328,7 @@ extern "C" float fn_8002C3FC(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
+float GetRunWBTurnSpeed(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -341,7 +341,7 @@ extern "C" float fn_8002C4D0(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C5A4(PlayerTweaks* tweaks)
+float GetTurboWBSpeed(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -514,12 +514,12 @@ extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002CEE8(PlayerTweaks*)
+float GetStrafeAccel(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fStrafeAccel;
 }
 
-extern "C" float fn_8002CEFC(PlayerTweaks*)
+float GetStrafeTurnSpeed(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fStrafeTurnSpeed;
 }
@@ -534,22 +534,22 @@ extern "C" float fn_8002CF24(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fRunDecel;
 }
 
-extern "C" float fn_8002CF38(PlayerTweaks*)
+float GetStrafeTurnFalloff(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fStrafeTurnFalloff;
 }
 
-extern "C" float fn_8002CF4C(PlayerTweaks*)
+float GetStrafeDecel(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fStrafeDecel;
 }
 
-extern "C" float fn_8002CF60(PlayerTweaks*)
+float GetRunWBTurnFalloff(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fRunWBTurnFalloff;
 }
 
-extern "C" float fn_8002CF74(PlayerTweaks*)
+float GetRunWBDecel(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fRunWBDecel;
 }
