@@ -150,7 +150,6 @@ void FreeImpostorLighting();
 void fn_80056EA8();
 void DestroyCharacters();
 
-extern bool gAudioEnabled;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
 

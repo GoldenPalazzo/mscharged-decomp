@@ -39,15 +39,6 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern "C" bool nlLoadCompressedFileAsync(const char* path, LoadAsyncCallback callback,
-    void* userData, unsigned int alignment, int allocType,
-    unsigned int chunkSize, void* readBuffer0, void* readBuffer1, void*,
-    unsigned long param, MemoryAllocator* allocator);
-extern "C" void LoadBundle(void* data, void* nonResidentData,
-    GLResourcePool* allocator, bool);
-
-extern bool gAudioEnabled;
-
 static bool g_bLoadAnimsCached;
 
 static int sPendingEffectsLoadCount;
