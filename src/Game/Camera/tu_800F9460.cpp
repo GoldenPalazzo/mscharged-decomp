@@ -680,7 +680,7 @@ facingGoalKnown:
     else
         mCameraFlags &= ~0x20;
 
-    if (g_pGame->mUnidentified080 || g_pGame->mUnidentified084)
+    if (g_pGame->GetXAxisTilt() != 0.0f || g_pGame->GetYAxisTilt() != 0.0f)
         mCameraFlags |= 0x40;
 }
 

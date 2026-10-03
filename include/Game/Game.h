@@ -142,6 +142,8 @@ public:
     inline bool IsLastTeamToScore(int side) const { return m_nLastTeamToScore == side; }
     inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
     inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
+    float GetXAxisTilt() const { return mUnidentified080; }
+    float GetYAxisTilt() const { return mUnidentified084; }
     const nlVector3& GetTiltDirection() const { return mTiltDirection; }
 
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
