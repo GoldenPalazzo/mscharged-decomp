@@ -815,7 +815,7 @@ void SolarFlare::OnGetReadyForKickoff()
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = g_pTeams[i]->GetFielder(j);
-                fn_8002E1A4(fielder)->mUnidentified004->mUnidentified078 = duration;
+                fn_8002E1A4(fielder)->mUnidentified004->mMaxDuration = duration;
                 fielder->m_pPhysicsCharacter->m_CanCollideWithBall = false;
             }
         }

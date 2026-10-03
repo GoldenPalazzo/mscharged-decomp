@@ -2099,7 +2099,7 @@ void SetBallVisible(cBall* pBall, bool bVisible)
 
 bool IsDesireActive(Desire* pDesire)
 {
-    return pDesire->UnidentifiedIsActive();
+    return pDesire->IsActive();
 }
 
 int GetFielderActionState(cFielder* pFielder)

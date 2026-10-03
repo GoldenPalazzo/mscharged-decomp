@@ -86,11 +86,11 @@ public:
     {
     }
 
-    virtual bool UnidentifiedInitialize(void*) = 0;
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*) = 0;
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(UnidentifiedScriptMachine*);
 
 protected:
     cTeam* m_pTeam;
@@ -107,14 +107,26 @@ public:
 
     virtual ~TutorialMegastrikeDesire();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
 };
 
 class cFielder;
 UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
+
+extern "C" void fn_80319904(UnidentifiedScriptMachine* machine, shdStateMachine* state);
+extern "C" AIContext* fn_80317E2C(UnidentifiedScriptMachine* machine);
+extern "C" bool fn_80317E88(const shdStateMachine* machine);
+extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
+extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
+extern "C" void fn_8031998C(UnidentifiedScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
+
+extern const float lbl_806E6880;
+extern const float lbl_806E6884;
+extern const float lbl_806E6888;
+extern const float lbl_806E688C;
 
 bool IsTransitionFuncSet(const TransitionFunc* transition);
 bool HasTransitionFunc(const TransitionFunc* transition);

@@ -10,7 +10,7 @@ void TutorialMegastrikeDesire::Update(
 {
 }
 
-void TutorialMegastrikeDesire::UnidentifiedCleanup()
+void TutorialMegastrikeDesire::Cleanup()
 {
 }
 
@@ -18,7 +18,7 @@ TutorialMegastrikeDesire::~TutorialMegastrikeDesire()
 {
 }
 
-bool TutorialMegastrikeDesire::UnidentifiedInitialize(void*)
+bool TutorialMegastrikeDesire::Initialize(void*)
 {
     const char* name = lbl_80504000;
 

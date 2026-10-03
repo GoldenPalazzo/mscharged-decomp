@@ -47,44 +47,6 @@ static inline int GetStatusDataSize(u8 status)
     }
 }
 
-static void BuddyFriendCallback(int index, void*)
-{
-    FriendManager* manager = g_pFriendManager;
-    tDebugPrintManager::Print(DC_NETWORK, "Got friendship with friend [%d].]\n", index);
-    manager->mFriendListChanged = true;
-}
-
-static void UpdateServersCallback(int error, BOOL isChanged, void*)
-{
-    if (error == 0)
-    {
-        tDebugPrintManager::Print(DC_NETWORK,
-            "Friends list synchronization successful (isChanged == %s)\n",
-            isChanged ? "true" : "false");
-        if (isChanged)
-        {
-            SaveLoad::StartSave(true);
-        }
-    }
-}
-
-static void FriendStatusCallback(
-    int index, u8 status, const char* statusString, void* param)
-{
-    g_pFriendManager->HandleFriendStatus(
-        index, status, statusString, param);
-}
-
-static void DeleteFriendCallback(
-    int deletedIndex, int sourceIndex, void*)
-{
-    tDebugPrintManager::Print(DC_NETWORK,
-        "Friend [%d] was deleted (equal friend[%d]).\n",
-        deletedIndex,
-        sourceIndex);
-    SaveLoad::StartSave(true);
-}
-
 FriendManager::FriendManager()
 {
     Reset(true);
@@ -120,8 +82,7 @@ void FriendManager::Reset(bool setInstance)
     }
 }
 
-void FriendManager::GetOwnFriendKeyString(
-    u16* output)
+void FriendManager::GetOwnFriendKeyString(u16* output)
 {
     DWCUserData* userData = reinterpret_cast<DWCUserData*>(
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
@@ -130,8 +91,7 @@ void FriendManager::GetOwnFriendKeyString(
     FormatFriendKey(friendKey, output);
 }
 
-bool FriendManager::AddFriendKey(
-    unsigned long long friendKey, int* error)
+bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
 {
     *error = -1;
 
@@ -195,6 +155,44 @@ bool FriendManager::AddFriendKey(
 
     mFriendListChanged = true;
     return true;
+}
+
+static void BuddyFriendCallback(int index, void*)
+{
+    FriendManager* manager = g_pFriendManager;
+    tDebugPrintManager::Print(DC_NETWORK, "Got friendship with friend [%d].]\n", index);
+    manager->mFriendListChanged = true;
+}
+
+static void UpdateServersCallback(int error, BOOL isChanged, void*)
+{
+    if (error == 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Friends list synchronization successful (isChanged == %s)\n",
+            isChanged ? "true" : "false");
+        if (isChanged)
+        {
+            SaveLoad::StartSave(true);
+        }
+    }
+}
+
+static void FriendStatusCallback(
+    int index, u8 status, const char* statusString, void* param)
+{
+    g_pFriendManager->HandleFriendStatus(
+        index, status, statusString, param);
+}
+
+static void DeleteFriendCallback(
+    int deletedIndex, int sourceIndex, void*)
+{
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Friend [%d] was deleted (equal friend[%d]).\n",
+        deletedIndex,
+        sourceIndex);
+    SaveLoad::StartSave(true);
 }
 
 static inline bool IsValidFriendStatusHeader(const FriendStatusHeader& header)
@@ -357,8 +355,7 @@ void FriendManager::HandleFriendStatus(
     mFriendStatusChanged[index] = true;
 }
 
-FriendStatusPayload*
-FriendManager::GetFriendStatusPayload(int index)
+FriendStatusPayload* FriendManager::GetFriendStatusPayload(int index)
 {
     if (index >= 0 && static_cast<unsigned int>(index) < 64)
     {
@@ -553,8 +550,7 @@ void FriendManager::SynchronizeFriends()
     }
 }
 
-void FriendManager::SetOwnStatusInitial(
-    int available)
+void FriendManager::SetOwnStatusInitial(int available)
 {
     mFriendStatusIndex = -1;
     int currentStatus = mOwnStatus.mHeader.mStatus;
@@ -588,8 +584,7 @@ void FriendManager::SetOwnStatusDecline(int index)
         GetStatusDataSize(mOwnStatus.mHeader.mStatus));
 }
 
-void FriendManager::
-    SetOwnStatusReceivedInvitation(int index)
+void FriendManager::SetOwnStatusReceivedInvitation(int index)
 {
     mFriendStatusIndex = -1;
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
@@ -604,7 +599,7 @@ void FriendManager::
 
 void FriendManager::SetOwnStatusHostInvitingPlayer(
     int index, const GameplaySettings* gameplaySettings,
-    const CheatSettings* cheatSettings, u8 value)
+    const CheatSettings* cheatSettings, u8 stadium)
 {
     mFriendStatusIndex = index;
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
@@ -614,7 +609,7 @@ void FriendManager::SetOwnStatusHostInvitingPlayer(
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
     mOwnStatus.mGameplaySettings = *gameplaySettings;
     mOwnStatus.mPowerupSettings = *cheatSettings;
-    mOwnStatus.mStadium = value;
+    mOwnStatus.mStadium = stadium;
     mOwnStatus.mNetworkVersion = GetNetworkVersionWord();
     tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusHostInvitingPlayer forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),

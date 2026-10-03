@@ -310,7 +310,7 @@ float AvoidableFielder::GetAvoidanceStrength(
             cFielder* pTarget = 0;
             DesireRunInDirection* pDesire
                 = (DesireRunInDirection*)fn_8002E08C(m_pFielder, 12);
-            if (pDesire != 0 && pDesire->UnidentifiedIsActive())
+            if (pDesire != 0 && pDesire->IsActive())
             {
                 pTarget = pDesire->GetTarget();
             }

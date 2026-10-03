@@ -6,7 +6,7 @@
  */
 inline int GetStateMachineState(const shdStateMachine* machine)
 {
-    return machine->UnidentifiedGetState();
+    return machine->GetState();
 }
 
 /**
@@ -15,7 +15,7 @@ inline int GetStateMachineState(const shdStateMachine* machine)
 inline UnidentifiedVariantCollection* GetStateMachineParameters(
     shdStateMachine* stateMachine)
 {
-    return &stateMachine->mUnidentified01C;
+    return &stateMachine->mParameters;
 }
 
 /**

@@ -8,6 +8,7 @@
 #include "Game/CharacterLoader.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/CharacterInfo.inl"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
@@ -626,6 +627,12 @@ static void fn_8000AE7C(void* data, unsigned long size, void* param)
     CharacterLoader_8056B290::sUnidentifiedInstance.mAnimSize = size;
 }
 
+static inline void GetUncompressedAnimationPath(char* path, const char* filename, unsigned long capacity)
+{
+    nlStrNCpy(path, filename, capacity);
+    *strstr(path, ".zlib") = '\0';
+}
+
 void CharacterLoader_8056B290::fn_8000AE90()
 {
     char szPath[200];
@@ -641,8 +648,7 @@ void CharacterLoader_8056B290::fn_8000AE90()
     {
         if (g_bLoadAnimsCached)
         {
-            nlStrNCpy(szPath, szAnimFilename, sizeof(szPath));
-            *strstr(szPath, ".zlib") = '\0';
+            GetUncompressedAnimationPath(szPath, szAnimFilename, sizeof(szPath));
             nlLoadEntireCachedFileAsync(szPath, fn_8000AE7C, mCurrent, 0x20, AllocateStart, 0, 0, 0);
         }
         else
@@ -950,9 +956,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
     tCharacterTemplate* pTemplate = GetCharacterTemplate(mCurrent->cc, &bCreated);
     tCharacterTemplateInfo* pInfo = GetCharacterTemplateInfo(mCurrent->cc);
 
-    cInventory<cSHierarchy>* pHierInv = pTemplate->pHierarchyInventory;
-    u32 hash = nlStringHash(pInfo->szHierarchy);
-    cSHierarchy* pHierarchy = pHierInv->Find((unsigned int)hash);
+    cSHierarchy* pHierarchy = pTemplate->pHierarchyInventory->Find((char*)pInfo->szHierarchy);
 
     AnimRetargetList* pAnimRetargetList = 0;
     if (pTemplate->pAnimRetargetListInventory != 0)
@@ -981,7 +985,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
             char szTexPath[64];
             char szSwapPath[64];
             cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
-            const char* szName = GetCharacterInfo(mCurrent->cc).mName;
+            const char* szName = GetCharacterInfo(mCurrent->cc).GetName();
             nlSNPrintf(szTexPath, 64, "mariogoalie/mariogoalie");
             nlSNPrintf(szSwapPath, 64, "%s/%s", szName, szName);
             pChar->fn_80022DAC(glGetTexture(szTexPath));

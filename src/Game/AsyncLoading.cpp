@@ -467,7 +467,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 19:
         SetLoadingComment("AsyncFinalizeCameraLoading");
-        FinishLoadingStepOrUndo(this, fn_800F08A4());
+        FinishLoadingStepOrUndo(this, AsyncFinalizeCameraLoading());
         break;
     case 20:
         SetLoadingComment("AsyncFinalizeGameWorldLoading");
@@ -563,16 +563,16 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 36:
     {
-        bool stadiumViewer = m_SP[-1] != 0;
+        bool frontEnd = m_SP[-1] != 0;
         m_SP--;
         SetLoadingComment("AsyncStartCameraLoading");
-        fn_800F030C(stadiumViewer);
+        AsyncStartCameraLoading(frontEnd);
         FinishLoadingStep(this);
         break;
     }
     case 37:
         SetLoadingComment("AsyncStartCameraLoadingForStadiumViewer");
-        fn_800F06D4();
+        AsyncStartCameraLoadingForStadiumViewer();
         break;
     case 38:
         fn_8011A2E8(this);

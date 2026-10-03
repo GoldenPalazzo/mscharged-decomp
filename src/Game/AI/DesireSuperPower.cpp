@@ -173,10 +173,10 @@ DesireSuperPower::DesireSuperPower()
 /**
  * Offset/Address/Size: 0x60 | 0x800C875C | size: 0x274
  */
-void DesireSuperPower::UnidentifiedSetContext(
+void DesireSuperPower::SetContext(
     UnidentifiedScriptMachine* context)
 {
-    Desire::UnidentifiedSetContext(context);
+    Desire::SetContext(context);
 
     if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
     {
@@ -189,9 +189,9 @@ void DesireSuperPower::UnidentifiedSetContext(
 /**
  * Offset/Address/Size: 0x2D4 | 0x800C89D0 | size: 0x5A8
  */
-bool DesireSuperPower::UnidentifiedInitialize(void* context)
+bool DesireSuperPower::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     fn_8002E340(m_pFielder);
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
@@ -200,7 +200,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     {
         mpTarget = 0;
         fn_8002E3F8(m_pFielder);
-        mUnidentified078 = gBowserSuperPowerTimeLimit;
+        mMaxDuration = gBowserSuperPowerTimeLimit;
         m_pFielder->fn_800501F0(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         EmitBowserSmoke(m_pFielder);
@@ -226,7 +226,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         m_pFielder->SetAnimState(104, true, 0.2f, false, false);
         m_pFielder->InitMovementFromAnim(
             0, gSuperPowerZeroVector, 1.0f, false);
-        mUnidentified078 = gDaisySuperPowerTimeLimit;
+        mMaxDuration = gDaisySuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case WARIO:
@@ -238,14 +238,14 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
                 (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
                 4.0f + lbl_806DB9D8);
         m_pFielder->fn_8004F828();
-        mUnidentified078 = gDKSuperPowerTimeLimit;
+        mMaxDuration = gDKSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case KOOPA:
         m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
-        mUnidentified078 = gSuperGrowTimeLimit;
+        mMaxDuration = gSuperGrowTimeLimit;
         fn_800367B4(m_pFielder);
         result = true;
         break;
@@ -253,20 +253,20 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
-        mUnidentified078 = gSuperGrowTimeLimit;
+        mMaxDuration = gSuperGrowTimeLimit;
         fn_800367B4(m_pFielder);
         result = true;
         break;
     case LUIGI:
         m_pFielder->fn_8004FB04();
-        mUnidentified078 = gPeachSuperPowerTimeLimit;
+        mMaxDuration = gPeachSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case YOSHI:
     {
         mpTarget = 0;
         fn_8002E3F8(m_pFielder);
-        mUnidentified078 = gPeteySuperPowerTimeLimit;
+        mMaxDuration = gPeteySuperPowerTimeLimit;
         m_pFielder->fn_800501F0(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         m_pFielder->mUnidentified408 = 0.0f;
@@ -284,7 +284,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     }
     case MARIO:
         mpTarget = 0;
-        mUnidentified078 = gWaluigiWarioSuperPowerTimeLimit;
+        mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
         m_pFielder->fn_800501F0(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         result = true;
@@ -292,7 +292,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     case PEACH:
     {
         mpTarget = 0;
-        mUnidentified078 = gWaluigiWarioSuperPowerTimeLimit;
+        mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
         m_pFielder->fn_800501F0(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
@@ -313,7 +313,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
 
     if (result)
     {
-        mUnidentified018->SetTransition("SuperPowerPlayDesire");
+        mScriptMachine->SetTransition("SuperPowerPlayDesire");
         fn_803198F4(fn_800A6968(m_pFielder->m_pTeam));
         cFielder* fielder = m_pFielder;
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
@@ -400,7 +400,7 @@ void DesireSuperPower::Update(
 /**
  * Offset/Address/Size: 0x9F0 | 0x800C90EC | size: 0x2B8
  */
-void DesireSuperPower::UnidentifiedCleanup()
+void DesireSuperPower::Cleanup()
 {
     fn_803198F4(fn_800A6968(m_pFielder->m_pTeam));
 
@@ -594,7 +594,7 @@ extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
     {
         self->m_pFielder->fn_8004FF40();
     }
-    fn_80316968(self);
+    RequestStateMachineDeactivation(self);
 }
 
 /**
@@ -662,7 +662,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
-    self->mUnidentified078 = gBowserJrSuperPowerTimeLimit;
+    self->mMaxDuration = gBowserJrSuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
         == (eFielderActionState)29;
 }
@@ -781,7 +781,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
-    self->mUnidentified078 = gDiddySuperPowerTimeLimit;
+    self->mMaxDuration = gDiddySuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
         == (eFielderActionState)29;
 }
@@ -831,7 +831,7 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
-        mUnidentifiedTimer.Countup(scaledDelta - fDeltaT, 10.0f);
+        mAgeTimer.Countup(scaledDelta - fDeltaT, 10.0f);
     }
     if (update->mData.i != 0)
     {
@@ -875,7 +875,7 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
-        mUnidentifiedTimer.Countup(scaledDelta - fDeltaT, 10.0f);
+        mAgeTimer.Countup(scaledDelta - fDeltaT, 10.0f);
     }
     if (update->mData.i != 0)
     {
@@ -1309,7 +1309,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
     UnidentifiedVariant_80054AB8 result(FT_INT, gChooseDirectionContinueResult);
-    if (machine->UnidentifiedGetState() != 12)
+    if (machine->GetState() != 12)
         return UnidentifiedVariant_80054AB8(FT_INT, gChooseDirectionFinishedResult);
     UnidentifiedFielderRef fielder = { (cFielder*)value.mData.pointer };
     fn_8002E08C(fielder.mFielder, 23);
@@ -1398,7 +1398,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 result.SetParameter(13, FuzzyVariant(gChooseDirectionNextSpeed));
                 result.SetParameter(10, FuzzyVariant((void*)ChooseDirectionTransition));
             }
-            if (fielder.mFielder->mUnidentified3DC && machine->UnidentifiedGetState() == 12)
+            if (fielder.mFielder->mUnidentified3DC && machine->GetState() == 12)
             {
                 unsigned short absolute = nlAbsAngle(nlAbsAngle(
                     nlAngleDelta(fielder.mFielder->mUnidentified024.m_aActualFacingDirection, angle)));
@@ -1648,7 +1648,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
         self->m_pFielder->StartRunning();
     }
     fn_800395C0(self->m_pFielder);
-    self->mUnidentified078 = gYoshiSuperPowerTimeLimit;
+    self->mMaxDuration = gYoshiSuperPowerTimeLimit;
     return true;
 }
 

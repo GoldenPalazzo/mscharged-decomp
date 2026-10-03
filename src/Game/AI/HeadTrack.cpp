@@ -1,6 +1,8 @@
 #include "Game/AI/HeadTrack.h"
 #include "NL/nlMath.inl"
 
+u16 g_headTrackSyncLogType = 0xFFFF;
+
 void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
     const nlMatrix4& m4ConstraintMatrix, float fDeltaT,
     unsigned short aOOIConstraint, int nHeadSpinMax, int nHeadTiltMax)

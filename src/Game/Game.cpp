@@ -85,8 +85,6 @@
 #include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
-extern float (*lbl_806DF560)();
-extern float (*lbl_806DF564)();
 extern "C" const nlVector3 lbl_804DBFE8;
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
@@ -698,14 +696,14 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     if (IsNetworkOrRecordedGame())
     {
         fn_8031A0FC(lbl_806E3740);
-        lbl_806DF560 = fn_80056CA4;
-        lbl_806DF564 = fn_80056CA4;
+        gAIProfilingClock = fn_80056CA4;
+        gAIActivityClock = fn_80056CA4;
     }
     else
     {
         fn_8031A0FC(lbl_806E3748);
-        lbl_806DF560 = fn_80056CD0;
-        lbl_806DF564 = fn_80056CA4;
+        gAIProfilingClock = fn_80056CD0;
+        gAIActivityClock = fn_80056CA4;
     }
 }
 

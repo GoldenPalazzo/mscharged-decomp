@@ -46,7 +46,7 @@ SlotPool<FuzzyActionQueueEntry> g_FuzzyActionQueuePool(16, 16);
 
 FuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
 {
-    return mUnidentified018->mAIContext->mRuntime;
+    return mScriptMachine->mAIContext->mRuntime;
 }
 
 FuzzyRuntimeBase* UnidentifiedScriptMachine::GetFuzzyRuntime()
@@ -764,7 +764,7 @@ extern "C" void FuzzySetActionSelection(
 extern "C" void FuzzySetTransition(
     void*, shdStateMachine* state, const char* name)
 {
-    UnidentifiedScriptMachine* machine = state->mUnidentified018;
+    UnidentifiedScriptMachine* machine = state->mScriptMachine;
     machine->SetTransition(name);
 }
 

@@ -206,13 +206,13 @@ void FielderDesireMachine::Reset(bool param)
 void FielderDesireMachine::Update(float deltaTime)
 {
     Desire* frozen = fn_8002E08C(GetFielder(), 29);
-    if (frozen->UnidentifiedIsActive())
+    if (frozen->IsActive())
     {
         UnidentifiedVariant_80054AB8 result;
-        fn_80317010(frozen, &result, true, deltaTime);
+        UpdateStateMachine(frozen, &result, true, deltaTime);
         if (result.mData.pointer != 0)
         {
-            fn_80316968(frozen);
+            RequestStateMachineDeactivation(frozen);
         }
         return;
     }
@@ -370,8 +370,8 @@ void FielderDesireMachine::UnidentifiedVirtual6()
 {
     if (mUnidentified004 != 0)
     {
-        fn_80316980(mUnidentified004, true);
-        if (mUnidentified004->UnidentifiedGetState() != 21)
+        DeactivateStateMachine(mUnidentified004, true);
+        if (mUnidentified004->GetState() != 21)
         {
             mUnidentified008 = mUnidentified004;
         }

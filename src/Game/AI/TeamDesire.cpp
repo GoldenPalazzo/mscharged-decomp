@@ -7,14 +7,14 @@ TeamDesire::TeamDesire(
     int state, TransitionFunc& transition)
     : shdStateMachine(state, transition)
 {
-    mUnidentified080 = 0.33f;
-    mUnidentified084 = 1.0f;
+    mDefaultMinDuration = 0.33f;
+    mDefaultMaxDuration = 1.0f;
 }
 
-void TeamDesire::UnidentifiedSetContext(
+void TeamDesire::SetContext(
     UnidentifiedScriptMachine* context)
 {
-    shdStateMachine::UnidentifiedSetContext(context);
+    shdStateMachine::SetContext(context);
     if (context != 0)
     {
         m_pTeam = (cTeam*)context->mAIContext->mData.pointer;
@@ -25,12 +25,12 @@ void TeamDesire::UnidentifiedSetContext(
     }
 }
 
-bool TeamDesire::UnidentifiedReinitialize(void*)
+bool TeamDesire::Reinitialize(void*)
 {
     return true;
 }
 
-void TeamDesire::UnidentifiedCleanup()
+void TeamDesire::Cleanup()
 {
 }
 

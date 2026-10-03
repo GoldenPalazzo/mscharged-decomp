@@ -47,9 +47,9 @@ int gTransDesireDefendPosContinue = DESIRE_CONTINUE;
 /**
  * Offset/Address/Size: 0x0 | 0x800B6DC0 | size: 0x48
  */
-bool DesireMark::UnidentifiedInitialize(void* context)
+bool DesireMark::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return result;
@@ -194,7 +194,7 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
 /**
  * Offset/Address/Size: 0x1C9C | 0x800B8A5C | size: 0x40
  */
-bool DesireDefendPos::UnidentifiedInitialize(void*)
+bool DesireDefendPos::Initialize(void*)
 {
     mvDesiredPosition = m_pFielder->mUnidentified024.m_v3Position;
     mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
@@ -343,7 +343,7 @@ void DesireDefendPos::Update(
 /**
  * Offset/Address/Size: 0x225C | 0x800B901C | size: 0x4
  */
-void DesireDefendPos::UnidentifiedCleanup()
+void DesireDefendPos::Cleanup()
 {
 }
 

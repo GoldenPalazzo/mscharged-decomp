@@ -4,6 +4,7 @@
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/FormationDefines.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidController.h"
 #include "Game/AI/AIPad.h"
@@ -48,7 +49,6 @@ static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& 
 static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
 extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
-extern float (*lbl_806DF564)();
 extern "C" const nlVector3& fn_80040234(cFielder*);
 nlVector2 lbl_806DC3D8 = { 10.0f, 10.0f };
 nlVector2 lbl_806DC3E0 = { 21845.0f, 0.0f };
@@ -776,7 +776,7 @@ extern "C" float fn_800D7988(int nAction, cFielder* pFielder)
 
     Desire* pDesire = fn_8002E08C(pFielder, nAction);
     int bActive = 0;
-    if ((pDesire != NULL) && pDesire->mUnidentifiedActive)
+    if ((pDesire != NULL) && pDesire->mActive)
     {
         bActive = 1;
     }
@@ -803,8 +803,8 @@ extern "C" float fn_800D79F4(int nAction, cFielder* pFielder)
     Desire* pDesire = fn_8002E08C(pFielder, nAction);
     if (pDesire != NULL)
     {
-        float fStartTime = pDesire->mUnidentified014;
-        fScore = NormalizeVal(lbl_806DF564() - fStartTime, lbl_806E41E0);
+        float fStartTime = pDesire->mLastActiveTime;
+        fScore = NormalizeVal(gAIActivityClock() - fStartTime, lbl_806E41E0);
     }
     return fScore;
 }
@@ -819,7 +819,7 @@ extern "C" float fn_800D7A70(cFielder* pFielder)
     shdStateMachine* pState = fn_8002E1A4(pFielder)->mUnidentified004;
     if (pState != NULL)
     {
-        pState->mUnidentifiedTimer.GetSeconds();
+        pState->mAgeTimer.GetSeconds();
     }
     return 1.0f;
 }
@@ -1645,7 +1645,7 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
 
     float fScore = 0.0f;
     DesireGooey* pDesire = (DesireGooey*)fn_8002E08C(pFielder, 27);
-    if (pDesire != NULL && pDesire->UnidentifiedIsActive())
+    if (pDesire != NULL && pDesire->IsActive())
     {
         fScore = pDesire->fn_800BD1F0();
     }
@@ -1661,7 +1661,7 @@ extern "C" float fn_800DA130(cFielder* pFielder)
 
     float fResult = 0.0f;
     Desire* pDesire = fn_8002E08C(pFielder, 0x1E);
-    if ((pDesire != NULL) && pDesire->mUnidentifiedActive)
+    if ((pDesire != NULL) && pDesire->mActive)
     {
         fResult = 1.0f;
     }
@@ -3340,7 +3340,7 @@ extern "C" float fn_800DF028(cFielder* pFielder)
     DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
     if (pFielder->m_eActionState == ACTION_ONETIMER
         || pFielder->m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
-        || (pDesire != NULL && pDesire->UnidentifiedIsActive() && pDesire->IsOneTouchShot()))
+        || (pDesire != NULL && pDesire->IsActive() && pDesire->IsOneTouchShot()))
     {
         fScore = 1.0f;
     }
