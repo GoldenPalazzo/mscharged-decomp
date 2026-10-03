@@ -268,7 +268,7 @@ float cFielder::GetSuperPowerTankFraction()
     return mUnidentified3E0 / mUnidentified3E4;
 }
 
-void cFielder::fn_80050008()
+void cFielder::ClearSuperPowerTank()
 {
     mUnidentified3E0 = 0.0f;
     mUnidentified3E4 = 0.0f;
@@ -347,7 +347,7 @@ void cFielder::fn_8005001C(bool bForce)
     }
 }
 
-void cFielder::fn_800501F0(bool bParam)
+void cFielder::InitSuperPowerTank(bool bTurnOn)
 {
     switch (mUnidentified024.m_eCharacterClass)
     {
@@ -371,13 +371,13 @@ void cFielder::fn_800501F0(bool bParam)
 
     mUnidentified3E0 = mUnidentified3E4;
 
-    if (bParam)
+    if (bTurnOn)
     {
-        fn_80050284();
+        TurnOnSuperPowerTank();
     }
 }
 
-bool cFielder::fn_80050284()
+bool cFielder::TurnOnSuperPowerTank()
 {
     if (!fn_8002EDC8(this, -1))
     {

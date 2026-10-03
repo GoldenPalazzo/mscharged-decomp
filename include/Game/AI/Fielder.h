@@ -399,10 +399,10 @@ public:
     void ActionPeachSuper(float fDeltaT);
     void fn_8004FF40();
     float GetSuperPowerTankFraction();
-    void fn_80050008();
+    void ClearSuperPowerTank();
     void fn_8005001C(bool bForce);
-    void fn_800501F0(bool bParam);
-    bool fn_80050284();
+    void InitSuperPowerTank(bool bTurnOn);
+    bool TurnOnSuperPowerTank();
     void fn_80045AEC(PhysicsObject* pObject);
     void ActionPostWhistle(float fDeltaT);
     void ShootBallDueToContact(const nlVector3& v3IncomingVelocity);
