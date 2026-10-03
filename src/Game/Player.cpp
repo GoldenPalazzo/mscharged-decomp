@@ -1402,8 +1402,8 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
         ballPosition.y = g_pBall->m_v3Position.y;
         if (region.ContainsPoint2D(ballPosition))
         {
-            if (gNPCManager->mUnidentified02C != NULL && gNPCManager->mUnidentified02C->mVisible)
-                gNPCManager->mUnidentified02C->Deactivate(false);
+            if (gNPCManager->mpKoopaShell != NULL && gNPCManager->mpKoopaShell->mVisible)
+                gNPCManager->mpKoopaShell->Deactivate(false);
             if (gNPCManager->mpBirdoEgg != NULL && gNPCManager->mpBirdoEgg->mVisible)
                 gNPCManager->mpBirdoEgg->Hide(false);
             g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
@@ -1499,9 +1499,9 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
     if (gNPCManager != NULL)
     {
         gNPCManager->ResetActiveHammers();
-        if (gNPCManager->mUnidentified024 != NULL)
+        if (gNPCManager->mpYoshiEgg != NULL)
         {
-            gNPCManager->mUnidentified024->Deactivate(true);
+            gNPCManager->mpYoshiEgg->Deactivate(true);
         }
     }
 }

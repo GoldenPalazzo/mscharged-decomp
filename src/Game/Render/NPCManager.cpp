@@ -44,11 +44,11 @@ NPCManager::NPCManager()
     , mTransientHierarchies(0)
     , mPendingTemplate(0)
     , mpChainChomp(0)
-    , mUnidentified024(0)
+    , mpYoshiEgg(0)
     , mpBirdoEgg(0)
-    , mUnidentified02C(0)
-    , mUnidentified030(0)
-    , mUnidentified054(0)
+    , mpKoopaShell(0)
+    , mNumVisibleDaisyFists(0)
+    , mNumBulletBills(0)
     , mpDiddyBanana(0)
 {
     gNPCManagerInstance = this;
@@ -60,11 +60,11 @@ NPCManager::NPCManager()
     unsigned int i;
     for (i = 0; i < 15; ++i)
     {
-        mUnidentified070[i] = 0;
+        mHammers[i] = 0;
     }
     for (i = 0; i < 6; ++i)
     {
-        mUnidentified058[i] = 0;
+        mBulletBills[i] = 0;
     }
     for (i = 0; i < 8; ++i)
     {
@@ -72,7 +72,7 @@ NPCManager::NPCManager()
     }
     for (i = 0; i < 3; ++i)
     {
-        mUnidentified0CC[i] = 0;
+        mWindDebris[i] = 0;
     }
     for (i = 0; i < 8; ++i)
     {
@@ -146,7 +146,7 @@ void NPCManager::CreateChainChomp()
 
 void NPCManager::CreateYoshiEgg()
 {
-    mUnidentified024 = new (8, false) YoshiEggObject(GetRenderObject(3, 0));
+    mpYoshiEgg = new (8, false) YoshiEggObject(GetRenderObject(3, 0));
 }
 
 void NPCManager::CreateBirdoEgg()
@@ -158,7 +158,7 @@ void NPCManager::CreateBirdoEgg()
 
 void NPCManager::CreateKoopaShell()
 {
-    mUnidentified02C = new (8, false) KoopaShellObject(GetRenderObject(5, 0));
+    mpKoopaShell = new (8, false) KoopaShellObject(GetRenderObject(5, 0));
 }
 
 void NPCManager::CreateDaisyFists()
@@ -185,7 +185,7 @@ DaisyFistObject* NPCManager::GetDaisyFist(int nIndex)
         pObject = mDaisyFists[i];
         if (pObject != 0 && !pObject->mVisible)
         {
-            mUnidentified030 = 8;
+            mNumVisibleDaisyFists = 8;
             return mDaisyFists[i];
         }
     }
@@ -194,7 +194,7 @@ DaisyFistObject* NPCManager::GetDaisyFist(int nIndex)
 
 BulletBillObject* NPCManager::GetBulletBill(int nIndex)
 {
-    return mUnidentified058[nIndex];
+    return mBulletBills[nIndex];
 }
 
 BulletBillObject* NPCManager::fn_801A9D20()
@@ -202,12 +202,12 @@ BulletBillObject* NPCManager::fn_801A9D20()
     BulletBillObject* pObject = 0;
     for (unsigned int i = 0; i < 6; ++i)
     {
-        if (mUnidentified058[i] == 0)
+        if (mBulletBills[i] == 0)
         {
             pObject = new (8, false) BulletBillObject(
                 GetRenderObject(1, i), i, lbl_806E5210, lbl_806E5214);
-            mUnidentified058[i] = pObject;
-            mUnidentified054 = i + 1;
+            mBulletBills[i] = pObject;
+            mNumBulletBills = i + 1;
             break;
         }
     }
@@ -216,7 +216,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
 
 UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
 {
-    return mUnidentified0CC[nIndex];
+    return mWindDebris[nIndex];
 }
 
 void NPCManager::CreateWindDebris()
@@ -234,7 +234,7 @@ void NPCManager::CreateWindDebris()
             pConfig->mCueId, pConfig->mUnidentified010,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
-        mUnidentified0CC[i] = pObject;
+        mWindDebris[i] = pObject;
         pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::fn_801B4830);
     }
 }
@@ -257,20 +257,20 @@ void NPCManager::CreateHammers()
         HammerObject* pObject
             = (HammerObject*)nlMalloc(sizeof(HammerObject), 8, false);
         pObject = new (pObject) HammerObject(i, lbl_806DD000);
-        mUnidentified070[i] = pObject;
+        mHammers[i] = pObject;
     }
 }
 
 int NPCManager::GetNumHammers()
 {
-    return mUnidentified070[0] == 0 ? 0 : 15;
+    return mHammers[0] == 0 ? 0 : 15;
 }
 
 void NPCManager::ResetActiveHammers()
 {
     for (int i = 0; i < 15; ++i)
     {
-        HammerObject* pObject = mUnidentified070[i];
+        HammerObject* pObject = mHammers[i];
         if (pObject != 0 && pObject->mActive)
         {
             pObject->Reset(true);
@@ -282,14 +282,14 @@ HammerObject* NPCManager::GetHammer(int nIndex)
 {
     if (nIndex >= 0)
     {
-        return mUnidentified070[nIndex];
+        return mHammers[nIndex];
     }
 
     for (int i = 0; i < 15; ++i)
     {
-        if (mUnidentified070[i] != 0 && !mUnidentified070[i]->mActive)
+        if (mHammers[i] != 0 && !mHammers[i]->mActive)
         {
-            return mUnidentified070[i];
+            return mHammers[i];
         }
     }
     return 0;
@@ -462,20 +462,20 @@ static inline void DestroyNPCs(NPCManager* pManager)
         pManager->mpDiddyBanana = 0;
     }
 
-    if (pManager->mUnidentified024 != 0)
+    if (pManager->mpYoshiEgg != 0)
     {
-        delete pManager->mUnidentified024;
-        pManager->mUnidentified024 = 0;
+        delete pManager->mpYoshiEgg;
+        pManager->mpYoshiEgg = 0;
     }
     if (pManager->mpBirdoEgg != 0)
     {
         delete pManager->mpBirdoEgg;
         pManager->mpBirdoEgg = 0;
     }
-    if (pManager->mUnidentified02C != 0)
+    if (pManager->mpKoopaShell != 0)
     {
-        delete pManager->mUnidentified02C;
-        pManager->mUnidentified02C = 0;
+        delete pManager->mpKoopaShell;
+        pManager->mpKoopaShell = 0;
     }
 
     for (unsigned int i = 0; i < 8; ++i)
@@ -488,27 +488,27 @@ static inline void DestroyNPCs(NPCManager* pManager)
     }
     for (unsigned int i = 0; i < 6; ++i)
     {
-        if (pManager->mUnidentified058[i] != 0)
+        if (pManager->mBulletBills[i] != 0)
         {
-            delete pManager->mUnidentified058[i];
-            pManager->mUnidentified058[i] = 0;
+            delete pManager->mBulletBills[i];
+            pManager->mBulletBills[i] = 0;
         }
     }
-    pManager->mUnidentified054 = 0;
+    pManager->mNumBulletBills = 0;
     for (unsigned int i = 0; i < 15; ++i)
     {
-        if (pManager->mUnidentified070[i] != 0)
+        if (pManager->mHammers[i] != 0)
         {
-            delete pManager->mUnidentified070[i];
-            pManager->mUnidentified070[i] = 0;
+            delete pManager->mHammers[i];
+            pManager->mHammers[i] = 0;
         }
     }
     for (int i = 0; i < 3; ++i)
     {
-        if (pManager->mUnidentified0CC[i] != 0)
+        if (pManager->mWindDebris[i] != 0)
         {
-            delete pManager->mUnidentified0CC[i];
-            pManager->mUnidentified0CC[i] = 0;
+            delete pManager->mWindDebris[i];
+            pManager->mWindDebris[i] = 0;
         }
     }
     for (unsigned int i = 0; i < 8; ++i)
@@ -587,24 +587,24 @@ void NPCManager::RenderNPCs()
 void NPCManager::UpdateAINPCs(float dt)
 {
     mpChainChomp->Update(dt);
-    if (mUnidentified024 != 0)
+    if (mpYoshiEgg != 0)
     {
-        mUnidentified024->Update(dt);
+        mpYoshiEgg->Update(dt);
     }
     if (mpBirdoEgg != 0)
     {
         mpBirdoEgg->Update(dt);
     }
-    if (mUnidentified02C != 0)
+    if (mpKoopaShell != 0)
     {
-        mUnidentified02C->Update(dt);
+        mpKoopaShell->Update(dt);
     }
     if (mpDiddyBanana != 0)
     {
         mpDiddyBanana->Update(dt);
     }
 
-    mUnidentified030 = 0;
+    mNumVisibleDaisyFists = 0;
     unsigned int i;
     for (i = 0; i < 8; ++i)
     {
@@ -613,26 +613,26 @@ void NPCManager::UpdateAINPCs(float dt)
             mDaisyFists[i]->Update(dt);
             if (mDaisyFists[i]->mVisible)
             {
-                ++mUnidentified030;
+                ++mNumVisibleDaisyFists;
             }
         }
     }
-    for (i = 0; i < mUnidentified054; ++i)
+    for (i = 0; i < mNumBulletBills; ++i)
     {
-        mUnidentified058[i]->Update(dt);
+        mBulletBills[i]->Update(dt);
     }
     for (i = 0; i < 15; ++i)
     {
-        if (mUnidentified070[i] != 0)
+        if (mHammers[i] != 0)
         {
-            mUnidentified070[i]->Update(dt);
+            mHammers[i]->Update(dt);
         }
     }
     for (i = 0; i < 3; ++i)
     {
-        if (mUnidentified0CC[i] != 0)
+        if (mWindDebris[i] != 0)
         {
-            mUnidentified0CC[i]->Update(dt);
+            mWindDebris[i]->Update(dt);
         }
     }
     for (i = 0; i < 8; ++i)
@@ -651,17 +651,17 @@ void NPCManager::ResetNPCs()
     {
         mpChainChomp->Hide();
     }
-    if (mUnidentified024 != 0)
+    if (mpYoshiEgg != 0)
     {
-        mUnidentified024->Reset();
+        mpYoshiEgg->Reset();
     }
     if (mpBirdoEgg != 0)
     {
         mpBirdoEgg->Reset();
     }
-    if (mUnidentified02C != 0)
+    if (mpKoopaShell != 0)
     {
-        mUnidentified02C->Reset();
+        mpKoopaShell->Reset();
     }
     if (mpDiddyBanana != 0)
     {
@@ -675,24 +675,24 @@ void NPCManager::ResetNPCs()
         {
             mDaisyFists[i]->Reset();
         }
-        mUnidentified030 = 0;
+        mNumVisibleDaisyFists = 0;
     }
-    for (i = 0; i < mUnidentified054; ++i)
+    for (i = 0; i < mNumBulletBills; ++i)
     {
-        mUnidentified058[i]->Reset();
+        mBulletBills[i]->Reset();
     }
     for (i = 0; i < 15; ++i)
     {
-        if (mUnidentified070[i] != 0)
+        if (mHammers[i] != 0)
         {
-            mUnidentified070[i]->Reset(false);
+            mHammers[i]->Reset(false);
         }
     }
     for (i = 0; i < 3; ++i)
     {
-        if (mUnidentified0CC[i] != 0)
+        if (mWindDebris[i] != 0)
         {
-            mUnidentified0CC[i]->fn_801B4B9C();
+            mWindDebris[i]->fn_801B4B9C();
         }
     }
     for (i = 0; i < 8; ++i)

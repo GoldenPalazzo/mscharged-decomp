@@ -73,7 +73,7 @@ public:
     void CreateKoopaShell();
     void CreateDaisyFists();
     DaisyFistObject* GetDaisyFist(int nIndex);
-    unsigned int GetNumBulletBills() const { return mUnidentified054; }
+    unsigned int GetNumBulletBills() const { return mNumBulletBills; }
     BulletBillObject* GetBulletBill(int nIndex);
     BulletBillObject* fn_801A9D20();
     UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
@@ -130,16 +130,16 @@ public:
         mTransientTemplates;
     /* 0x1C */ NPCTemplate* mPendingTemplate;
     /* 0x20 */ ChainChomp* mpChainChomp;
-    /* 0x24 */ YoshiEggObject* mUnidentified024;
+    /* 0x24 */ YoshiEggObject* mpYoshiEgg;
     /* 0x28 */ BirdoEggObject* mpBirdoEgg;
-    /* 0x2C */ KoopaShellObject* mUnidentified02C;
-    /* 0x30 */ unsigned int mUnidentified030;
+    /* 0x2C */ KoopaShellObject* mpKoopaShell;
+    /* 0x30 */ unsigned int mNumVisibleDaisyFists;
     /* 0x34 */ DaisyFistObject* mDaisyFists[8];
-    /* 0x54 */ unsigned int mUnidentified054;
-    /* 0x58 */ BulletBillObject* mUnidentified058[6];
-    /* 0x70 */ HammerObject* mUnidentified070[15];
+    /* 0x54 */ unsigned int mNumBulletBills;
+    /* 0x58 */ BulletBillObject* mBulletBills[6];
+    /* 0x70 */ HammerObject* mHammers[15];
     /* 0xAC */ ThwompObject* mThwomps[8];
-    /* 0xCC */ UnidentifiedNPC_801B43F8* mUnidentified0CC[3];
+    /* 0xCC */ UnidentifiedNPC_801B43F8* mWindDebris[3];
     /* 0xD8 */ DiddyBanana* mpDiddyBanana;
 }; // total size: 0xDC
 

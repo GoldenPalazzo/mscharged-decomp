@@ -487,7 +487,7 @@ void DesireSuperPower::Cleanup()
         fn_80039CF0(m_pFielder, 0);
         m_pFielder->bYoshiInWindup = false;
         EmitYoshiShellBreak(m_pFielder);
-        gNPCManager->mUnidentified024->Break();
+        gNPCManager->mpYoshiEgg->Break();
         break;
     }
 
@@ -1622,7 +1622,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
  */
 extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
-    gNPCManager->mUnidentified024->Activate(self->m_pFielder);
+    gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
         = self->m_pFielder->mUnidentified328;
     fn_8002E52C(self->m_pFielder);

@@ -4222,9 +4222,9 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
                 }
                 if (GetCharacterClass() == (eCharacterClass)0x0E)
                 {
-                    if (gNPCManager->mUnidentified02C != 0)
+                    if (gNPCManager->mpKoopaShell != 0)
                     {
-                        gNPCManager->mUnidentified02C->Activate(this);
+                        gNPCManager->mpKoopaShell->Activate(this);
                     }
                 }
                 else if (GetCharacterClass() == (eCharacterClass)0x0C)
