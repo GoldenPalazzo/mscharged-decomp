@@ -433,7 +433,7 @@ config.libs = [
             Object(NonMatching, "Game/DetInput.cpp"),
             Object(Matching, "Game/EventDataTypes.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/ExcitementSystem.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Field.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Field.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Formation.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FormationDefines.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FriendManager.cpp"),
