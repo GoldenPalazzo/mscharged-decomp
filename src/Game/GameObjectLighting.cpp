@@ -150,7 +150,7 @@ TweakValueInt lbl_80570BB0(
 TweakValueInt lbl_80570BD0("siCharacterLightGreen", gLastTweakCategory, 0);
 TweakValueInt lbl_80570BF0("siCharacterLightBlue", gLastTweakCategory, 0);
 
-extern "C" void fn_80182128();
+void fn_80182128();
 
 UnidentifiedTweakAction lbl_806E1430(
     "Character Light Red", gLastTweakCategory, Function0<void>(fn_80182128));
@@ -163,9 +163,8 @@ static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };
 
 void FillInGameObjectLightRamp();
 void SetCameraRelativeLightData(void* pLightData);
-extern "C" void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview);
+void fn_80182F74(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview);
 
-extern "C" {
 int IsGameObjectLightingEnabled()
 {
     return lbl_806DCC40;
@@ -180,14 +179,12 @@ int ShouldDoubleGameObjectLighting()
 {
     return lbl_806E1412;
 }
-}
 
 bool AlwaysUseCameraRelativeCharacterLighting()
 {
     return gAlwaysUseCameraRelativeCharacterLighting;
 }
 
-extern "C" {
 void fn_80182128()
 {
     lbl_80570B80.colour.c[0] = lbl_80570BB0.value;
@@ -197,7 +194,6 @@ void fn_80182128()
 
 void fn_80182164()
 {
-}
 }
 
 void PrepareStadiumLight(StadiumLight* pLight)
@@ -215,7 +211,6 @@ void PrepareStadiumLight(StadiumLight* pLight)
     light.intensity = pLight->GetIntensity();
 }
 
-extern "C" {
 int GetGameObjectLightCount(bool arg0, bool arg1)
 {
     bool var0 = arg1 && lbl_806DCC48;
@@ -237,7 +232,7 @@ int GetGameObjectLightCount(bool arg0, bool arg1)
     }
 }
 
-GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
+GameObjectLight* GetGameObjectLight(int arg0, bool arg1)
 {
     s32 var0 = arg1 ? lbl_80570B70.value : lbl_806DCC64;
     if (!lbl_806DCC68 && lbl_806E1428 == 1)
@@ -302,7 +297,6 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
     default:
         return lbl_805709D8;
     }
-}
 }
 
 void InitializeGameObjectLighting()
@@ -516,23 +510,22 @@ static const GXLightID sSpecularLightIDs[2] = { GX_LIGHT6, GX_LIGHT7 };
 
 nlMatrix4 lbl_80570C18;
 
-extern "C" {
-u32 GetGameObjectLightTexture()
+unsigned long GetGameObjectLightTexture()
 {
     return lbl_806DCC60;
 }
 
-void SetGameObjectLightTexture(u32 texture)
+void SetGameObjectLightTexture(unsigned long texture)
 {
     lbl_806DCC60 = texture;
 }
 
-void SetGameObjectLightingMode(s32 mode)
+void SetGameObjectLightingMode(int mode)
 {
     lbl_806E1428 = mode;
 }
 
-void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
+void LoadGameObjectLights(int arg0, GLView* arg1, bool arg2)
 {
     static GLView* lbl_806E143C;
     static bool lbl_806E1440;
@@ -554,7 +547,7 @@ void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
     }
 }
 
-void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
+void fn_80182F74(int lightId, const GameObjectLight* pLight, const nlMatrix4& mview)
 {
     GXLightObj light;
     nlVector3 var1;
@@ -658,7 +651,7 @@ void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mv
     GXLoadLightObjImm(&light, sGameObjectLightIDs[lightId]);
 }
 
-void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
+void SetGameObjectLightingEnabled(bool arg0, int arg1, bool arg2)
 {
     if (arg0)
     {
@@ -685,7 +678,7 @@ void SetGameObjectLightingEnabled(bool arg0, s32 arg1, bool arg2)
     }
 }
 
-void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 exponent, const nlMatrix4& viewMatrix)
+void LoadGameObjectSpecularLight(int index, GameObjectLight* lightData, float exponent, const nlMatrix4& viewMatrix)
 {
     if (index < 0 || index >= 2)
         return;
@@ -759,7 +752,7 @@ void LoadGameObjectSpecularLight(s32 index, GameObjectLight* lightData, f32 expo
     GXLoadLightObjImm(&light, sSpecularLightIDs[index]);
 }
 
-void SetGameObjectSpecularLightingEnabled(s32 enabled, s32)
+void SetGameObjectSpecularLightingEnabled(int enabled, int)
 {
     if (enabled)
     {
@@ -789,7 +782,7 @@ void SetGameObjectSpecularLightingEnabled(s32 enabled, s32)
     }
 }
 
-void SetGameObjectAmbientLightingEnabled(s32 enabled)
+void SetGameObjectAmbientLightingEnabled(int enabled)
 {
     if (enabled)
     {
@@ -806,7 +799,7 @@ void SetGameObjectAmbientLightingEnabled(s32 enabled)
     }
 }
 
-void fn_80183764(u32 textureHandle)
+void fn_80183764(unsigned long textureHandle)
 {
     if (textureHandle != (u32)-1 && glTextureLoad(textureHandle))
     {
@@ -820,7 +813,7 @@ void fn_80183764(u32 textureHandle)
     }
 }
 
-void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
+void ApplyGameObjectShadowLighting(int arg0, unsigned long arg1)
 {
     if (!fn_80183C54())
         return;
@@ -893,7 +886,7 @@ void RestoreGameObjectShadowLighting()
     }
 }
 
-void SetGameObjectShadowModelMatrix(u32 matrix)
+void SetGameObjectShadowModelMatrix(unsigned long matrix)
 {
     if (!fn_80183C54())
         return;
@@ -936,7 +929,6 @@ bool fn_80183C54()
         return false;
 
     return true;
-}
 }
 
 nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)

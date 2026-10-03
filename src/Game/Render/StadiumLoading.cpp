@@ -28,11 +28,11 @@
 #include "NL/nlTask.h"
 #include "Game/Render/HighRange.h"
 #include "Game/Render/PlanarShadowDrawable.h"
+#include "Game/GameObjectLighting.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 extern "C"
 {
-    void fn_80182164();
     DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
     void fn_80278818(BasicStadium* stadium);
     float fn_802789A0(BasicStadium* stadium);
