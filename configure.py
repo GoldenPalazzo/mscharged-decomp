@@ -417,7 +417,7 @@ config.libs = [
         "objects": [
             # Game
             Object(Matching, "Game/AIPad.cpp"),
-            Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AsyncLoading.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/Ball.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/BasicStadium.cpp", extra_cflags=["-ipa file"]),

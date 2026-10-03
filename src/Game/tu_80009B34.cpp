@@ -1182,8 +1182,3 @@ static TweakBoolBinding sUnidentifiedLoadAnimsCachedTweak(
 CharacterLoader_8056B290 CharacterLoader_8056B290::sUnidentifiedInstance;
 
 #include "NL/nlstring_impl.h"
-
-int nlPrintf(const char* format, ...)
-{
-    return 0;
-}
