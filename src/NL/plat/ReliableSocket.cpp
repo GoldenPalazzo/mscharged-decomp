@@ -482,47 +482,47 @@ void ReliableSocket::RejectConnection(unsigned int connection)
     ((TransportConnection*)connection)->Reject();
 }
 
-static TweakIntBinding lbl_80584530(
+static TweakIntBinding sTransportLayerLogTweak(
     "g_TransportLayerLog", "Network/TransportLayer", &g_TransportLayerLog, false);
-static TweakBoolBinding lbl_80584550(
+static TweakBoolBinding sDisplayScreenPrinterTweak(
     "s_bDisplayScreenPrinter", "Network/TransportLayer", &s_bDisplayScreenPrinter, false);
-static TweakBoolBinding lbl_80584570(
+static TweakBoolBinding sDisplayBWTweak(
     "s_bDisplayBW", "Network/TransportLayer", &s_bDisplayBW, false);
-static TweakIntBinding lbl_80584590(
+static TweakIntBinding sPayloadRedundancyTweak(
     "s_nPayloadRedundancy", "Network/TransportLayer", &s_nPayloadRedundancy, false);
-static TweakIntBinding lbl_805845B0(
+static TweakIntBinding sPacketRedundancyTweak(
     "s_nPacketRedundancy", "Network/TransportLayer", &s_nPacketRedundancy, false);
-static TweakIntBinding lbl_805845D0(
+static TweakIntBinding sSendKeepAliveMSTweak(
     "s_nSendKeepAliveMS", "Network/TransportLayer", &s_nSendKeepAliveMS, false);
-static TweakIntBinding lbl_805845F0(
+static TweakIntBinding sExpireKeepAliveMSTweak(
     "s_nExpireKeepAliveMS", "Network/TransportLayer", &s_nExpireKeepAliveMS, false);
-static TweakBoolBinding lbl_80584610(
+static TweakBoolBinding sExpireKeepAliveEnabledTweak(
     "s_bExpireKeepAliveEnabled", "Network/TransportLayer", &s_bExpireKeepAliveEnabled, false);
-static TweakIntBinding lbl_80584630(
+static TweakIntBinding sSendVoiceMSTweak(
     "s_nSendVoiceMS", "Network/TransportLayer", &s_nSendVoiceMS, false);
-static TweakIntBinding lbl_80584650(
+static TweakIntBinding sSendVoiceHighwaterNumTweak(
     "s_nSendVoiceHighwaterNum", "Network/TransportLayer", &s_nSendVoiceHighwaterNum, false);
-static TweakIntBinding lbl_80584670(
+static TweakIntBinding sSendPendingAckMSTweak(
     "s_nSendPendingAckMS", "Network/TransportLayer", &s_nSendPendingAckMS, false);
-static TweakIntBinding lbl_80584690(
+static TweakIntBinding sResendNormalMSTweak(
     "s_nResendNormalMS", "Network/TransportLayer", &s_nResendNormalMS, false);
-static TweakBoolBinding lbl_805846B0(
+static TweakBoolBinding sResendNormalAggressiveTweak(
     "s_nResendNormalAggressive", "Network/TransportLayer", &s_nResendNormalAggressive, false);
-static TweakIntBinding lbl_805846D0(
+static TweakIntBinding sResendGroupMSTweak(
     "s_nResendGroupMS", "Network/TransportLayer", &s_nResendGroupMS, false);
-static TweakIntBinding lbl_805846F0(
+static TweakIntBinding sSendPingMSTweak(
     "s_nSendPingMS", "Network/TransportLayer", &s_nSendPingMS, false);
-static TweakIntBinding lbl_80584710(
+static TweakIntBinding sConnectClientTimeoutMSTweak(
     "s_nConnectClientTimeoutMS", "Network/TransportLayer", &s_nConnectClientTimeoutMS, false);
-static TweakIntBinding lbl_80584730(
+static TweakIntBinding sConnectServerTimeoutMSTweak(
     "s_nConnectServerTimeoutMS", "Network/TransportLayer", &s_nConnectServerTimeoutMS, false);
-static TweakIntBinding lbl_80584750(
+static TweakIntBinding sClosingTimeoutMSTweak(
     "s_nClosingTimeoutMS", "Network/TransportLayer", &s_nClosingTimeoutMS, false);
-static TweakIntBinding lbl_80584770(
+static TweakIntBinding sSendEveryNthFrameTweak(
     "s_nSendEveryNthFrame", "Network/TransportLayer", &s_nSendEveryNthFrame, false);
-static TweakBoolBinding lbl_80584790(
+static TweakBoolBinding sLogTLTweak(
     "s_bLogTL", "Network/TransportLayer", &s_bLogTL, false);
-static TweakBoolBinding lbl_805847B0(
+static TweakBoolBinding sLogTLUseCacheTweak(
     "s_bLogTLUseCache", "Network/TransportLayer", &s_bLogTLUseCache, false);
-static TweakIntBinding lbl_805847D0(
+static TweakIntBinding sBWWindowMSTweak(
     "s_nBWWindowMS", "Network/TransportLayer", &s_nBWWindowMS, false);
