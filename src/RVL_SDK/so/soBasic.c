@@ -279,7 +279,7 @@ int SOGetSockName(int s, void* sockAddr)
 
         args[0] = s;
         addrBuffer = (SOSockAddr*)((u8*)args + 32);
-        memcpy(addrBuffer, addr, addr->len);
+        memcpy((u8*)args + 32, addr, addr->len);
         result = IOS_Ioctl(rmId, NET_SO_GETSOCKNAME, args, 4, addrBuffer, addr->len);
         if (result >= 0)
         {
