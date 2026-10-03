@@ -205,15 +205,10 @@ private:
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C7A8(PlayerTweaks*);
 extern "C" float fn_8002C7D0(PlayerTweaks*);
-extern "C" float fn_8002C7F4(PlayerTweaks*);
 extern "C" float fn_8002C8D4(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002CD2C(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002CF88(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CF9C(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CFB0(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CFD8(PlayerTweaks*);
 extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
@@ -227,14 +222,9 @@ extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value);
 extern "C" float fn_8002C0AC(PlayerTweaks* tweaks);
 extern "C" float fn_8002C180(PlayerTweaks* tweaks);
 extern "C" float fn_8002C254(const PlayerTweaks* tweaks);
-extern "C" float fn_8002C678(PlayerTweaks* tweaks);
-extern "C" float fn_8002C6E8(PlayerTweaks*);
-extern "C" float fn_8002C730(PlayerTweaks* tweaks);
-extern "C" float fn_8002C7E8(PlayerTweaks* tweaks);
 extern "C" float fn_8002C800(PlayerTweaks* tweaks);
 extern "C" float fn_8002CF10(PlayerTweaks*);
 extern "C" float fn_8002CF24(PlayerTweaks*);
-extern "C" float fn_8002CFC4(PlayerTweaks*);
 
 // C++ accessors from Game/CharacterTweaks.cpp.
 float GetOffensiveRating(PlayerTweaks*);
@@ -244,11 +234,21 @@ float GetJogTurnSpeed(PlayerTweaks*);
 float GetRunWBAccel(PlayerTweaks*);
 float GetRunWBTurnSpeed(PlayerTweaks*);
 float GetTurboWBSpeed(PlayerTweaks*);
+float GetFastestGroundPassSpeed(PlayerTweaks*);
+float GetSlowestGroundPassSpeed(PlayerTweaks*);
+float GetFastestVolleyPassSpeed(PlayerTweaks*);
+float GetOneTimerMaxSpeed(PlayerTweaks*);
+float GetShootingWindupTime(PlayerTweaks*);
+float GetShootingWindupTotalTime(PlayerTweaks*);
 float GetStrafeAccel(PlayerTweaks*);
 float GetStrafeTurnSpeed(PlayerTweaks*);
 float GetStrafeTurnFalloff(PlayerTweaks*);
 float GetStrafeDecel(PlayerTweaks*);
 float GetRunWBTurnFalloff(PlayerTweaks*);
 float GetRunWBDecel(PlayerTweaks*);
+float GetShotWindupTurnSpeed(PlayerTweaks*);
+float GetShotWindupTurnFalloff(PlayerTweaks*);
+float GetShotWindupDecel(PlayerTweaks*);
+float GetSlowestVolleyPassSpeed(PlayerTweaks*);
 
 #endif // GAME_CHARACTER_TWEAKS_H

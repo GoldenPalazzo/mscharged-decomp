@@ -157,7 +157,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
     float fCombinedValue = (fDirectionValue + fDistanceValue) / 2.0f;
 
     m_fSpeedValue = InterpolateRangeClamped(0.2f,
-        fn_8002C7A8(pFielder->GetTweaks()),
+        GetOneTimerMaxSpeed(pFielder->GetTweaks()),
         0.0f,
         1.0f,
         fCombinedValue);
@@ -281,8 +281,8 @@ void ShotMeter::Reset(cFielder* pFielder)
     m_fScoreValue = 0.0f;
     m_fSpeedValue = 0.0f;
     m_fSTSValue = 0.0f;
-    mUnidentified008 = fn_8002C7E8(pFielder->GetTweaks());
-    mUnidentified00C = fn_8002C7F4(pFielder->GetTweaks());
+    mUnidentified008 = GetShootingWindupTime(pFielder->GetTweaks());
+    mUnidentified00C = GetShootingWindupTotalTime(pFielder->GetTweaks());
 }
 
 void ShotMeter::ShotReleased(cFielder* pFielder)

@@ -1018,8 +1018,8 @@ void cFielder::fn_80043C18(float fDeltaT)
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
-                fn_8002CF88(this->GetTweaks()),
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnSpeed(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             true);
 
@@ -1210,8 +1210,8 @@ void cFielder::fn_80044290(float fDeltaT)
             SetFacingDirection(
                 SeekDirection(mUnidentified024.m_aActualFacingDirection,
                     mUnidentified024.m_aDesiredFacingDirection,
-                    fn_8002CF88(this->GetTweaks()),
-                    fn_8002CF9C(this->GetTweaks()),
+                    GetShotWindupTurnSpeed(this->GetTweaks()),
+                    GetShotWindupTurnFalloff(this->GetTweaks()),
                     fDeltaT),
                 true);
         }
@@ -1801,8 +1801,8 @@ void cFielder::fn_80045C74(float fDeltaT)
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
-                fn_8002CF88(this->GetTweaks()),
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnSpeed(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             true);
 
@@ -3674,7 +3674,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
     InitMovementFromAnim(
         (s16)(nTurnAdjust + facingDelta2), v3Zero, 0.6f, false);
 
-    DoRegularPassing(pPlayer, bParam, true, true, bParam, fn_8002CFC4(this->GetTweaks()), fn_8002C730(this->GetTweaks()));
+    DoRegularPassing(pPlayer, bParam, true, true, bParam, GetSlowestVolleyPassSpeed(this->GetTweaks()), GetFastestVolleyPassSpeed(this->GetTweaks()));
 
     mUnidentified371 = true;
 }
@@ -3769,12 +3769,12 @@ void cFielder::ActionPass(float fDeltaT)
 {
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
-        float fA = fn_8002CFC4(this->GetTweaks());
-        float fB = fn_8002C730(this->GetTweaks());
+        float fA = GetSlowestVolleyPassSpeed(this->GetTweaks());
+        float fB = GetFastestVolleyPassSpeed(this->GetTweaks());
         if (!bIsModified)
         {
-            fA = fn_8002C6E8(this->GetTweaks());
-            fB = fn_8002C678(this->GetTweaks());
+            fA = GetSlowestGroundPassSpeed(this->GetTweaks());
+            fB = GetFastestGroundPassSpeed(this->GetTweaks());
         }
         DoRegularPassing(mUnidentified36C, bIsModified, mUnidentified370, false, false, fA, fB);
     }
@@ -4144,7 +4144,7 @@ void cFielder::fn_8004B658()
         SetAction(ACTION_UNKNOWN_30);
         DoResetShotMeter(0.0f);
         fn_8003A544(this);
-        InitMovementRunningNoTurn(0.0f, fn_8002CFB0(this->GetTweaks()));
+        InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         if (mUnidentified024.m_fActualSpeed > this->GetTweaks()->GetRunningSpeed())
         {
@@ -4267,7 +4267,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         }
 
         float fSpeed = mUnidentified024.m_fActualSpeed;
-        InitMovementRunningNoTurn(0.0f, fSpeed / fn_8002C7E8(this->GetTweaks()));
+        InitMovementRunningNoTurn(0.0f, fSpeed / GetShootingWindupTime(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
 
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
@@ -4288,11 +4288,11 @@ void cFielder::fn_8004BB80(float fDeltaT)
     mUnidentified024.m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
 
     SetFacingDirection(
-        SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()), fn_8002CF9C(this->GetTweaks()), fDeltaT),
+        SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, GetShotWindupTurnSpeed(this->GetTweaks()), GetShotWindupTurnFalloff(this->GetTweaks()), fDeltaT),
         false);
 
     float fChargeTime = m_pShotMeter->m_fTime;
-    fChargeTime = fn_8002C7E8(this->GetTweaks()) - fChargeTime;
+    fChargeTime = GetShootingWindupTime(this->GetTweaks()) - fChargeTime;
     if (fChargeTime < 0.01f)
     {
         fChargeTime = 0.01f;
@@ -4389,7 +4389,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
                 200000.0f,
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             false);
     }

@@ -354,7 +354,7 @@ float GetTurboWBSpeed(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C678(PlayerTweaks* tweaks)
+float GetFastestGroundPassSpeed(PlayerTweaks* tweaks)
 {
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float scale = 0.25f * terrain + 0.75f;
@@ -364,14 +364,14 @@ extern "C" float fn_8002C678(PlayerTweaks* tweaks)
         tweaks->fPassing);
 }
 
-extern "C" float fn_8002C6E8(PlayerTweaks*)
+float GetSlowestGroundPassSpeed(PlayerTweaks*)
 {
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     return gGameTweaks.mFielderTweaks->fSlowestGroundPassSpeed
          * (0.25f * terrain + 0.75f);
 }
 
-extern "C" float fn_8002C730(PlayerTweaks* tweaks)
+float GetFastestVolleyPassSpeed(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fFastestVolleyPassSpeedMin,
         gGameTweaks.mFielderTweaks->fFastestVolleyPassSpeedMax,
@@ -392,7 +392,7 @@ extern "C" float fn_8002C780(PlayerTweaks* tweaks)
         tweaks->fShooting);
 }
 
-extern "C" float fn_8002C7A8(PlayerTweaks* tweaks)
+float GetOneTimerMaxSpeed(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fOneTimerMaxSpeedMin,
         gGameTweaks.mFielderTweaks->fOneTimerMaxSpeedMax,
@@ -404,12 +404,12 @@ extern "C" float fn_8002C7D0(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fMushroomEffectTime;
 }
 
-extern "C" float fn_8002C7E8(PlayerTweaks* tweaks)
+float GetShootingWindupTime(PlayerTweaks* tweaks)
 {
     return tweaks->fOffenseShootingWindupTime;
 }
 
-extern "C" float fn_8002C7F4(PlayerTweaks* tweaks)
+float GetShootingWindupTotalTime(PlayerTweaks* tweaks)
 {
     return tweaks->fOffenseShootingWindupTotalTime;
 }
@@ -554,22 +554,22 @@ float GetRunWBDecel(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fRunWBDecel;
 }
 
-extern "C" float fn_8002CF88(PlayerTweaks*)
+float GetShotWindupTurnSpeed(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fShotWindupTurnSpeed;
 }
 
-extern "C" float fn_8002CF9C(PlayerTweaks*)
+float GetShotWindupTurnFalloff(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fShotWindupTurnFalloff;
 }
 
-extern "C" float fn_8002CFB0(PlayerTweaks*)
+float GetShotWindupDecel(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fShotWindupDecel;
 }
 
-extern "C" float fn_8002CFC4(PlayerTweaks*)
+float GetSlowestVolleyPassSpeed(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fSlowestVolleyPassSpeed;
 }
