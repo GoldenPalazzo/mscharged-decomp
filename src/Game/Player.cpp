@@ -178,7 +178,7 @@ extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam)
     }
 }
 
-extern "C" void fn_80095870(cPlayer* pPlayer)
+void SetDesiredFacingDirection(cPlayer* pPlayer)
 {
     if (pPlayer->m_pController != NULL)
     {

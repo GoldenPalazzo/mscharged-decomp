@@ -2113,7 +2113,7 @@ __ct__7cPlayerFi15eCharacterClassPCiP11cSHierarchyP14cAnimInventoryPC20Character
 __dt__7cPlayerFv = .text:0x80095698; // type:function size:0xEC
 SetSpaceSearch__7cPlayerFP11SpaceSearch = .text:0x80095784; // type:function size:0x60
 fn_800957E4 = .text:0x800957E4; // type:function size:0x8C
-fn_80095870 = .text:0x80095870; // type:function size:0xAC
+SetDesiredFacingDirection__FP7cPlayer = .text:0x80095870; // type:function size:0xAC
 SwapController__7cPlayerFb = .text:0x8009591C; // type:function size:0x4D8 scope:global
 fn_80095DF4__7cPlayerFf = .text:0x80095DF4; // type:function size:0x2EC
 Update__7cPlayerFf = .text:0x800960E0; // type:function size:0x68

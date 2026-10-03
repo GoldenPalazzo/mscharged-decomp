@@ -74,7 +74,7 @@ void DesireUserControlled::Update(
             m_pFielder->StartRunning();
         }
 
-        fn_80095870(m_pFielder);
+        SetDesiredFacingDirection(m_pFielder);
         if (m_pFielder->m_eActionState == ACTION_RUNNING)
         {
             float fMaxSpeed = fn_8002C254(
