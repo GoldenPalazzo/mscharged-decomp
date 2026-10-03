@@ -4455,7 +4455,7 @@ void cFielder::InitActionSlideAttack(
         SetAction(ACTION_SLIDE_ATTACK);
         SetAnimState(0x5E, true, 0.2f, false, false);
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()), fn_8002CF24(this->GetTweaks()));
-        mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C800(this->GetTweaks()));
+        mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(GetSlideTime(this->GetTweaks()));
 
         mUnidentified388 = 0;
         bAttackSucceeded = false;
@@ -4700,7 +4700,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         {
             PlayRumbleAction(1, GetGlobalPad());
             mUnidentified388 = 1;
-            mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(this->GetTweaks()));
+            mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(GetSlideDecelTime(this->GetTweaks()));
         }
         break;
     }

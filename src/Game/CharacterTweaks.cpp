@@ -399,7 +399,7 @@ float GetOneTimerMaxSpeed(PlayerTweaks* tweaks)
         tweaks->fShooting);
 }
 
-extern "C" float fn_8002C7D0(PlayerTweaks*)
+float GetMushroomEffectTime(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fMushroomEffectTime;
 }
@@ -414,7 +414,7 @@ float GetShootingWindupTotalTime(PlayerTweaks* tweaks)
     return tweaks->fOffenseShootingWindupTotalTime;
 }
 
-extern "C" float fn_8002C800(PlayerTweaks* tweaks)
+float GetSlideTime(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fDefenseSlideTackle;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -427,7 +427,7 @@ extern "C" float fn_8002C800(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
+float GetSlideDecelTime(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fDefenseSlideTackle;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -440,7 +440,7 @@ extern "C" float fn_8002C8D4(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C9A8(const PlayerTweaks* tweaks)
+float GetSlideSpeed(const PlayerTweaks* tweaks)
 {
     float result = fn_8002C254(tweaks);
     result *= Interpolate(gGameTweaks.mFielderTweaks->fSlideSpeedMin,
@@ -453,7 +453,7 @@ extern "C" float fn_8002C9A8(const PlayerTweaks* tweaks)
     return result * Interpolate(gGameTweaks.mFielderTweaks->fTerrainMinSpeedAdjust, gGameTweaks.mFielderTweaks->fTerrainMaxSpeedAdjust, g_pGame->mpTerrain->GetSpeedFactor());
 }
 
-extern "C" float fn_8002CB2C(PlayerTweaks*)
+float GetMushroomSpeedBoost(PlayerTweaks*)
 {
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float terrainMaximum = fielderTweaks->fTerrainMaxSpeedAdjust;
@@ -463,7 +463,7 @@ extern "C" float fn_8002CB2C(PlayerTweaks*)
     return terrainScale * (float)gGameTweaks.mFielderTweaks->fMushroomSpeedBoost;
 }
 
-extern "C" float fn_8002CBB8(PlayerTweaks*)
+float GetStarSpeedBoost(PlayerTweaks*)
 {
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float terrainMaximum = fielderTweaks->fTerrainMaxSpeedAdjust;
@@ -574,17 +574,17 @@ float GetSlowestVolleyPassSpeed(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fSlowestVolleyPassSpeed;
 }
 
-extern "C" float fn_8002CFD8(PlayerTweaks*)
+float GetStarEffectTime(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fStarEffectTime;
 }
 
-extern "C" float fn_8002CFF0(PlayerTweaks*)
+float GetShellSpeed(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fGreenShellSpeed;
 }
 
-extern "C" float fn_8002D008(PlayerTweaks*)
+float GetSuperSlideSpeedBonus(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fSuperSlideSpeedBonus;
 }

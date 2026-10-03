@@ -861,7 +861,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
     if (pFielder->m_eActionState != ACTION_SLIDE_ATTACK && vTarget.z <= 0.35f)
     {
-        float fDuration = fn_8002C800(pFielder->GetTweaks());
+        float fDuration = GetSlideTime(pFielder->GetTweaks());
         float fSpeed = fn_8003C40C(pFielder, pFielder->mUnidentified024.m_aActualFacingDirection);
         float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, vTarget), true);
         float fRadius = pFielder->mUnidentified320->GetRadius();

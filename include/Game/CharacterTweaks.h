@@ -205,12 +205,8 @@ private:
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C7D0(PlayerTweaks*);
-extern "C" float fn_8002C8D4(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002CD2C(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002CFD8(PlayerTweaks*);
-extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
@@ -222,7 +218,6 @@ extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value);
 extern "C" float fn_8002C0AC(PlayerTweaks* tweaks);
 extern "C" float fn_8002C180(PlayerTweaks* tweaks);
 extern "C" float fn_8002C254(const PlayerTweaks* tweaks);
-extern "C" float fn_8002C800(PlayerTweaks* tweaks);
 extern "C" float fn_8002CF10(PlayerTweaks*);
 extern "C" float fn_8002CF24(PlayerTweaks*);
 
@@ -238,8 +233,14 @@ float GetFastestGroundPassSpeed(PlayerTweaks*);
 float GetSlowestGroundPassSpeed(PlayerTweaks*);
 float GetFastestVolleyPassSpeed(PlayerTweaks*);
 float GetOneTimerMaxSpeed(PlayerTweaks*);
+float GetMushroomEffectTime(PlayerTweaks*);
 float GetShootingWindupTime(PlayerTweaks*);
 float GetShootingWindupTotalTime(PlayerTweaks*);
+float GetSlideTime(PlayerTweaks*);
+float GetSlideDecelTime(PlayerTweaks*);
+float GetSlideSpeed(const PlayerTweaks*);
+float GetMushroomSpeedBoost(PlayerTweaks*);
+float GetStarSpeedBoost(PlayerTweaks*);
 float GetStrafeAccel(PlayerTweaks*);
 float GetStrafeTurnSpeed(PlayerTweaks*);
 float GetStrafeTurnFalloff(PlayerTweaks*);
@@ -250,5 +251,8 @@ float GetShotWindupTurnSpeed(PlayerTweaks*);
 float GetShotWindupTurnFalloff(PlayerTweaks*);
 float GetShotWindupDecel(PlayerTweaks*);
 float GetSlowestVolleyPassSpeed(PlayerTweaks*);
+float GetStarEffectTime(PlayerTweaks*);
+float GetShellSpeed(PlayerTweaks*);
+float GetSuperSlideSpeedBonus(PlayerTweaks*);
 
 #endif // GAME_CHARACTER_TWEAKS_H

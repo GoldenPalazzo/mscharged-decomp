@@ -1884,7 +1884,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
         v3TargetVel = m_pTarget->mUnidentified024.m_v3Velocity;
     }
 
-    float fSpeed = fn_8002CFF0(pThrower->GetTweaks());
+    float fSpeed = GetShellSpeed(pThrower->GetTweaks());
 
     if (lbl_806DBDA0 || pThrower->GetGlobalPad() == 0)
     {
