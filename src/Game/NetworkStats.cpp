@@ -111,7 +111,7 @@ bool NetworkStatsReporter::ReportGameResult(int,
     if (!reportHome)
     {
         tDebugPrintManager::Print(DC_NETWORK,
-            "ReportGameResult returning true, but did not really report this game...only home team should do that for now\n");
+            "ReportGameResult returning true, but did not really report this game..only home team should do that for now\n");
         return true;
     }
 
