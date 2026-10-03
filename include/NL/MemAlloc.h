@@ -24,9 +24,9 @@ public:
     void AddBlock(void* memory, unsigned int size);
 
     FreeBlockList* m_free_block_list;
-    u32 m_04;
-    u32 m_08;
-    void* m_0C;
+    u32 m_allocation_count;
+    u32 m_memory_size;
+    void* m_memory;
     u32 m_10;
     u32 m_14;
 };

@@ -16,23 +16,23 @@ char sFreePanicDumpFilename[] = "FreePanicDump.txt";
 extern char sFreeMemoryDumpHeader[];
 extern char sFreeMemoryDumpTotalFormat[];
 
-struct MemoryStats_802AF2E4
+struct MemoryStats
 {
-    MemoryStats_802AF2E4(MemoryAllocator* allocator);
+    MemoryStats(MemoryAllocator* allocator);
     u32 total;
     u32 largest;
     u32 count;
 };
 
-class MemoryStatsCallback_802AF2E4
+class MemoryStatsCallback
 {
 public:
     void Callback(FreeBlockList* block);
 
-    MemoryStats_802AF2E4* stats;
+    MemoryStats* stats;
 };
 
-class FreePanicDumpCallback_802AF470
+class FreeBlockDumpCallback
 {
 public:
     void Callback(FreeBlockList* block);
@@ -42,31 +42,31 @@ public:
     u32 count;
 };
 
-inline MemoryStats_802AF2E4::MemoryStats_802AF2E4(MemoryAllocator* allocator)
+inline MemoryStats::MemoryStats(MemoryAllocator* allocator)
 {
-    MemoryStatsCallback_802AF2E4 callback;
+    MemoryStatsCallback callback;
     callback.stats = this;
     total = 0;
     largest = 0;
     count = 0;
-    nlWalkDLRing(allocator->m_free_block_list, &callback, &MemoryStatsCallback_802AF2E4::Callback);
+    nlWalkDLRing(allocator->m_free_block_list, &callback, &MemoryStatsCallback::Callback);
 }
 
 static inline unsigned int GetTotalFreeMemory(MemoryAllocator* allocator)
 {
-    MemoryStats_802AF2E4 stats(allocator);
+    MemoryStats stats(allocator);
     return stats.total;
 }
 
 static inline unsigned int GetLargestFreeBlock(MemoryAllocator* allocator)
 {
-    MemoryStats_802AF2E4 stats(allocator);
+    MemoryStats stats(allocator);
     return stats.largest;
 }
 
 static inline void WriteFreeMemoryDump(MemoryAllocator* allocator, FILE* file)
 {
-    FreePanicDumpCallback_802AF470 dump;
+    FreeBlockDumpCallback dump;
     dump.file = file;
     dump.total = 0;
     dump.count = 0;
@@ -79,7 +79,7 @@ static inline void WriteFreeMemoryDump(MemoryAllocator* allocator, FILE* file)
         nlPrintf(sFreeMemoryDumpHeader);
     }
 
-    nlWalkDLRing(allocator->m_free_block_list, &dump, &FreePanicDumpCallback_802AF470::Callback);
+    nlWalkDLRing(allocator->m_free_block_list, &dump, &FreeBlockDumpCallback::Callback);
 
     char buffer[512];
     nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
@@ -225,7 +225,7 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
     }
 
     void* result = InitializeAllocation(cur, size, prefix, cur->m_size - usedSize);
-    m_04++;
+    m_allocation_count++;
     return result;
 }
 
@@ -279,7 +279,7 @@ void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignmen
     }
 
     void* result = AllocateFromBlockEnd(&m_free_block_list, cur, size, offset, requestSize);
-    m_04++;
+    m_allocation_count++;
     return result;
 }
 
@@ -331,9 +331,9 @@ void MemoryAllocator::Initialize(void* memory, unsigned int size)
 {
     m_free_block_list = 0;
     AddBlock(memory, size);
-    m_04 = 0;
-    m_0C = memory;
-    m_08 = size;
+    m_allocation_count = 0;
+    m_memory = memory;
+    m_memory_size = size;
     m_10 = 0x40000000;
     m_14 = 0x40000000;
 }
@@ -421,7 +421,7 @@ void MemoryAllocator::AddBlock(void* memory, unsigned int size)
     }
 }
 
-void MemoryStatsCallback_802AF2E4::Callback(FreeBlockList* block)
+void MemoryStatsCallback::Callback(FreeBlockList* block)
 {
     stats->total += block->m_size;
     u32 largest = stats->largest;
@@ -435,20 +435,20 @@ void MemoryStatsCallback_802AF2E4::Callback(FreeBlockList* block)
 
 unsigned int MemoryAllocator::TotalFreeMemory()
 {
-    MemoryStats_802AF2E4 stats(this);
+    MemoryStats stats(this);
     return stats.total;
 }
 
 unsigned int MemoryAllocator::LargestFreeBlock()
 {
-    MemoryStats_802AF2E4 stats(this);
+    MemoryStats stats(this);
     return stats.largest;
 }
 
 char sFreeMemoryDumpHeader[] = "count   address     size        allocNum    file(line)  description \n";
 char sFreeMemoryDumpTotalFormat[] = "Total free memory: %d\n";
 
-void FreePanicDumpCallback_802AF470::Callback(FreeBlockList* block)
+void FreeBlockDumpCallback::Callback(FreeBlockList* block)
 {
     char buffer[512];
     nlSNPrintf(buffer, sizeof(buffer), "%4d| 0x%08x| %10d| \n", count, block, block->m_size);

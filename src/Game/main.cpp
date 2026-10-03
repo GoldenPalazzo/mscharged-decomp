@@ -265,10 +265,10 @@ void MemCheckTask::Run(float)
     static u32 sPreviousTaskState = 1;
 
     const float bytesPerMiB = 1048576.0f;
-    const u32 currentVirtualFree = VirtualAllocator.m_04;
+    const u32 virtualAllocationCount = VirtualAllocator.m_allocation_count;
 
-    sLastVirtualFreeDelta = currentVirtualFree - sPreviousVirtualFree;
-    sPreviousVirtualFree = currentVirtualFree;
+    sLastVirtualFreeDelta = virtualAllocationCount - sPreviousVirtualFree;
+    sPreviousVirtualFree = virtualAllocationCount;
     sVirtualFreeMiB = VirtualAllocator.TotalFreeMemory() / bytesPerMiB;
     sVirtualLargestFreeMiB =
         VirtualAllocator.LargestFreeBlock() / bytesPerMiB;
