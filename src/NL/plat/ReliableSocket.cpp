@@ -213,7 +213,7 @@ void ReliableSocket::Send(int connection,
     }
 }
 
-void ReliableSocket::SocketVirtual34(u8 connection,
+void ReliableSocket::SendVoice(u8 connection,
     void* buffer, int size)
 {
     ((TransportConnection*)connection)
@@ -249,7 +249,7 @@ inline void TransportScreenPrinter::Draw()
     }
 }
 
-void ReliableSocket::SocketVirtual48()
+void ReliableSocket::DrawScreenPrinter()
 {
     if (s_bDisplayScreenPrinter)
     {

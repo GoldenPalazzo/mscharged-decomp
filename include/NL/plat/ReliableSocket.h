@@ -43,10 +43,10 @@ struct ReliableSocket
     void Disconnect(TransportConnection* connection, bool immediate);
     void Send(int connection,
         void* buffer, int size, bool reliable);
-    void SocketVirtual34(u8 connection,
+    void SendVoice(u8 connection,
         void* buffer, int size);
     void DebugDraw(int column, int* row, bool showBandwidth);
-    void SocketVirtual48();
+    void DrawScreenPrinter();
     void Update();
     void UpdateBandwidth();
     void LogMessage(int size, TransportMessage* message);
