@@ -1881,7 +1881,7 @@ config.libs = [
         "objects": [
             # RVL_SDK/nhttp
             Object(Matching, "RVL_SDK/nhttp/d_nhttp.c"),
-            Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_common.c"),
+            Object(Matching, "RVL_SDK/nhttp/d_nhttp_common.c"),
             Object(Matching, "RVL_SDK/nhttp/d_nhttp_private.c"),
             Object(Matching, "RVL_SDK/nhttp/NHTTP_bgnend.c"),
             Object(Matching, "RVL_SDK/nhttp/NHTTP_control.c"),
