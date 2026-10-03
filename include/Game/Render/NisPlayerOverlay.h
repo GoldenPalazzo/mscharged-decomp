@@ -1,5 +1,5 @@
-#ifndef GAME_RENDER_TU_80283D9C_H
-#define GAME_RENDER_TU_80283D9C_H
+#ifndef GAME_RENDER_NIS_PLAYER_OVERLAY_H
+#define GAME_RENDER_NIS_PLAYER_OVERLAY_H
 
 #include "types.h"
 
@@ -79,4 +79,4 @@ public:
 void fn_8028468C(float x, float y, float z);
 void fn_8028469C(bool value);
 
-#endif // GAME_RENDER_TU_80283D9C_H
+#endif // GAME_RENDER_NIS_PLAYER_OVERLAY_H

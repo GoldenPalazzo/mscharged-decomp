@@ -29,7 +29,7 @@
 #include "Game/TweakQuery.h"
 
 #include "Game/Effects/EmissionManager.h"
-#include "Game/Render/tu_80283D9C.h"
+#include "Game/Render/NisPlayerOverlay.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlDebug.h"
 #include "NL/nlFile.h"

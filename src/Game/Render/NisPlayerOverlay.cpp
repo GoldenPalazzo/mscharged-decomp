@@ -1,4 +1,4 @@
-#include "Game/Render/tu_80283D9C.h"
+#include "Game/Render/NisPlayerOverlay.h"
 
 #include "Game/NisPlayer.h"
 #include "Game/Camera/CameraMan.h"

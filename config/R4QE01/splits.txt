@@ -2385,7 +2385,7 @@ Game/Render/Nis.cpp:
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
 
-Game/Render/tu_80283D9C.cpp:
+Game/Render/NisPlayerOverlay.cpp:
 	.text       start:0x8028400C end:0x80284A58
 	.ctors      start:0x804DB7F0 end:0x804DB7F4
 	.data       start:0x805237F0 end:0x805238B8
