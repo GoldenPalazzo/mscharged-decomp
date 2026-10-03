@@ -31,28 +31,28 @@ FielderTweaks::~FielderTweaks()
 
 void FielderTweaks::Init()
 {
-    mUnidentified474 = 4000.0f;
-    mUnidentified478 = 12.5f;
+    fRunTurnFalloff = 4000.0f;
+    fRunDecel = 12.5f;
     mUnidentified47C = 9.5f;
-    mUnidentified480 = 4000.0f;
-    mUnidentified484 = 15.0f;
-    mUnidentified488 = 15.0f;
-    mUnidentified48C = 30000.0f;
-    mUnidentified490 = 40000.0f;
+    fStrafeTurnFalloff = 4000.0f;
+    fStrafeDecel = 15.0f;
+    fStrafeAccel = 15.0f;
+    fJogTurnSpeedMin = 30000.0f;
+    fJogTurnSpeedMax = 40000.0f;
     mUnidentified494 = 0.85f;
-    mUnidentified498 = 120000.0f;
+    fStrafeTurnSpeed = 120000.0f;
     mUnidentified49C = 0.9f;
     mUnidentified4A0 = 2500.0f;
     mUnidentified4A4 = 22.5f;
     mUnidentified4A8 = 18.0f;
-    mUnidentified4AC = 3200.0f;
-    mUnidentified4B0 = 18.0f;
+    fRunWBTurnFalloff = 3200.0f;
+    fRunWBDecel = 18.0f;
     mUnidentified4B4 = 10.0f;
-    mUnidentified4B8 = 12.0f;
-    mUnidentified4BC = 12.0f;
-    mUnidentified4C0 = 75000.0f;
-    mUnidentified4C4 = 4000.0f;
-    mUnidentified4C8 = 6.0f;
+    fSlowestGroundPassSpeed = 12.0f;
+    fSlowestVolleyPassSpeed = 12.0f;
+    fShotWindupTurnSpeed = 75000.0f;
+    fShotWindupTurnFalloff = 4000.0f;
+    fShotWindupDecel = 6.0f;
     mUnidentified4CC = 26.0f;
     mUnidentified4D0 = 106.0f;
     mUnidentified4D4 = 27.0f;
@@ -258,8 +258,8 @@ extern "C" float fn_8002C08C(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified024;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
-    return Interpolate(fielderTweaks->mUnidentified48C,
-        fielderTweaks->mUnidentified490,
+    return Interpolate(fielderTweaks->fJogTurnSpeedMin,
+        fielderTweaks->fJogTurnSpeedMax,
         playerValue);
 }
 
@@ -367,7 +367,7 @@ extern "C" float fn_8002C678(PlayerTweaks* tweaks)
 extern "C" float fn_8002C6E8(PlayerTweaks*)
 {
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
-    return gGameTweaks.mFielderTweaks->mUnidentified4B8
+    return gGameTweaks.mFielderTweaks->fSlowestGroundPassSpeed
          * (0.25f * terrain + 0.75f);
 }
 
@@ -516,62 +516,62 @@ extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
 
 extern "C" float fn_8002CEE8(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified488;
+    return gGameTweaks.mFielderTweaks->fStrafeAccel;
 }
 
 extern "C" float fn_8002CEFC(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified498;
+    return gGameTweaks.mFielderTweaks->fStrafeTurnSpeed;
 }
 
 extern "C" float fn_8002CF10(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified474;
+    return gGameTweaks.mFielderTweaks->fRunTurnFalloff;
 }
 
 extern "C" float fn_8002CF24(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified478;
+    return gGameTweaks.mFielderTweaks->fRunDecel;
 }
 
 extern "C" float fn_8002CF38(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified480;
+    return gGameTweaks.mFielderTweaks->fStrafeTurnFalloff;
 }
 
 extern "C" float fn_8002CF4C(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified484;
+    return gGameTweaks.mFielderTweaks->fStrafeDecel;
 }
 
 extern "C" float fn_8002CF60(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4AC;
+    return gGameTweaks.mFielderTweaks->fRunWBTurnFalloff;
 }
 
 extern "C" float fn_8002CF74(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4B0;
+    return gGameTweaks.mFielderTweaks->fRunWBDecel;
 }
 
 extern "C" float fn_8002CF88(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4C0;
+    return gGameTweaks.mFielderTweaks->fShotWindupTurnSpeed;
 }
 
 extern "C" float fn_8002CF9C(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4C4;
+    return gGameTweaks.mFielderTweaks->fShotWindupTurnFalloff;
 }
 
 extern "C" float fn_8002CFB0(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4C8;
+    return gGameTweaks.mFielderTweaks->fShotWindupDecel;
 }
 
 extern "C" float fn_8002CFC4(PlayerTweaks*)
 {
-    return gGameTweaks.mFielderTweaks->mUnidentified4BC;
+    return gGameTweaks.mFielderTweaks->fSlowestVolleyPassSpeed;
 }
 
 extern "C" float fn_8002CFD8(PlayerTweaks*)
