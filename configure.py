@@ -979,7 +979,8 @@ config.libs = [
             Object(Matching, "Game/Triggers/SebringAnimScript.cpp", cflags=cflags_game_deferred),
 
             # Game/World
-            Object(NonMatching, "Game/World/worldanim.cpp", extra_cflags=["-inline auto,depth=3", "-ipa file"]),
+            Object(Matching, "Game/World/WorldPhysics.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/World/worldanim.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/World/worldanimobjects.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
             Object(Matching, "Game/World/WorldEffect.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
 
