@@ -127,11 +127,11 @@ void ShapeRender::CreateBoxGeometry(PrimitiveShape& prim)
     static int tri_map[6] = { 0, 1, 2, 3, 0, 2 };
 
     prim.position = (nlVector3*)glResourceAlloc(
-        36 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        36 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        36 * sizeof(nlVector2), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector2), GLM_VertexData, m_pResource);
     prim.vertCount = 36;
 
     int i;
@@ -188,11 +188,11 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 150;
     prim.position = (nlVector3*)glResourceAlloc(
-        150 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        150 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        150 * sizeof(nlVector2), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector2), GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -279,11 +279,11 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 0x20;
     prim.position = (nlVector3*)glResourceAlloc(
-        0x180, GLM_VertexData, m_Unknown00);
+        0x180, GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        0x180, GLM_VertexData, m_Unknown00);
+        0x180, GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        0x100, GLM_VertexData, m_Unknown00);
+        0x100, GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -360,11 +360,11 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 0x40;
     prim.position = (nlVector3*)glResourceAlloc(
-        0x300, GLM_VertexData, m_Unknown00);
+        0x300, GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        0x300, GLM_VertexData, m_Unknown00);
+        0x300, GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        0x200, GLM_VertexData, m_Unknown00);
+        0x200, GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -473,11 +473,11 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
 
     unsigned long offset;
     glModel* pModel = glModelDupNoStreams(prim.model, false, 0);
-    nlFloatColour local_08;
-    local_08.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
-    local_08.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
-    local_08.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
-    local_08.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
+    nlFloatColour floatColour;
+    floatColour.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
+    floatColour.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
+    floatColour.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
+    floatColour.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
 
     unsigned long index;
     index = 0;
@@ -487,8 +487,8 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
         glModelPacket* packet = (glModelPacket*)((u8*)pModel->packets + offset);
         packet->matrix = matrix;
         memcpy((u8*)packet->materialParameters + sizeof(glTextureBinding),
-            &local_08,
-            sizeof(local_08));
+            &floatColour,
+            sizeof(floatColour));
 
         if (colour.c[3] != 255)
         {
@@ -665,17 +665,17 @@ void ShapeRender::Initialize(void* resource)
 {
     if (!m_Initialized)
     {
-        m_Unknown00 = resource;
+        m_pResource = resource;
         m_Initialized = true;
         glBeginResource("ShapeRender");
         CreateBoxGeometry(m_Box);
         CreateCylinderGeometry(m_Cylinder);
         CreateHemisphereGeometry(m_Hemisphere);
         CreateFlatCylinderEndGeometry(m_FlatCylinderEnd);
-        fn_802BD2C8(&m_Box, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_Cylinder, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_Hemisphere, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_FlatCylinderEnd, GLP_TriStrip, m_Unknown00);
+        fn_802BD2C8(&m_Box, GLP_TriStrip, m_pResource);
+        fn_802BD2C8(&m_Cylinder, GLP_TriStrip, m_pResource);
+        fn_802BD2C8(&m_Hemisphere, GLP_TriStrip, m_pResource);
+        fn_802BD2C8(&m_FlatCylinderEnd, GLP_TriStrip, m_pResource);
         m_pLightUserData = 0;
         glEndResource();
         m_eView = 0;

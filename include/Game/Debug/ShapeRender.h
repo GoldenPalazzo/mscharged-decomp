@@ -21,7 +21,7 @@ class ShapeRender
 {
 public:
     ShapeRender()
-        : m_Unknown00(0)
+        : m_pResource(0)
         , m_Initialized(false)
     {
     }
@@ -45,7 +45,7 @@ public:
         const nlColour& colour) const;
     void Initialize(void* resource);
 
-    /* 0x00 */ void* m_Unknown00;
+    /* 0x00 */ void* m_pResource;
     /* 0x04 */ bool m_Initialized;
     /* 0x08 */ PrimitiveShape m_Box;
     /* 0x1C */ PrimitiveShape m_Hemisphere;
