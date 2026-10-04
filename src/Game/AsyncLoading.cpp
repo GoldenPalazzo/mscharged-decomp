@@ -1744,7 +1744,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     NisPlayer::Instance()->RegisterEventHandlers();
     GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();
-    ExcitementSystem::fn_80196644().fn_80196924();
+    ExcitementSystem::Instance().RegisterEventHandlers();
     fn_8001FE80();
     fn_80018A00();
     UnidentifiedCameraEffects::Instance()->RegisterEventListeners();

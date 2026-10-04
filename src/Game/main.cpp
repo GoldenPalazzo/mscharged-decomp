@@ -593,7 +593,7 @@ static void Initialize()
     ReplayChoreo::Instance();
     GetPresentation();
     FrontEndPresentation::GetInstance();
-    ExcitementSystem::fn_80196644();
+    ExcitementSystem::Instance();
     AddTasks();
     SetupViews();
     HideLayerView(eCLV_ScreenBlur);

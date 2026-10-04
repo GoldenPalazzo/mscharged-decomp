@@ -320,14 +320,14 @@ void ReplayManager::GrabSnapshot()
     if (nlTaskManager::m_pInstance->mCurrentState == 2)
     {
         mTime = mReplay->EndTime() + g_fSimulationTick;
-        unsigned int unidentifiedState = ExcitementSystem::fn_80196644().mUnidentified02C;
-        unidentifiedState <<= 16;
-        unidentifiedState += ExcitementSystem::fn_80196644().mUnidentified02E;
-        mReplay->Record<RenderSnapshot>(mTime, *mCurrent, mEvents, unidentifiedState);
+        unsigned int excitement = ExcitementSystem::Instance().mExcitement;
+        excitement <<= 16;
+        excitement += ExcitementSystem::Instance().mExcitementCount;
+        mReplay->Record<RenderSnapshot>(mTime, *mCurrent, mEvents, excitement);
 
-        ExcitementSystem& state = ExcitementSystem::fn_80196644();
-        state.mUnidentified02C = 0;
-        state.mUnidentified02E = 0;
+        ExcitementSystem& state = ExcitementSystem::Instance();
+        state.mExcitement = 0;
+        state.mExcitementCount = 0;
         mEvents = 0;
     }
 }
