@@ -969,7 +969,7 @@ config.libs = [
             # Game/Transitions
             Object(Matching, "Game/Transitions/ColourBlendScreenTransition.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Transitions/ModelTransition.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Transitions/ScreenTransitionManager.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
+            Object(Matching, "Game/Transitions/ScreenTransitionManager.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/Transitions/ScriptedTransition.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/Transitions/TransitionSequence.cpp"),
 
