@@ -40,7 +40,7 @@ static bool sRenderParticles = true;
 float ParticleSystem::m_fAspect = 1.0f;
 bool ParticleSystem::m_AllowInFront = true;
 
-static bool sWhiteParticles;
+static bool sUseWhiteParticleTexture;
 static bool sDisableParticleDepthTest;
 int ParticleSystem::m_NumInstances;
 bool (*ParticleSystem::m_Callback)(ParticleSystem*, GLView*,
@@ -811,7 +811,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     {
         glSetRasterState(GLS_DepthTest, 0);
     }
-    if (sWhiteParticles)
+    if (sUseWhiteParticleTexture)
     {
         glSetRasterState(GLS_AlphaBlend, 3);
     }
@@ -1002,7 +1002,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 iterator.Step();
             }
 
-            if (sWhiteParticles)
+            if (sUseWhiteParticleTexture)
             {
                 glTextureBinding* textureState
                     = (glTextureBinding*)mesh.GetModel()
