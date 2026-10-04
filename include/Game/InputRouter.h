@@ -118,7 +118,7 @@ public:
     /* 0x0291 */ u8 mPadding291[3];
     /* 0x0294 */ s32 mBundledMessageCount;
     /* 0x0298 */ NetMessageInputBundle mBundledMessage;
-    /* 0x0480 */ NetworkInputMessageQueue mInputQueues[4];
+    /* 0x0480 */ NetworkInputMessageQueue m_InputQueue[4];
     /* 0xE5C0 */ volatile u32 mQueueCursor;
     /* 0xE5C4 */ u32 mQueueLimit;
 

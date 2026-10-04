@@ -360,8 +360,8 @@ void NetworkInputRouter::Reset(int resetQueues)
 
     for (int machine = 0; machine < 4; ++machine)
     {
-        mInputQueues[machine].mHead = 0;
-        mInputQueues[machine].mCount = 0;
+        m_InputQueue[machine].mHead = 0;
+        m_InputQueue[machine].mCount = 0;
     }
     mQueueCursor = 0;
     mQueueLimit = 4;
@@ -379,7 +379,7 @@ void NetworkInputRouter::CheckCongestion()
         int machineCount = mSession->GetNumMachines();
         for (s8 machine = 0; machine < machineCount; ++machine)
         {
-            if (mInputQueues[machine].mCount <= 1)
+            if (m_InputQueue[machine].mCount <= 1)
             {
                 mCongested = true;
             }
@@ -401,7 +401,7 @@ bool NetworkInputRouter::HasInput()
     int machineCount = mSession->GetNumMachines();
     for (s8 machine = 0; machine < machineCount; ++machine)
     {
-        if (mInputQueues[machine].mCount == 0)
+        if (m_InputQueue[machine].mCount == 0)
         {
             return false;
         }
@@ -548,7 +548,7 @@ void NetworkInputRouter::OnInputReady()
         for (s8 machine = 0; machine < machineCount; ++machine)
         {
             NetworkPeer* peer = mSession->GetPeer(machine);
-            NetMessageInput* message = &mInputQueues[machine].Pop();
+            NetMessageInput* message = &m_InputQueue[machine].Pop();
 
             message->GetNetworkInputMessageRemapAngle(
                 &mRemapAngles[machine]);
@@ -721,9 +721,9 @@ void NetworkInputRouter::CheckPeerSynchronization()
 void NetworkInputRouter::ReceiveInput(
     s8 machine, NetMessageInput* message)
 {
-    if (!mInputQueues[machine].IsFull())
+    if (!m_InputQueue[machine].IsFull())
     {
-        mInputQueues[machine].PushSlot()->CopyFrom(message);
+        m_InputQueue[machine].PushSlot()->CopyFrom(message);
     }
     else
     {
@@ -744,7 +744,7 @@ void NetworkInputRouter::DebugDraw(int column, int* row)
     char output[100];
     for (int machine = 0; machine < machineCount; ++machine)
     {
-        int inputCount = mInputQueues[machine].GetCount();
+        int inputCount = m_InputQueue[machine].GetCount();
         char queueText[100];
         int maxTextLength = nlMin(inputCount, 99);
         int queueTextLength = 0;
