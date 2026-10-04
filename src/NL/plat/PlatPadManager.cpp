@@ -29,15 +29,15 @@ static void PadConnectChanged(WPADChannel channel, WPADResult result)
     }
 }
 
-static void* AllocPadMemory(unsigned long size)
+static void* AllocPadMemory(u32 size)
 {
     return nlMalloc(size);
 }
 
-static int FreePadMemory(void* memory)
+static BOOL FreePadMemory(void* memory)
 {
     nlFree(memory);
-    return true;
+    return TRUE;
 }
 
 void PlatPadManager::Initialize()
@@ -58,7 +58,7 @@ void PlatPadManager::Initialize()
         KPADSetAccParam(channel, 0.0f, 1.0f);
         KPADSetBtnRepeat(channel, 0.75f, 0.25f);
 
-        type[channel] = 0;
+        type[channel] = PLAT_PAD_NONE;
         connected[channel] = false;
         dpdEnabled[channel] = false;
         dpdActive[channel] = false;
@@ -92,7 +92,7 @@ void PlatPadManager::UpdateChannel(int channel)
     {
     case WPAD_ERR_NO_CONTROLLER:
         connected[channel] = false;
-        newType = 0;
+        newType = PLAT_PAD_NONE;
         dpdActive[channel] = false;
         dataFormatSet[channel] = false;
         break;
@@ -151,7 +151,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (coreStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].core.wpad = coreStatus;
-                    newType = 1;
+                    newType = PLAT_PAD_REMOTE;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].core.kpad = kpadStatus[0];
@@ -163,7 +163,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (freestyleStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].freestyle.wpad = freestyleStatus;
-                    newType = 2;
+                    newType = PLAT_PAD_FREESTYLE;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].freestyle.kpad
@@ -176,7 +176,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (classicStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].classic.wpad = classicStatus;
-                    newType = 3;
+                    newType = PLAT_PAD_CLASSIC;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].classic.kpad = kpadStatus[0];
