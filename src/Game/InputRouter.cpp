@@ -107,7 +107,7 @@ void InputRouter::Reset(int)
 
     mSyncMismatch = false;
     mSyncMismatchReported = false;
-    mOutgoingQueueOverflowed = false;
+    mQueueOverflowed = false;
     mStarvedForInput = false;
 }
 
@@ -246,7 +246,7 @@ void InputRouter::QueueDetermData(const void* data, u32 size)
     else
     {
         tDebugPrintManager::Print(DC_NETWORK, "m_OutgoingCustomDetermDataQ overflowed\n");
-        mOutgoingQueueOverflowed = true;
+        mQueueOverflowed = true;
     }
 }
 
@@ -728,7 +728,7 @@ void NetworkInputRouter::ReceiveInput(
     else
     {
         tDebugPrintManager::Print(DC_NETWORK, "m_InputQueue[%d] overflowed\n", machine);
-        mOutgoingQueueOverflowed = true;
+        mQueueOverflowed = true;
     }
 }
 

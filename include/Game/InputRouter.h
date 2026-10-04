@@ -46,11 +46,11 @@ public:
     /* 0x13C */ u32 mRandomSeeds[4];
     /* 0x14C */ bool mSyncMismatch;
     /* 0x14D */ bool mSyncMismatchReported;
-    /* 0x14E */ bool mOutgoingQueueOverflowed;
+    /* 0x14E */ bool mQueueOverflowed;
     /* 0x14F */ bool mStarvedForInput;
     /* 0x150 */ u32 mCurrentCRC;
     /* 0x154 */ s32 mLastGameFrame;
-    /* 0x158 */ u32 mPadding158;
+    /* 0x158 */ u32 mUnidentified158;
     /* 0x15C */ StaticCircularQueue<DetermDataEvent*, 10> m_OutgoingCustomDetermDataQ;
     /* 0x194 */ NetworkSessionBase* mSession;
 }; // size: 0x198
