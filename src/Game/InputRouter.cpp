@@ -370,7 +370,7 @@ void NetworkInputRouter::Reset(int resetQueues)
 void NetworkInputRouter::CheckCongestion()
 {
     mCongested = false;
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         mCongested = false;
     }
@@ -393,7 +393,7 @@ void NetworkInputRouter::CheckCongestion()
 
 bool NetworkInputRouter::HasInput()
 {
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         return true;
     }
@@ -453,7 +453,7 @@ void NetworkInputRouter::OnInputCaptured()
     mCurrentMessage.SetNetworkInputMessageCongested(mWasCongested);
     mWasCongested = false;
 
-    if (mQueueLimit < mQueueCursor && (frame & 1) != 0)
+    if (mQueueLimit < GetQueueCursor() && (frame & 1) != 0)
     {
         mMessageHeld = true;
         --mQueueCursor;
@@ -511,7 +511,7 @@ void NetworkInputRouter::OnInputReady()
 {
     bool congested = false;
 
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         ++mQueueCursor;
         int machineCount = mSession->GetNumMachines();
