@@ -284,15 +284,15 @@ inline void AudioResourceRuntime::ApplyEffectSet(u32 bindingKey,
 /**
  * Address/Size: 0x802F4E84 | size: 0xDC4
  *
- * Applies the named transition set: walks every transition it lists, reads the
- * transition's "Time" and "Invert" properties and starts each effect of the
- * transition's "EffectSet" on the binding the entry names.
+ * Applies the transition set whose name hash is given: reads the set's "Time",
+ * then for every entry it lists reads "EffectSet" and "Invert" and applies that
+ * effect set to each binding the entry names.
  */
-bool ApplyAudioTransition(const u32* transitionName, bool invert, void* owner)
+bool ApplyAudioTransition(const u32* transitionHash, bool invert, void* owner)
 {
     u32 transitionKey = nlStringLowerHash("Transitions");
     RegistryContainer* set
-        = FindConfigGroupEntry(transitionKey, *transitionName);
+        = FindConfigGroupEntry(transitionKey, *transitionHash);
     if (set == 0)
     {
         return false;

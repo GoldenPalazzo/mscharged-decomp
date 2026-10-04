@@ -39,6 +39,6 @@ void NotifyAudioSoundStopped(AudioResourceRuntime* runtime, u32 instance);
 // mangle a C++ declaration differently from this unit's u32.
 extern "C" bool StartAudioEffect(const u32* bindingKey, const u32* definitionKey,
     void* parameterData, bool invert, float blendTime);
-bool ApplyAudioTransition(const u32* transitionName, bool invert, void* owner);
+bool ApplyAudioTransition(const u32* transitionHash, bool invert, void* owner);
 
 #endif // GAME_AUDIO_AUDIO_RESOURCE_RUNTIME_H

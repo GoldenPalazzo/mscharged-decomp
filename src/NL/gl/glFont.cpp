@@ -27,9 +27,9 @@ char sLargeFontName[] __attribute__((aligned(4))) = "font/fixedWidthLarge";
 char sMediumFontName[] __attribute__((aligned(4))) = "font/fixedWidthMedium";
 char sSmallFontName[] __attribute__((aligned(4))) = "font/fixedWidthSmall";
 
-const char* sLargeFontTexture = sLargeFontName;
-const char* sMediumFontTexture = sMediumFontName;
-const char* sSmallFontTexture = sSmallFontName;
+const char* sLargeFontTextureName = sLargeFontName;
+const char* sMediumFontTextureName = sMediumFontName;
+const char* sSmallFontTextureName = sSmallFontName;
 
 #include "NL/gl/font_data.h"
 
@@ -41,7 +41,7 @@ int sFontTextureWidth[3] = { 128, 128, 128 };
 int sFontTextureHeight[3] = { 256, 256, 256 };
 int sFontCharactersPerRow[4] = { 14, 12, 10, 0 };
 
-const char* sFontTextures[4] = { sSmallFontTexture, sMediumFontTexture, sLargeFontTexture };
+const char* sFontTextureNames[4] = { sSmallFontTextureName, sMediumFontTextureName, sLargeFontTextureName };
 glPoly2 sFontPolys[128];
 
 float sFontOffsetX = 0.5f;
@@ -112,7 +112,7 @@ void gl_FontStartup()
 
     for (eGLFont font = GLFONT_Small; font < GLFONT_Count; font = (eGLFont)(font + 1))
     {
-        unsigned long texture = glGetTexture(sFontTextures[font]);
+        unsigned long texture = glGetTexture(sFontTextureNames[font]);
         int width = sFontTextureWidth[font];
         int height = sFontTextureHeight[font];
         unsigned long imageSize = width * height * sizeof(unsigned short);
@@ -173,7 +173,7 @@ void glFontBegin(bool drop)
 {
     if (sFontEnabled)
     {
-        unsigned long texture = glGetTexture(sFontTextures[sCurrentFont]);
+        unsigned long texture = glGetTexture(sFontTextureNames[sCurrentFont]);
         glSetDefaultState(false);
         glSetCurrentTexture(texture, GLTT_Diffuse);
         glSetRasterState(GLS_AlphaTest, 1);
