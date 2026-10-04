@@ -525,7 +525,7 @@ config.libs = [
             Object(Matching, "Game/AI/AiUtil.cpp"),
             Object(Matching, "Game/AI/AvoidableObject.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/AvoidController.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/AI/Desire.cpp", extra_cflags=["-inline noauto"]),
+            Object(NonMatching, "Game/AI/Desire.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "Game/AI/DesireMark.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireMegaStrike.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesirePass.cpp", extra_cflags=["-ipa file"]),

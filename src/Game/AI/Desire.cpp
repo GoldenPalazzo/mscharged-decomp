@@ -263,7 +263,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = (int)DESIRE_FINISHED;
             return;
         }
         Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
@@ -293,7 +293,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = (int)DESIRE_FINISHED;
             return;
         }
         nlVector3 opponentDelta;
@@ -368,7 +368,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = (int)DESIRE_FINISHED;
             return;
         }
         nlVector3 delta;
@@ -727,7 +727,7 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
 {
     if (m_pFielder->fn_8003EA6C() && Incapacitated(m_pTarget))
     {
-        update->SetDesireFinished();
+        *update = (int)DESIRE_FINISHED;
         return;
     }
     if (update->mData.i != DESIRE_CONTINUE)
@@ -736,7 +736,7 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
     }
     if (m_fMaxDistance > 0.0f && m_fDistTravelled >= m_fMaxDistance)
     {
-        update->SetDesireFinished();
+        *update = (int)DESIRE_FINISHED;
         return;
     }
 
