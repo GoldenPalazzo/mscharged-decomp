@@ -14,16 +14,10 @@
 
 class AudioSource;
 
-struct AudioBundleManagerSoundInstanceView
+static inline AudioRpcController* GetAudioRpcController()
 {
-    u8 pad_00[0x50];
-    AudioRpcController* rpcController;
-};
-
-static inline AudioRpcController* GetSoundInstanceRpcController()
-{
-    return ((AudioBundleManagerSoundInstanceView*)GetAudioBundleManager())
-        ->rpcController;
+    return static_cast<UnidentifiedAudioBundleManager_802ECD34*>(
+        GetAudioBundleManager())->m_RpcController;
 }
 
 SlotPool<SoundInstance> sSoundInstancePool(32, 16);
@@ -86,7 +80,7 @@ void SoundInstance::Play(float)
 static inline void PrepareSoundInstanceRpcNodes(SoundInstance* instance)
 {
     AudioRpcGroup* group;
-    AudioRpcController* controller = GetSoundInstanceRpcController();
+    AudioRpcController* controller = GetAudioRpcController();
     for (u32 groupIndex = 0;
         groupIndex < instance->definition->rpcGroupCount;
         groupIndex++)
@@ -197,7 +191,7 @@ void SoundInstance::Update(float dt)
         if (voiceState == SOUND_INSTANCE_STATE_STOPPED)
         {
             RemoveAudioRpcRuntimeNodes(
-                GetSoundInstanceRpcController(),
+                GetAudioRpcController(),
                 (AudioRpcOwner*)instance);
             instance->rpcEntries.Clear();
             AudioSequenceInstance* voice = instance->voices;
@@ -215,7 +209,7 @@ void SoundInstance::Update(float dt)
         if (voiceState == SOUND_INSTANCE_STATE_STOPPED)
         {
             RemoveAudioRpcRuntimeNodes(
-                GetSoundInstanceRpcController(),
+                GetAudioRpcController(),
                 (AudioRpcOwner*)instance);
             instance->rpcEntries.Clear();
             AudioSequenceInstance* voice = instance->voices;
@@ -280,6 +274,6 @@ float SoundInstance::GetPitch()
 void SoundInstance::Destroy()
 {
     RemoveAudioRpcRuntimeNodes(
-        GetSoundInstanceRpcController(), (AudioRpcOwner*)this);
+        GetAudioRpcController(), (AudioRpcOwner*)this);
     rpcEntries.Clear();
 }
