@@ -4,6 +4,8 @@
 #include "Game/Audio/AudioEffect.h"
 #include "NL/nlSlotPool.h"
 
+struct AXFX_DELAY;
+
 class DelayParameter : public AudioEffectParameter
 {
 public:
@@ -65,5 +67,10 @@ public:
 
     static SlotPool<Delay> s_Pool;
 };
+
+extern bool gDelayOverrideEnabled;
+extern float gDelayOverrideVolume;
+
+void SetDefaultDelaySettings(AXFX_DELAY* delay);
 
 #endif // GAME_AUDIO_DELAY_H

@@ -6,7 +6,6 @@
 #include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 
 #include <float.h>
@@ -67,9 +66,8 @@ Delay::Delay()
         AXGetAuxACallback(&callback, &context);
         if (platform->m_OutputMode == 3)
         {
-            if (callback != (AXAuxCallback)ProcessDelayDpl2)
-                AXRegisterAuxACallback(
-                    (AXAuxCallback)ProcessDelayDpl2, delayEffect);
+            if (callback != ProcessDelayDpl2)
+                AXRegisterAuxACallback(ProcessDelayDpl2, delayEffect);
         }
         else if (callback != ProcessDelay)
         {
@@ -80,9 +78,8 @@ Delay::Delay()
         AXGetAuxBCallback(&callback, &context);
         if (platform->m_OutputMode == 3)
         {
-            if (callback != (AXAuxCallback)ProcessDelayDpl2)
-                AXRegisterAuxBCallback(
-                    (AXAuxCallback)ProcessDelayDpl2, delayEffect);
+            if (callback != ProcessDelayDpl2)
+                AXRegisterAuxBCallback(ProcessDelayDpl2, delayEffect);
         }
         else if (callback != ProcessDelay)
         {

@@ -3,6 +3,7 @@
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioEffect.h"
+#include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioSystem.h"
 #include "NL/nlMemory.h"
 #include "NL/nlFileGC.h"
