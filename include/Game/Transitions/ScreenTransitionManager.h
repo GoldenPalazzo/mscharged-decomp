@@ -29,7 +29,7 @@ public:
 class ScreenTransitionCallback
 {
 public:
-    virtual void fn_80188764();
+    virtual void ScreenGrabRequested();
     virtual void TransitionFinished();
     virtual void TransitionProgressed(float);
     virtual void Cut() { }

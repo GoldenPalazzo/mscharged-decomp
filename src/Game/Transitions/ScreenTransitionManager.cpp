@@ -92,7 +92,7 @@ void ScreenTransitionManager::Render()
 
         if (m_pCallback != 0 && m_pActiveTransition->ConsumeScreenGrabRequest())
         {
-            m_pCallback->fn_80188764();
+            m_pCallback->ScreenGrabRequested();
         }
     }
 }
