@@ -5,6 +5,14 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlChunk.h"
 
+static void ResolveGroupTemplates(EffectsBundleData* data)
+{
+    for (unsigned long i = 0; i < data->mNumGroups; ++i)
+    {
+        data->mGroups[i]->ResolveTemplates(data->mTemplates);
+    }
+}
+
 EffectsBundleData* EffectsBundleData::Initialize(nlChunk* bundle)
 {
     EffectsBundleData* data;
@@ -30,10 +38,7 @@ EffectsBundleData* EffectsBundleData::Initialize(nlChunk* bundle)
         data->mGroups[i] = EffectsGroup::LoadFromChunk(chunk);
     }
 
-    for (unsigned long j = 0; j < data->mNumGroups; ++j)
-    {
-        data->mGroups[j]->ResolveTemplates(data->mTemplates);
-    }
+    ResolveGroupTemplates(data);
     return data;
 }
 
