@@ -33,8 +33,6 @@ static float sWarbleTop;
 static int sWarbleInputExtent;
 bool gWarbleEnabled;
 static float sWarblePhase;
-static u32 sWarbleColourHandle;
-static char sWarbleColourLoaded;
 
 static TweakValueFloat sWarbleFrequency(
     "gfWarbleFreq", "/Rendering/Effects/Warble", 60.0f);
@@ -215,11 +213,7 @@ void UpdateWarblePhase(bool*, float dt)
 
 void RenderWarbleQuad(bool*)
 {
-    if (!sWarbleColourLoaded)
-    {
-        sWarbleColourHandle = glGetTexture(sWarbleColourTexture);
-        sWarbleColourLoaded = true;
-    }
+    static u32 sWarbleColourHandle = glGetTexture(sWarbleColourTexture);
 
     GLWarbleMeshWriter writer;
     glSetDefaultState(false);
@@ -240,7 +234,6 @@ void RenderWarbleQuad(bool*)
         writer.Position(left, bottom, 0.0f);
 
         writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
-        const u32 colourHandle = sWarbleColourHandle;
         writer.Texcoord(0x400, 0x400);
         writer.Position(right, bottom, 0.0f);
 
@@ -248,7 +241,7 @@ void RenderWarbleQuad(bool*)
         writer.Texcoord(0x400, 0);
         writer.Position(right, top, 0.0f);
 
-        writer.Texture(0, colourHandle);
+        writer.Texture(0, sWarbleColourHandle);
 
         if (writer.End())
             GetLayerView(eCLV_WarbleBlend)->AttachModel(writer.model, 0);
