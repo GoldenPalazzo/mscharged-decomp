@@ -282,7 +282,7 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
 
 int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, bool skipCapture)
 {
-    static int sImpostorTriangleIndices[6] = { 0, 1, 2, 0, 2, 3 };
+    static int triangleIndices[6] = { 0, 1, 2, 0, 2, 3 };
     int rendered;
     GLCompactColourMeshWriter* writer;
     int i;
@@ -384,7 +384,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
             {
                 for (vertex = 0; vertex < 6; ++vertex)
                 {
-                    const int* corner = &sImpostorTriangleIndices[vertex];
+                    const int* corner = &triangleIndices[vertex];
                     WriteImpostorVertex(writer, quad.texcoord[*corner],
                         quad.position, corner, impostor->mColour);
                 }

@@ -26387,7 +26387,7 @@ __vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21De
 __vt__47nlAVLTree<Ul,P7nlChunk,21DefaultKeyCompare<Ul>> = .data:0x8052E72C; // type:object size:0x14 scope:weak
 __vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>> = .data:0x8052E740; // type:object size:0x14 scope:weak
 __vt__10GLSkinMesh = .data:0x8052E758; // type:object size:0x20 scope:global
-sImpostorTriangleIndices$2908 = .data:0x8052E778; // type:object size:0x18 scope:local data:4byte
+triangleIndices$2910 = .data:0x8052E778; // type:object size:0x18 scope:local data:4byte
 @3473 = .data:0x8052E790; // type:object size:0x10 scope:local data:string
 @3476 = .data:0x8052E7A0; // type:object size:0x25 scope:local data:string
 @3477 = .data:0x8052E7C8; // type:object size:0x25 scope:local data:string
