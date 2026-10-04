@@ -767,7 +767,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
                 PlaySound(10, soundID, lbl_804FB284, g_pGame);
 
                 u32 hash = nlStringLowerHash(lbl_804FB294);
-                fn_802F4E84(&hash, 0, 0);
+                ApplyAudioTransition(&hash, 0, 0);
             }
 
             g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);

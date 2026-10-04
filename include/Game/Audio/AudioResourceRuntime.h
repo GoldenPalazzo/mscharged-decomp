@@ -18,10 +18,10 @@ public:
     /* 0x00 */ AudioRegistryOwner m_Registry;
 
     void LoadScriptData(void* data, unsigned int size);
-    void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+    void ApplyEffectSet(u32 bindingKey, u32 effectSetKey,
         bool inverted, void* owner);
-    void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
-        bool inverted, float duration);
+    void ApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+        bool inverted, float blendTime);
     AudioConfigNode* GetConfigRoot() const { return m_ConfigRoot; }
 
     /* 0x20 */ AudioConfigNode* m_ConfigRoot;
@@ -31,10 +31,14 @@ public:
 
 extern AudioResourceRuntime* g_pAudioResourceRuntime;
 
-extern "C" void fn_802F4904(AudioResourceRuntime* runtime, float deltaTime);
-extern "C" void fn_802F4958(AudioResourceRuntime* runtime);
+void UpdateAudioResourceRuntime(AudioResourceRuntime* runtime, float deltaTime);
+void ShutdownAudioResourceRuntime(AudioResourceRuntime* runtime);
 void NotifyAudioSoundStarted(AudioResourceRuntime* runtime, u32 hash, u32 instance);
 void NotifyAudioSoundStopped(AudioResourceRuntime* runtime, u32 instance);
-extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner);
+// C linkage: AsyncLoading.cpp sees the SDK u32 (unsigned long), which would
+// mangle a C++ declaration differently from this unit's u32.
+extern "C" bool StartAudioEffect(const u32* bindingKey, const u32* definitionKey,
+    void* parameterData, bool invert, float blendTime);
+bool ApplyAudioTransition(const u32* transitionName, bool invert, void* owner);
 
 #endif // GAME_AUDIO_AUDIO_RESOURCE_RUNTIME_H

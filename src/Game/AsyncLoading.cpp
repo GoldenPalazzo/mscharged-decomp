@@ -57,6 +57,7 @@
 #include "Game/SH/SHBootLoading.h"
 
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -138,8 +139,6 @@ bool IsNetworkOrRecordedGame();
 void ShutdownWarbleRendering(void*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
-extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
-    void* parameterData, bool immediate, float value);
 void fn_80056CF4(void*, int, bool);
 extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
@@ -1548,7 +1547,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker1");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1558,7 +1557,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker2");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1568,7 +1567,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker3");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1578,7 +1577,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker4");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
 
     GameInfoManager::Instance()->unknown_0x71C8 = 0;
@@ -1791,7 +1790,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker1");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1801,7 +1800,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker2");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1811,7 +1810,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker3");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1821,7 +1820,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker4");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
 
     FinishLoadingStep(manager);
