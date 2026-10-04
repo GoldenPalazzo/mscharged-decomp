@@ -13,10 +13,10 @@ void AudioBankLoader::ParseChunk(nlChunk* chunk)
         return;
     }
 
-    nlChunk* header = (nlChunk*)chunk->GetData();
+    nlChunk* header = chunk->GetFirstChunk();
     m_Chunk23200 = (AudioSourceData*)header->GetData();
     nlChunk* definitions = header->GetLastChunk();
-    AudioSourceInfo* entries = (AudioSourceInfo*)definitions->GetData();
+    AudioSourceInfo* entries = (AudioSourceInfo*)definitions->GetFirstChunk();
     m_Chunk23200Entries = entries;
     u32 i = 0;
     u32 entryOffset = 0;
