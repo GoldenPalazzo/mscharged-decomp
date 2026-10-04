@@ -821,7 +821,7 @@ config.libs = [
             Object(Matching, "Game/Render/CrowdImpostors.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/CrowdLayoutObject.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/CrowdModelCollection.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/World/WorldVisibility.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/World/WorldVisibility.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/DaisyFist.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/depthoffield.cpp"),
             Object(Matching, "Game/Render/DiddyBanana.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
