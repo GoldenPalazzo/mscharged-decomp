@@ -399,7 +399,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
         else if (lbl_806E106A)
         {
-            fn_80370E20();
+            MovieInit();
             if (FEMusic::IsEnabled())
             {
                 PlayTrackedSound(0x17, 0x6AF33AC2,
@@ -778,7 +778,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         nlFileCache* fileCache = nlGetFileCache();
         fileCache->mCacheWritesEnabled = true;
-        fn_80370E20();
+        MovieInit();
         break;
     }
     case 82:
@@ -1655,7 +1655,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     }
     g_pAudioSystem->Shutdown();
 
-    fn_80370E64();
+    MovieQuit();
     DestroyPadBackends();
     fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
@@ -2091,7 +2091,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
     }
 
     GameSceneManager::Instance()->Push((SceneList)0x10, SCREEN_NOTHING, false);
-    fn_80370E20();
+    MovieInit();
     FinishLoadingStep(manager);
 }
 
