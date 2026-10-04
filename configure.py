@@ -605,7 +605,7 @@ config.libs = [
             Object(Matching, "Game/Audio/Pitch.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/Plat3dSoundSrc.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/Reverb.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/Audio/SoundInstance.cpp", extra_cflags=["-ipa file", "-inline auto,depth=3", "-sym on"]),
+            Object(Matching, "Game/Audio/SoundInstance.cpp", extra_cflags=["-ipa file", "-inline auto,depth=3", "-sym on"]),
             Object(Matching, "Game/Audio/SoundMap.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/Transition.cpp"),
             Object(Matching, "Game/Audio/AudioScriptRuntime.cpp", extra_cflags=["-inline auto,depth=3", "-ipa file", "-sym on"]),
