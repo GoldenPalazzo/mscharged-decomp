@@ -10,6 +10,8 @@ class GLView;
 
 struct PrimitiveShape
 {
+    void MakeModel(int primType, void* resource);
+
     /* 0x00 */ nlVector3* position;
     /* 0x04 */ nlVector3* normal;
     /* 0x08 */ nlVector2* texcoord;
@@ -43,7 +45,15 @@ public:
         float radius) const;
     void DrawWireBox(const nlVector3& boundsMin, const nlVector3& boundsMax,
         const nlColour& colour) const;
+    void DrawEllipse2D(const nlVector3& p0, float fRadius, float fScaleX,
+        float fScaleY, const nlColour& colour, bool bWithDepth) const;
     void Initialize(void* resource);
+
+private:
+    void DrawPrimitive(const PrimitiveShape& prim, const nlMatrix4& mat_world,
+        bool, const nlColour& colour) const;
+
+public:
 
     /* 0x00 */ void* m_pResource;
     /* 0x04 */ bool m_Initialized;
