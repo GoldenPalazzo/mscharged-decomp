@@ -57,13 +57,46 @@ struct WarbleBlobRow
     WarbleByteRow ByteRow() const { return (WarbleByteRow)byteRow; }
 };
 
+struct WarbleCI8Column
+{
+    const u8* data;
+    u8 Pixel(int block, WarbleByteRow row) const
+    {
+        return (data + row)[block << 5];
+    }
+};
+
+static inline WarbleCI8Column WarbleColumn(const PlatTexture* texture, int x)
+{
+    WarbleCI8Column result = {
+        static_cast<const u8*>(texture->m_SwizzledData) + (x & 7)
+    };
+    return result;
+}
+
+struct WarblePalette
+{
+    u16* data;
+    u16& Colour(u8 index) const
+    {
+        return data[index];
+    }
+};
+
+static inline WarblePalette BlobPalette(const PlatTexture* texture)
+{
+    WarblePalette result = {texture->m_PaletteData};
+    return result;
+}
+
 static inline u8 ReadWarbleBlobValue(const WarbleBlobRow& row, int x)
 {
+    const WarblePalette palette = BlobPalette(row.texture);
     int block = row.blockRow * (row.texture->m_Width >> 3) + (x >> 3);
     const WarbleByteRow byteRow = row.ByteRow();
-    int offset = (block << 5) + byteRow + (x & 7);
-    u8 paletteIndex = ((u8*)row.texture->m_SwizzledData)[offset];
-    const u16 colour = row.texture->m_PaletteData[paletteIndex];
+    const WarbleCI8Column column = WarbleColumn(row.texture, x);
+    u8 paletteIndex = column.Pixel(block, byteRow);
+    const u16 colour = palette.Colour(paletteIndex);
     if (colour & 0x8000)
     {
         unsigned int component = (colour >> 10) & 0x1F;
