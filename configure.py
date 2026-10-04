@@ -1007,7 +1007,7 @@ config.libs = [
             Object(Matching, "NL/nlEvent.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "NL/nlFile.cpp", extra_cflags=["-i src/zlib"]),
             Object(Matching, "NL/nlFileGC.cpp", extra_cflags=["-inline nobottomup", "-ipa file", "-sym on"]),
-            Object(NonMatching, "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(Matching, "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "NL/nlFunctionMemory.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlInit.cpp"),
             Object(Matching, "NL/nlIntersection.cpp"),

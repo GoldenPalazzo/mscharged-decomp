@@ -11,6 +11,7 @@
 
 struct nlColour;
 class FontCharString;
+class GLView;
 
 struct TextMetrics
 {
@@ -59,6 +60,7 @@ public:
     struct GlyphInfo
     {
         GlyphInfo() { nlVec2Set(uv, -1.0f, -1.0f); }
+        bool IsValid() const { return -1.0f != uv.x; }
 
         /* 0x00 */ nlVector2 uv;
         /* 0x08 */ nlVector2 Unidentified_08;
@@ -108,11 +110,17 @@ public:
     unsigned long GetStringWidth(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;
     unsigned long fn_80305278(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
     unsigned long fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const;
+    unsigned long GetStringLineCount(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
+    const GlyphInfo& GetGlyphInfo(unsigned short c) const
+    {
+        const GlyphInfo& glyph = c > 0x7F ? m_pExtendedGlyphs[c - 0x80] : m_GlyphLookup[c - 0x20];
+        return glyph.IsValid() ? glyph : m_GlyphLookup['?' - 0x20];
+    }
     unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
     unsigned short GetExtendedFontChar(unsigned short Character) const;
     void DisableScissorBox() const;
     void SetScissorBox(const ScissorBox& other) const;
-    void DrawString(eGLView View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;
+    void DrawString(GLView* View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;
     unsigned char Load(const char* szFontName, char* pFontDescData, unsigned long HashId);
 
     ~nlFont();
