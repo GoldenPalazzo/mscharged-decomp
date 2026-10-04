@@ -63,11 +63,11 @@ public:
         bool IsValid() const { return -1.0f != uv.x; }
 
         /* 0x00 */ nlVector2 uv;
-        /* 0x08 */ nlVector2 Unidentified_08;
+        /* 0x08 */ nlVector2 uvEnd;
         /* 0x10 */ unsigned char Advance;
         /* 0x11 */ unsigned char RenderWidth;
-        /* 0x12 */ unsigned char Unidentified_12;
-        /* 0x13 */ unsigned char Unidentified_13;
+        /* 0x12 */ unsigned char RenderHeight;
+        /* 0x13 */ unsigned char RenderAscent;
         /* 0x14 */ signed char Offset;
         /* 0x15 */ unsigned char Page : 4;
         /* 0x15 */ unsigned char HasKernPairs : 1;
@@ -108,8 +108,8 @@ public:
 
     unsigned long GetStringWidth(const FontCharString& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;
     unsigned long GetStringWidth(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, bool SingleLine, unsigned long Width, bool WordWrap) const;
-    unsigned long fn_80305278(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
-    unsigned long fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const;
+    unsigned long GetStringHeight(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
+    unsigned long GetStringHeight(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const;
     unsigned long GetStringLineCount(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
     const GlyphInfo& GetGlyphInfo(unsigned short c) const
     {
@@ -230,10 +230,10 @@ inline unsigned long nlFont::GetStringWidth(const BasicString<unsigned short, De
     return GetStringWidth(fontText, SingleLine, Width, WordWrap);
 }
 
-inline unsigned long nlFont::fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const
+inline unsigned long nlFont::GetStringHeight(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const
 {
     FontCharString fontText(Text.c_str(), this, (unsigned short*)0);
-    return fn_80305278(fontText, Width, WordWrap);
+    return GetStringHeight(fontText, Width, WordWrap);
 }
 
 #endif // NL_FONT_H

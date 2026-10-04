@@ -82,7 +82,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
     unsigned short Base;
     nlFont::KernPair* pKP;
 
-    float fVar_f24 = 0.0f;
+    float FormatVersion = 0.0f;
 
     CurrentPage = 0;
     CurrentTexelX = 0;
@@ -107,7 +107,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
         switch (nlToUpper(*pCurrentLine))
         {
         case 'V':
-            fVar_f24 = atof(pToken);
+            FormatVersion = atof(pToken);
             break;
 
         case 'P':
@@ -235,7 +235,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
             pInfo->Offset = (signed char)atoi(pCurrentLine);
 
-            bool usePackedGlyphs = 1.2f - fVar_f24 > 0.0001f;
+            bool usePackedGlyphs = 1.2f - FormatVersion > 0.0001f;
             if (usePackedGlyphs)
             {
                 if ((CurrentTexelX + pInfo->RenderWidth) > m_PageSize)
@@ -250,17 +250,17 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
                     }
                 }
 
-                pInfo->Unidentified_13 = RenderAscent;
-                pInfo->Unidentified_12 = RenderHeight;
+                pInfo->RenderAscent = RenderAscent;
+                pInfo->RenderHeight = RenderHeight;
             }
             else
             {
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
-                pInfo->Unidentified_12 = (unsigned char)atoi(pCurrentLine);
+                pInfo->RenderHeight = (unsigned char)atoi(pCurrentLine);
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
-                pInfo->Unidentified_13 = (unsigned char)atoi(pCurrentLine);
+                pInfo->RenderAscent = (unsigned char)atoi(pCurrentLine);
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
                 pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
                 CurrentTexelX = atoi(pCurrentLine);
@@ -269,7 +269,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             }
 
             nlVec2Set(pInfo->uv, (float)CurrentTexelX * m_InvTexSize, (float)CurrentTexelY * m_InvTexSize);
-            nlVec2Set(pInfo->Unidentified_08, pInfo->uv.x + (pInfo->RenderWidth - 1) * m_InvTexSize, pInfo->uv.y + (pInfo->Unidentified_12 - 1) * m_InvTexSize);
+            nlVec2Set(pInfo->uvEnd, pInfo->uv.x + (pInfo->RenderWidth - 1) * m_InvTexSize, pInfo->uv.y + (pInfo->RenderHeight - 1) * m_InvTexSize);
             pInfo->Page = CurrentPage;
             CurrentTexelX += pInfo->RenderWidth;
             break;
@@ -405,13 +405,13 @@ static inline unsigned long CalculateCharWidth(const nlFont& font, const GlyphLo
     return (unsigned long)(ret * font.m_Metrics.Spacing);
 }
 
-class FontGlyphLookup
+// Shared lookup state for one string traversal.
+class FontStringContext
 {
 public:
     typedef nlFont::GlyphInfo GlyphInfo;
-    typedef nlFont::KernPair KernPair;
 
-    FontGlyphLookup(const nlFont& font)
+    FontStringContext(const nlFont& font)
         : m_Font(font)
         , m_EscapeBegin(nlEscapeSequence::ESCAPE_BEGIN)
         , m_Glyphs(font.m_GlyphLookup)
@@ -475,7 +475,7 @@ void nlFont::DrawString(GLView* View, const FontCharString& Text, const nlVector
         OverrideColour = *pOverrideColour;
     }
 
-    FontGlyphLookup glyphLookup(*this);
+    FontStringContext glyphLookup(*this);
     const unsigned short* PushColourIndex = 0;
     nlColour LastPushedColour = OverrideColour;
     nlVec2Set(CurrentPosition, StartingX, StartingY);
@@ -548,62 +548,62 @@ void nlFont::DrawString(GLView* View, const FontCharString& Text, const nlVector
             {
                 pGlyph = &glyphLookup.GetGlyphInfo(Char);
                 unsigned long Page = pGlyph->Page;
-                    CurrentPosition.x += (float)pGlyph->Offset;
-                    if (Page == CurrentPage)
+                CurrentPosition.x += (float)pGlyph->Offset;
+                if (Page == CurrentPage)
+                {
+                    int renderAscent = FlipY ? -pGlyph->RenderAscent : pGlyph->RenderAscent;
+                    CurrentPosition.y = StartingY - (float)renderAscent;
+                    pCurrentQuad->m_pos[1].x = CurrentPosition.x;
+                    pCurrentQuad->m_pos[0].x = CurrentPosition.x;
+
+                    pCurrentQuad->m_pos[2].x = pCurrentQuad->m_pos[3].x = CurrentPosition.x + (float)pGlyph->RenderWidth - 1.0f;
+
+                    pCurrentQuad->m_pos[3].y = CurrentPosition.y;
+                    pCurrentQuad->m_pos[0].y = CurrentPosition.y;
+
+                    int renderHeight;
+                    if (FlipY)
                     {
-                        int renderAscent = FlipY ? -pGlyph->Unidentified_13 : pGlyph->Unidentified_13;
-                        CurrentPosition.y = StartingY - (float)renderAscent;
-                        pCurrentQuad->m_pos[1].x = CurrentPosition.x;
-                        pCurrentQuad->m_pos[0].x = CurrentPosition.x;
-
-                        pCurrentQuad->m_pos[2].x = pCurrentQuad->m_pos[3].x = CurrentPosition.x + (float)pGlyph->RenderWidth - 1.0f;
-
-                        pCurrentQuad->m_pos[3].y = CurrentPosition.y;
-                        pCurrentQuad->m_pos[0].y = CurrentPosition.y;
-
-                        int renderHeight;
-                        if (FlipY)
-                        {
-                            renderHeight = -(pGlyph->Unidentified_12 - 1);
-                        }
-                        else
-                        {
-                            renderHeight = pGlyph->Unidentified_12 - 1;
-                        }
-
-                        pCurrentQuad->m_pos[1].y = pCurrentQuad->m_pos[2].y = CurrentPosition.y + (float)renderHeight;
-
-                        pCurrentQuad->depth = 0.0f;
-
-                        pCurrentQuad->m_uv[0].x = pCurrentQuad->m_uv[1].x = pGlyph->uv.x;
-
-                        pCurrentQuad->m_uv[2].x = pCurrentQuad->m_uv[3].x = pGlyph->Unidentified_08.x;
-
-                        pCurrentQuad->m_uv[0].y = pCurrentQuad->m_uv[3].y = pGlyph->uv.y;
-
-                        pCurrentQuad->m_uv[1].y = pCurrentQuad->m_uv[2].y = pGlyph->Unidentified_08.y;
-
-                        nlColour QuadColour = OverrideColour;
-                        QuadColour.c[3] = Colour.c[3];
-                        pCurrentQuad->SetColour(QuadColour);
-
-                        pCurrentQuad++;
-                        HandledChars++;
+                        renderHeight = -(pGlyph->RenderHeight - 1);
+                    }
+                    else
+                    {
+                        renderHeight = pGlyph->RenderHeight - 1;
                     }
 
-                    int FinalAdvance = (int)pGlyph->Advance;
-                    if (pGlyph->HasKernPairs && pCurrentChar[1] != 0)
-                    {
-                        unsigned short* pKern = (unsigned short*)pCurrentChar;
-                        KernPair kp = { { pKern[0], pKern[1] }, 0 };
-                        KernPair* pValidKp = nlBSearch<KernPair, KernPair>(kp, m_pKernTable, m_KernTableSize);
-                        if (pValidKp != 0)
-                        {
-                            FinalAdvance += pValidKp->Kern;
-                        }
-                    }
+                    pCurrentQuad->m_pos[1].y = pCurrentQuad->m_pos[2].y = CurrentPosition.y + (float)renderHeight;
 
-                    CurrentPosition.x += (float)FinalAdvance * m_Metrics.Spacing;
+                    pCurrentQuad->depth = 0.0f;
+
+                    pCurrentQuad->m_uv[0].x = pCurrentQuad->m_uv[1].x = pGlyph->uv.x;
+
+                    pCurrentQuad->m_uv[2].x = pCurrentQuad->m_uv[3].x = pGlyph->uvEnd.x;
+
+                    pCurrentQuad->m_uv[0].y = pCurrentQuad->m_uv[3].y = pGlyph->uv.y;
+
+                    pCurrentQuad->m_uv[1].y = pCurrentQuad->m_uv[2].y = pGlyph->uvEnd.y;
+
+                    nlColour QuadColour = OverrideColour;
+                    QuadColour.c[3] = Colour.c[3];
+                    pCurrentQuad->SetColour(QuadColour);
+
+                    pCurrentQuad++;
+                    HandledChars++;
+                }
+
+                int FinalAdvance = (int)pGlyph->Advance;
+                if (pGlyph->HasKernPairs && pCurrentChar[1] != 0)
+                {
+                    unsigned short* pKern = (unsigned short*)pCurrentChar;
+                    KernPair kp = { { pKern[0], pKern[1] }, 0 };
+                    KernPair* pValidKp = nlBSearch<KernPair, KernPair>(kp, m_pKernTable, m_KernTableSize);
+                    if (pValidKp != 0)
+                    {
+                        FinalAdvance += pValidKp->Kern;
+                    }
+                }
+
+                CurrentPosition.x += (float)FinalAdvance * m_Metrics.Spacing;
             }
 
             pCurrentChar++;
@@ -678,7 +678,7 @@ unsigned long nlFont::GetStringWidth(const FontCharString& Text, bool SingleLine
         unsigned short PrevChar = 0;
         unsigned long StringWidth = 0;
         const unsigned short* pCurrentChar = Text.m_pString;
-        FontGlyphLookup glyphLookup(*this);
+        FontStringContext glyphLookup(*this);
         while (*pCurrentChar != 0)
         {
             if (*pCurrentChar == glyphLookup.GetEscapeBegin())
@@ -705,7 +705,7 @@ unsigned long nlFont::GetStringWidth(const FontCharString& Text, bool SingleLine
     unsigned char IsNewParagraph = 0;
     const unsigned short* pCurrentChar = Text.m_pString;
     unsigned long CharWidth;
-    FontGlyphLookup glyphLookup(*this);
+    FontStringContext glyphLookup(*this);
 
     while (*pCurrentChar != 0)
     {
@@ -783,7 +783,7 @@ unsigned long nlFont::GetStringWidth(const FontCharString& Text, bool SingleLine
     return MaxWidth;
 }
 
-unsigned long nlFont::fn_80305278(const FontCharString& Text, unsigned long Width, bool WordWrap) const
+unsigned long nlFont::GetStringHeight(const FontCharString& Text, unsigned long Width, bool WordWrap) const
 {
     unsigned long LineCount = GetStringLineCount(Text, Width, WordWrap);
     return (unsigned long)(m_Metrics.Spacing * (m_Metrics.Height * LineCount));
@@ -799,7 +799,7 @@ unsigned long nlFont::GetStringLineCount(const FontCharString& Text, unsigned lo
     unsigned char IsNewParagraph = 0;
     const unsigned short* pCurrentChar = Text.m_pString;
     unsigned long CharWidth;
-    FontGlyphLookup glyphLookup(*this);
+    FontStringContext glyphLookup(*this);
 
     while (*pCurrentChar != 0)
     {
