@@ -3564,6 +3564,16 @@ struct UnidentifiedFielderDesireState
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
+static inline void RegisterFielderMarks(DebugWriteCache* cache,
+    cFielder** marks, const void* base)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        cache->AddField(15, gDebugFieldTypes[15].size,
+            (u8*)&marks[i] - (const u8*)base, "m_pMark[i]");
+    }
+}
+
 void cFielder::SyncLog(void* context, DebugWriteCache* cache)
 {
     cPlayer::SyncLog(context, cache);
@@ -3593,11 +3603,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
             muInvincibleStatus, "muInvincibleStatus");
         REGISTER_FIELDER_FIELD(14, m_bHasBeenUpdated,
             m_eRole, "m_eRole");
-        for (int i = 0; i < 4; i++)
-        {
-            REGISTER_FIELDER_FIELD(15, m_bHasBeenUpdated,
-                m_pMark[i], "m_pMark[i]");
-        }
+        RegisterFielderMarks(cache, m_pMark, &m_bHasBeenUpdated);
         REGISTER_FIELDER_FIELD(16, m_bHasBeenUpdated,
             mbWasHitByPowerupThisFrame, "mbWasHitByPowerupThisFrame");
         REGISTER_FIELDER_FIELD(16, m_bHasBeenUpdated,
