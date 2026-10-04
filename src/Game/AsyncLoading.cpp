@@ -140,7 +140,6 @@ void ShutdownWarbleRendering(void*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
 void fn_80056CF4(void*, int, bool);
-extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
 void FreeImpostorLighting();
 
@@ -368,7 +367,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
-        fn_8030753C(FontManager::Instance(), GetFEResourcePool());
+        FontManager::Instance()->SetResourcePool(GetFEResourcePool());
         gLoadInGameFonts = false;
         BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);
@@ -500,7 +499,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
-        fn_8030753C(FontManager::Instance(), GetFEResourcePool());
+        FontManager::Instance()->SetResourcePool(GetFEResourcePool());
         gLoadInGameFonts = true;
         BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);

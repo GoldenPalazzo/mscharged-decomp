@@ -750,7 +750,7 @@ config.libs = [
 
             # Game/Font
             Object(Matching, "Game/Font/FontLoading.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/Font/fontmanager.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Font/fontmanager.cpp", extra_cflags=["-ipa file", "-sym on"]),
 
             # Game/GL
             Object(Matching, "Game/GL/GLColourMeshWriter.cpp"),
