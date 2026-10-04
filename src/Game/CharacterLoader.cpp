@@ -180,7 +180,7 @@ bool CharacterLoader::NeedsCharacterTextures()
     Entry* pEntry = mCurrent;
     if (pEntry->bGoalie)
     {
-        return !GetGoalieTemplateInfo(pEntry->cc - 20)->bLoaded;
+        return !GetGoalieTemplateInfo(pEntry->cc - 20)->bTexturesLoaded;
     }
     if (pEntry->bCaptain)
     {
@@ -207,7 +207,7 @@ void CharacterLoader::StartLoadingCharacterTextures()
         s32 goalieIdx = pEntry->cc - 20;
         glBeginLoadTextureBundle(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename, TextureBundleLoaded_cb,
             mCurrent, glGetCurrentResourcePool());
-        GetGoalieTemplateInfo(goalieIdx)->bLoaded = 1;
+        GetGoalieTemplateInfo(goalieIdx)->bTexturesLoaded = 1;
     }
     else
     {
@@ -481,13 +481,13 @@ void CharacterLoader::StartLoadingCharacterModel(int nModel)
         szFilename = mTemplateInfo->szModelFilename;
         break;
     case 1:
-        szFilename = mTemplateInfo->pUnidentified08;
+        szFilename = mTemplateInfo->szShockModelFilename;
         break;
     case 2:
-        szFilename = mTemplateInfo->pUnidentified0C;
+        szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
     case 3:
-        szFilename = mTemplateInfo->pUnidentified10;
+        szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }
     if (szFilename != 0)
@@ -505,13 +505,13 @@ bool CharacterLoader::FinalizeLoadingCharacterModel(int nModel)
         szFilename = mTemplateInfo->szModelFilename;
         break;
     case 1:
-        szFilename = mTemplateInfo->pUnidentified08;
+        szFilename = mTemplateInfo->szShockModelFilename;
         break;
     case 2:
-        szFilename = mTemplateInfo->pUnidentified0C;
+        szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
     case 3:
-        szFilename = mTemplateInfo->pUnidentified10;
+        szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }
     if (szFilename == 0)
@@ -899,25 +899,25 @@ void CharacterLoader::StartLoadingCharINIFiles()
 {
     if (mCurrent->bGoalie)
     {
-        mTemplate->pUnidentified30 = new (nlMalloc(sizeof(GoalieTweaks), 8, false))
-            GoalieTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->pUnidentified48);
-        mTemplate->pUnidentified28 = 0;
-        mTemplate->pUnidentified2C = 0;
+        mTemplate->pGoalieTweaks = new (nlMalloc(sizeof(GoalieTweaks), 8, false))
+            GoalieTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->szTweaksCategory);
+        mTemplate->pPlayerTweaks = 0;
+        mTemplate->pSuperPlayerTweaks = 0;
     }
     else
     {
-        mTemplate->pUnidentified28 = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
-            PlayerTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->pUnidentified48);
-        if (mTemplateInfo->pUnidentified4C != 0)
+        mTemplate->pPlayerTweaks = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
+            PlayerTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->szTweaksCategory);
+        if (mTemplateInfo->szSuperTweaksFilename != 0)
         {
-            mTemplate->pUnidentified2C = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
-                PlayerTweaks(mTemplateInfo->pUnidentified4C, mTemplateInfo->pUnidentified50);
+            mTemplate->pSuperPlayerTweaks = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
+                PlayerTweaks(mTemplateInfo->szSuperTweaksFilename, mTemplateInfo->szSuperTweaksCategory);
         }
         else
         {
-            mTemplate->pUnidentified2C = 0;
+            mTemplate->pSuperPlayerTweaks = 0;
         }
-        mTemplate->pUnidentified30 = 0;
+        mTemplate->pGoalieTweaks = 0;
     }
 }
 
@@ -961,7 +961,7 @@ void CharacterLoader::CreateCharacterInstance()
         s32 goalieIdx = mCurrent->cc - 20;
         Goalie* pGoalie = new (nlMalloc(sizeof(Goalie), 8, false)) Goalie(
             mCurrent->cc, (const int*)pTemplate, pHierarchy, pTemplate->pAnimInventory,
-            pTemplate->pPhysicsData, pTemplate->pUnidentified30, pAnimRetargetList,
+            pTemplate->pPhysicsData, pTemplate->pGoalieTweaks, pAnimRetargetList,
             mCurrent->nCharIdx);
         pGoalie->m_szEffectsName = pInfo->szEffectsName;
         pGoalie->fn_80022DAC(GetHashFromTextureFile(pInfo->szTextureFilename));
@@ -989,7 +989,7 @@ void CharacterLoader::CreateCharacterInstance()
         cFielder* pFielder = new (nlMalloc(sizeof(cFielder), 8, false)) cFielder(
             mCurrent->nPlayerID, mCurrent->nTeamID, mCurrent->cc, (const int*)pTemplate,
             pHierarchy, pTemplate->pAnimInventory, pTemplate->pPhysicsData,
-            pTemplate->pUnidentified28, pTemplate->pUnidentified2C, pAnimRetargetList,
+            pTemplate->pPlayerTweaks, pTemplate->pSuperPlayerTweaks, pAnimRetargetList,
             mCurrent->nCharIdx);
         pFielder->m_szEffectsName = pInfo->szEffectsName;
 
@@ -1034,7 +1034,7 @@ bool CharacterLoader::HasAlternateSwapTexture()
         {
             if (altcaptain != CHARACTER_CLASS_INVALID && mCurrent->cc == altcaptain)
             {
-                const char* szFilename = GetCharacterTemplateInfo(altcaptain)->pUnidentified18;
+                const char* szFilename = GetCharacterTemplateInfo(altcaptain)->szAlternateTextureFilename;
                 if (szFilename != 0 && nlFileExists(szFilename))
                 {
                     return true;
@@ -1046,7 +1046,7 @@ bool CharacterLoader::HasAlternateSwapTexture()
             if (altcaptain != CHARACTER_CLASS_INVALID
                 && mCurrent->nTeamID == (mCaptain[0] != altcaptain))
             {
-                const char* szFilename = GetGoalieTemplateInfo(mCurrent->cc - 20)->pUnidentified08;
+                const char* szFilename = GetGoalieTemplateInfo(mCurrent->cc - 20)->szAlternateTextureFilename;
                 if (szFilename != 0 && nlFileExists(szFilename))
                 {
                     return true;
@@ -1065,11 +1065,11 @@ bool CharacterLoader::StartLoadingCaptainOrGoalieAlternateSwapTexture()
     const char* szFilename = 0;
     if (pEntry->bCaptain)
     {
-        szFilename = GetCharacterTemplateInfo(pEntry->cc)->pUnidentified18;
+        szFilename = GetCharacterTemplateInfo(pEntry->cc)->szAlternateTextureFilename;
     }
     else if (pEntry->bGoalie)
     {
-        szFilename = GetGoalieTemplateInfo(pEntry->cc - 20)->pUnidentified08;
+        szFilename = GetGoalieTemplateInfo(pEntry->cc - 20)->szAlternateTextureFilename;
     }
     glBeginLoadTextureBundle(szFilename, AlternateSwapTextureLoaded_cb, mCurrent, glGetCurrentResourcePool());
     return true;
@@ -1128,7 +1128,7 @@ bool CharacterLoader::NeedsCaptainAudio()
 
 void CharacterLoader::StartLoadingCaptainAudio()
 {
-    int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
+    int nBank = GetCharacterInfo(mCurrent->cc).mSoundBankId;
     mAudioRequestCount += gAudioEnabled;
     LoadSoundBank((GameAudio*)g_pAudioSystem, nBank,
         (mCurrent->nTeamID == 0) ? 1 : 5, AudioBankLoaded_cb, (void*)mAudioRequestCount);
@@ -1141,7 +1141,7 @@ bool CharacterLoader::NeedsSidekickAudio()
 
 void CharacterLoader::StartLoadingSidekickAudio()
 {
-    int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
+    int nBank = GetCharacterInfo(mCurrent->cc).mSoundBankId;
     mAudioRequestCount += gAudioEnabled;
     Entry* pEntry = mCurrent;
     int nSlot = (pEntry->nTeamID == 0) ? 1 : 5;
