@@ -3,7 +3,7 @@
 #include "revolution/ax.h"
 #include "revolution/axfx.h"
 
-#include "Game/Audio/AudioEffect.h"
+#include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlSlotPool.h"
@@ -21,33 +21,6 @@ static u32 sDelayOutputLeft = 100;
 static u32 sDelayOutputRight = 100;
 static u32 sDelayOutputSurround = 100;
 
-class DelayParameter : public AudioEffectParameter
-{
-public:
-    DelayParameter();
-    virtual ~DelayParameter() { }
-    void ApplySettings(AXFX_DELAY* delay);
-
-    static void* operator new(unsigned long)
-    {
-        DelayParameter* parameter = 0;
-        s_Pool.Allocate(parameter);
-        return parameter;
-    }
-
-    static void operator delete(void* pointer)
-    {
-        s_Pool.Free((DelayParameter*)pointer);
-    }
-
-    u32 m_Delay[3];
-    u32 m_Feedback[3];
-    u32 m_Output[3];
-    float m_AuxVolume;
-
-    static SlotPool<DelayParameter> s_Pool;
-};
-
 inline DelayParameter::DelayParameter()
     : m_AuxVolume(0.0f)
 {
@@ -61,44 +34,6 @@ inline DelayParameter::DelayParameter()
     m_Output[1] = sDelayOutputRight;
     m_Output[2] = sDelayOutputSurround;
 }
-
-class Delay : public AudioEffectBase
-{
-public:
-    Delay();
-    virtual ~Delay() { }
-    virtual void CreateParameter(unsigned int definition, const void* context, bool negate,
-        AudioEffectParameter** output);
-    virtual void BeginBlend()
-    {
-        m_Final = m_Initial;
-    }
-    virtual void BlendParameter(AudioEffectParameter* destination,
-        AudioEffectParameter* source);
-    virtual void EndBlend();
-    virtual void OnParameterFinished(AudioEffectParameter*) { }
-    virtual void OnSoundStarted(void*);
-    virtual void ApplyToSound(void* handle);
-
-    static void* operator new(unsigned long)
-    {
-        Delay* effect = 0;
-        s_Pool.Allocate(effect);
-        return effect;
-    }
-
-    static void operator delete(void* pointer)
-    {
-        s_Pool.Free((Delay*)pointer);
-    }
-
-    DelayParameter m_Initial;
-    DelayParameter m_Final;
-
-    static SlotPool<Delay> s_Pool;
-};
-
-static const int sDelaySendEffectId = 0;
 
 SlotPool<DelayParameter> DelayParameter::s_Pool(16, 16);
 SlotPool<Delay> Delay::s_Pool(16, 16);
@@ -237,7 +172,7 @@ void Delay::ApplyToSound(void* handle)
     GetSoundSources(handle, voices, &count);
 
     int volume = (int)(-960.0f * (1.0f - m_Final.m_AuxVolume));
-    int auxIndex = g_pAuxEffectMap->GetAuxiliary(sDelaySendEffectId);
+    int auxIndex = g_pAuxEffectMap->GetAuxiliary(0);
     for (u32 i = 0; i < count; ++i)
         voices[i]->SetAuxiliaryVolume(auxIndex, volume);
 }
