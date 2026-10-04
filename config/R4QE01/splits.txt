@@ -3622,13 +3622,17 @@ Game/Effects/EmissionController.cpp:
 	.sdata2     start:0x806E6558 end:0x806E6570
 
 Game/Effects/EmissionManager.cpp:
-	.text       start:0x802E5B60 end:0x802EB344
-	.ctors      start:0x804DBA30 end:0x804DBA38
+	.text       start:0x802E5B60 end:0x802EAF64
+	.ctors      start:0x804DBA30 end:0x804DBA34
 	.data       start:0x8052F0E8 end:0x8052F3A0
 	.bss        start:0x8057F6A8 end:0x8057F928
 	.sdata      start:0x806DF488 end:0x806DF4C8
 	.sbss       start:0x806E1FD4 end:0x806E2010 align:4
 	.sdata2     start:0x806E6570 end:0x806E65A0
+
+Game/Effects/EffectsBundleData.cpp:
+	.text       start:0x802EAF64 end:0x802EB344
+	.ctors      start:0x804DBA34 end:0x804DBA38
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB5BC

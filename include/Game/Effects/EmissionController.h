@@ -11,6 +11,7 @@ class cPoseAccumulator;
 class EffectsGroup;
 class EmissionManager;
 class LoadFrame;
+class SaveFrame;
 class ParticleSystem;
 class UserEffectSpec;
 struct EffectsSpec;
@@ -41,6 +42,7 @@ public:
         return m_Id;
     }
     void Replay(LoadFrame& frame);
+    void Replay(SaveFrame& frame);
     float GetRemainingTime() const;
     bool IsLingering() const;
     void ComputePositionAndVelocity(EffectsSpec& spec, nlVector3& pos, nlVector3& vel);
