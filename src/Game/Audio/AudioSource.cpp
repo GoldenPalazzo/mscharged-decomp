@@ -1,6 +1,6 @@
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioResourcePlatform.h"
-#include "Game/Audio/AudioStreamSource.h"
+#include "Game/Audio/AudioSource.h"
 
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/Plat3dSoundSrc.h"

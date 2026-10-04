@@ -2,6 +2,7 @@
 #define GAME_AUDIO_AUDIO_SOURCE_H
 
 #include "revolution/sp.h"
+#include "revolution/os/OSInterrupt.h"
 #include "NL/nlFile.h"
 #include "NL/nlSlotPool.h"
 
@@ -40,7 +41,7 @@ public:
         m_Unknown14_0C = 1;
         m_Unknown14_18 = 0;
     }
-    virtual ~AudioSource() { }
+    virtual ~AudioSource();
     virtual void UpdateState();
     virtual int GetState() { return m_Unknown04; }
     virtual bool IsResident();
@@ -121,6 +122,8 @@ struct AudioReadQueueEntry
     AsyncEntry* m_Unknown00;
     AudioReadQueueEntry* m_next;
 };
+
+extern SlotPool<AudioReadQueueEntry> gAudioReadQueueEntryPool;
 
 struct AudioStreamHeader
 {
@@ -214,5 +217,90 @@ inline void* AudioSampleSource::operator new(unsigned long)
 {
     return gAudioSampleSourcePool.Allocate();
 }
+
+inline bool AudioSource::IsResident()
+{
+    return true;
+}
+
+inline bool AudioSource::IsStream()
+{
+    return false;
+}
+
+template <unsigned int ChannelCount>
+class UnidentifiedAudioChannels : public AudioReadState
+{
+public:
+    virtual ~UnidentifiedAudioChannels() { }
+
+    virtual AXVPB* GetVoice();
+
+    virtual bool WasVoiceDropped();
+
+    virtual void ReleaseVoice(bool release);
+
+    virtual unsigned int GetChannelCount();
+
+    virtual AudioStreamChannel* GetFirstChannel();
+
+    virtual AudioStreamChannel* GetChannelIterator();
+
+    virtual AudioStreamChannel* GetNextChannel(AudioStreamChannel* channel);
+
+    virtual bool HasVoice();
+
+    AudioStreamChannel m_Channels[ChannelCount];
+};
+
+class AudioReadState_8035D154 : public UnidentifiedAudioChannels<1>
+{
+public:
+    virtual ~AudioReadState_8035D154();
+    virtual void SetPan(float value);
+    virtual void SetInterauralDelay(int value);
+    virtual unsigned int UnidentifiedVirtual70();
+
+    static void* operator new(unsigned long);
+    static void operator delete(void*);
+};
+
+class AudioReadState_80361920 : public UnidentifiedAudioChannels<2>
+{
+public:
+    virtual ~AudioReadState_80361920();
+    virtual bool Prepare();
+    virtual void SetPan(float);
+    virtual void SetInterauralDelay(int);
+    virtual unsigned int UnidentifiedVirtual70();
+
+    static void* operator new(unsigned long);
+    static void operator delete(void*);
+};
+
+extern SlotPool<AudioReadState_8035D154> lbl_80585C48;
+extern SlotPool<AudioReadState_80361920> lbl_80585C70;
+
+inline void* AudioReadState_8035D154::operator new(unsigned long)
+{
+    return lbl_80585C48.Allocate();
+}
+
+inline void AudioReadState_8035D154::operator delete(void* pointer)
+{
+    lbl_80585C48.Free((AudioReadState_8035D154*)pointer);
+}
+
+inline void* AudioReadState_80361920::operator new(unsigned long)
+{
+    return lbl_80585C70.Allocate();
+}
+
+inline void AudioReadState_80361920::operator delete(void* pointer)
+{
+    lbl_80585C70.Free((AudioReadState_80361920*)pointer);
+}
+
+#include "Game/Audio/AudioSource.inl"
 
 #endif // GAME_AUDIO_AUDIO_SOURCE_H
