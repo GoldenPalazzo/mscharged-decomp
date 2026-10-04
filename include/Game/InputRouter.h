@@ -40,7 +40,7 @@ public:
 
     /* 0x004 */ PackedDetInput mInputRecords[16];
     /* 0x104 */ u8 mInputStates[16];
-    /* 0x114 */ u16 mNetworkTicks[4];
+    /* 0x114 */ u16 mRemapAngles[4];
     /* 0x11C */ u32 mNetworkCRCs[4];
     /* 0x12C */ s32 mRemoteTicks[4];
     /* 0x13C */ u32 mRandomSeeds[4];
@@ -114,9 +114,9 @@ public:
     /* 0x019A */ u8 mPadding19A[2];
     /* 0x019C */ float mCongestionMultiplier;
     /* 0x01A0 */ NetMessageInput mCurrentMessage;
-    /* 0x0290 */ u8 mUnidentified290;
+    /* 0x0290 */ u8 mMessageHeld;
     /* 0x0291 */ u8 mPadding291[3];
-    /* 0x0294 */ s32 mUnidentified294;
+    /* 0x0294 */ s32 mBundledMessageCount;
     /* 0x0298 */ NetMessageInputBundle mBundledMessage;
     /* 0x0480 */ NetworkInputMessageQueue mInputQueues[4];
     /* 0xE5C0 */ volatile u32 mQueueCursor;

@@ -83,7 +83,7 @@ void InputRouter::Reset(int)
 
     for (int machine = 0; machine < 4; ++machine)
     {
-        mNetworkTicks[machine] = 0;
+        mRemapAngles[machine] = 0;
         mNetworkCRCs[machine] = 0;
         mRemoteTicks[machine] = 0;
         mRandomSeeds[machine] = 0;
@@ -181,7 +181,7 @@ bool InputRouter::ProcessPlaybackFrame()
         int eventCount = 0;
         u32 dataSize = 0;
         if (!gNetworkInputRecording->ReadNetworkInputPacketHeader(machine,
-                &mNetworkTicks[machine], &mNetworkCRCs[machine],
+                &mRemapAngles[machine], &mNetworkCRCs[machine],
                 (u32*)&mRemoteTicks[machine], &mRandomSeeds[machine],
                 (u32*)&eventCount, &dataSize))
         {
@@ -218,7 +218,7 @@ bool InputRouter::ProcessPlaybackFrame()
                 return false;
             }
             channel->ApplyNetworkPeerChannelInput(
-                &mInputRecords[playerId], mNetworkTicks[machine],
+                &mInputRecords[playerId], mRemapAngles[machine],
                 mInputStates[playerId]);
         }
     }
@@ -294,7 +294,7 @@ void SimpleInputRouter::OnInputReady()
     s8 machine = mSession->GetLocalMachineId();
     int playerCount = peer->mPlayerCount;
 
-    mNetworkTicks[machine]
+    mRemapAngles[machine]
         = peer->GetNetworkPeerChannel(0)->GetNetworkPeerChannelRemapAngle();
 
     int eventCount = m_OutgoingCustomDetermDataQ.GetCount();
@@ -304,7 +304,7 @@ void SimpleInputRouter::OnInputReady()
         NetworkInputRecording* recording = gNetworkInputRecording;
         u32 seed = GetNetworkRandomSeed();
         recording->WriteNetworkInputPacketHeader(machine,
-            mNetworkTicks[machine], mCurrentCRC, frame, seed, eventCount, 0);
+            mRemapAngles[machine], mCurrentCRC, frame, seed, eventCount, 0);
     }
 
     for (int i = 0; i < eventCount; ++i)
@@ -329,7 +329,7 @@ void SimpleInputRouter::OnInputReady()
             = channel->GetNetworkPeerChannelConnectionStatus();
         const PackedDetInput* input = &mInputRecords[playerId];
         channel->ApplyNetworkPeerChannelInput(
-            input, mNetworkTicks[machine], mInputStates[playerId]);
+            input, mRemapAngles[machine], mInputStates[playerId]);
 
         if (gNetworkInputRecording->mRecording)
         {
@@ -355,8 +355,8 @@ void NetworkInputRouter::Reset(int resetQueues)
     mCongestionMultiplier = fDefCongestionMultiplier;
     mWasCongested = false;
     mCurrentMessage.Reset(true, true);
-    mUnidentified290 = 0;
-    mUnidentified294 = 0;
+    mMessageHeld = 0;
+    mBundledMessageCount = 0;
 
     for (int machine = 0; machine < 4; ++machine)
     {
@@ -420,8 +420,8 @@ void NetworkInputRouter::OnInputCaptured()
         mLastGameFrame = frame;
     }
 
-    mCurrentMessage.Reset(false, !mUnidentified290);
-    mUnidentified290 = false;
+    mCurrentMessage.Reset(false, !mMessageHeld);
+    mMessageHeld = false;
 
     NetworkPeer* peer = mSession->GetLocalPeer();
     for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
@@ -455,7 +455,7 @@ void NetworkInputRouter::OnInputCaptured()
 
     if (mQueueLimit < mQueueCursor && (frame & 1) != 0)
     {
-        mUnidentified290 = true;
+        mMessageHeld = true;
         --mQueueCursor;
         return;
     }
@@ -476,12 +476,12 @@ void NetworkInputRouter::OnInputCaptured()
     }
     case 2:
     {
-        if (mUnidentified294 == 0)
+        if (mBundledMessageCount == 0)
         {
             mBundledMessage.mMessage0.CopyFrom(&mCurrentMessage);
-            ++mUnidentified294;
+            ++mBundledMessageCount;
         }
-        else if (mUnidentified294 == 1)
+        else if (mBundledMessageCount == 1)
         {
             mBundledMessage.mMessage1.CopyFrom(&mCurrentMessage);
             u8 buffer[400];
@@ -492,7 +492,7 @@ void NetworkInputRouter::OnInputCaptured()
             {
                 g_pNetworkSessionBase->Send(machine, buffer, size, true);
             }
-            mUnidentified294 = 0;
+            mBundledMessageCount = 0;
         }
         break;
     }
@@ -504,7 +504,7 @@ inline void NetworkInputRouter::RecordEmptyInputHeader(s8 machine, int frame)
     NetworkInputRecording* recording = gNetworkInputRecording;
     u32 seed = GetNetworkRandomSeed();
     recording->WriteNetworkInputPacketHeader(machine,
-        mNetworkTicks[machine], mCurrentCRC, frame, seed, 0, 0);
+        mRemapAngles[machine], mCurrentCRC, frame, seed, 0, 0);
 }
 
 void NetworkInputRouter::OnInputReady()
@@ -530,7 +530,7 @@ void NetworkInputRouter::OnInputReady()
                     = peer->GetNetworkPeerChannel(player);
                 s8 playerId = GetNetworkPlayerId(player, machine);
                 channel->ApplyNetworkPeerChannelInput(
-                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    &mInputRecords[playerId], mRemapAngles[machine],
                     mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
@@ -551,7 +551,7 @@ void NetworkInputRouter::OnInputReady()
             NetMessageInput* message = &mInputQueues[machine].Pop();
 
             message->GetNetworkInputMessageRemapAngle(
-                &mNetworkTicks[machine]);
+                &mRemapAngles[machine]);
             if ((message->mUnidentified008 & 4) != 0)
             {
                 mNetworkCRCs[machine] = message->mUnidentified00C;
@@ -576,7 +576,7 @@ void NetworkInputRouter::OnInputReady()
                 NetworkInputRecording* recording = gNetworkInputRecording;
                 u32 seed = GetNetworkRandomSeed();
                 recording->WriteNetworkInputPacketHeader(machine,
-                    mNetworkTicks[machine], mCurrentCRC, frame, seed,
+                    mRemapAngles[machine], mCurrentCRC, frame, seed,
                     eventCount, serializedLength);
             }
 
@@ -610,7 +610,7 @@ void NetworkInputRouter::OnInputReady()
                 mInputStates[playerId]
                     = message->GetNetworkInputMessagePlayerState(player);
                 channel->ApplyNetworkPeerChannelInput(
-                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    &mInputRecords[playerId], mRemapAngles[machine],
                     mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
