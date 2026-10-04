@@ -1,4 +1,5 @@
 #include "Game/PadMonkey.h"
+#include "NL/plat/WiiPad.h"
 
 #include <string.h>
 
