@@ -13,7 +13,7 @@ public:
     FontManager();
     virtual ~FontManager();
 
-    nlFont* GetFontByHashID(unsigned long hashID);
+    nlFont* GetFontByHashID(unsigned long uHashID);
     bool IsLoadingComplete() const;
     bool LoadFont(const char* szBundleFilename, const char* szFileName, const char* szFileFontName);
     void SetResourcePool(GLResourcePool* pResourcePool);

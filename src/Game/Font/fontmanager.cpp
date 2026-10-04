@@ -74,12 +74,13 @@ void FontManager::BundleOpenComplete(void*, unsigned long, unsigned long uParam)
 void FontManager::FontDescriptionLoadComplete(void* buffer, unsigned long, unsigned long uParam)
 {
     FontLoadState* state = (FontLoadState*)uParam;
+    char* fontData = (char*)buffer;
     BundleFileDirectoryEntry entry;
 
     nlFont* pNewFont = new (8, false) nlFont();
-    pNewFont->Load(state->szFileName, (char*)buffer, nlStringHash(state->szFontName));
+    pNewFont->Load(state->szFileName, fontData, nlStringHash(state->szFontName));
     FontManager::Instance()->m_fonts.AddEnd(pNewFont);
-    delete[] (char*)buffer;
+    delete[] fontData;
 
     for (unsigned long i = 0; i < pNewFont->m_PageCount; i++)
     {
@@ -166,7 +167,7 @@ FontManager::~FontManager()
     m_fonts.Clear();
 }
 
-nlFont* FontManager::GetFontByHashID(unsigned long hashID)
+nlFont* FontManager::GetFontByHashID(unsigned long uHashID)
 {
     nlDLListIterator<nlFont*> it = m_fonts.Begin();
     DLListEntry<nlFont*>* head = it.m_Head;
@@ -175,7 +176,7 @@ nlFont* FontManager::GetFontByHashID(unsigned long hashID)
     while (entry != 0)
     {
         nlFont* font = entry->entry;
-        if (hashID == font->m_Metrics.FontName)
+        if (uHashID == font->m_Metrics.FontName)
         {
             return font;
         }
@@ -190,7 +191,7 @@ nlFont* FontManager::GetFontByHashID(unsigned long hashID)
         }
     }
 
-    nlPrintf("FontManager: Warning, failed to find font 0x%08x\n", hashID);
+    nlPrintf("FontManager: Warning, failed to find font 0x%08x\n", uHashID);
 
     nlDLListIterator<nlFont*> start = m_fonts.Begin();
     if (start.hasNext())
