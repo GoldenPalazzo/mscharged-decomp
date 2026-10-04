@@ -126,7 +126,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 mImpostors[i] = new (8, false) ImpostorModel(*npcTemplate->hierarchy, npcTemplate->modelID, npcTemplate->mResourcePool);
                 mImpostors[i]->PlayAnimation(*anim, PM_HOLD, 0);
                 mImpostors[i]->mVisible = true;
-                mImpostors[i]->mModelCallback = fn_80183F78;
+                mImpostors[i]->mModelCallback = SetImpostorPacketShadowLevels;
                 mImpostorNames[i] = npcTemplate->mName;
                 int lastIndex = nlStrLen(anim->m_szName) - 1;
                 mImpostorSuffixes[i] = anim->m_szName[lastIndex];
@@ -539,7 +539,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     int charIdx = -1;
     if (nlStrICmp(target, "ball") == 0)
     {
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl != 0)
         {
             ctrl->m_uUserData = (u32)player;
@@ -549,7 +549,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     }
     if (nlStrICmp(target, "ballpos") == 0)
     {
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl != 0)
         {
             ReplayManager* manager = ReplayManager::Instance();
@@ -593,7 +593,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
     {
         void* context = g_pCharacters[charIdx];
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl == 0)
             return;
         ctrl->SetAnimController(*nis.mCharacterControllers[charIdx]);
@@ -610,7 +610,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
                 && nlStrNICmp(target, nis.mImpostorNames[i], nlStrLen(nis.mImpostorNames[i])) == 0
                 && nis.mImpostorSuffixes[i] == target[nlStrLen(target) - 1])
             {
-                EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+                EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
                 if (ctrl == 0)
                     return;
                 ctrl->SetAnimController(*nis.mImpostors[i]->mAnimController);

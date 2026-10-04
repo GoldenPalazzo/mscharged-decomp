@@ -209,6 +209,24 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_NOTHING, true);
 }
 
+struct DraftMachineCursor
+{
+    const NetworkDraftMachineInfo* mEntry;
+};
+
+static inline void CopyDraftPlayerName(NetworkDraftPlayer& player, const u16* name)
+{
+    nlStrNCpy(player.mName, name, sizeof(player.mName) / sizeof(player.mName[0]));
+}
+
+static inline void CopyDraftMachineInfo(NetworkDraftPlayer& player, const NetworkDraftMachineInfo& entry)
+{
+    player.mHead = entry.mStats;
+    CopyDraftPlayerName(player, entry.mName);
+    memcpy(player.mData, entry.mMiiData, sizeof(player.mData));
+    player.mPeerIndex = (s8)entry.mMachineIndex;
+}
+
 void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 {
     gNetworkMessageRegistry->RegisterReceiver(23, this);
@@ -223,23 +241,20 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     mTeams[0].Reset();
     mTeams[1].Reset();
 
-    const NetworkDraftMachineInfo* entry = message->mEntries;
+    DraftMachineCursor cursor = { message->mEntries };
     for (int entryIndex = 0; entryIndex < message->mMachineCount; ++entryIndex)
     {
-        int playerCount = entry->mGuestEnabled ? 2 : 1;
+        int playerCount = cursor.mEntry->mGuestEnabled ? 2 : 1;
         for (int playerIndex = 0; playerIndex < playerCount; ++playerIndex)
         {
             int teamIndex = message->mPlayerSides.mData[entryIndex][playerIndex];
             NetworkDraftPlayer& player =
                 mTeams[teamIndex].mPlayers[mTeams[teamIndex].mPlayerCount];
-            player.mHead = entry->mStats;
-            nlStrNCpy(player.mName, entry->mName, 11);
-            memcpy(player.mData, entry->mMiiData, sizeof(player.mData));
-            player.mPeerIndex = (s8)entry->mMachineIndex;
+            CopyDraftMachineInfo(player, *cursor.mEntry);
             player.mGuest = playerIndex == 1;
             ++mTeams[teamIndex].mPlayerCount;
         }
-        ++entry;
+        ++cursor.mEntry;
     }
     AssignDraftSides();
     mNextDraftingTeam = -1;
@@ -250,40 +265,46 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     GameSceneManager::Instance()->Push((SceneList)0x32, SCREEN_FORWARD, true);
 }
 
-void NetworkDraft::AssignDraftSides()
+struct DraftSidePlayer
 {
-    struct SidePlayer
+    DraftSidePlayer() : machine(-1), guest(false) { }
+
+    s8 machine;
+    bool guest;
+};
+
+static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
+    int sideCounts[2], DraftSidePlayer sidePlayers[2][3])
+{
+    for (int machine = 0; machine < message.mMachineCount; ++machine)
     {
-        SidePlayer() : machine(-1), guest(false) { }
-
-        s8 machine;
-        bool guest;
-    };
-
-    bool usedMachines[4] = { false };
-    int sideCounts[2] = { 0, 0 };
-    SidePlayer sidePlayers[2][3];
-
-    for (int machine = 0; machine < mDraftMessage.mMachineCount; ++machine)
-    {
-        int side = mDraftMessage.mPlayerSides.mData[machine][0];
+        int side = message.mPlayerSides.mData[machine][0];
         if (side != -1)
         {
             int count = sideCounts[side]++;
-            SidePlayer& player = sidePlayers[side][count];
+            DraftSidePlayer& player = sidePlayers[side][count];
             player.machine = machine;
             player.guest = false;
         }
 
-        side = mDraftMessage.mPlayerSides.mData[machine][1];
+        side = message.mPlayerSides.mData[machine][1];
         if (side != -1)
         {
             int count = sideCounts[side]++;
-            SidePlayer& player = sidePlayers[side][count];
+            DraftSidePlayer& player = sidePlayers[side][count];
             player.machine = machine;
             player.guest = true;
         }
     }
+}
+
+void NetworkDraft::AssignDraftSides()
+{
+    bool usedMachines[4] = { false };
+    int sideCounts[2] = { 0, 0 };
+    DraftSidePlayer sidePlayers[2][3];
+
+    CollectDraftSidePlayers(mDraftMessage, sideCounts, sidePlayers);
 
     int side = 0;
     if (sideCounts[1] == 1 && sideCounts[0] > 1)

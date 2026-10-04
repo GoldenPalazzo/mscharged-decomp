@@ -182,12 +182,12 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 24:
     {
         bool enabled = m_SP[-1] != 0;
-        float z = *(float*)&m_SP[-2];
-        float y = *(float*)&m_SP[-3];
-        float x = *(float*)&m_SP[-4];
+        float height = *(float*)&m_SP[-2];
+        float width = *(float*)&m_SP[-3];
+        float verticalOffset = *(float*)&m_SP[-4];
         m_SP -= 4;
-        fn_8028468C(x, y, z);
-        fn_8028469C(enabled);
+        SetHolotronDimensions(verticalOffset, width, height);
+        SetHolotronCameraTrackingEnabled(enabled);
         break;
     }
     case 25:

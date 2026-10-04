@@ -285,7 +285,7 @@ void DrawableCharacter::BuildNpcMatrix()
     float angle = 0.0000958738f * (float)facingDirection;
     nlMakeRotationMatrixZ(worldMatrix, angle);
     worldMatrix.SetTranslation(position);
-    fn_8030B9C8(poseAccumulator, &worldMatrix);
+    poseAccumulator->BuildNodeMatricesFromQuaternions(worldMatrix);
 }
 
 void DrawableCharacter::Render(cCharacter& source)
@@ -907,7 +907,7 @@ void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* mo
     glModelPacket* pPacket;
     static u32 shadowLevelHash = nlStringLowerHash("shadowLevel");
 
-    int shadowAlpha = fn_80183DEC(&bip01Position);
+    int shadowAlpha = GetShadowLookupLevel(&bip01Position);
     float fade = 1.0f;
     if (bip01Position.z > fade)
     {

@@ -1,7 +1,7 @@
 #ifndef GAME_RENDER_NIS_PLAYER_OVERLAY_INL
 #define GAME_RENDER_NIS_PLAYER_OVERLAY_INL
 
-#include "Game/Render/tu_80283D9C.h"
+#include "Game/Render/NisPlayerOverlay.h"
 
 inline void NisPlayerOverlay::Reset()
 {

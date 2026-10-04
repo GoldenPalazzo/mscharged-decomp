@@ -9,8 +9,6 @@
 const char* __SOCKET_VERSION = "<< RVL_SDK - SOCKET \trelease build: Dec 10 "
                                "2007 10:02:35 (0x4199_60831) >>";
 
-// static int SO_Initialized = 0;
-
 enum
 {
     NET_SO_ACCEPT = 1,

@@ -146,8 +146,8 @@ public:
     /* 0x34359 */ bool mDisplayNisInfo;
     /* 0x3435A */ bool mUseViewMatrixOverride;
     /* 0x3435C */ nlMatrix4 mViewMatrixOverride;
-    /* 0x3439C */ bool mUnidentified3439C;
-    /* 0x3439D */ u8 unknown_0x3439D[0x43];
+    /* 0x3439C */ bool mInitialCameraRotationCached;
+    /* 0x343A0 */ nlMatrix4 mInitialCameraRotationInverse;
     /* 0x343E0 */ bool mSuppressBlinking;
     /* 0x343E4 */ float mRequestedFogStart;
     /* 0x343E8 */ float mSavedFogStart;

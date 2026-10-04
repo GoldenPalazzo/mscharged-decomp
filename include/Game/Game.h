@@ -258,6 +258,9 @@ public:
 
 extern cGame* g_pGame;
 
+extern "C" void fn_8006040C(cGame*, cFielder*);
+extern "C" void fn_80060804(cGame*, cFielder*);
+
 extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
 extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005D550(void* pManager, const GoalieSaveData* pData);
