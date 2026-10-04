@@ -304,6 +304,11 @@ void UpdateFlyingCameras(float dt)
     }
 }
 
+static inline void ResetCameraIntegral(FlyingCamera* camera)
+{
+    nlVec3Set(camera->mPositionIntegral, lbl_806E5034, lbl_806E5034, lbl_806E5034);
+}
+
 void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
 {
     FlyingCamera** slot = &gFlyingCameras[count];
@@ -378,8 +383,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     {
         gFlyingCameras[i]->mPosition = initialPosition;
         gFlyingCameras[i]->mPreviousPosition = initialPosition;
-        nlVec3Set(gFlyingCameras[i]->mPositionIntegral,
-            lbl_806E5034, lbl_806E5034, lbl_806E5034);
+        ResetCameraIntegral(gFlyingCameras[i]);
         gFlyingCameras[i]->mOrbitRadius = orbitRadius;
     }
 
