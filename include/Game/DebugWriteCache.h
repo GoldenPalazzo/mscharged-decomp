@@ -63,7 +63,6 @@ enum DebugReservedTypeId
 struct DebugFieldType
 {
     /* 0x0 */ u16 size;
-    /* 0x2 */ u16 unknown;
     /* 0x4 */ DebugFieldWriter writer;
 }; // size: 0x8
 
