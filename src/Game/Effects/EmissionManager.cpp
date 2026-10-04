@@ -52,7 +52,6 @@ public:
     }
 
     inline void Load(nlChunk* bundle);
-    inline EffectsBundleData* ParseData(nlChunk* bundle, nlChunk* end);
 
     /* 0x00 */ EffectsBundle* m_next;
     /* 0x04 */ EffectsBundle* m_prev;
@@ -124,7 +123,7 @@ inline void EffectsBundleManager::ClearAdditional()
             EffectsBundleData* data = iterator.Current();
             for (int i = 0; i < data->mNumGroups; ++i)
             {
-                unsigned long hash = data->mGroups[i]->GetHashID();
+                unsigned long hash = data->GetGroup(i)->GetHashID();
                 sEffectsGroups.Remove(hash);
             }
         }
@@ -136,15 +135,8 @@ inline void EffectsBundleManager::ClearAdditional()
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
 
-inline EffectsBundleData* EffectsBundle::ParseData(nlChunk* bundle, nlChunk* end)
+static inline void RegisterBundleGroups(EffectsBundleData* data)
 {
-    mInventory.ParseChunks(bundle, end);
-    return mInventory.Find(0);
-}
-
-inline void EffectsBundle::Load(nlChunk* bundle)
-{
-    EffectsBundleData* data = ParseData(bundle, bundle->GetLastChunk());
     for (int i = 0; i < data->mNumGroups; ++i)
     {
         EffectsGroup* group = data->GetGroup(i);
@@ -156,23 +148,11 @@ inline void EffectsBundle::Load(nlChunk* bundle)
     }
 }
 
-class EffectsBundleChunkIterator
+inline void EffectsBundle::Load(nlChunk* bundle)
 {
-public:
-    EffectsBundleChunkIterator(nlChunk* container)
-        : mEnd(container->GetLastChunk())
-        , mCurrent(container->GetFirstChunk())
-    {
-    }
-
-    bool IsValid() const { return mCurrent != mEnd; }
-    nlChunk* Current() const { return mCurrent; }
-    void Next() { mCurrent = mCurrent->GetNextChunk(); }
-
-private:
-    nlChunk* mEnd;
-    nlChunk* mCurrent;
-};
+    mInventory.ParseChunks(bundle, bundle->GetNextChunk());
+    RegisterBundleGroups(mInventory.Find(0));
+}
 
 class EffectsBundleChunkLoader : public GLResourceChunkLoader
 {
@@ -183,9 +163,15 @@ public:
     {
     }
 
-    bool LoadChunk(void* data)
+    void Load(nlChunk* bundle)
     {
-        return LoadChunk((nlChunk*)data);
+        nlChunk* end = bundle->GetLastChunk();
+        nlChunk* chunk = bundle->GetFirstChunk();
+        while (chunk != end)
+        {
+            LoadChunk(chunk);
+            chunk = chunk->GetNextChunk();
+        }
     }
 
     bool LoadChunk(nlChunk* chunk)
@@ -214,28 +200,17 @@ void EffectsBundleManager::Load(void* data, void* nonResidentData,
 
     if (bundleType == 2)
     {
-        loader.LoadChunk(data);
+        loader.LoadChunk((nlChunk*)data);
     }
     else
     {
         if (data != 0)
         {
-            EffectsBundleChunkIterator iterator((nlChunk*)data);
-            while (iterator.IsValid())
-            {
-                loader.LoadChunk(iterator.Current());
-                iterator.Next();
-            }
+            loader.Load((nlChunk*)data);
         }
-
         if (nonResidentData != 0)
         {
-            EffectsBundleChunkIterator iterator((nlChunk*)nonResidentData);
-            while (iterator.IsValid())
-            {
-                loader.LoadChunk(iterator.Current());
-                iterator.Next();
-            }
+            loader.Load((nlChunk*)nonResidentData);
         }
     }
 
