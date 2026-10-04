@@ -75,7 +75,7 @@ static inline void PrepareSoundInstanceRpcNodes(SoundInstance* instance)
             AudioRpcDefinition* rpcDefinition =
                 &group->dynamicDefinitions[definitionIndex];
             AudioRpcRuntimeNode* node = AddAudioRpcRuntimeNode(
-                controller, rpcDefinition, (AudioRpcOwner*)instance);
+                controller, rpcDefinition, instance);
             instance->activeRpc = rpcDefinition->sliderIndex == 2 ? node : 0;
             instance->rpcEntries.AddEnd(node);
         }
@@ -170,7 +170,7 @@ void SoundInstance::Update(float dt)
         {
             RemoveAudioRpcRuntimeNodes(
                 GetAudioRpcController(),
-                (AudioRpcOwner*)this);
+                this);
             rpcEntries.Clear();
             AudioSequenceInstance* voice = voices;
             while (voice != 0)
@@ -188,7 +188,7 @@ void SoundInstance::Update(float dt)
         {
             RemoveAudioRpcRuntimeNodes(
                 GetAudioRpcController(),
-                (AudioRpcOwner*)this);
+                this);
             rpcEntries.Clear();
             AudioSequenceInstance* voice = voices;
             while (voice != 0)
@@ -251,6 +251,6 @@ float SoundInstance::GetPitch()
 void SoundInstance::Destroy()
 {
     RemoveAudioRpcRuntimeNodes(
-        GetAudioRpcController(), (AudioRpcOwner*)this);
+        GetAudioRpcController(), this);
     rpcEntries.Clear();
 }
