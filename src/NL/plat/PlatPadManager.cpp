@@ -1,5 +1,4 @@
 #include "NL/plat/PlatPadManager.h"
-#include "Game/PadMonkey.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
@@ -254,20 +253,4 @@ WiiFreestylePadStatus* PlatPadManager::GetFreestyleStatus(int channel)
 WiiClassicPadStatus* PlatPadManager::GetClassicStatus(int channel)
 {
     return &status[channel].classic;
-}
-
-WiiPadMonkey::WiiPadMonkey(int padIndex)
-    : PadMonkey(padIndex)
-{
-    m_prevPressurePtr = &m_prevPressure[0];
-    m_currPressurePtr = &m_currPressure[0];
-    m_buttonChance = &m_buttonChances[0];
-
-    memset(m_prevPressurePtr, 0, GetButtonCount() * sizeof(float));
-    memset(m_currPressurePtr, 0, GetButtonCount() * sizeof(float));
-
-    for (int i = 0; i < GetButtonCount(); ++i)
-    {
-        m_buttonChance[i] = 0.0f;
-    }
 }

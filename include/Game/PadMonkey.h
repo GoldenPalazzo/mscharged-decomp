@@ -51,17 +51,11 @@ class WiiPadMonkey : public PadMonkey
 {
 public:
     WiiPadMonkey(int padIndex);
-    virtual ~WiiPadMonkey() { }
+    virtual ~WiiPadMonkey();
 
-    virtual int GetButtonIndex(int button, bool remap)
-    {
-        return GetPadButtonIndex(remap ? gWiiFreestyleButtonRemap[button] : button);
-    }
-    virtual int GetButtonMask(int buttonIndex)
-    {
-        return GetPadButtonMask(buttonIndex);
-    }
-    virtual int GetButtonCount() { return 16; }
+    virtual int GetButtonIndex(int button, bool remap);
+    virtual int GetButtonMask(int buttonIndex);
+    virtual int GetButtonCount();
 
     /* 0x3C */ float m_prevPressure[16];
     /* 0x7C */ float m_currPressure[16];
