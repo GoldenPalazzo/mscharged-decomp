@@ -1,3 +1,4 @@
+#include "Game/NetworkEvents.h"
 #include "Game/InputRouter.h"
 #include "Game/NetworkDebug.h"
 #include "Game/Sys/debug.h"
@@ -8,7 +9,6 @@
 
 #include <string.h>
 
-#include "Game/NetworkEvents.h"
 #include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -44,10 +44,7 @@ static EventDispatcher sDetermDataDispatcher;
 static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
     &sDetermDataDispatcher, "DetermDataEventQueue", -1);
 
-void fn_803353DC(DetermDataEvent* event)
-{
-    delete event;
-}
+inline void fn_803353DC(DetermDataEvent* event);
 
 void InitializeInputRouters()
 {
@@ -785,58 +782,6 @@ NetworkInputMessageQueue::~NetworkInputMessageQueue()
 {
 }
 
-NetMessageInputBundle::~NetMessageInputBundle()
-{
-}
-
-void NetworkInputRouter::ReceiveAllInputs(
-    s8, NetMessageAllInputs*)
-{
-}
-
-bool NetworkInputRouter::CanCaptureInput()
-{
-    return !mStarvedForInput;
-}
-
-int NetworkInputRouter::GetUpdateCount()
-{
-    return 1;
-}
-
-void SimpleInputRouter::DebugDraw(int column, int* row)
-{
-}
-
-void SimpleInputRouter::ReceiveAllInputs(
-    s8, NetMessageAllInputs*)
-{
-}
-
-void SimpleInputRouter::ReceiveInput(
-    s8, NetMessageInput*)
-{
-}
-
-void SimpleInputRouter::CheckCongestion()
-{
-}
-
-bool SimpleInputRouter::CanCaptureInput()
-{
-    return true;
-}
-
-bool SimpleInputRouter::HasInput()
-{
-    return true;
-}
-
-int SimpleInputRouter::GetUpdateCount()
-{
-    return 1;
-}
-
 static TweakIntBinding sTransmitSyncDataEvery(
     "g_TransmitSyncDataEvery", "Network/InputMan", &g_TransmitSyncDataEvery, true);
 static TweakIntBinding sTicksPerPacket(
@@ -893,4 +838,5 @@ typedef char VerifyInputQueueSize[
 typedef char VerifyNetworkInputRouterSize[
     (sizeof(NetworkInputRouter) == 0xE5C8) ? 1 : -1];
 
+#include "Game/InputRouter.inl"
 #include "NL/nlBind_impl.h"

@@ -4251,7 +4251,7 @@ Game/NetworkRandomSeed.cpp:
 Game/InputRouter.cpp:
 	.text       start:0x80332EDC end:0x80336B6C
 	.ctors      start:0x804DBAE4 end:0x804DBAE8
-	.data       start:0x80533508 end:0x80533BB8
+	.data       start:0x80533508 end:0x80533B68
 	.bss        start:0x80584900 end:0x80584B68 align:4
 	.sdata      start:0x806DF750 end:0x806DF7A8
 	.sbss       start:0x806E2150 end:0x806E2160
@@ -4259,7 +4259,7 @@ Game/InputRouter.cpp:
 Game/NetworkInput.cpp:
 	.text       start:0x80336B6C end:0x80338898
 	.ctors      start:0x804DBAE8 end:0x804DBAEC
-	.data       start:0x80533BB8 end:0x80533C00
+	.data       start:0x80533B68 end:0x80533C00
 	.bss        start:0x80584B68 end:0x80584B88
 	.sdata      start:0x806DF7A8 end:0x806DF7B0
 	.sbss       start:0x806E2160 end:0x806E2168

@@ -74,17 +74,17 @@ public:
 
     virtual ~SimpleInputRouter();
     virtual void Reset(int resetQueues);
-    virtual int GetUpdateCount();
-    virtual bool HasInput();
-    virtual bool CanCaptureInput();
+    virtual int GetUpdateCount() { return 1; }
+    virtual bool HasInput() { return true; }
+    virtual bool CanCaptureInput() { return true; }
     virtual void OnInputCaptured();
     virtual void OnInputReady();
-    virtual void CheckCongestion();
+    virtual void CheckCongestion() { }
     virtual void ReceiveInput(
-        s8 machine, NetMessageInput* message);
+        s8 machine, NetMessageInput* message) { }
     virtual void ReceiveAllInputs(
-        s8 machine, NetMessageAllInputs* message);
-    virtual void DebugDraw(int column, int* row);
+        s8 machine, NetMessageAllInputs* message) { }
+    virtual void DebugDraw(int column, int* row) { }
 };
 
 class NetworkInputRouter : public InputRouter
@@ -97,16 +97,16 @@ public:
     virtual ~NetworkInputRouter();
     void CheckPeerSynchronization();
     virtual void Reset(int resetQueues);
-    virtual int GetUpdateCount();
+    virtual int GetUpdateCount() { return 1; }
     virtual bool HasInput();
-    virtual bool CanCaptureInput();
+    virtual bool CanCaptureInput() { return !mStarvedForInput; }
     virtual void OnInputCaptured();
     virtual void OnInputReady();
     virtual void CheckCongestion();
     virtual void ReceiveInput(
         s8 machine, NetMessageInput* message);
     virtual void ReceiveAllInputs(
-        s8 machine, NetMessageAllInputs* message);
+        s8 machine, NetMessageAllInputs* message) { }
     virtual void DebugDraw(int column, int* row);
 
     /* 0x0198 */ bool mCongested;

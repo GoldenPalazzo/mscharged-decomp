@@ -447,7 +447,7 @@ config.libs = [
             Object(Matching, "Game/GoalieTweaks.cpp"),
             Object(NonMatching, "Game/HBMManager.cpp", extra_cflags=["-ipa file", "-inline noauto"]),
             Object(Matching, "Game/InputManager.cpp"),
-            Object(NonMatching, "Game/InputRouter.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/InputRouter.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/InterpreterOperations.cpp", cflags=cflags_game),
             Object(Matching, "Game/InterpreterCore.cpp", cflags=cflags_game + ["-ipa file", "-sym on"]),
             Object(Matching, "Game/LANConnectionMessages.cpp"),
