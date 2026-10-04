@@ -3,6 +3,7 @@
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/AudioRpc.h"
+#include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Audio/AudioSystem.h"
@@ -151,7 +152,7 @@ void SoundInstance::Update(float dt)
     if (activeRpc != 0 && state == SOUND_INSTANCE_STATE_STOPPING)
     {
         transitionTime += dt;
-        Transition* slider = (Transition*)GetSoundParameter(owner, 2);
+        AudioSlider* slider = GetSoundParameter(owner, 2);
         slider->SetTarget(transitionTime, 0.0f);
         if (activeRpc->value < -94.0f)
         {

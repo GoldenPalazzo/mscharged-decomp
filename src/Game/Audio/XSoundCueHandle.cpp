@@ -82,9 +82,9 @@ XSoundCueHandle::~XSoundCueHandle()
         delete instance;
 }
 
-AudioParameter* GetSoundParameter(XSoundHandle* handle, unsigned long index)
+AudioSlider* GetSoundParameter(XSoundHandle* handle, unsigned long index)
 {
-    return (AudioParameter*)(((XSoundCueHandle*)handle)->GetLocalSliders()->sliders + index);
+    return ((XSoundCueHandle*)handle)->GetLocalSliders()->sliders + index;
 }
 
 void GetSoundSources(void* handle, AudioSource** sources, unsigned int* output)
