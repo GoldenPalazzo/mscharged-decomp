@@ -580,7 +580,7 @@ config.libs = [
             Object(Matching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioBankLoader.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/AudioBankTable.cpp"),
-            Object(NonMatching, "Game/Audio/AudioBundleManager.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Audio/AudioBundleManager.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioBundleManagerPlatform.cpp"),
             Object(Matching, "Game/Audio/AudioCalculation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioEffectBinding.cpp", extra_cflags=["-ipa file", "-sym on"]),
