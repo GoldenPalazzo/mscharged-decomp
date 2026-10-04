@@ -481,7 +481,7 @@ config.libs = [
             Object(NonMatching, "Game/NetworkStatsManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/NetworkSync.cpp"),
             Object(Matching, "Game/NisPlayer.cpp", extra_cflags=["-inline deferred", "-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/objectblur.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/objectblur.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/PackedDetInput.cpp"),
             Object(Matching, "Game/PadActions.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/PadMonkey.cpp", extra_cflags=["-sym on"]),
