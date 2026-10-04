@@ -41,7 +41,7 @@
 #include <math.h>
 #include "Game/CharacterTriggers.h"
 
-static const LooseBallContactAnimInfo lbl_804DC1B0[5] = {
+static const LooseBallContactAnimInfo sReceiveContactAnims[5] = {
     { 0x29, 3.0f, 0x0000, 0xFFFF },
     { 0x2B, 7.0f, 0xE000, 0x2000 },
     { 0x2C, 7.0f, 0xA000, 0xE000 },
@@ -49,14 +49,14 @@ static const LooseBallContactAnimInfo lbl_804DC1B0[5] = {
     { 0x2D, 7.0f, 0x2000, 0x6000 },
 };
 
-static const LooseBallContactAnimInfo lbl_804DC1F0[4] = {
+static const LooseBallContactAnimInfo sVolleyReceiveContactAnims[4] = {
     { 0x2A, 9.0f, 0x0000, 0xFFFF },
     { 0x2F, 10.0f, 0xE000, 0x2000 },
     { 0x33, 9.0f, 0x2000, 0x8000 },
     { 0x31, 9.0f, 0x8000, 0xE000 },
 };
 
-static const LooseBallContactAnimInfo lbl_804DC220[8] = {
+static const LooseBallContactAnimInfo sVolleyOneTouchShotContactAnims[8] = {
     { 0x3C, 10.0f, 0xE000, 0x2000 },
     { 0x3D, 9.0f, 0xA000, 0xE000 },
     { 0x3F, 9.0f, 0x6000, 0xA000 },
@@ -67,7 +67,7 @@ static const LooseBallContactAnimInfo lbl_804DC220[8] = {
     { 0x42, 9.5f, 0x2000, 0x6000 },
 };
 
-static const LooseBallContactAnimInfo lbl_804DC280[8] = {
+static const LooseBallContactAnimInfo sOneTouchShotContactAnims[8] = {
     { 0x34, 7.0f, 0xE000, 0x2000 },
     { 0x35, 7.0f, 0xA000, 0xE000 },
     { 0x37, 7.0f, 0x6000, 0xA000 },
@@ -78,14 +78,14 @@ static const LooseBallContactAnimInfo lbl_804DC280[8] = {
     { 0x3A, 9.0f, 0x2000, 0x6000 },
 };
 
-static const LooseBallContactAnimInfo lbl_804DC2E0[4] = {
+static const LooseBallContactAnimInfo sVolleyOneTouchContactAnims[4] = {
     { 0x44, 4.0f, 0xE000, 0x2000 },
     { 0x45, 4.0f, 0xA000, 0xE000 },
     { 0x47, 4.0f, 0x6000, 0xA000 },
     { 0x46, 4.0f, 0x2000, 0x6000 },
 };
 
-static const LooseBallContactAnimInfo lbl_804DC310[2] = {
+static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
     { 0x32, 4.0f, 0x8000, 0xE000 },
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
@@ -103,42 +103,42 @@ extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" void fn_8005C650(cGame*);
-static float lbl_806DC190 = 5.0f;
+static float sfReceivePassMaxDuration = 5.0f;
 unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
-bool lbl_806DC196 = true;
-float lbl_806DC198 = 0.66f;
-float lbl_806DC19C = 30.0f;
-float lbl_806DC1A0 = 0.5f;
-float lbl_806DC1A4 = 3.0f;
-float lbl_806DC1A8 = 0.5f;
-float lbl_806DC1AC = 0.1f;
-float lbl_806DC1B0 = 12.5f;
-float lbl_806DC1B4 = 0.1f;
-float lbl_806DC1B8 = 0.1f;
-float lbl_806DC1BC = 1.0f;
-float lbl_806DC1C0 = 1.9f;
-float lbl_806DC1C4 = 0.1f;
-float lbl_806DC1C8 = 0.4f;
-float lbl_806DC1CC = 0.5f;
-float lbl_806DC1D0 = 0.5f;
-float lbl_806DC1D4 = 2.0f;
-float lbl_806DC1D8 = 0.93f;
-float lbl_806DC1DC = 5.0f;
-float lbl_806DC1E0 = 0.55f;
-float lbl_806DC1E4 = 0.02f;
-float lbl_806DC1E8 = 0.02f;
-float lbl_806DC1EC = 0.02f;
-float lbl_806DC1F0 = 0.02f;
-float lbl_806E0E48 = lbl_806DC1E4 + lbl_806DC1E8
-    + lbl_806DC1EC + lbl_806DC1F0;
-static TweakFloatBinding lbl_8056DA88("sfSpeedAdjustChargeLevel1",
-    "Game/Gameplay/Charging/Pass", &lbl_806DC1E4, true);
-static TweakFloatBinding lbl_8056DAA8("sfSpeedAdjustChargeLevel2",
-    "Game/Gameplay/Charging/Pass", &lbl_806DC1E8, true);
-static TweakFloatBinding lbl_8056DAC8("sfSpeedAdjustChargeLevel3",
-    "Game/Gameplay/Charging/Pass", &lbl_806DC1EC, true);
-static TweakFloatBinding lbl_8056DAE8("sfSpeedAdjustChargeLevelMax",
-    "Game/Gameplay/Charging/Pass", &lbl_806DC1F0, true);
+bool g_bFindReceivePassPosition = true;
+float g_fOneTimerMinPassProgress = 0.66f;
+float g_fMaxVolleyPassUpSpeed = 30.0f;
+float g_fPasserNoPickUpTime = 0.5f;
+float g_fGroundPassMaxLift = 3.0f;
+float g_fGroundPassMinLift = 0.5f;
+float g_fPassDistanceMin = 0.1f;
+float g_fPassDistanceMax = 12.5f;
+float g_fOneTouchMinPassProgress = 0.1f;
+float g_fOneTouchMinDesireAge = 0.1f;
+float g_fAnimStartThresholdTicks = 1.0f;
+float g_fAnimStartPositionTolerance = 1.9f;
+float g_fReceiveArrivalRadius = 0.1f;
+float g_fReceiveArrivalRadiusLarge = 0.4f;
+float g_fAirContactHeightScale = 0.5f;
+float g_fMinContactAnimSpeed = 0.5f;
+float g_fMaxContactAnimSpeed = 2.0f;
+float g_fBallApproachMinDot = 0.93f;
+float g_fBallApproachMaxSpeed = 5.0f;
+float g_fMaxSteeringAvoidance = 0.55f;
+float sfSpeedAdjustChargeLevel1 = 0.02f;
+float sfSpeedAdjustChargeLevel2 = 0.02f;
+float sfSpeedAdjustChargeLevel3 = 0.02f;
+float sfSpeedAdjustChargeLevelMax = 0.02f;
+float g_fSpeedAdjustChargeTotal = sfSpeedAdjustChargeLevel1 + sfSpeedAdjustChargeLevel2
+    + sfSpeedAdjustChargeLevel3 + sfSpeedAdjustChargeLevelMax;
+static TweakFloatBinding sSpeedAdjustChargeLevel1Binding("sfSpeedAdjustChargeLevel1",
+    "Game/Gameplay/Charging/Pass", &sfSpeedAdjustChargeLevel1, true);
+static TweakFloatBinding sSpeedAdjustChargeLevel2Binding("sfSpeedAdjustChargeLevel2",
+    "Game/Gameplay/Charging/Pass", &sfSpeedAdjustChargeLevel2, true);
+static TweakFloatBinding sSpeedAdjustChargeLevel3Binding("sfSpeedAdjustChargeLevel3",
+    "Game/Gameplay/Charging/Pass", &sfSpeedAdjustChargeLevel3, true);
+static TweakFloatBinding sSpeedAdjustChargeLevelMaxBinding("sfSpeedAdjustChargeLevelMax",
+    "Game/Gameplay/Charging/Pass", &sfSpeedAdjustChargeLevelMax, true);
 
 
 static inline float DoCalculatePassSpeed(const nlVector2& distance,
@@ -147,22 +147,22 @@ static inline float DoCalculatePassSpeed(const nlVector2& distance,
 {
     float fPassCharge = NormalizeVal(
                             nlVec2Length(distance), passDistMin, passDistMax)
-        - lbl_806E0E48;
+        - g_fSpeedAdjustChargeTotal;
     if (GetBallChargeValue(g_pBall, 0) > 1.0f)
     {
-        fPassCharge += lbl_806DC1E4;
+        fPassCharge += sfSpeedAdjustChargeLevel1;
     }
     if (GetBallChargeValue(g_pBall, 0) > 2.0f)
     {
-        fPassCharge += lbl_806DC1E8;
+        fPassCharge += sfSpeedAdjustChargeLevel2;
     }
     if (GetBallChargeValue(g_pBall, 0) > 3.0f)
     {
-        fPassCharge += lbl_806DC1EC;
+        fPassCharge += sfSpeedAdjustChargeLevel3;
     }
     if (GetBallChargeValue(g_pBall, 0) >= 4.0f)
     {
-        fPassCharge += lbl_806DC1F0;
+        fPassCharge += sfSpeedAdjustChargeLevelMax;
     }
     fPassCharge = nlMaxEquals(fPassCharge, 0.0f);
     fPassCharge = nlMinEquals(fPassCharge, 1.0f);
@@ -212,7 +212,7 @@ bool DesireReceivePass::Initialize(void* context)
 
     SelectContactAnimation();
 
-    float fMaxDistanceSq = lbl_806DC1C4 * lbl_806DC1C4;
+    float fMaxDistanceSq = g_fReceiveArrivalRadius * g_fReceiveArrivalRadius;
 
     nlVector2 v2Delta = {
         mEstimated.v3AnimStartPos.x
@@ -238,8 +238,8 @@ bool DesireReceivePass::Initialize(void* context)
 
     if (result)
     {
-        m_pFielder->SetNoPickUpTime(lbl_806DC190);
-        mMaxDuration = lbl_806DC190;
+        m_pFielder->SetNoPickUpTime(sfReceivePassMaxDuration);
+        mMaxDuration = sfReceivePassMaxDuration;
     }
     return result;
 }
@@ -297,7 +297,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     }
 
     if (g_pBall->fn_800C2EC0() == m_pFielder
-        && g_pBall->fn_800C2EC8() > lbl_806DC198
+        && g_pBall->fn_800C2EC8() > g_fOneTimerMinPassProgress
         && AIsgn(g_pBall->fn_800C2F18().x)
             == AIsgn(m_pFielder->GetTeam()->GetOtherNet()->fn_800C2F30().x)
         && mbOneTouchShot && !mbOneTouchVolley)
@@ -309,7 +309,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     {
         mEstimated.fAnimStartTime -= fDeltaT;
     }
-    float fStartThreshold = lbl_806DC1BC * g_fSimulationTick;
+    float fStartThreshold = g_fAnimStartThresholdTicks * g_fSimulationTick;
     switch (meDesireSubState)
     {
     case 0:
@@ -330,15 +330,15 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             return;
         }
 
-        float fArrivalRadius = lbl_806DC1C4;
+        float fArrivalRadius = g_fReceiveArrivalRadius;
         if (!fn_800C0E74())
         {
-            fArrivalRadius = lbl_806DC1C8;
+            fArrivalRadius = g_fReceiveArrivalRadiusLarge;
         }
         DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
         SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
             mEstimated.aFacingDirection, mEstimated.fAnimStartTime, fArrivalRadius);
-        pSteering->SetAvoidanceMultiplier(InterpolateClamped(lbl_806DC1E0, 0.0f, g_pBall->fn_800C2EC8()));
+        pSteering->SetAvoidanceMultiplier(InterpolateClamped(g_fMaxSteeringAvoidance, 0.0f, g_pBall->fn_800C2EC8()));
         if (m_pFielder->GetDistanceToDesiredPos() <= fArrivalRadius)
         {
             if (!CalcExactEstimates(true))
@@ -375,7 +375,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         {
             DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
             SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
-                mEstimated.aFacingDirection, mEstimated.fAnimStartTime, lbl_806DC1C4);
+                mEstimated.aFacingDirection, mEstimated.fAnimStartTime, g_fReceiveArrivalRadius);
         }
         break;
     case 2:
@@ -515,8 +515,8 @@ inline bool DesireReceivePass::CanRequestOneTouch()
     bool bSpecialReceive = m_pFielder->fn_8003E7F8()
         || m_pFielder->fn_8003E84C();
     if ((bSpecialReceive && m_pFielder->m_pBall != 0)
-        || (fPassProgress < lbl_806DC1B4
-            && mAgeTimer.GetSeconds() < lbl_806DC1B8)
+        || (fPassProgress < g_fOneTouchMinPassProgress
+            && mAgeTimer.GetSeconds() < g_fOneTouchMinDesireAge)
         || (meDesireSubState == 4 && (mbOneTouchShot || mbOneTouchPass)))
     {
         return false;
@@ -746,7 +746,7 @@ bool DesireReceivePass::fn_800C0E74()
             m_pFielder->mUnidentified024.m_v3Position.x - mv3PassIntercept.x,
             m_pFielder->mUnidentified024.m_v3Position.y - mv3PassIntercept.y,
         };
-        result = nlVec2LengthSquared(v2Delta) > lbl_806DC1C4;
+        result = nlVec2LengthSquared(v2Delta) > g_fReceiveArrivalRadius;
         break;
     }
     }
@@ -788,7 +788,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     float fDesiredScale =
         m_pFielder->mUnidentified024.m_fDesiredPlayerScale;
     if (fContactHeight
-        > lbl_806DC1CC * fDesiredScale)
+        > g_fAirContactHeightScale * fDesiredScale)
     {
         g_pBall->PredictLandingSpotAndTime(estimated.v3BallContactPos,
             &nNumIntercepts, fInterceptTimes,
@@ -859,7 +859,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         }
 
         fInterceptTimes[0] = fInterceptTime;
-        fInterceptTimes[1] = lbl_806DC190;
+        fInterceptTimes[1] = sfReceivePassMaxDuration;
         nNumIntercepts = 2;
 
         nlVector3 v3FirstBallPosition;
@@ -916,9 +916,9 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                 }
             }
 
-            if (fDot > lbl_806DC1D8
+            if (fDot > g_fBallApproachMinDot
                 && nlVec3Length(g_pBall->m_v3Velocity)
-                    < lbl_806DC1DC)
+                    < g_fBallApproachMaxSpeed)
             {
                 v3ClosestPoint = GetClosestPointOnLineABFromPointC(
                     v3FirstBallPosition, v3SecondBallPosition,
@@ -1146,7 +1146,7 @@ bool DesireReceivePass::StartPickupAnimation()
     float fDistance = nlSqrt(nlVec2LengthSquared(v2Delta), true);
     float fRadius = m_pFielder->mUnidentified320->GetRadius();
     if (fDistance - fRadius
-        > mEstimated.fAnimStartOffset + lbl_806DC1C0)
+        > mEstimated.fAnimStartOffset + g_fAnimStartPositionTolerance)
     {
         tDebugPrintManager::Print(DC_AI,
             "DesireReceivePass::StartPickupAnimation - position is outside max threshold !\n");
@@ -1180,8 +1180,8 @@ bool DesireReceivePass::StartPickupAnimation()
     }
 
     float fPlaybackSpeed = nlMinEquals(
-        nlMaxEquals(fAnimTime / fTimeToIntercept, lbl_806DC1D0),
-        lbl_806DC1D4);
+        nlMaxEquals(fAnimTime / fTimeToIntercept, g_fMinContactAnimSpeed),
+        g_fMaxContactAnimSpeed);
     m_pFielder->m_pCurrentAnimController
         ->m_fPlaybackSpeedScale = fPlaybackSpeed;
     return true;
@@ -1196,28 +1196,28 @@ const LooseBallContactAnimInfo* DesireReceivePass::GetContactAnimInfoList(
     {
     case 2:
         nNumAnims = 5;
-        pAnimInfo = lbl_804DC1B0;
+        pAnimInfo = sReceiveContactAnims;
         break;
     case 4:
     case 5:
         nNumAnims = 4;
-        pAnimInfo = lbl_804DC2E0;
+        pAnimInfo = sVolleyOneTouchContactAnims;
         break;
     case 8:
         nNumAnims = 8;
-        pAnimInfo = lbl_804DC280;
+        pAnimInfo = sOneTouchShotContactAnims;
         break;
     case 3:
         nNumAnims = 4;
-        pAnimInfo = lbl_804DC1F0;
+        pAnimInfo = sVolleyReceiveContactAnims;
         break;
     case 16:
         nNumAnims = 2;
-        pAnimInfo = lbl_804DC310;
+        pAnimInfo = sSpecialVolleyContactAnims;
         break;
     case 9:
         nNumAnims = 8;
-        pAnimInfo = lbl_804DC220;
+        pAnimInfo = sVolleyOneTouchShotContactAnims;
         break;
     }
     return pAnimInfo;
@@ -1302,7 +1302,7 @@ const LooseBallContactAnimInfo* DesireReceivePass::FindBestContactAnimInfo(
         float fContactOffset = nlVec2Length(
             *(nlVector2*)&v3ContactOffsetWorld);
         if (fDistanceToContact
-            > fContactOffset - lbl_806DC1C4)
+            > fContactOffset - g_fReceiveArrivalRadius)
         {
             pReachableAnimInfo = pCurrentAnimInfo;
             continue;
@@ -1379,8 +1379,8 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         pPassTarget->mUnidentified024.m_v3Position.y - g_pBall->GetPosition().y,
     };
     float fPassSpeed = DoCalculatePassSpeed(v2BallToTarget,
-        fMinPassSpeed, fMaxPassSpeed, lbl_806DC1AC, lbl_806DC1B0);
-    if (bFindPosition && lbl_806DC196)
+        fMinPassSpeed, fMaxPassSpeed, g_fPassDistanceMin, g_fPassDistanceMax);
+    if (bFindPosition && g_bFindReceivePassPosition)
     {
         nlVector3 v3FoundPassPosition;
         if (pv3PassPosition != 0)
@@ -1445,9 +1445,9 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         g_pBall->ShootAtFast(
             v3BallVelocity, v3PassPosition, fPassTime);
         if (!m_pFielder->fn_8003E74C()
-            && v3BallVelocity.z > lbl_806DC19C)
+            && v3BallVelocity.z > g_fMaxVolleyPassUpSpeed)
         {
-            v3BallVelocity.z = lbl_806DC19C;
+            v3BallVelocity.z = g_fMaxVolleyPassUpSpeed;
             bHighArc = true;
         }
     }
@@ -1460,8 +1460,8 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         if (g_pBall->m_v3Position.z < 0.36f)
         {
             v3BallVelocity.z = InterpolateRangeClamped(
-                lbl_806DC1A8, lbl_806DC1A4,
-                lbl_806DC1AC, lbl_806DC1B0, fPassDistance);
+                g_fGroundPassMinLift, g_fGroundPassMaxLift,
+                g_fPassDistanceMin, g_fPassDistanceMax, fPassDistance);
         }
         else
         {
@@ -1472,7 +1472,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
 
     fn_80016DF8(g_pBall, pPasser, &v3BallVelocity,
         eSpinType, bVolleyPass && !bHighArc, false);
-    pPasser->SetNoPickUpTime(lbl_806DC1A0);
+    pPasser->SetNoPickUpTime(g_fPasserNoPickUpTime);
     EmitBallShot((cFielder*)pPasser, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);
 
     if (pPassTarget->CanReceivePass() && !bHighArc)
