@@ -24,6 +24,18 @@ struct UnidentifiedOwnerHandle
     /* 0x00 */ UnidentifiedOwnerRecord* mOwner;
 };
 
+struct UnidentifiedOwnerConnection
+{
+    UnidentifiedOwnerConnection()
+        : mOwner(0)
+    {
+    }
+
+    ~UnidentifiedOwnerConnection();
+
+    /* 0x00 */ UnidentifiedOwnerRecord* mOwner;
+};
+
 enum AsyncLoadingSequenceState
 {
     ASYNC_LOADING_IDLE = 0,
@@ -114,8 +126,6 @@ void fn_8011B40C(AudioResourceLoadOwner*, void*);
 void fn_8011B418();
 void fn_8011B424(void*, unsigned long, unsigned long);
 void fn_8011B6E8(AsyncLoadingManager* manager);
-UnidentifiedOwnerHandle* fn_8011B858(UnidentifiedOwnerHandle* handle,
-    int shouldDelete);
 }
 
 #endif // GAME_ASYNC_LOADING_H
