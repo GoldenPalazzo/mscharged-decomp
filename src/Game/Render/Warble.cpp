@@ -109,13 +109,15 @@ static inline int SwizzledIA8Offset(int x, int y)
 void GenerateWarbleTexture(
     float phase, float frequency, float amplitude)
 {
+    int y;
+    int x;
     PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleTexture));
     u8* output = static_cast<u8*>(texture->m_SwizzledData);
 
-    for (int y = 0; y < 32; ++y)
+    for (y = 0; y < 32; ++y)
     {
         const float dy = (float)y * (1.0f / 64.0f) - 0.5f;
-        for (int x = 0; x < 32; ++x)
+        for (x = 0; x < 32; ++x)
         {
             const float source = sWarbleBlob[y][x];
             int displacement;
@@ -146,9 +148,9 @@ void GenerateWarbleTexture(
         }
     }
 
-    for (int y = 0; y < 32; ++y)
+    for (y = 0; y < 32; ++y)
     {
-        for (int x = 0; x < 32; ++x)
+        for (x = 0; x < 32; ++x)
         {
             const int source = SwizzledIA8Offset(x, y);
             const int mirrorX = SwizzledIA8Offset(63 - x, y);
