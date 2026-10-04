@@ -249,21 +249,21 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     if (update->fn_800C2BD4() == 3)
     {
         bool bUnhandled = false;
-        switch (update->fn_800C2C00(8)->fn_800C2BD4())
+        switch (update->GetParameter(8)->fn_800C2BD4())
         {
         case 15:
             *update = 0;
-            RequestOneTouchShot(update->fn_800C2C08()->Get(16)->fn_800C2BF8());
+            RequestOneTouchShot(update->GetParameters()->Get(16)->fn_800C2BF8());
             SetPassTransitionTimer();
             break;
         case 14:
         {
             *update = 0;
-            cPlayer* pPassTarget = update->fn_800C2C08()->Get(14)->GetPlayer();
+            cPlayer* pPassTarget = update->GetParameters()->Get(14)->GetPlayer();
             bool bVolleyPass = false;
-            if (update->fn_800C2C10(16))
+            if (update->IsParameterSet(16))
             {
-                bVolleyPass = update->fn_800C2C08()->Get(16)->fn_800C2BF8();
+                bVolleyPass = update->GetParameters()->Get(16)->fn_800C2BF8();
             }
             RequestOneTouchPass(bVolleyPass, pPassTarget);
             SetPassTransitionTimer();
