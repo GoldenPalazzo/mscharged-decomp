@@ -1366,7 +1366,7 @@ config.libs = [
             Object(Matching, "NL/plat/nlFileCache.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"], mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/nlFlash.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/nlMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
-            Object(NonMatching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(NonMatching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/TransportSocket.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
