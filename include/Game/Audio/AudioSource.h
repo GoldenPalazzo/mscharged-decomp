@@ -13,20 +13,20 @@ struct AudioStreamChannel;
 
 struct AudioSourceData
 {
-    unsigned int m_Unknown00;
-    unsigned int m_Unknown04;
-    unsigned char m_Unknown08;
+    unsigned int m_SourceCount;
+    unsigned int m_StreamBlockSize;
+    unsigned char m_IsStream;
 };
 
 struct AudioSourceInfo
 {
     unsigned int m_Unknown00;
-    unsigned int m_Unknown04;
+    unsigned int m_StreamOffset;
     unsigned int m_Unknown08;
     unsigned int m_Unknown0C;
-    unsigned int m_Unknown10;
+    unsigned int m_ChannelCount;
     unsigned int m_Unknown14;
-    AudioBankLoader* m_Unknown18;
+    AudioBankLoader* m_BankLoader;
 };
 
 class AudioSource
@@ -35,9 +35,9 @@ public:
     AudioSource()
     {
         m_Unknown04 = 0;
-        m_Unknown08 = 0;
+        m_SourceInfo = 0;
         m_Unknown10 = 0;
-        m_Unknown14_00 = 0;
+        m_PlayCount = 0;
         m_Unknown14_0C = 1;
         m_Unknown14_18 = 0;
     }
@@ -71,10 +71,10 @@ public:
     void SetControllerSpeaker(bool, unsigned int);
 
     /* 0x04 */ int m_Unknown04;
-    /* 0x08 */ AudioSourceInfo* m_Unknown08;
-    /* 0x0C */ float m_Unknown0C;
+    /* 0x08 */ AudioSourceInfo* m_SourceInfo;
+    /* 0x0C */ float m_SampleRateRatio;
     /* 0x10 */ int m_Unknown10;
-    /* 0x14 */ unsigned int m_Unknown14_00 : 12;
+    /* 0x14 */ unsigned int m_PlayCount : 12;
     unsigned int m_Unknown14_0C : 12;
     unsigned int m_Unknown14_18 : 1;
     unsigned int m_Unknown14_19 : 2;
@@ -155,11 +155,11 @@ struct AudioStreamChannel
     static void OnVoiceDropped(void*);
 
     /* 0x00 */ AudioReadState* m_Unknown00;
-    /* 0x04 */ AXVPB* m_Unknown04;
+    /* 0x04 */ AXVPB* m_Voice;
     /* 0x08 */ void* m_Unknown08;
     /* 0x0C */ unsigned int m_Unknown0C;
     /* 0x10 */ unsigned int m_Unknown10_00 : 31;
-    unsigned int m_Unknown10_1F : 1;
+    unsigned int m_VoiceDropped : 1;
     /* 0x14 */ unsigned int m_Unknown14;
 };
 
@@ -181,7 +181,7 @@ public:
     virtual void SetSurroundPan(float);
     virtual void SetLowPassFilter(bool, unsigned int, bool);
     virtual void SetAuxiliaryVolume(int, int);
-    virtual unsigned int UnidentifiedVirtual70() = 0;
+    virtual unsigned int GetStreamHeaderOffset() = 0;
     virtual unsigned int GetChannelCount() = 0;
     virtual AudioStreamChannel* GetFirstChannel() = 0;
     virtual AudioStreamChannel* GetChannelIterator() = 0;
@@ -229,10 +229,10 @@ inline bool AudioSource::IsStream()
 }
 
 template <unsigned int ChannelCount>
-class UnidentifiedAudioChannels : public AudioReadState
+class AudioStreamChannels : public AudioReadState
 {
 public:
-    virtual ~UnidentifiedAudioChannels() { }
+    virtual ~AudioStreamChannels() { }
 
     virtual AXVPB* GetVoice();
 
@@ -253,52 +253,52 @@ public:
     AudioStreamChannel m_Channels[ChannelCount];
 };
 
-class AudioReadState_8035D154 : public UnidentifiedAudioChannels<1>
+class AudioMonoStreamSource : public AudioStreamChannels<1>
 {
 public:
-    virtual ~AudioReadState_8035D154();
+    virtual ~AudioMonoStreamSource();
     virtual void SetPan(float value);
     virtual void SetInterauralDelay(int value);
-    virtual unsigned int UnidentifiedVirtual70();
+    virtual unsigned int GetStreamHeaderOffset();
 
     static void* operator new(unsigned long);
     static void operator delete(void*);
 };
 
-class AudioReadState_80361920 : public UnidentifiedAudioChannels<2>
+class AudioStereoStreamSource : public AudioStreamChannels<2>
 {
 public:
-    virtual ~AudioReadState_80361920();
+    virtual ~AudioStereoStreamSource();
     virtual bool Prepare();
     virtual void SetPan(float);
     virtual void SetInterauralDelay(int);
-    virtual unsigned int UnidentifiedVirtual70();
+    virtual unsigned int GetStreamHeaderOffset();
 
     static void* operator new(unsigned long);
     static void operator delete(void*);
 };
 
-extern SlotPool<AudioReadState_8035D154> lbl_80585C48;
-extern SlotPool<AudioReadState_80361920> lbl_80585C70;
+extern SlotPool<AudioMonoStreamSource> gAudioMonoStreamSourcePool;
+extern SlotPool<AudioStereoStreamSource> gAudioStereoStreamSourcePool;
 
-inline void* AudioReadState_8035D154::operator new(unsigned long)
+inline void* AudioMonoStreamSource::operator new(unsigned long)
 {
-    return lbl_80585C48.Allocate();
+    return gAudioMonoStreamSourcePool.Allocate();
 }
 
-inline void AudioReadState_8035D154::operator delete(void* pointer)
+inline void AudioMonoStreamSource::operator delete(void* pointer)
 {
-    lbl_80585C48.Free((AudioReadState_8035D154*)pointer);
+    gAudioMonoStreamSourcePool.Free((AudioMonoStreamSource*)pointer);
 }
 
-inline void* AudioReadState_80361920::operator new(unsigned long)
+inline void* AudioStereoStreamSource::operator new(unsigned long)
 {
-    return lbl_80585C70.Allocate();
+    return gAudioStereoStreamSourcePool.Allocate();
 }
 
-inline void AudioReadState_80361920::operator delete(void* pointer)
+inline void AudioStereoStreamSource::operator delete(void* pointer)
 {
-    lbl_80585C70.Free((AudioReadState_80361920*)pointer);
+    gAudioStereoStreamSourcePool.Free((AudioStereoStreamSource*)pointer);
 }
 
 #include "Game/Audio/AudioSource.inl"

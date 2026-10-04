@@ -29,7 +29,7 @@ void AudioBankLoader::ParseChunk(nlChunk* chunk)
     {
         AudioSourceInfo* entry = (AudioSourceInfo*)(
             (u8*)m_Chunk23200Entries + entryOffset);
-        entry->m_Unknown18 = this;
+        entry->m_BankLoader = this;
         i++;
         entryOffset += sizeof(AudioSourceInfo);
     }

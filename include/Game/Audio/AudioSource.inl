@@ -3,7 +3,7 @@
 
 inline bool AudioSource::IsLooping()
 {
-    return m_Unknown14_00 == 0xFFFF;
+    return m_PlayCount == 0xFFFF;
 }
 
 inline void AudioReadState::SetInputVolume(float value)
@@ -17,8 +17,8 @@ inline void AudioReadState::SetInputVolume(float value)
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceInputVolume(channel->m_Unknown04, value);
+        if (channel->m_Voice != 0)
+            SetVoiceInputVolume(channel->m_Voice, value);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -34,8 +34,8 @@ inline void AudioReadState::SetMixVolume(float value)
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceMixVolume(channel->m_Unknown04, value);
+        if (channel->m_Voice != 0)
+            SetVoiceMixVolume(channel->m_Voice, value);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -51,8 +51,8 @@ inline void AudioReadState::SetPitch(float value)
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoicePitch(channel->m_Unknown04, m_Unknown0C, value);
+        if (channel->m_Voice != 0)
+            SetVoicePitch(channel->m_Voice, m_SampleRateRatio, value);
         OSRestoreInterrupts(enabled);
     }
 }
@@ -68,8 +68,8 @@ inline void AudioReadState::SetSurroundPan(float value)
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceSurroundPan(channel->m_Unknown04, value);
+        if (channel->m_Voice != 0)
+            SetVoiceSurroundPan(channel->m_Voice, value);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -85,8 +85,8 @@ inline void AudioReadState::SetLowPassFilter(bool on, unsigned int frequency, bo
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceLowPassFilter(channel->m_Unknown04, on, frequency, unchanged);
+        if (channel->m_Voice != 0)
+            SetVoiceLowPassFilter(channel->m_Voice, on, frequency, unchanged);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -102,32 +102,32 @@ inline void AudioReadState::SetAuxiliaryVolume(int auxiliary, int value)
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceAuxiliaryVolume(channel->m_Unknown04, auxiliary, value);
+        if (channel->m_Voice != 0)
+            SetVoiceAuxiliaryVolume(channel->m_Voice, auxiliary, value);
     }
     OSRestoreInterrupts(enabled);
 }
 
 template <unsigned int ChannelCount>
-inline AXVPB* UnidentifiedAudioChannels<ChannelCount>::GetVoice()
+inline AXVPB* AudioStreamChannels<ChannelCount>::GetVoice()
 {
-    return m_Channels[0].m_Unknown04;
+    return m_Channels[0].m_Voice;
 }
 
 template <unsigned int ChannelCount>
-inline bool UnidentifiedAudioChannels<ChannelCount>::WasVoiceDropped()
+inline bool AudioStreamChannels<ChannelCount>::WasVoiceDropped()
 {
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        if (channel->m_Unknown10_1F)
+        if (channel->m_VoiceDropped)
             return true;
     }
     return false;
 }
 
 template <unsigned int ChannelCount>
-inline void UnidentifiedAudioChannels<ChannelCount>::ReleaseVoice(bool release)
+inline void AudioStreamChannels<ChannelCount>::ReleaseVoice(bool release)
 {
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
@@ -135,25 +135,25 @@ inline void UnidentifiedAudioChannels<ChannelCount>::ReleaseVoice(bool release)
 }
 
 template <unsigned int ChannelCount>
-inline unsigned int UnidentifiedAudioChannels<ChannelCount>::GetChannelCount()
+inline unsigned int AudioStreamChannels<ChannelCount>::GetChannelCount()
 {
     return ChannelCount;
 }
 
 template <unsigned int ChannelCount>
-inline AudioStreamChannel* UnidentifiedAudioChannels<ChannelCount>::GetFirstChannel()
+inline AudioStreamChannel* AudioStreamChannels<ChannelCount>::GetFirstChannel()
 {
     return m_Channels;
 }
 
 template <unsigned int ChannelCount>
-inline AudioStreamChannel* UnidentifiedAudioChannels<ChannelCount>::GetChannelIterator()
+inline AudioStreamChannel* AudioStreamChannels<ChannelCount>::GetChannelIterator()
 {
     return m_Channels - 1;
 }
 
 template <unsigned int ChannelCount>
-inline AudioStreamChannel* UnidentifiedAudioChannels<ChannelCount>::GetNextChannel(AudioStreamChannel* channel)
+inline AudioStreamChannel* AudioStreamChannels<ChannelCount>::GetNextChannel(AudioStreamChannel* channel)
 {
     ++channel;
     if (channel >= m_Channels + ChannelCount)
@@ -162,32 +162,32 @@ inline AudioStreamChannel* UnidentifiedAudioChannels<ChannelCount>::GetNextChann
 }
 
 template <unsigned int ChannelCount>
-inline bool UnidentifiedAudioChannels<ChannelCount>::HasVoice()
+inline bool AudioStreamChannels<ChannelCount>::HasVoice()
 {
     bool hasVoice = false;
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
-        hasVoice |= channel->m_Unknown04 != 0;
+        hasVoice |= channel->m_Voice != 0;
     return hasVoice;
 }
 
-inline AudioReadState_8035D154::~AudioReadState_8035D154()
+inline AudioMonoStreamSource::~AudioMonoStreamSource()
 {
 }
 
-inline void AudioReadState_8035D154::SetPan(float value)
+inline void AudioMonoStreamSource::SetPan(float value)
 {
-    SetVoicePan(m_Channels[0].m_Unknown04, value);
+    SetVoicePan(m_Channels[0].m_Voice, value);
 }
 
-inline void AudioReadState_8035D154::SetInterauralDelay(int value)
+inline void AudioMonoStreamSource::SetInterauralDelay(int value)
 {
-    SetVoiceInterauralDelay(m_Channels[0].m_Unknown04, value);
+    SetVoiceInterauralDelay(m_Channels[0].m_Voice, value);
 }
 
-inline unsigned int AudioReadState_8035D154::UnidentifiedVirtual70()
+inline unsigned int AudioMonoStreamSource::GetStreamHeaderOffset()
 {
-    return m_Unknown08->m_Unknown04;
+    return m_SourceInfo->m_StreamOffset;
 }
 
 inline AudioSource::~AudioSource()
