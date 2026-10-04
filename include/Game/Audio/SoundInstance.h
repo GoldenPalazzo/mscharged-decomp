@@ -33,7 +33,7 @@ struct SoundInstance
     void Play(float time);
     void Prepare();
     void SetVolume(bool releaseAfterTransition, float target, float duration);
-    void Stop(void* value);
+    void Stop(void* force);
     void Pause();
     void Resume();
     void GetSources(AudioSource** sources, unsigned int* count);

@@ -10,10 +10,6 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
-#include <NMWException.h>
-
-class AudioSource;
-
 static inline AudioRpcController* GetAudioRpcController()
 {
     return static_cast<UnidentifiedAudioBundleManager_802ECD34*>(
@@ -110,10 +106,10 @@ void SoundInstance::SetVolume(
         releaseTime = duration;
 }
 
-void SoundInstance::Stop(void* value)
+void SoundInstance::Stop(void* force)
 {
     if (state != SOUND_INSTANCE_STATE_PLAYING
-        || value != 0 || activeRpc == 0)
+        || force != 0 || activeRpc == 0)
     {
         activeRpc = 0;
         if (voices != 0)
