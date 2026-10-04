@@ -34,23 +34,23 @@ cPoseAccumulator::cPoseAccumulator(
     m_BaseSHierarchy = pSHierarchy;
     m_Scale = 1.0f;
     m_bUseObject = false;
-    m_Unknown70 = pSHierarchy->m_nNumNodes;
+    m_nNumNodes = pSHierarchy->m_nNumNodes;
 
     if (bStorePrevNodeMatrices)
     {
-        m_PrevNodeMatrices = new (8, false) nlMatrix4[m_Unknown70 + 1];
+        m_PrevNodeMatrices = new (8, false) nlMatrix4[m_nNumNodes + 1];
     }
     else
     {
         m_PrevNodeMatrices = NULL;
     }
 
-    m_NodeMatrices = new (8, false) nlMatrix4[m_Unknown70 + 1];
-    m_pQuaternions = new (8, false) nlQuaternion[m_Unknown70 + 1];
-    m_rot = new (8, false) RotAccum[m_Unknown70];
-    m_scale = new (8, false) ScaleAccum[m_Unknown70];
-    m_trans = new (8, false) TransAccum[m_Unknown70];
-    m_cb = new (8, false) cBuildNodeMatrixCallbackInfo[m_Unknown70];
+    m_NodeMatrices = new (8, false) nlMatrix4[m_nNumNodes + 1];
+    m_pQuaternions = new (8, false) nlQuaternion[m_nNumNodes + 1];
+    m_rot = new (8, false) RotAccum[m_nNumNodes];
+    m_scale = new (8, false) ScaleAccum[m_nNumNodes];
+    m_trans = new (8, false) TransAccum[m_nNumNodes];
+    m_cb = new (8, false) cBuildNodeMatrixCallbackInfo[m_nNumNodes];
 
     for (int i = 0; i < m_BaseSHierarchy->m_nNumNodes; ++i)
     {
@@ -86,17 +86,17 @@ cPoseAccumulator::cPoseAccumulator(const cPoseAccumulator& other)
     if (m_PrevNodeMatrices != NULL && other.m_PrevNodeMatrices != NULL)
     {
         memcpy(m_PrevNodeMatrices, other.m_PrevNodeMatrices,
-            other.m_Unknown70 * sizeof(nlMatrix4));
+            other.m_nNumNodes * sizeof(nlMatrix4));
     }
     memcpy(m_NodeMatrices, other.m_NodeMatrices,
-        other.m_Unknown70 * sizeof(nlMatrix4));
+        other.m_nNumNodes * sizeof(nlMatrix4));
     memcpy(m_pQuaternions, other.m_pQuaternions,
-        other.m_Unknown70 * sizeof(nlQuaternion));
-    memcpy(m_rot, other.m_rot, other.m_Unknown70 * sizeof(RotAccum));
-    memcpy(m_scale, other.m_scale, other.m_Unknown70 * sizeof(ScaleAccum));
-    memcpy(m_trans, other.m_trans, other.m_Unknown70 * sizeof(TransAccum));
+        other.m_nNumNodes * sizeof(nlQuaternion));
+    memcpy(m_rot, other.m_rot, other.m_nNumNodes * sizeof(RotAccum));
+    memcpy(m_scale, other.m_scale, other.m_nNumNodes * sizeof(ScaleAccum));
+    memcpy(m_trans, other.m_trans, other.m_nNumNodes * sizeof(TransAccum));
     memcpy(m_cb, other.m_cb,
-        other.m_Unknown70 * sizeof(cBuildNodeMatrixCallbackInfo));
+        other.m_nNumNodes * sizeof(cBuildNodeMatrixCallbackInfo));
     memcpy(&m_MorphWeights, &other.m_MorphWeights,
         sizeof(MorphWeightAccum));
     m_Scale = other.m_Scale;
@@ -112,17 +112,17 @@ cPoseAccumulator& cPoseAccumulator::operator=(const cPoseAccumulator& other)
     if (m_PrevNodeMatrices != NULL && other.m_PrevNodeMatrices != NULL)
     {
         memcpy(m_PrevNodeMatrices, other.m_PrevNodeMatrices,
-            other.m_Unknown70 * sizeof(nlMatrix4));
+            other.m_nNumNodes * sizeof(nlMatrix4));
     }
     memcpy(m_NodeMatrices, other.m_NodeMatrices,
-        other.m_Unknown70 * sizeof(nlMatrix4));
+        other.m_nNumNodes * sizeof(nlMatrix4));
     memcpy(m_pQuaternions, other.m_pQuaternions,
-        other.m_Unknown70 * sizeof(nlQuaternion));
-    memcpy(m_rot, other.m_rot, other.m_Unknown70 * sizeof(RotAccum));
-    memcpy(m_scale, other.m_scale, other.m_Unknown70 * sizeof(ScaleAccum));
-    memcpy(m_trans, other.m_trans, other.m_Unknown70 * sizeof(TransAccum));
+        other.m_nNumNodes * sizeof(nlQuaternion));
+    memcpy(m_rot, other.m_rot, other.m_nNumNodes * sizeof(RotAccum));
+    memcpy(m_scale, other.m_scale, other.m_nNumNodes * sizeof(ScaleAccum));
+    memcpy(m_trans, other.m_trans, other.m_nNumNodes * sizeof(TransAccum));
     memcpy(m_cb, other.m_cb,
-        other.m_Unknown70 * sizeof(cBuildNodeMatrixCallbackInfo));
+        other.m_nNumNodes * sizeof(cBuildNodeMatrixCallbackInfo));
     memcpy(&m_MorphWeights, &other.m_MorphWeights,
         sizeof(MorphWeightAccum));
     m_Scale = other.m_Scale;

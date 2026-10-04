@@ -69,9 +69,9 @@ public:
     cPoseAccumulator& operator=(const cPoseAccumulator& other);
     template <typename T>
     void Replay(T& frame);
-    void fn_801949E4(float scale)
+    void SetScale(float fScale)
     {
-        m_Scale = scale;
+        m_Scale = fScale;
     }
     void InitAccumulators();
     cSHierarchy* GetBaseHierarchy() const
@@ -113,7 +113,7 @@ public:
     TransAccum* m_trans;
     cBuildNodeMatrixCallbackInfo* m_cb;
     MorphWeightAccum m_MorphWeights;
-    u32 m_Unknown70;
+    u32 m_nNumNodes;
     float m_Scale;
     bool m_bUseObject;
     u8 m_Padding[3];
@@ -122,12 +122,12 @@ public:
 template <typename T>
 inline void cPoseAccumulator::Replay(T& frame)
 {
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         const UnidentifiedQuaternionCompressor quaternion(m_pQuaternions[i]);
         frame.template Replayable<0>(quaternion);
     }
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         if (!m_BaseSHierarchy->PreserveBoneLength(i))
         {
@@ -140,7 +140,7 @@ inline void cPoseAccumulator::Replay(T& frame)
             }
         }
     }
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         Replayable<0>(frame, m_scale[i].bIdentity);
         if (!m_trans[i].bIdentity)
