@@ -533,6 +533,12 @@ void NetworkInputRecording::Reset(bool constructing)
     mPlayerCounts[3] = 0;
 }
 
+static inline void BuildNetworkRecordingPath(char* path, unsigned long size, const char* fileName)
+{
+    nlStrNCpy(path, "GameLog/", size);
+    nlStrNCat(path, path, fileName, size);
+}
+
 void NetworkInputRecording::StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize)
 {
     mRecording = true;
@@ -545,8 +551,7 @@ void NetworkInputRecording::StartNetworkInputRecording(int localMachine, int mac
     }
 
     char path[256];
-    nlStrNCpy(path, "GameLog/", sizeof(path));
-    nlStrNCat(path, path, mFileName, sizeof(path));
+    BuildNetworkRecordingPath(path, sizeof(path), mFileName);
     mDebugFile = nlOpenFileDebug(path, true, false);
     nlBufferedWriterAttach(&mWriter, mDebugFile,
         mUnidentified02, 2000, 1800);

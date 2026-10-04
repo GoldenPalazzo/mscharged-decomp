@@ -464,7 +464,7 @@ config.libs = [
             Object(Matching, "Game/NetworkDebug.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/NetworkDiagnostics.cpp"),
             Object(NonMatching, "Game/NetworkDraft.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/NetworkInput.cpp"),
+            Object(NonMatching, "Game/NetworkInput.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/NetworkLobby.cpp", extra_cflags=[flag for flag in cflags_rvl_dwc if flag.startswith("-i ")] + ["-ipa file"]),
             Object(Matching, "Game/NetworkMessageRegistry.cpp"),
             Object(NonMatching, "Game/NetworkMessages.cpp"),
