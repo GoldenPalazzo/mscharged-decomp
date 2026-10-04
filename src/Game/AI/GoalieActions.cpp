@@ -161,11 +161,6 @@ extern "C" void fn_8005E604(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E800(
     void* pManager, const PlayerAttackData* pData);
-extern "C" SaveData* fn_800925C0(
-    SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
-extern "C" SaveData* fn_80092644(SaveData* pSaveData,
-    SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
-extern "C" SaveData* fn_80093780(int nAnimID);
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
 extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetPosition,
@@ -5177,8 +5172,8 @@ void Goalie::fn_8008D210(float fDeltaT)
                 fParam2);
         }
 
-        SaveData* pLowLobSave = fn_80093780(mLowLobAnim);
-        SaveData* pHighLobSave = fn_80093780(0x5B);
+        SaveData* pLowLobSave = GoalieSave::FindSaveData(mLowLobAnim);
+        SaveData* pHighLobSave = GoalieSave::FindSaveData(0x5B);
         float fPredictionHeight = Interpolate(
             pLowLobSave->mv3SavePos.z,
             pHighLobSave->mv3SavePos.z,
@@ -5268,15 +5263,15 @@ void Goalie::fn_8008D210(float fDeltaT)
             {
                 if (bPositiveSide)
                 {
-                    mpSaveData = fn_80093780(0x61);
+                    mpSaveData = GoalieSave::FindSaveData(0x61);
                 }
                 else
                 {
-                    mpSaveData = fn_80093780(0x5C);
+                    mpSaveData = GoalieSave::FindSaveData(0x5C);
                 }
-                mpSaveData = fn_80092644(mpSaveData,
-                    &mBlendInfo,
-                    &mv3LocalContactPosition);
+                mpSaveData = GetBlendedSave(mpSaveData,
+                    mBlendInfo,
+                    mv3LocalContactPosition);
                 GetWorldPoint(mv3NavTarget,
                     mBlendInfo.mv3BlendedSavePos,
                     mv3TargetPosition,
@@ -5297,32 +5292,32 @@ void Goalie::fn_8008D210(float fDeltaT)
             if (bSubstateOne
                 || nlVec2LengthSquared(v2Distance) < 1.44f)
             {
-                mpSaveData = fn_80093780(0x86);
+                mpSaveData = GoalieSave::FindSaveData(0x86);
                 if (0.2f + mpSaveData->mv3SavePos.z
                     < mv3TargetPosition.z)
                 {
                     if (bPositiveSide)
                     {
-                        mpSaveData = fn_80093780(0x33);
+                        mpSaveData = GoalieSave::FindSaveData(0x33);
                     }
                     else
                     {
-                        mpSaveData = fn_80093780(0x2E);
+                        mpSaveData = GoalieSave::FindSaveData(0x2E);
                     }
-                    mpSaveData = fn_80092644(mpSaveData,
-                        &mBlendInfo,
-                        &mv3LocalContactPosition);
+                    mpSaveData = GetBlendedSave(mpSaveData,
+                        mBlendInfo,
+                        mv3LocalContactPosition);
                 }
-                else if (lbl_8056D3B0.z >= mv3TargetPosition.z)
+                else if (gLobJumpSavePos.z >= mv3TargetPosition.z)
                 {
-                    mpSaveData = fn_800925C0(
-                        &mBlendInfo, &mv3LocalContactPosition);
+                    mpSaveData = GetBlendedLobSave(
+                        mBlendInfo, mv3LocalContactPosition);
                 }
                 else
                 {
-                    mpSaveData = fn_80092644(mpSaveData,
-                        &mBlendInfo,
-                        &mv3LocalContactPosition);
+                    mpSaveData = GetBlendedSave(mpSaveData,
+                        mBlendInfo,
+                        mv3LocalContactPosition);
                 }
 
                 GetWorldPoint(mv3NavTarget,
@@ -5340,7 +5335,7 @@ void Goalie::fn_8008D210(float fDeltaT)
 
     if (mpSaveData == 0 && bNeedsFallback)
     {
-        SaveData* pNearSave = fn_80093780(0x47);
+        SaveData* pNearSave = GoalieSave::FindSaveData(0x47);
         nlVector3 v3PredictedPosition;
         nlVector3 v3PredictedVelocity;
         float fPredictedTime = FakeBallWorld::GetPredictedHeightLimitTime(
@@ -5377,7 +5372,7 @@ void Goalie::fn_8008D210(float fDeltaT)
         }
         else
         {
-            mpSaveData = fn_80093780(0x4A);
+            mpSaveData = GoalieSave::FindSaveData(0x4A);
         }
 
         unsigned short aAnimAngle
@@ -5393,9 +5388,9 @@ void Goalie::fn_8008D210(float fDeltaT)
             mv3TargetPosition,
             mUnidentified024.m_v3Position,
             maSaveAngle);
-        mpSaveData = fn_80092644(mpSaveData,
-            &mBlendInfo,
-            &mv3LocalContactPosition);
+        mpSaveData = GetBlendedSave(mpSaveData,
+            mBlendInfo,
+            mv3LocalContactPosition);
         GetWorldPoint(mv3NavTarget,
             mBlendInfo.mv3BlendedSavePos,
             mv3TargetPosition,
