@@ -27,7 +27,7 @@ enum SoundInstanceState
 
 struct SoundInstance
 {
-    SoundInstance(XSoundHandle* owner, AudioVoiceDefinition* definition);
+    SoundInstance(XSoundHandle* handle, AudioVoiceDefinition* voiceDefinition);
     ~SoundInstance() { Destroy(); }
 
     void Play(float time);
