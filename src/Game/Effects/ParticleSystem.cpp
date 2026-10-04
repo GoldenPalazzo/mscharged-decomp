@@ -15,6 +15,7 @@
 #include "NL/gl/glView.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "Game/TweakValueFloat.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
@@ -718,8 +719,7 @@ static void RenderLightOnField(GLView* view, const EffectsLight& light)
     glSetRasterState(GLS_DepthWrite, 0);
     glSetCurrentRasterState(glHandleizeRasterState());
 
-    float dim = (2.0f * light.m_fRadius) * (heightFrac * heightFrac);
-    dim = 1.4f * dim;
+    float dim = 1.4f * ((2.0f * light.m_fRadius) * (heightFrac * heightFrac));
     nlMatrix4 mRot;
     mRot.SetIdentity();
     glQuad3 q;

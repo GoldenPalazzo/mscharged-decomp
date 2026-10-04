@@ -673,7 +673,7 @@ config.libs = [
             Object(NonMatching, "Game/Effects/EffectsBundleData.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Effects/EmissionManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Effects/EmitterCallbacks.cpp"),
-            Object(NonMatching, "Game/Effects/ParticleSystem.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Effects/ParticleSystem.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Effects/PhotoFlashEffect.cpp"),
 
             # Game/FE
