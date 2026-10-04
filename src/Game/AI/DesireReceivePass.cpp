@@ -190,7 +190,7 @@ bool DesireReceivePass::Initialize(void* context)
     mbOneTouchPass = false;
     mpOneTouchPassTarget = 0;
 
-    mUnidentifiedB4 = nlSqrt(
+    mfInitialBallSpeed = nlSqrt(
         g_pBall->m_v3Velocity.x * g_pBall->m_v3Velocity.x
             + g_pBall->m_v3Velocity.y * g_pBall->m_v3Velocity.y,
         true);
@@ -210,7 +210,7 @@ bool DesireReceivePass::Initialize(void* context)
         return result;
     }
 
-    fn_800C1A08();
+    SelectContactAnimation();
 
     float fMaxDistanceSq = lbl_806DC1C4 * lbl_806DC1C4;
 
@@ -253,8 +253,8 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         {
         case 15:
             *update = 0;
-            fn_800C089C(update->fn_800C2C08()->Get(16)->fn_800C2BF8());
-            fn_800C0F14();
+            RequestOneTouchShot(update->fn_800C2C08()->Get(16)->fn_800C2BF8());
+            SetPassTransitionTimer();
             break;
         case 14:
         {
@@ -265,8 +265,8 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             {
                 bVolleyPass = update->fn_800C2C08()->Get(16)->fn_800C2BF8();
             }
-            fn_800C0AE8(bVolleyPass, pPassTarget);
-            fn_800C0F14();
+            RequestOneTouchPass(bVolleyPass, pPassTarget);
+            SetPassTransitionTimer();
             break;
         }
         default:
@@ -289,7 +289,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     }
 
     mvDesiredPosition = mEstimated.v3AnimStartPos;
-    fn_800C0704();
+    ProcessUserInput();
     if (GetScriptMachine()->fn_800C2F20() != this)
     {
         *update = 1;
@@ -319,7 +319,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             *update = 1;
             return;
         }
-        fn_800C1A08();
+        SelectContactAnimation();
         if (mEstimated.fAnimStartTime <= fStartThreshold)
         {
             if (!CalcExactEstimates(true) || !StartPickupAnimation())
@@ -483,7 +483,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                     m_pFielder->InitActionShot(mbOneTouchVolley, true);
                 }
             }
-            else if (!mbOneTouchShot && fn_800C2F6C())
+            else if (!mbOneTouchShot && IsGroundReceive())
             {
                 if (!fn_800C0E74() || m_pFielder->ShouldStartCrossBlend(0x14))
                 {
@@ -500,7 +500,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     }
 }
 
-inline int DesireReceivePass::UnidentifiedAddReceiveFlags(int animType, bool bFlag)
+inline int DesireReceivePass::AddVolleyReceiveFlag(int animType, bool bFlag)
 {
     if (bFlag)
     {
@@ -509,7 +509,7 @@ inline int DesireReceivePass::UnidentifiedAddReceiveFlags(int animType, bool bFl
     return animType;
 }
 
-inline bool DesireReceivePass::UnidentifiedCanOneTouch()
+inline bool DesireReceivePass::CanRequestOneTouch()
 {
     float fPassProgress = g_pBall->fn_800C2EC8();
     bool bSpecialReceive = m_pFielder->fn_8003E7F8()
@@ -524,18 +524,18 @@ inline bool DesireReceivePass::UnidentifiedCanOneTouch()
     return true;
 }
 
-void DesireReceivePass::fn_800C0704()
+void DesireReceivePass::ProcessUserInput()
 {
     if (m_pFielder->GetGlobalPad() != 0)
     {
         fn_80098098(m_pFielder);
         if (m_pFielder->GetGlobalPad()->JustPressed(0x1C, true))
         {
-            fn_800C089C(m_pFielder->IsActionModifierPressed());
+            RequestOneTouchShot(m_pFielder->IsActionModifierPressed());
         }
         else if (m_pFielder->GetGlobalPad()->JustPressed(0x1B, true))
         {
-            fn_800C0AE8(
+            RequestOneTouchPass(
                 m_pFielder->IsActionModifierPressed(), 0);
         }
 
@@ -576,9 +576,9 @@ void DesireReceivePass::fn_800C0704()
     }
 }
 
-void DesireReceivePass::fn_800C089C(bool bVolleyPass)
+void DesireReceivePass::RequestOneTouchShot(bool bVolleyPass)
 {
-    if (!UnidentifiedCanOneTouch())
+    if (!CanRequestOneTouch())
     {
         return;
     }
@@ -605,7 +605,7 @@ void DesireReceivePass::fn_800C089C(bool bVolleyPass)
     if (fn_800C0E54()
         && (mbOneTouchVolley || bSpecialReceive))
     {
-        int eOneTouchReceiveAnimType = UnidentifiedAddReceiveFlags(4, fn_800C0E54());
+        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, fn_800C0E54());
         float fBallContactTime =
             mEstimated.fBallContactTime;
         mEstimated.fBallContactTime = -1.0f;
@@ -622,13 +622,13 @@ void DesireReceivePass::fn_800C089C(bool bVolleyPass)
         return;
     }
 
-    eReceiveAnimType = UnidentifiedAddReceiveFlags(8, fn_800C0E54());
+    eReceiveAnimType = AddVolleyReceiveFlag(8, fn_800C0E54());
     meReceiveAnimType = eReceiveAnimType;
 }
 
-void DesireReceivePass::fn_800C0AE8(bool bVolleyPass, cPlayer* pPassTarget)
+void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarget)
 {
-    if (!UnidentifiedCanOneTouch())
+    if (!CanRequestOneTouch())
     {
         return;
     }
@@ -643,7 +643,7 @@ void DesireReceivePass::fn_800C0AE8(bool bVolleyPass, cPlayer* pPassTarget)
     }
     if (pPassTarget == 0)
     {
-        fn_800C089C(bVolleyPass);
+        RequestOneTouchShot(bVolleyPass);
         return;
     }
 
@@ -667,7 +667,7 @@ void DesireReceivePass::fn_800C0AE8(bool bVolleyPass, cPlayer* pPassTarget)
     if (fn_800C0E54()
         && (mbOneTouchVolley || bSpecialReceive))
     {
-        int eOneTouchReceiveAnimType = UnidentifiedAddReceiveFlags(4, fn_800C0E54());
+        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, fn_800C0E54());
         float fBallContactTime =
             mEstimated.fBallContactTime;
         mEstimated.fBallContactTime = -1.0f;
@@ -684,7 +684,7 @@ void DesireReceivePass::fn_800C0AE8(bool bVolleyPass, cPlayer* pPassTarget)
         return;
     }
 
-    int eReceiveAnimType = UnidentifiedAddReceiveFlags(2, fn_800C0E54());
+    int eReceiveAnimType = AddVolleyReceiveFlag(2, fn_800C0E54());
     meReceiveAnimType = eReceiveAnimType;
 }
 
@@ -753,7 +753,7 @@ bool DesireReceivePass::fn_800C0E74()
     return result;
 }
 
-void DesireReceivePass::fn_800C0F14()
+void DesireReceivePass::SetPassTransitionTimer()
 {
     float fDuration = 0.5f + g_pBall->m_tPassTargetTimer.GetSeconds();
     const TransitionFunc& transition =
@@ -762,10 +762,10 @@ void DesireReceivePass::fn_800C0F14()
     input->SetTimer(input->GetTimerKey(transition.mFuncHash, 1), fDuration);
 }
 
-float DesireReceivePass::UnidentifiedContactHeight(int receiveAnimType)
+float DesireReceivePass::GetBallContactHeight(int receiveAnimType)
 {
     int nNumAnims;
-    const LooseBallContactAnimInfo* pAnimInfo = fn_800C1FA4(receiveAnimType, nNumAnims);
+    const LooseBallContactAnimInfo* pAnimInfo = GetContactAnimInfoList(receiveAnimType, nNumAnims);
     nlVector3 v3ContactOffsetWorld;
     m_pFielder->GetReceivePassBallContactOffset(v3ContactOffsetWorld,
         m_pFielder->mUnidentified024.m_aActualFacingDirection, pAnimInfo);
@@ -782,7 +782,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     Estimated estimated = mEstimated;
     bool bUseGroundIntercept = true;
     int nNumIntercepts;
-    float fContactHeight = UnidentifiedContactHeight(receiveAnimType);
+    float fContactHeight = GetBallContactHeight(receiveAnimType);
 
     float fInterceptTimes[2];
     float fDesiredScale =
@@ -926,7 +926,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             }
             float fBlend = NormalizeVal(
                 nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity)
-                    / mUnidentifiedB4,
+                    / mfInitialBallSpeed,
                 0.5f, 1.0f);
             nlVecLerp(estimated.v3BallContactPos,
                 v3FirstBallPosition, v3ClosestPoint, fBlend);
@@ -998,7 +998,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
         result = fn_80036234(m_pFielder,
             &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
             &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
-            mEstimated.mUnidentifiedAnimInfo,
+            mEstimated.pAnimInfo,
             &mEstimated.v3BallContactPos,
             mEstimated.aFacingTargetDirection);
     }
@@ -1008,7 +1008,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
             &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
             &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
             mEstimated.aFacingTargetDirection,
-            mEstimated.mUnidentifiedAnimInfo);
+            mEstimated.pAnimInfo);
     }
 
     g_pBall->m_pPhysicsBall->mbUseTiltForce =
@@ -1030,7 +1030,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     return result;
 }
 
-void DesireReceivePass::fn_800C1A08()
+void DesireReceivePass::SelectContactAnimation()
 {
     nlVector3 v3BallPosition;
     if (mbOneTouchShot)
@@ -1064,7 +1064,7 @@ void DesireReceivePass::fn_800C1A08()
     }
 
     const LooseBallContactAnimInfo* pBestBallContactAnimInfo =
-        fn_800C2048(v3BallPosition,
+        FindBestContactAnimInfo(v3BallPosition,
             m_pFielder->mUnidentified024.m_v3Position,
             mEstimated.v3BallContactPos,
             mEstimated.aFacingTargetDirection, meReceiveAnimType);
@@ -1107,7 +1107,7 @@ void DesireReceivePass::fn_800C1A08()
         break;
     }
 
-    mEstimated.mUnidentifiedAnimInfo = pBestBallContactAnimInfo;
+    mEstimated.pAnimInfo = pBestBallContactAnimInfo;
     mEstimated.nReceivePassAnim = pBestBallContactAnimInfo->nAnimID;
 
     cSAnim* pBestContactAnim = m_pFielder->m_pAnimInventory
@@ -1170,7 +1170,7 @@ bool DesireReceivePass::StartPickupAnimation()
     }
 
     float fAnimTime =
-        mEstimated.mUnidentifiedAnimInfo->fAnimContactFrame
+        mEstimated.pAnimInfo->fAnimContactFrame
         / 30.0f;
     float fTimeToIntercept =
         g_pBall->m_tPassTargetTimer.GetSeconds();
@@ -1187,7 +1187,7 @@ bool DesireReceivePass::StartPickupAnimation()
     return true;
 }
 
-const LooseBallContactAnimInfo* DesireReceivePass::fn_800C1FA4(
+const LooseBallContactAnimInfo* DesireReceivePass::GetContactAnimInfoList(
     int receiveAnimType, int& nNumAnims)
 {
     nNumAnims = 0;
@@ -1223,7 +1223,7 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C1FA4(
     return pAnimInfo;
 }
 
-const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
+const LooseBallContactAnimInfo* DesireReceivePass::FindBestContactAnimInfo(
     const nlVector3& v3BallPosition,
     const nlVector3& v3FielderPosition,
     nlVector3& v3BallContactPos,
@@ -1231,7 +1231,7 @@ const LooseBallContactAnimInfo* DesireReceivePass::fn_800C2048(
 {
     int nNumAnims;
     const LooseBallContactAnimInfo* pAnimInfoList =
-        fn_800C1FA4(receiveAnimType, nNumAnims);
+        GetContactAnimInfoList(receiveAnimType, nNumAnims);
 
     nlVector3 v3BallDirection;
     nlVec3Sub(v3BallDirection, v3BallPosition, v3BallContactPos);
@@ -1354,7 +1354,7 @@ void DesireReceivePass::FindPassPosition(cPlayer* pPasser,
         v3Position, *pfRadius, true);
 }
 
-void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFindPosition,
+void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFindPosition,
     bool bPerfectPass, const nlVector3* pv3PassPosition,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
@@ -1420,7 +1420,7 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         int nNumAnims;
         eSpinType = SPINTYPE_BACK;
         const LooseBallContactAnimInfo* pAnimInfo =
-            fn_800C1FA4(eReceiveAnimType, nNumAnims);
+            GetContactAnimInfoList(eReceiveAnimType, nNumAnims);
         cSAnim* pAnim = m_pFielder->m_pAnimInventory
                             ->GetAnim(pAnimInfo->nAnimID);
         aFacingDirection =

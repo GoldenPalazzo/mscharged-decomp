@@ -20,12 +20,12 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    void fn_800C0704();
-    void fn_800C089C(bool);
-    void fn_800C0AE8(bool, cPlayer*);
-    void fn_800C22CC(cPlayer*, bool, bool, bool, const nlVector3*, float, float);
-    void fn_800C0F14();
-    bool fn_800C2F6C() { return !fn_800C0E54(); }
+    void ProcessUserInput();
+    void RequestOneTouchShot(bool);
+    void RequestOneTouchPass(bool, cPlayer*);
+    void ExecutePass(cPlayer*, bool, bool, bool, const nlVector3*, float, float);
+    void SetPassTransitionTimer();
+    bool IsGroundReceive() { return !fn_800C0E54(); }
     bool fn_800C0E54();
     bool CalcRoughEstimates(int);
     bool CalcExactEstimates(bool);
@@ -61,7 +61,7 @@ private:
             aFacingDirection = 0;
             aFacingTargetDirection = 0;
             fBallContactTime = -1.0f;
-            mUnidentifiedAnimInfo = 0;
+            pAnimInfo = 0;
             fAnimStartTime = 0.0f;
             nReceivePassAnim = 0;
             fReceivePassAnimTime = 0.0f;
@@ -74,7 +74,7 @@ private:
         unsigned short aFacingTargetDirection;
         float fBallContactTime;
         float fAnimStartOffset;
-        const LooseBallContactAnimInfo* mUnidentifiedAnimInfo;
+        const LooseBallContactAnimInfo* pAnimInfo;
         float fAnimStartTime;
         int nReceivePassAnim;
         float fReceivePassAnimTime;
@@ -82,21 +82,21 @@ private:
 
     static unsigned short sDesireReceivePassType;
 
-    static int UnidentifiedAddReceiveFlags(int, bool);
-    bool UnidentifiedCanOneTouch();
-    float UnidentifiedContactHeight(int);
+    static int AddVolleyReceiveFlag(int, bool);
+    bool CanRequestOneTouch();
+    float GetBallContactHeight(int);
     bool fn_800C0E74();
-    const LooseBallContactAnimInfo* fn_800C1FA4(
+    const LooseBallContactAnimInfo* GetContactAnimInfoList(
         int, int&);
-    const LooseBallContactAnimInfo* fn_800C2048(
+    const LooseBallContactAnimInfo* FindBestContactAnimInfo(
         const nlVector3&, const nlVector3&, nlVector3&,
         unsigned short, int);
-    void fn_800C1A08();
+    void SelectContactAnimation();
     void FindPassPosition(cPlayer*, bool, bool, float, nlVector3&, float*);
 
     bool mbValidPassIntercept;
     nlVector3 mv3PassIntercept;
-    float mUnidentifiedB4;
+    float mfInitialBallSpeed;
     int meReceiveAnimType;
 
 public:
