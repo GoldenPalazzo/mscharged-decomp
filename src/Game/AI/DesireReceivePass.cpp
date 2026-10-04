@@ -299,7 +299,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     if (g_pBall->GetPassTarget() == m_pFielder
         && g_pBall->GetPassProgress() > g_fOneTimerMinPassProgress
         && AIsgn(g_pBall->GetPassIntercept().x)
-            == AIsgn(m_pFielder->GetTeam()->GetOtherNet()->fn_800C2F30().x)
+            == AIsgn(m_pFielder->GetTeam()->GetOtherNet()->GetNetLocation().x)
         && mbOneTouchShot && !mbOneTouchVolley)
     {
         fn_8005C650(g_pGame);
