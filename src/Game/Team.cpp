@@ -320,7 +320,7 @@ cTeam::cTeam(int nSide)
 
 SkillTweaks* fn_800A636C(cTeam* pTeam)
 {
-    return gGameTweaks.mUnidentified18[pTeam->m_nSide];
+    return gGameTweaks.mSkillTweaks[pTeam->m_nSide];
 }
 
 /**

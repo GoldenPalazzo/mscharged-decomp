@@ -874,7 +874,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         SetLoadingComment("InitializeStadiumViewer2");
         fn_80056CF4((void*)gGameTweaks.mTerrainType,
-            gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
+            gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
         ParticleUpdateTask* particleUpdateTask = ParticleUpdateTask::sInstance;
         RLView* particleView = GetLayerView(eCLV_Particles);
         particleUpdateTask->Initialize(particleView, 0x5F6, 0x2FB);
@@ -1731,7 +1731,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameState2");
-    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
+    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
     static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E1514();
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
