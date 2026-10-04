@@ -201,13 +201,16 @@ void cPoseAccumulator::Pose(
     BuildNodeMatrices(pWorldMatrix);
 }
 
-extern "C" void fn_8030B038(cPoseAccumulator* pAccumulator,
+/**
+ * Offset/Address/Size: 0x668 | 0x8030B038 | size: 0x188
+ */
+void cPoseAccumulator::Pose(
     const cPoseNode* pPoseTree, const nlMatrix4* pWorldMatrix)
 {
-    PoseAccumulatorInitNodeAccumulators(pAccumulator);
-    PoseAccumulatorClearMorphWeights(pAccumulator);
-    pPoseTree->Evaluate(1.0f, pAccumulator);
-    pAccumulator->BuildNodeMatrices(*pWorldMatrix);
+    PoseAccumulatorInitNodeAccumulators(this);
+    PoseAccumulatorClearMorphWeights(this);
+    pPoseTree->Evaluate(1.0f, this);
+    BuildNodeMatrices(*pWorldMatrix);
 }
 
 /**
@@ -447,31 +450,34 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
     }
 }
 
-extern "C" void fn_8030B9C8(
-    cPoseAccumulator* pAccumulator, const nlMatrix4* pWorldMatrix)
+/**
+ * Offset/Address/Size: 0xFF8 | 0x8030B9C8 | size: 0x350
+ */
+void cPoseAccumulator::BuildNodeMatricesFromQuaternions(
+    const nlMatrix4& pWorldMatrix)
 {
     bool ScaleIdentityStack[32];
     nlVector3 ScaleStack[32];
     int nStackIndex = 0;
 
-    if (pAccumulator->m_scale[0].bIdentity
-        && fabsf(pAccumulator->m_Scale - 1.0f) < 0.0001f)
+    if (m_scale[0].bIdentity
+        && fabsf(m_Scale - 1.0f) < 0.0001f)
     {
         ScaleIdentityStack[0] = true;
     }
     else
     {
         ScaleIdentityStack[0] = false;
-        nlVec3Scale(ScaleStack[0], pAccumulator->m_scale[0].s,
-            pAccumulator->m_Scale);
+        nlVec3Scale(ScaleStack[0], m_scale[0].s,
+            m_Scale);
     }
 
-    for (int i = 0; i < pAccumulator->m_BaseSHierarchy->m_nNumNodes; ++i)
+    for (int i = 0; i < m_BaseSHierarchy->m_nNumNodes; ++i)
     {
         nlVector3 v3Position;
-        if (!pAccumulator->m_trans[i].bIdentity)
+        if (!m_trans[i].bIdentity)
         {
-            v3Position = pAccumulator->m_trans[i].t;
+            v3Position = m_trans[i].t;
         }
         else
         {
@@ -483,7 +489,7 @@ extern "C" void fn_8030B9C8(
         if (i > 0)
         {
             int nPreviousScaleIndex = nStackIndex - 1;
-            ScaleAccum& s = pAccumulator->m_scale[i];
+            ScaleAccum& s = m_scale[i];
             if (s.bIdentity)
             {
                 ScaleIdentityStack[nStackIndex]
@@ -507,17 +513,17 @@ extern "C" void fn_8030B9C8(
                 }
             }
 
-            int nParentIndex = pAccumulator->m_BaseSHierarchy->GetParent(i);
+            int nParentIndex = m_BaseSHierarchy->GetParent(i);
             nlMultPosVectorMatrix(
-                v3Position, pAccumulator->m_NodeMatrices[nParentIndex]);
+                v3Position, m_NodeMatrices[nParentIndex]);
         }
         else
         {
-            nlMultPosVectorMatrix(v3Position, *pWorldMatrix);
+            nlMultPosVectorMatrix(v3Position, pWorldMatrix);
         }
 
-        nlMatrix4& mNode = pAccumulator->m_NodeMatrices[i];
-        nlQuatToMatrix(mNode, pAccumulator->m_pQuaternions[i], false);
+        nlMatrix4& mNode = m_NodeMatrices[i];
+        nlQuatToMatrix(mNode, m_pQuaternions[i], false);
         mNode.m41 = v3Position.x;
         mNode.m42 = v3Position.y;
         mNode.m43 = v3Position.z;
@@ -530,7 +536,7 @@ extern "C" void fn_8030B9C8(
             nlVec3Scale(*(nlVector3*)&mNode.e2[2][0], ScaleStack[nStackIndex].z);
         }
 
-        nStackIndex += pAccumulator->m_BaseSHierarchy->GetPushPop(i);
+        nStackIndex += m_BaseSHierarchy->GetPushPop(i);
     }
 }
 

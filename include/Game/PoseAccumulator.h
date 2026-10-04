@@ -79,6 +79,7 @@ public:
         return m_BaseSHierarchy;
     }
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
+    void BuildNodeMatricesFromQuaternions(const nlMatrix4& pWorldMatrix);
     void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,
         bool bMirror);
     void BlendRotAroundZ(int nNode, unsigned short rot, float fWeight);
@@ -98,6 +99,7 @@ public:
     nlMatrix4& GetNodeMatrixByHashID(unsigned int nHashID) const;
     s32 GetNumNodes() const;
     void Pose(const cPoseNode& pPoseTree, const nlMatrix4& pWorldMatrix);
+    void Pose(const cPoseNode* pPoseTree, const nlMatrix4* pWorldMatrix);
     void SetBuildNodeMatrixCallback(int nNode,
         BuildNodeMatrixFn funcCallback, unsigned int nParam1,
         unsigned int nParam2);
@@ -116,8 +118,6 @@ public:
     bool m_bUseObject;
     u8 m_Padding[3];
 };
-
-extern "C" void fn_8030B9C8(cPoseAccumulator* pAccumulator, const nlMatrix4* pWorldMatrix);
 
 template <typename T>
 inline void cPoseAccumulator::Replay(T& frame)
