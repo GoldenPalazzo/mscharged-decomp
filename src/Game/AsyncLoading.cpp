@@ -1315,7 +1315,7 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
         char buffer[200];
         nlSNPrintf(buffer, sizeof(buffer), "Total Load Time %f MS\n", lbl_806E105C);
         tDebugPrintManager::Print(DC_LOADER, buffer);
-        fn_802BD718("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
+        SmokeTestLogGraphValue("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
     }
     return result;
 }
@@ -1888,11 +1888,11 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
         totalMemFree, totalMemFree / 1024.0f,
         totalMemFree / 1048576.0f);
 
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "MEM1 Free at end of InitializeGameState", "bytes", mem1Free);
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "MEM2 Free at end of InitializeGameState", "bytes", mem2Free);
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "Total Free Memory at end of InitializeGameState", "bytes",
         totalMemFree);
 
@@ -1910,13 +1910,13 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     fn_80056EA8();
 
-    if (fn_802BD63C())
+    if (IsSmokeTestEnabled())
     {
-        fn_802BD718("FrameTime_GamePlay", "ms",
+        SmokeTestLogGraphValue("FrameTime_GamePlay", "ms",
             pGamePlayTimeRegion->m_fThreshold / (float)pGamePlayTimeRegion->m_unk10);
-        fn_802BD718("FrameTime_NIS", "ms",
+        SmokeTestLogGraphValue("FrameTime_NIS", "ms",
             pNISTimeRegion->m_fThreshold / (float)pNISTimeRegion->m_unk10);
-        fn_802BD718("FrameTime_AutoReplay", "ms",
+        SmokeTestLogGraphValue("FrameTime_AutoReplay", "ms",
             pAutoReplayTimeRegion->m_fThreshold / (float)pAutoReplayTimeRegion->m_unk10);
         g_FrameCounter.fn_802B80C4();
     }
