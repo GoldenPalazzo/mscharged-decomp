@@ -268,32 +268,36 @@ void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* 
         record->mButtonBitfield = *(u16*)mUnidentified01C[player].mData;
     if (mUnidentified018[player] & 4)
     {
-        s8 leftX = mUnidentified01C[player].mData[12];
-        s8 leftY = mUnidentified01C[player].mData[13];
+        const u8* source = mUnidentified01C[player].mData + 12;
+        s8 leftX = *source++;
+        s8 leftY = *source;
         record->mAnalogAxes[0] = leftX;
         record->mAnalogAxes[1] = leftY;
     }
     if (mUnidentified018[player] & 8)
     {
-        s8 rightX = mUnidentified01C[player].mData[14];
-        s8 rightY = mUnidentified01C[player].mData[15];
+        const u8* source = mUnidentified01C[player].mData + 14;
+        s8 rightX = *source++;
+        s8 rightY = *source;
         record->mAnalogAxes[2] = rightX;
         record->mAnalogAxes[3] = rightY;
     }
     if (mUnidentified018[player] & 0x10)
     {
-        s8 x = mUnidentified01C[player].mData[3];
-        s8 y = mUnidentified01C[player].mData[4];
-        s8 z = mUnidentified01C[player].mData[5];
+        const u8* source = mUnidentified01C[player].mData + 3;
+        s8 x = *source++;
+        s8 y = *source++;
+        s8 z = *source;
         record->mRemoteAccel[0] = x;
         record->mRemoteAccel[1] = y;
         record->mRemoteAccel[2] = z;
     }
     if (mUnidentified018[player] & 0x20)
     {
-        s8 x = mUnidentified01C[player].mData[6];
-        s8 y = mUnidentified01C[player].mData[7];
-        s8 z = mUnidentified01C[player].mData[8];
+        const u8* source = mUnidentified01C[player].mData + 6;
+        s8 x = *source++;
+        s8 y = *source++;
+        s8 z = *source;
         record->mFreeStyleAccel[0] = x;
         record->mFreeStyleAccel[1] = y;
         record->mFreeStyleAccel[2] = z;
