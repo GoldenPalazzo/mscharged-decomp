@@ -707,6 +707,16 @@ static inline DrawableObject* FindStadiumDrawableObject(const char* name)
     return FindStadiumDrawableObject(nlStringLowerHash(name));
 }
 
+static inline bool HasSoftnessOverride(const StadiumTweaks& tweaks)
+{
+    return tweaks.fSoftness >= 0.0f;
+}
+
+static inline void SetNetSoftness(float softness)
+{
+    // Stadium softness overrides are disabled.
+}
+
 bool FinishLoadStadium(bool stadiumViewer)
 {
     if (lbl_806E1968 == 1)
@@ -760,6 +770,10 @@ bool FinishLoadStadium(bool stadiumViewer)
         lbl_806E196C->fGoalpostRadius, lbl_806E196C->fGoalpostOffset);
     SetPhysicsNetDimensions(lbl_806E196C->fPhysNetWidth,
         lbl_806E196C->fPhysNetHeight, lbl_806E196C->fPhysNetDepth);
+    if (HasSoftnessOverride(*lbl_806E196C))
+    {
+        SetNetSoftness(lbl_806E196C->fSoftness);
+    }
     NetMesh::SetDontUseLowestNetTextureLOD(lbl_806E196C->bDontUseLowest);
     NetMesh::s_bAnimatedNetMeshEnabled = true;
     SetCoPlanarZ(lbl_806E196C->fShadowHeight);

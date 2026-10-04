@@ -857,7 +857,7 @@ config.libs = [
             Object(Matching, "Game/Render/ShootToScoreMeter.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Render/SkinAnimatedMovableNPC.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Render/SkinAnimatedNPC.cpp", cflags=cflags_game),
-            Object(NonMatching, "Game/Render/StadiumLoading.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Render/StadiumLoading.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/StadiumTweaks.cpp"),
             Object(Matching, "Game/Render/ThwompObject.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/TimedObject.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
