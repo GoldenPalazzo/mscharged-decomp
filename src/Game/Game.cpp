@@ -690,7 +690,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     {
         ChangeGameState(1);
         FixedUpdateTask* task = GetFixedUpdateTask();
-        task->mUnidentified38 = true;
+        task->mSimulationStarted = true;
     }
     else
     {

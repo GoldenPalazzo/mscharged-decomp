@@ -525,9 +525,9 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
 {
     for (int i = 0; i < 3; i++)
     {
-        mBlend[i] = GetFixedUpdateTask()->mUnidentified28 / g_fFixedUpdateTick;
+        mBlend[i] = GetFixedUpdateTask()->mInterpolationDeltaT / g_fFixedUpdateTick;
     }
-    mDeltaTime = GetFixedUpdateTask()->mUnidentified28;
+    mDeltaTime = GetFixedUpdateTask()->mInterpolationDeltaT;
 
     DoPotentialDebugReplay(deltaTime);
     DoPotentialAutoReplay(deltaTime);
