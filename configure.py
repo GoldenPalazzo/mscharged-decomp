@@ -455,7 +455,7 @@ config.libs = [
             Object(Matching, "Game/LANLobby.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/LANMessageRegistry.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/main.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/MiiManager.cpp"),
+            Object(Matching, "Game/MiiManager.cpp"),
             Object(Matching, "Game/Net.cpp"),
             Object(Matching, "Game/NetMeshEdge.cpp"),
             Object(Matching, "Game/NetMeshModelLoader.cpp", extra_cflags=["-ipa file", "-sym on"]),
