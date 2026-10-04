@@ -838,7 +838,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/ImpostorLighting.cpp"),
             Object(NonMatching, "Game/Render/ImpostorManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/ImpostorModel.cpp"),
-            Object(NonMatching, "Game/Render/ImpostorSprite.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Render/ImpostorSprite.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/Indicators.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/Jumbotron.cpp"),
             Object(Matching, "Game/Render/KoopaShellObject.cpp"),
