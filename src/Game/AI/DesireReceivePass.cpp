@@ -281,7 +281,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
 
     if (meDesireSubState != 4
         && (!g_pBall->HasActivePassTarget()
-            || g_pBall->fn_800C2EC0() != m_pFielder
+            || g_pBall->GetPassTarget() != m_pFielder
             || !m_pFielder->CanReceivePass()))
     {
         *update = 1;
@@ -296,9 +296,9 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         return;
     }
 
-    if (g_pBall->fn_800C2EC0() == m_pFielder
-        && g_pBall->fn_800C2EC8() > g_fOneTimerMinPassProgress
-        && AIsgn(g_pBall->fn_800C2F18().x)
+    if (g_pBall->GetPassTarget() == m_pFielder
+        && g_pBall->GetPassProgress() > g_fOneTimerMinPassProgress
+        && AIsgn(g_pBall->GetPassIntercept().x)
             == AIsgn(m_pFielder->GetTeam()->GetOtherNet()->fn_800C2F30().x)
         && mbOneTouchShot && !mbOneTouchVolley)
     {
@@ -338,7 +338,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
         SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
             mEstimated.aFacingDirection, mEstimated.fAnimStartTime, fArrivalRadius);
-        pSteering->SetAvoidanceMultiplier(InterpolateClamped(g_fMaxSteeringAvoidance, 0.0f, g_pBall->fn_800C2EC8()));
+        pSteering->SetAvoidanceMultiplier(InterpolateClamped(g_fMaxSteeringAvoidance, 0.0f, g_pBall->GetPassProgress()));
         if (m_pFielder->GetDistanceToDesiredPos() <= fArrivalRadius)
         {
             if (!CalcExactEstimates(true))
@@ -511,7 +511,7 @@ inline int DesireReceivePass::AddVolleyReceiveFlag(int animType, bool bFlag)
 
 inline bool DesireReceivePass::CanRequestOneTouch()
 {
-    float fPassProgress = g_pBall->fn_800C2EC8();
+    float fPassProgress = g_pBall->GetPassProgress();
     bool bSpecialReceive = m_pFielder->fn_8003E7F8()
         || m_pFielder->fn_8003E84C();
     if ((bSpecialReceive && m_pFielder->m_pBall != 0)
