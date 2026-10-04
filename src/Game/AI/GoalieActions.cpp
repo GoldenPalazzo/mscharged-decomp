@@ -1,3 +1,4 @@
+#include "Game/Render/StadiumLoading.h"
 #include "Game/Sys/audio.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Player.h"
@@ -149,8 +150,6 @@ extern "C" void fn_8005DB44(
     UnidentifiedGoalieActionState* pState, unsigned int nParam, bool bParam);
 extern "C" void fn_8001AD24(
     LiveBallTrail* pBallTrail, cFielder* pFielder);
-extern "C" void fn_802779EC(
-    nlVector3& v3Result, float fParam1, float fParam2, float fParam3);
 
 extern "C" float fn_8007ECB4(Goalie* pGoalie, float fTimeToContact,
     unsigned int uSaveType, bool bFromTakeoff, bool bFindFailSave);
@@ -1037,7 +1036,7 @@ void Goalie::fn_8008418C(float fDeltaT)
             nlVector3 v3TargetPosition;
             nlVector3 v3Velocity;
             nlVector3 v3Rotation;
-            fn_802779EC(
+            StadiumScreenToWorldPosition(
                 v3TargetPosition, fScreenX, fScreenY, fDistance);
 
             nlVector3 v3Axis = { 0.0f, 0.0f, 1.0f };

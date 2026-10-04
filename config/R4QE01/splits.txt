@@ -2314,16 +2314,17 @@ Game/Render/RLViewLayers.cpp:
 Game/Render/StadiumLoading.cpp:
 	.text       start:0x80276264 end:0x80277E28
 	.ctors      start:0x804DB7CC end:0x804DB7D0
-	.data       start:0x80521CA0 end:0x80522310
+	.data       start:0x80521CA0 end:0x80522330
 	.bss        start:0x8057A698 end:0x8057AB50
 	.sdata      start:0x806DEE30 end:0x806DEE70
 	.sbss       start:0x806E1960 end:0x806E19A8
+	.sdata2     start:0x806E5C48 end:0x806E5C58
 
 Game/BasicStadium.cpp:
 	.text       start:0x80277E28 end:0x80278EA4
 	.ctors      start:0x804DB7D0 end:0x804DB7D4
-	.data       start:0x80522310 end:0x80522428
-	.sdata2     start:0x806E5C48 end:0x806E5C70
+	.data       start:0x80522330 end:0x80522428
+	.sdata2     start:0x806E5C58 end:0x806E5C70
 
 Game/Render/StadiumTweaks.cpp:
 	.text       start:0x80278EA4 end:0x8027944C

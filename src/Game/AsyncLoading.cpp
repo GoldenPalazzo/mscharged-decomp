@@ -136,8 +136,6 @@
 bool IsNetworkOrRecordedGame();
 
 void ShutdownWarbleRendering(void*);
-extern "C" bool fn_802773B8(bool stadiumViewer);
-extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
 extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
@@ -470,11 +468,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 20:
         SetLoadingComment("AsyncFinalizeGameWorldLoading");
-        FinishLoadingStepOrUndo(this, fn_802773B8(false));
+        FinishLoadingStepOrUndo(this, FinishLoadStadium(false));
         break;
     case 21:
         SetLoadingComment("AsyncFinalizeGameWorldLoadingForStadiumViewer");
-        FinishLoadingStepOrUndo(this, fn_802773B8(true));
+        FinishLoadingStepOrUndo(this, FinishLoadStadium(true));
         break;
     case 22:
         SetLoadingComment("AsyncFinalizeLoadingAI");
@@ -1730,7 +1728,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     lbl_806E1050 = new (8, false) WorldNPCManager;
     lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
     lbl_806E1050->mModelCallback = SetImpostorShadowLevel;
-    lbl_806E1050->mRenderFilter = fn_80277DD4;
+    lbl_806E1050->mRenderFilter = ShouldRenderStadiumNPC;
     FinishLoadingStep(manager);
 }
 
