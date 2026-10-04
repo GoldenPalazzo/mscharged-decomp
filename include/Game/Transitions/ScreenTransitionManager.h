@@ -8,8 +8,6 @@
 #include "NL/nlString.h"
 #include "NL/nlVector.h"
 
-class DefaultAllocator;
-
 class ScreenTransition
 {
 public:
