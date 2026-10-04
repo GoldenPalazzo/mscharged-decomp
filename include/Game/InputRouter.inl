@@ -3,7 +3,7 @@
 
 #include "Game/InputRouter.h"
 
-inline void fn_803353DC(DetermDataEvent* event)
+inline void FreeDetermDataEvent(DetermDataEvent* event)
 {
     delete event;
 }

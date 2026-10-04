@@ -44,7 +44,7 @@ static EventDispatcher sDetermDataDispatcher;
 static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
     &sDetermDataDispatcher, "DetermDataEventQueue", -1);
 
-inline void fn_803353DC(DetermDataEvent* event);
+inline void FreeDetermDataEvent(DetermDataEvent* event);
 
 void InitializeInputRouters()
 {
@@ -197,7 +197,7 @@ bool InputRouter::ProcessPlaybackFrame()
                 return false;
             }
 
-            Function<DetermDataEvent*> disposer(fn_803353DC);
+            Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
             sDetermDataEventQueue.Queue(event, disposer);
         }
 
@@ -315,7 +315,7 @@ void SimpleInputRouter::OnInputReady()
             gNetworkInputRecording->WriteNetworkInputEvent(event);
         }
 
-        Function<DetermDataEvent*> disposer(fn_803353DC);
+        Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
         sDetermDataEventQueue.Queue(event, disposer);
     }
 
@@ -589,7 +589,7 @@ void NetworkInputRouter::OnInputReady()
                     gNetworkInputRecording->WriteNetworkInputEvent(event);
                 }
 
-                Function<DetermDataEvent*> disposer(fn_803353DC);
+                Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
                 sDetermDataEventQueue.Queue(event, disposer);
             }
 
