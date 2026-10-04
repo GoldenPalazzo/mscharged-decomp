@@ -35,9 +35,9 @@ void UpdateAudioResourceRuntime(AudioResourceRuntime* runtime, float deltaTime);
 void ShutdownAudioResourceRuntime(AudioResourceRuntime* runtime);
 void NotifyAudioSoundStarted(AudioResourceRuntime* runtime, u32 hash, u32 instance);
 void NotifyAudioSoundStopped(AudioResourceRuntime* runtime, u32 instance);
-// C linkage: AsyncLoading.cpp sees the SDK u32 (unsigned long), which would
-// mangle a C++ declaration differently from this unit's u32.
-extern "C" bool StartAudioEffect(const u32* bindingKey, const u32* definitionKey,
+// Keys are spelled unsigned long: AsyncLoading.cpp sees the SDK u32 (unsigned
+// long) while this unit's u32 is unsigned int.
+bool StartAudioEffect(const unsigned long* bindingKey, const unsigned long* definitionKey,
     void* parameterData, bool invert, float blendTime);
 bool ApplyAudioTransition(const u32* transitionHash, bool invert, void* owner);
 

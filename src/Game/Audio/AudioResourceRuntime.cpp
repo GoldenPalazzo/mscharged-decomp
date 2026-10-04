@@ -188,7 +188,7 @@ inline bool AudioScriptRuntime::StartEffect(const u32& key,
 /**
  * Address/Size: 0x802F49C0 | size: 0x4C4
  */
-extern "C" bool StartAudioEffect(const u32* bindingKey, const u32* definitionKey,
+bool StartAudioEffect(const unsigned long* bindingKey, const unsigned long* definitionKey,
     void* parameterData, bool invert, float blendTime)
 {
     u32 key = *bindingKey;
