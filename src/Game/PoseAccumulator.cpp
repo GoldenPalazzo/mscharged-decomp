@@ -795,8 +795,7 @@ void cPoseAccumulator::SetBuildNodeMatrixCallback(int nNode,
     BuildNodeMatrixFn funcCallback, unsigned int nParam1,
     unsigned int nParam2)
 {
-    int offset = nNode * (int)sizeof(cBuildNodeMatrixCallbackInfo);
-    *(BuildNodeMatrixFn*)((char*)m_cb + offset) = funcCallback;
-    *(unsigned int*)((char*)m_cb + offset + 4) = nParam1;
-    *(unsigned int*)((char*)m_cb + offset + 8) = nParam2;
+    m_cb[nNode].funcCallback = funcCallback;
+    m_cb[nNode].nParam1 = nParam1;
+    m_cb[nNode].nParam2 = nParam2;
 }
