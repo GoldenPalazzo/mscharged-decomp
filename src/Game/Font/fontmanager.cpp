@@ -11,115 +11,117 @@
 template <>
 FontManager* nlSingleton<FontManager>::s_pInstance = 0;
 
-struct Unidentified_80307564
+// One asynchronous LoadFont request. bComplete is set while the slot is idle
+// and again once every texture read issued for the font has finished.
+struct FontLoadState
 {
-    Unidentified_80307564()
+    FontLoadState()
     {
-        field_0x0 = true;
-        field_0x4 = 0;
-        field_0x388 = 0;
-        field_0x38C = 0;
-        field_0x8[0] = field_0x107[0] = field_0x206[0] = '\0';
+        bComplete = true;
+        pBundle = 0;
+        uNumTextures = 0;
+        uNumTexturesLoaded = 0;
+        szBundleFilename[0] = szFileName[0] = szFontName[0] = '\0';
         for (int i = 0; i < 16; i++)
         {
-            field_0x308[i].field_0x0 = 0;
-            field_0x308[i].field_0x4 = -1;
+            pendingTextures[i].pBuffer = 0;
+            pendingTextures[i].uHashID = -1;
         }
     }
 
-    bool field_0x0;
-    BundleFile* field_0x4;
-    char field_0x8[255];
-    char field_0x107[255];
-    char field_0x206[255];
-    struct Entry
+    bool bComplete;
+    BundleFile* pBundle;
+    char szBundleFilename[255];
+    char szFileName[255];
+    char szFontName[255];
+    struct PendingTexture
     {
-        void* field_0x0;
-        unsigned long field_0x4;
-    } field_0x308[16];
-    unsigned long field_0x388;
-    unsigned long field_0x38C;
+        void* pBuffer;
+        unsigned long uHashID;
+    } pendingTextures[16];
+    unsigned long uNumTextures;
+    unsigned long uNumTexturesLoaded;
 };
 
-Unidentified_80307564 lbl_80580748[16];
+FontLoadState gFontLoadStates[16];
 
-static inline void LoadFontTexture(Unidentified_80307564* state, unsigned long fileHashID)
+static inline void LoadFontTexture(FontLoadState* state, unsigned long uFileHashID)
 {
     BundleFileDirectoryEntry entry;
-    if (state->field_0x4->GetFileInfo(fileHashID, &entry, true))
+    if (state->pBundle->GetFileInfo(uFileHashID, &entry, true))
     {
         void* textureData = nlMalloc(entry.m_length, 0x20, true);
-        state->field_0x4->ReadFileAsync(fileHashID, textureData, entry.m_length, FontManager::TextureLoadComplete, (unsigned long)state);
-        state->field_0x308[state->field_0x388].field_0x0 = textureData;
-        state->field_0x308[state->field_0x388].field_0x4 = fileHashID;
-        state->field_0x388++;
+        state->pBundle->ReadFileAsync(uFileHashID, textureData, entry.m_length, FontManager::TextureLoadComplete, (unsigned long)state);
+        state->pendingTextures[state->uNumTextures].pBuffer = textureData;
+        state->pendingTextures[state->uNumTextures].uHashID = uFileHashID;
+        state->uNumTextures++;
     }
 }
 
 void FontManager::BundleOpenComplete(void*, unsigned long, unsigned long uParam)
 {
-    Unidentified_80307564* state = (Unidentified_80307564*)uParam;
-    unsigned long hashID = nlStringHash(state->field_0x107);
+    FontLoadState* state = (FontLoadState*)uParam;
+    unsigned long uFileHashID = nlStringHash(state->szFileName);
     BundleFileDirectoryEntry entry;
 
-    if (state->field_0x4->GetFileInfo(hashID, &entry, true))
+    if (state->pBundle->GetFileInfo(uFileHashID, &entry, true))
     {
         void* fileData = nlMalloc(entry.m_length, 0x20, true);
-        state->field_0x4->ReadFileAsync(hashID, fileData, entry.m_length, FontDescriptionLoadComplete, (unsigned long)state);
+        state->pBundle->ReadFileAsync(uFileHashID, fileData, entry.m_length, FontDescriptionLoadComplete, (unsigned long)state);
     }
 }
 
 void FontManager::FontDescriptionLoadComplete(void* buffer, unsigned long, unsigned long uParam)
 {
-    Unidentified_80307564* state = (Unidentified_80307564*)uParam;
+    FontLoadState* state = (FontLoadState*)uParam;
     BundleFileDirectoryEntry entry;
 
-    nlFont* newFont = new (8, false) nlFont();
-    newFont->Load(state->field_0x107, (char*)buffer, nlStringHash(state->field_0x206));
-    FontManager::Instance()->m_fonts.AddEnd(newFont);
+    nlFont* pNewFont = new (8, false) nlFont();
+    pNewFont->Load(state->szFileName, (char*)buffer, nlStringHash(state->szFontName));
+    FontManager::Instance()->m_fonts.AddEnd(pNewFont);
     delete[] (char*)buffer;
 
-    for (unsigned long i = 0; i < newFont->m_PageCount; i++)
+    for (unsigned long i = 0; i < pNewFont->m_PageCount; i++)
     {
-        unsigned long hashID = newFont->m_TextureHandles[i];
-        state->field_0x4->GetFileInfo(hashID, &entry, true);
-        LoadFontTexture(state, hashID);
+        unsigned long uTextureHashID = pNewFont->m_TextureHandles[i];
+        state->pBundle->GetFileInfo(uTextureHashID, &entry, true);
+        LoadFontTexture(state, uTextureHashID);
 
-        if (newFont->m_TextureType == SplitFX)
+        if (pNewFont->m_TextureType == SplitFX)
         {
-            hashID = newFont->m_EffectTextureHandles[i];
-            state->field_0x4->GetFileInfo(hashID, &entry, true);
-            LoadFontTexture(state, hashID);
+            uTextureHashID = pNewFont->m_EffectTextureHandles[i];
+            state->pBundle->GetFileInfo(uTextureHashID, &entry, true);
+            LoadFontTexture(state, uTextureHashID);
         }
     }
 
-    state->field_0x38C = 0;
+    state->uNumTexturesLoaded = 0;
 }
 
 void FontManager::TextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam)
 {
-    Unidentified_80307564* state = (Unidentified_80307564*)uParam;
+    FontLoadState* state = (FontLoadState*)uParam;
     char* textureData = (char*)buffer;
 
     for (int i = 0; i < 16; i++)
     {
-        if (textureData == state->field_0x308[i].field_0x0)
+        if (textureData == state->pendingTextures[i].pBuffer)
         {
-            glBeginResource(state->field_0x308[i].field_0x4);
-            glTextureAdd(state->field_0x308[i].field_0x4, textureData, uReadSize, FontManager::Instance()->field_0x20);
+            glBeginResource(state->pendingTextures[i].uHashID);
+            glTextureAdd(state->pendingTextures[i].uHashID, textureData, uReadSize, FontManager::Instance()->m_pResourcePool);
             glEndResource();
-            state->field_0x38C++;
+            state->uNumTexturesLoaded++;
             break;
         }
     }
 
     delete[] textureData;
 
-    if (state->field_0x38C == state->field_0x388)
+    if (state->uNumTexturesLoaded == state->uNumTextures)
     {
-        state->field_0x4->Close();
-        delete state->field_0x4;
-        state->field_0x0 = true;
+        state->pBundle->Close();
+        delete state->pBundle;
+        state->bComplete = true;
     }
 }
 
@@ -127,7 +129,7 @@ bool FontManager::IsLoadingComplete() const
 {
     for (int i = 0; i < 16; i++)
     {
-        if (!lbl_80580748[i].field_0x0)
+        if (!gFontLoadStates[i].bComplete)
         {
             return false;
         }
@@ -138,7 +140,7 @@ bool FontManager::IsLoadingComplete() const
 FontManager::FontManager()
     : m_fonts(8)
 {
-    field_0x20 = glGetCurrentResourcePool();
+    m_pResourcePool = glGetCurrentResourcePool();
 }
 
 FontManager::~FontManager()
@@ -198,31 +200,31 @@ nlFont* FontManager::GetFontByHashID(unsigned long hashID)
     return 0;
 }
 
-bool FontManager::LoadFont(const char* bundlePath, const char* fontName, const char* fontFileName)
+bool FontManager::LoadFont(const char* szBundleFilename, const char* szFileName, const char* szFileFontName)
 {
-    Unidentified_80307564* state = 0;
+    FontLoadState* state = 0;
     for (int i = 0; i < 16; i++)
     {
-        if (lbl_80580748[i].field_0x0)
+        if (gFontLoadStates[i].bComplete)
         {
-            state = &lbl_80580748[i];
+            state = &gFontLoadStates[i];
             break;
         }
     }
 
-    state->field_0x0 = false;
-    state->field_0x4 = new (0x20, true) BundleFile();
-    nlStrNCpy(state->field_0x8, bundlePath, 0xFF);
-    nlStrNCpy(state->field_0x107, fontName, 0xFF);
-    nlStrNCpy(state->field_0x206, fontFileName, 0xFF);
-    nlToLower(state->field_0x206);
-    state->field_0x388 = 0;
-    state->field_0x38C = 0;
-    state->field_0x4->OpenAsync(bundlePath, BundleOpenComplete, (unsigned long)state, false);
+    state->bComplete = false;
+    state->pBundle = new (0x20, true) BundleFile();
+    nlStrNCpy(state->szBundleFilename, szBundleFilename, 0xFF);
+    nlStrNCpy(state->szFileName, szFileName, 0xFF);
+    nlStrNCpy(state->szFontName, szFileFontName, 0xFF);
+    nlToLower(state->szFontName);
+    state->uNumTextures = 0;
+    state->uNumTexturesLoaded = 0;
+    state->pBundle->OpenAsync(szBundleFilename, BundleOpenComplete, (unsigned long)state, false);
     return true;
 }
 
-void FontManager::SetResourcePool(GLResourcePool* resourcePool)
+void FontManager::SetResourcePool(GLResourcePool* pResourcePool)
 {
-    field_0x20 = resourcePool;
+    m_pResourcePool = pResourcePool;
 }
