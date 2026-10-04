@@ -3050,6 +3050,20 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttacker->PickupBall(g_pBall);
 }
 
+static inline void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
+{
+    {
+        UnidentifiedVariant_80054AB8 bestTarget = fn_80041AFC(
+            FuzzyAIGetFielderRuntime(fielder), "BestHitTarget", fielder);
+        if (bestTarget.IsPointerType())
+        {
+            target = bestTarget.GetPlayer();
+            return;
+        }
+    }
+    target = 0;
+}
+
 void cFielder::UpdateHeadTracking(float fDeltaT)
 {
     m_pHeadTrack->m_fSmoothTime = lbl_806DB6E8;
@@ -3071,7 +3085,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
             }
             if (pUnidentified == 0)
             {
-                pUnidentified = DoFindBestHitTarget();
+                FindHeadTrackingHitTarget(this, pUnidentified);
             }
 
             nlVector3 v3Unidentified;
@@ -3103,11 +3117,12 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 
     if (fn_8003E74C() && m_pBall == 0)
     {
-        cPlayer* pUnidentified = DoFindBestHitTarget();
-        if (pUnidentified != 0)
+        cPlayer* hitTarget;
+        FindHeadTrackingHitTarget(this, hitTarget);
+        if (hitTarget != 0)
         {
             m_pHeadTrack->m_v3OOI
-                = pUnidentified->GetJointPosition(pUnidentified->m_nBip01JointIndex_0xA4);
+                = hitTarget->GetJointPosition(hitTarget->m_nBip01JointIndex_0xA4);
             m_pHeadTrack->m_bTrackOOI = true;
             return;
         }
@@ -3188,7 +3203,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
         }
         break;
 
@@ -3220,7 +3235,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
             m_pHeadTrack->m_bTrackOOI = true;
         }
         break;
@@ -3232,7 +3247,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
             m_pHeadTrack->m_bTrackOOI = true;
         }
         break;
@@ -3245,7 +3260,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
             m_pHeadTrack->m_bTrackOOI = true;
         }
         break;
@@ -3257,7 +3272,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         {
             if (m_eAnimID != 0x27)
             {
-                m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+                m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
                 m_pHeadTrack->m_bTrackOOI = true;
                 break;
             }
@@ -3268,7 +3283,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
     case ACTION_RUNNING_WB:
         if (!gNPCManager->mpChainChomp->IsHidden())
         {
-            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->mv3Position;
+            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->GetPosition();
             m_pHeadTrack->m_bTrackOOI = true;
         }
         else
@@ -3281,11 +3296,11 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
     case ACTION_RUNNING:
         if (!gNPCManager->mpChainChomp->IsHidden())
         {
-            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->mv3Position;
+            m_pHeadTrack->m_v3OOI = gNPCManager->mpChainChomp->GetPosition();
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
         }
         m_pHeadTrack->m_bTrackOOI = true;
         break;
@@ -3299,14 +3314,14 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         else
         {
-            m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+            m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
         }
         m_pHeadTrack->m_bTrackOOI = true;
         break;
     }
 
     case ACTION_WAIT:
-        m_pHeadTrack->m_v3OOI = g_pBall->m_v3Position;
+        m_pHeadTrack->m_v3OOI = g_pBall->GetPosition();
         m_pHeadTrack->m_bTrackOOI = true;
         break;
     }
