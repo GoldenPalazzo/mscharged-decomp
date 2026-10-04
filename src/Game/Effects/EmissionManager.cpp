@@ -653,7 +653,7 @@ void EmissionManager::AddEffectsLight(const EffectsLight& light)
 void EmissionManager::Render()
 {
     g_nNumLights = 0;
-    sUnidentified_806E1FAC = 0;
+    gNumRenderedParticles = 0;
 
     int i;
     EmissionResourceStats* stats = Instance()->mResourceStats;
