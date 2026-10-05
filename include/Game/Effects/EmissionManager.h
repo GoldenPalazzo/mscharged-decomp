@@ -97,7 +97,7 @@ public:
     static void SetResourceBudget(int resource, int budget);
     static void ConfigureResource(int resource, const char* name, int budget);
     static void RecordRenderedParticles(unsigned long resource, int numParticles);
-    static void StartLoading(bool allocateResidentAtStart,
+    static void StartLoading(bool allocateAtStart,
         bool allocateNonResidentAtStart, bool, bool compressedNonResident);
     static bool FinishLoading(GLResourcePool* context);
     static void LoadBundle(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
@@ -108,7 +108,7 @@ public:
     /* 0x1A8 */ bool m_bRecording;
     /* 0x1A9 */ u8 unknown_0x1A9[0x03];
     /* 0x1AC */ void* mContext;
-    /* 0x1B0 */ bool m_bDiscardOnReplay;
+    /* 0x1B0 */ bool mDiscardOnReplay;
     /* 0x1B1 */ u8 unknown_0x1B1[0x03];
     /* 0x1B4 */ nlDLListContainer<EmissionController*> mReplayControllers;
     /* 0x1BC */ nlDLListContainer<EmissionController*> mControllers;

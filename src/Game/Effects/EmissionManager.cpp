@@ -130,9 +130,6 @@ inline void EffectsBundleManager::ClearAdditional()
     }
 }
 
-void OnEffectsGeometryLoaded(
-    void* data, unsigned long size, void* userData);
-
 static inline void RegisterBundleGroups(EffectsBundleData* data)
 {
     for (int i = 0; i < data->mNumGroups; ++i)
@@ -287,7 +284,7 @@ void OnEffectsTexturesLoaded(void* data, unsigned long size, void* userData)
 /**
  * Offset/Address/Size: 0x6BC | 0x802E6620 | size: 0x154
  */
-void EmissionManager::StartLoading(bool allocateResidentAtStart,
+void EmissionManager::StartLoading(bool allocateAtStart,
     bool allocateNonResidentAtStart, bool, bool compressedNonResident)
 {
     gEffectsData = 0;
@@ -298,7 +295,7 @@ void EmissionManager::StartLoading(bool allocateResidentAtStart,
 
     nlLoadEntireFileAsync("art/effects/effects.bun", OnEffectsDataLoaded,
         &gEffectsData, 0x20,
-        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
 
     if (compressedNonResident)
     {
@@ -316,10 +313,10 @@ void EmissionManager::StartLoading(bool allocateResidentAtStart,
 
     nlLoadEntireFileAsync("art/objects/effectsgeometry.bun", OnEffectsGeometryLoaded,
         &gEffectsGeometryData, 0x20,
-        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
     nlLoadEntireFileAsync("art/objects/effectsgeometrytextures.rlt",
         OnEffectsTexturesLoaded, &gEffectsTextureData, 0x20,
-        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
 
     gEffectsModelInventory = glGetCurrentResourcePool()->m_inventory;
 }
@@ -366,7 +363,7 @@ EmissionManager::EmissionManager()
     : mNextControllerId(1)
     , m_bRecording(true)
     , mContext(0)
-    , m_bDiscardOnReplay(false)
+    , mDiscardOnReplay(false)
     , mReplayControllers()
     , mControllers()
     , mErrors()
@@ -749,7 +746,7 @@ EmissionController* EmissionManager::Create(
     return controller;
 }
 
-EmissionController* EmissionManager::Create(EffectsGroup* group, int view, bool addToEnd, unsigned short id)
+EmissionController* EmissionManager::Create(EffectsGroup* pEffectsGroup, int view, bool addToEnd, unsigned short id)
 {
     MemoryAllocator* allocator = mMemoryContext;
     AllocatorStack[AllocatorStackDepth++] = allocator;
@@ -765,7 +762,7 @@ EmissionController* EmissionManager::Create(EffectsGroup* group, int view, bool 
     }
 
     EmissionController* controller = new (nlMalloc(sizeof(EmissionController), 8, false))
-        EmissionController(group, this, id, mContext, view);
+        EmissionController(pEffectsGroup, this, id, mContext, view);
     if (addToEnd)
     {
         mControllers.AddEnd(controller);
@@ -1246,7 +1243,7 @@ void EmissionManager::Replay(LoadFrame& frame)
 {
     if (m_bRecording)
     {
-        if (m_bDiscardOnReplay)
+        if (mDiscardOnReplay)
         {
             DestroyAll(true);
         }
@@ -1316,7 +1313,7 @@ void EmissionManager::Replay(LoadFrame& frame)
     oldControllers.Clear();
 }
 
-// Leaving replay with m_bDiscardOnReplay set destroys the current context's
+// Leaving replay with mDiscardOnReplay set destroys the current context's
 // non-persistent controllers instead of restoring the stashed ones.
 static inline void DestroyReplayedControllers(EmissionManager* manager)
 {
@@ -1379,7 +1376,7 @@ void EmissionManager::Replay(SaveFrame& frame)
 {
     if (!m_bRecording)
     {
-        if (m_bDiscardOnReplay)
+        if (mDiscardOnReplay)
         {
             DestroyReplayedControllers(this);
         }
