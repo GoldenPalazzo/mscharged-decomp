@@ -17,9 +17,9 @@ struct NetworkRecordedFrameHeader
     u32 mChecksum;
     u32 mFrame;
     u32 mRandomSeed;
-    u16 mTick;
+    u16 mRemapAngle;
     u16 mEventCount;
-    u32 mValue;
+    u32 mDataSize;
 };
 
 struct NetworkRecordingHeader
@@ -65,7 +65,7 @@ void NetworkInputRecording::Reset(bool constructing)
 {
     if (constructing)
     {
-        mUnidentified02 = 0;
+        mBufferedWrites = 0;
         mRecordingEnabled = false;
         mRecording = false;
         mPlaybackEnabled = false;
@@ -135,7 +135,7 @@ void NetworkInputRecording::StartNetworkInputRecording(int localMachine, int mac
     BuildNetworkRecordingPath(path, sizeof(path), mFileName);
     mDebugFile = nlOpenFileDebug(path, true, false);
     nlBufferedWriterAttach(&mWriter, mDebugFile,
-        mUnidentified02, 2000, 1800);
+        mBufferedWrites, 2000, 1800);
 
     NetworkSessionData* session = g_pNetworkSessionBase;
     NetworkRecordingHeader header;
@@ -181,15 +181,15 @@ int NetworkInputRecording::GetNetworkInputPlaybackExtraUpdates()
     return mPlaybackReady ? g_numPacketPlaybackTurbo : 0;
 }
 
-void NetworkInputRecording::WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 value)
+void NetworkInputRecording::WriteNetworkInputPacketHeader(s8 machine, u16 remapAngle, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 dataSize)
 {
     NetworkRecordedFrameHeader header;
     header.mChecksum = checksum;
     header.mFrame = frame;
     header.mRandomSeed = randomSeed;
-    header.mTick = tick;
+    header.mRemapAngle = remapAngle;
     header.mEventCount = eventCount;
-    header.mValue = value;
+    header.mDataSize = dataSize;
     nlBufferedWriterWrite(&mWriter, &header, sizeof(header));
 }
 
@@ -226,7 +226,7 @@ void NetworkInputRecording::Flush()
     nlBufferedWriterFlushIfNeeded(&mWriter);
 }
 
-bool NetworkInputRecording::ReadNetworkInputPacketHeader(s8 machine, u16* tick, u32* checksum, u32* frame, u32* randomSeed, u32* eventCount, u32* value)
+bool NetworkInputRecording::ReadNetworkInputPacketHeader(s8 machine, u16* remapAngle, u32* checksum, u32* frame, u32* randomSeed, u32* eventCount, u32* dataSize)
 {
     if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(NetworkRecordedFrameHeader))
         return false;
@@ -235,9 +235,9 @@ bool NetworkInputRecording::ReadNetworkInputPacketHeader(s8 machine, u16* tick, 
     *checksum = header.mChecksum;
     *frame = header.mFrame;
     *randomSeed = header.mRandomSeed;
-    *tick = header.mTick;
+    *remapAngle = header.mRemapAngle;
     *eventCount = header.mEventCount;
-    *value = header.mValue;
+    *dataSize = header.mDataSize;
     return true;
 }
 
@@ -278,5 +278,5 @@ bool NetworkInputRecording::ReadNetworkInputRecord(s8 machine, PackedDetInput* r
     return true;
 }
 
-typedef char VerifyNetGameStateSize[
+typedef char VerifyNetworkInputRecordingSize[
     sizeof(NetworkInputRecording) == 0xF0 ? 1 : -1];
