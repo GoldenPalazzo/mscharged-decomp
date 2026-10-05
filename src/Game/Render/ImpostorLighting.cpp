@@ -33,8 +33,8 @@ void UpdateImpostorLighting()
         return;
     }
 
-    ImpostorManager* impostors = ImpostorManager::GetInstance();
-    int count = impostors->GetNumImpostors();
+    ImpostorManager* manager = ImpostorManager::GetInstance();
+    int count = manager->GetNumImpostors();
     Impostor* entry = ImpostorManager::GetInstance()->mImpostors;
     for (int i = 0; i < count; ++i, ++entry)
     {
