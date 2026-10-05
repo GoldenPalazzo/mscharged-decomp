@@ -2985,7 +2985,7 @@ bool cFielder::IsDefense() const
     return m_eRole == ROLE_DEFENCE;
 }
 
-unsigned int cFielder::IsFrozen()
+unsigned int cFielder::IsFrozen() const
 {
     return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
 }
