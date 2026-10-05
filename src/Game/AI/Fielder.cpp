@@ -2991,14 +2991,12 @@ bool cFielder::IsDefense() const
 
 unsigned int cFielder::IsFrozen()
 {
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
-        ->IsUnidentifiedState(2);
+    return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
 }
 
 extern "C" bool fn_8003877C(const cFielder* pFielder)
 {
-    return ((DesireFrozen*)fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D))
-        ->IsUnidentifiedState(1);
+    return ((DesireFrozen*)GetConcurrentState(pFielder->mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(1);
 }
 
 bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
