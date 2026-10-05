@@ -139,8 +139,6 @@ extern "C" unsigned int lbl_806E0C10;
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void Hide(BirdoEggObject*, bool);
-extern "C" void fn_802B5370(
-    nlQuaternion&, const nlVector3&, unsigned short);
 float Exp(float);
 
 cBall* g_pBall = NULL;
