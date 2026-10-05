@@ -4,24 +4,24 @@
 
 NetMessageAllInputs::NetMessageAllInputs()
 {
-    mUnidentified008[0] = 0;
-    memset(mPadding3CC, 0, sizeof(mPadding3CC));
+    mFlags = 0;
+    memset(mUnidentified3CC, 0, sizeof(mUnidentified3CC));
 }
 
 void NetMessageAllInputs::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified008[0], 1);
+    serializer->Transfer(&mFlags, 1);
     for (int i = 0; i < 4; ++i)
     {
-        if (mUnidentified008[0] & (1 << i))
+        if (mFlags & (1 << i))
             mMessages[i].Serialize(serializer);
     }
-    if (mUnidentified008[0] & 0x80)
+    if (mFlags & 0x80)
     {
-        serializer->Transfer(mPadding3CC + 0, 4);
-        serializer->Transfer(mPadding3CC + 4, 4);
-        serializer->Transfer(mPadding3CC + 8, 4);
+        serializer->Transfer(&mUnidentified3CC[0], 4);
+        serializer->Transfer(&mUnidentified3CC[1], 4);
+        serializer->Transfer(&mUnidentified3CC[2], 4);
     }
 }
 
