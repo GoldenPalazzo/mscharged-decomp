@@ -123,7 +123,6 @@ public:
     /* 0x1F9 */ u8 unknown_0x1F9[0x03];
 };
 
-extern "C" void Startup(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();
 
 extern GLInventory* gEffectsModelInventory;
