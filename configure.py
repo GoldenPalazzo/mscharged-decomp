@@ -1181,7 +1181,7 @@ config.libs = [
             Object(Matching, "NL/plat/TransportPacket.cpp"),
             Object(Matching, "NL/plat/WiiClassicPad.cpp", extra_cflags=["-sym on", "-ipa file"]),
             Object(Matching, "NL/plat/WiiFreestylePad.cpp", extra_cflags=["-sym on", "-ipa file"]),
-            Object(NonMatching, "NL/plat/WiiPad.cpp"),
+            Object(Matching, "NL/plat/WiiPad.cpp"),
             Object(Matching, "NL/plat/WiiRemotePad.cpp", extra_cflags=["-sym on", "-ipa file"]),
 
             # zlib
