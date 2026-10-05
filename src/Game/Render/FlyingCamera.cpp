@@ -59,13 +59,6 @@ static inline float MaxOf(float a, float b)
     return b;
 }
 
-static inline float MinOf(float a, float b)
-{
-    if (a <= b)
-        return a;
-    return b;
-}
-
 void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 {
     nlQuaternion facing;
@@ -86,10 +79,7 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     fn_802B549C(facing, camera->mAngle);
 
-    if (flatDirection.x * flatDirection.x
-            + flatDirection.y * flatDirection.y
-            + flatDirection.z * flatDirection.z
-        < 0.001f)
+    if (flatDirection.GetLengthSq3D() < 0.001f)
     {
         fn_802B549C(targetOrientation, 0x4000);
     }
@@ -101,10 +91,7 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     nlMultQuat(targetOrientation, targetOrientation, facing);
 
-    float orientationBlend = gFlyingCameraOrientationRate * dt;
-    orientationBlend = orientationBlend <= 1.0f
-                         ? orientationBlend
-                         : 1.0f;
+    float orientationBlend = nlMinEquals(gFlyingCameraOrientationRate * dt, 1.0f);
     nlQuatNLerp(camera->mOrientation, targetOrientation, camera->mOrientation, orientationBlend);
 
     nlSinCos(&sine, &cosine, camera->mAngle);
@@ -119,13 +106,13 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     float minIntegral = gFlyingCameraIntegralMin;
     float maxIntegral = gFlyingCameraIntegralMax;
-    camera->mPositionIntegral.x = MinOf(
+    camera->mPositionIntegral.x = nlMinEquals(
         MaxOf(camera->mPositionIntegral.x, minIntegral),
         maxIntegral);
-    camera->mPositionIntegral.y = MinOf(
+    camera->mPositionIntegral.y = nlMinEquals(
         MaxOf(camera->mPositionIntegral.y, minIntegral),
         maxIntegral);
-    camera->mPositionIntegral.z = MinOf(
+    camera->mPositionIntegral.z = nlMinEquals(
         MaxOf(camera->mPositionIntegral.z, minIntegral),
         maxIntegral);
 
@@ -136,11 +123,11 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     nlVec3Add(camera->mPosition, camera->mPosition, accumulatedChange);
     nlVec3Add(camera->mPosition, camera->mPosition, directChange);
 
-    camera->mPosition.x = MinOf(
+    camera->mPosition.x = nlMinEquals(
         MaxOf(camera->mPosition.x, -30.0f), 30.0f);
-    camera->mPosition.y = MinOf(
+    camera->mPosition.y = nlMinEquals(
         MaxOf(camera->mPosition.y, -30.0f), 30.0f);
-    camera->mPosition.z = MinOf(
+    camera->mPosition.z = nlMinEquals(
         MaxOf(camera->mPosition.z, -30.0f), 30.0f);
 }
 
