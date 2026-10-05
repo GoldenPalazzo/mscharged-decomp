@@ -54,7 +54,6 @@ extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
-extern "C" void fn_80139D1C(int, DetInput*);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_80097358(cPlayer*, float);
@@ -856,6 +855,27 @@ bool cFielder::fn_800306F4(cFielder* pParam)
     return false;
 }
 
+static inline u8 IsHittingForCollision(const cFielder* fielder)
+{
+    return fielder->IsHitting();
+}
+
+static inline float GetCollisionHitIntensity(cFielder* hittee,
+    const nlVector3& contactPosition, const nlVector3& velocity,
+    const cFielder* hitter)
+{
+    float closingSpeed = GetClosingSpeed(contactPosition, velocity,
+        hitter->mUnidentified024.m_v3Position, v3Zero);
+    float runningSpeed = fn_8002C254(hittee->m_pTweaks);
+    float minimumSpeed = -runningSpeed;
+    return NormalizeVal(closingSpeed, minimumSpeed, runningSpeed);
+}
+
+static inline int HasBallForCollision(const cFielder* fielder)
+{
+    return fielder->HasBall();
+}
+
 void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
     cPlayer* pPlayerCollidedWith = pData->player2;
@@ -870,11 +890,11 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         if (IsFallenDown())
             return;
 
-        u8 gotHit = pFielderCollidedWith->IsHitting();
+        u8 gotHit = IsHittingForCollision(pFielderCollidedWith);
         if (gotHit)
         {
             u8 hitteeIsHitter = 1;
-            u8 bAlsoHitting = IsHitting();
+            u8 bAlsoHitting = IsHittingForCollision(this);
             if (bAlsoHitting)
             {
                 if (pFielderCollidedWith->m_pTweaks->mUnidentified064
@@ -893,8 +913,8 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                         ->m_pSAnim->m_nNumKeys;
                     float fHitTime = fn_8002D038(pFielderCollidedWith->m_pTweaks)
                         / fNumKeys;
-                    float fMyHitTime = fabsf(m_pCurrentAnimController->m_fTime - fHitTime);
-                    float fOtherHitTime = fabsf(pFielderCollidedWith->m_pCurrentAnimController->m_fTime - fHitTime);
+                    float fMyHitTime = fabsf(m_pCurrentAnimController->get_fTime() - fHitTime);
+                    float fOtherHitTime = fabsf(pFielderCollidedWith->m_pCurrentAnimController->get_fTime() - fHitTime);
                     if (fMyHitTime <= fOtherHitTime)
                         hitteeIsHitter = 0;
                 }
@@ -917,10 +937,8 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             adjustedPosition.x += cosVal * combinedRadius;
             adjustedPosition.y += sinVal * combinedRadius;
 
-            float closingSpeed = GetClosingSpeed(adjustedPosition, pData->velocity1,
-                pFielderCollidedWith->mUnidentified024.m_v3Position, v3Zero);
-            float fRunningSpeed = fn_8002C254(m_pTweaks);
-            float attackIntensity = NormalizeVal(closingSpeed, -fRunningSpeed, fRunningSpeed);
+            float attackIntensity = GetCollisionHitIntensity(this, adjustedPosition,
+                pData->velocity1, pFielderCollidedWith);
             int nUnidentified = fn_8002E9FC(this, pFielderCollidedWith, attackIntensity);
             bool canPickup = false;
             if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || fn_8003E74C()))
@@ -968,7 +986,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->mUnidentified0C = nUnidentified;
             pAttackData->mUnidentified10 = false;
             fn_8005ED64(g_pGame, pAttackData);
-            fn_80139D1C(2, pFielderCollidedWith->GetGlobalPad());
+            PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
         }
         else if (pFielderCollidedWith->fn_80038660() && m_eActionState != ACTION_HIT)
         {
@@ -980,7 +998,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 if (m_pTweaks->mUnidentified064
                     < pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    bool bHadBall = m_pBall != 0;
+                    int bHadBall = HasBallForCollision(this);
                     bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
                     InitActionSlideAttackReact(pFielderCollidedWith, false);
                     pFielderCollidedWith->bAttackSucceeded = true;
@@ -997,7 +1015,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 else if (m_pTweaks->mUnidentified064
                     > pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    bool bHadBall = pFielderCollidedWith->m_pBall != 0;
+                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
                     bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
                     pFielderCollidedWith->InitActionSlideAttackReact(this, false);
                     bAttackSucceeded = true;
@@ -1011,9 +1029,9 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                         fn_80036594(this, pFielderCollidedWith, 3);
                     }
                 }
-                else if (mUnidentified024.m_fActualSpeed < pFielderCollidedWith->mUnidentified024.m_fActualSpeed)
+                else if (GetActualSpeed() < pFielderCollidedWith->GetActualSpeed())
                 {
-                    bool bHadBall = m_pBall != 0;
+                    int bHadBall = HasBallForCollision(this);
                     bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
                     InitActionSlideAttackReact(pFielderCollidedWith, false);
                     pFielderCollidedWith->bAttackSucceeded = true;
@@ -1029,7 +1047,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 }
                 else
                 {
-                    bool bHadBall = pFielderCollidedWith->m_pBall != 0;
+                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
                     bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
                     pFielderCollidedWith->InitActionSlideAttackReact(this, false);
                     bAttackSucceeded = true;
@@ -1046,7 +1064,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             }
             else
             {
-                bool bHadBall = m_pBall != 0;
+                int bHadBall = HasBallForCollision(this);
                 bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
                 InitActionSlideAttackReact(pFielderCollidedWith, false);
                 pFielderCollidedWith->bAttackSucceeded = true;
@@ -1068,22 +1086,22 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             float otherRadius, thisRadius;
             pFielderCollidedWith->m_pPhysicsCharacter->GetRadius(&otherRadius);
             m_pPhysicsCharacter->GetRadius(&thisRadius);
-            nlVector2 v2Delta;
-            nlVec2Set(v2Delta, pFielderCollidedWith->mUnidentified024.m_v3Position.x - v3Position.x,
-                pFielderCollidedWith->mUnidentified024.m_v3Position.y - v3Position.y);
+            nlVector2 v2Delta = {
+                pFielderCollidedWith->mUnidentified024.m_v3Position.x - v3Position.x,
+                pFielderCollidedWith->mUnidentified024.m_v3Position.y - v3Position.y,
+            };
             float fOverlap = thisRadius + otherRadius - nlVec2Length(v2Delta);
             if (!(fOverlap > 0.0f))
                 return;
 
             nlVector3 v3BallDelta;
-            nlVec3Set(v3BallDelta, g_pBall->m_v3Position.x - mUnidentified024.m_v3Position.x,
-                g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y, 0.0f);
+            nlVec3Sub(v3BallDelta, g_pBall->m_v3Position, mUnidentified024.m_v3Position);
+            v3BallDelta.z = 0.0f;
             nlVector3 v3PlayerDelta;
-            nlVec3Set(v3PlayerDelta, pFielderCollidedWith->mUnidentified024.m_v3Position.x - mUnidentified024.m_v3Position.x,
-                pFielderCollidedWith->mUnidentified024.m_v3Position.y - mUnidentified024.m_v3Position.y, 0.0f);
+            nlVec3Sub(v3PlayerDelta, pFielderCollidedWith->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position);
+            v3PlayerDelta.z = 0.0f;
             nlVector3 v3Projection;
-            nlVec3Scale(v3Projection, v3BallDelta,
-                nlVec3DotProduct(v3PlayerDelta, v3BallDelta) / nlVec3LengthSquared(v3BallDelta));
+            nlVec3Project(v3Projection, v3PlayerDelta, v3BallDelta);
             nlVector3 v3Direction;
             nlVec3Sub(v3Direction, v3PlayerDelta, v3Projection);
             if (nlVec3LengthSquared(v3Direction) < 0.001f)
@@ -1091,8 +1109,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 v3Direction.x = v3BallDelta.y;
                 v3Direction.y = -v3BallDelta.x;
             }
-            nlVec3Scale(v3Direction, v3Direction,
-                nlRecipSqrt(nlVec3LengthSquared(v3Direction), true));
+            nlVec3Normalize(v3Direction, v3Direction);
             nlVec3ScaleAdd(v3Direction, fOverlap, v3Direction,
                 pFielderCollidedWith->mUnidentified024.m_v3Position);
             pFielderCollidedWith->SetPosition(v3Direction);
@@ -1102,14 +1119,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         && !pFielderCollidedWith->IsFallenDown()
         && !pFielderCollidedWith->fn_8003E74C())
     {
-        bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                           pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                          ->IsUnidentifiedState(1)
-            || ((DesireFrozen*)fn_80319FC0(
-                    pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                   ->IsUnidentifiedState(2);
-        bool bUnidentified = !bFrozen && (pFielderCollidedWith->muInvincibleStatus & 1);
-        if (!bUnidentified)
+        if (!pFielderCollidedWith->IsInvincibleChars())
             pFielderCollidedWith->fn_8004D238();
     }
 }
@@ -1215,7 +1225,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 ShootBallDueToContact(eventData->mUnidentified10->m_Velocity);
             }
             fn_8004E11C(lbl_806DB788);
-            fn_80139D1C(2, GetGlobalPad());
+            PlayRumbleAction(2, GetGlobalPad());
         }
     }
     else if (type == 0)
@@ -1341,14 +1351,14 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 {
                     fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 0, false, false);
                     PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
-                    fn_80139D1C(2, pOwner->GetGlobalPad());
+                    PlayRumbleAction(2, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
                 fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 1, false, true);
                 PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
-                fn_80139D1C(2, pOwner->GetGlobalPad());
+                PlayRumbleAction(2, pOwner->GetGlobalPad());
             }
         }
     }
@@ -1362,7 +1372,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             && m_eActionState != (eFielderActionState)0x18
             && m_eActionState != (eFielderActionState)0x23)
         {
-            fn_80139D1C(3, GetGlobalPad());
+            PlayRumbleAction(3, GetGlobalPad());
             nlVector3 v3Unidentified = mUnidentified024.m_v3Velocity;
             v3Unidentified.z = 25.0f;
             fn_80044148(v3Unidentified);
@@ -1375,7 +1385,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             && !fn_8003EA6C() && !IsInvincible()
             && !IsCharacterInAir(eventData->mUnidentified10->GetRadius()))
         {
-            fn_80139D1C(3, GetGlobalPad());
+            PlayRumbleAction(3, GetGlobalPad());
             nlVector3 v3Start;
             nlVec3ScaleAdd(v3Start, -100.0f,
                 eventData->mUnidentified10->fn_80173CCC(),
@@ -2631,27 +2641,24 @@ bool cFielder::fn_80038918() const
 
 bool cFielder::IsHitting() const
 {
-    const cPN_SAnimController* pAnimController = m_pCurrentAnimController;
     const float fAnimTime
-        = pAnimController->m_fTime * pAnimController->m_pSAnim->m_nNumKeys;
+        = m_pCurrentAnimController->m_fTime * m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
 
-    bool isHitting = false;
-    bool bUnidentified2 = false;
-    bool bUnidentified1 = false;
-    bool bUnidentified0 = false;
+    bool isHitting, hitStarted, hitAction, canHit;
+    canHit = hitAction = hitStarted = isHitting = false;
     if (mUnidentified024.m_eCharacterClass != TOAD && !fn_80038918())
     {
-        bUnidentified0 = true;
+        canHit = true;
     }
-    if (bUnidentified0 && m_eActionState == ACTION_HIT)
+    if (canHit && m_eActionState == ACTION_HIT)
     {
-        bUnidentified1 = true;
+        hitAction = true;
     }
-    if (bUnidentified1 && fAnimTime >= fn_8002D020(m_pTweaks))
+    if (hitAction && fAnimTime >= fn_8002D020(m_pTweaks))
     {
-        bUnidentified2 = true;
+        hitStarted = true;
     }
-    if (bUnidentified2 && fAnimTime <= fn_8002D050(m_pTweaks))
+    if (hitStarted && fAnimTime <= fn_8002D050(m_pTweaks))
     {
         isHitting = true;
     }
