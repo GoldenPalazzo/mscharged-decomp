@@ -46,13 +46,7 @@ GLView* g_pNisRenderView;
 
 bool g_bNisAnimatedCharacters[Nis::MAX_NUM_CHARACTERS];
 
-struct PendingAnimationRequest
-{
-    Nis::PendingAnimation* animation;
-    bool active;
-};
-
-SlotPool<PendingAnimationRequest> lbl_8057AB80(16, 16);
+SlotPool<PendingAnimationRequest> g_PendingAnimationRequestPool(16, 16);
 
 void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData);
 
@@ -260,7 +254,7 @@ Nis::~Nis()
             else
             {
                 nlCancelEntireFileLoad(mPendingAnimations[i].loadHandle, 0);
-                lbl_8057AB80.Free((PendingAnimationRequest*)mPendingAnimations[i].request);
+                g_PendingAnimationRequestPool.Free((PendingAnimationRequest*)mPendingAnimations[i].request);
             }
         }
         if (mPendingAnimations[i].data != 0)
@@ -1031,7 +1025,7 @@ void Nis::LoadCharacterAnimation(const char* animName, int characterIndex)
         char filename[100];
         nlSNPrintf(filename, sizeof(filename) - 1, "Art/Animation/%s/%s.sanim", info->szHierarchy, animName);
 
-        PendingAnimationRequest* request = lbl_8057AB80.Allocate();
+        PendingAnimationRequest* request = g_PendingAnimationRequestPool.Allocate();
         request->active = true;
         request->animation = entry;
         entry->request = request;
@@ -1055,5 +1049,5 @@ void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData)
     {
         ::operator delete(data);
     }
-    lbl_8057AB80.Free(request);
+    g_PendingAnimationRequestPool.Free(request);
 }

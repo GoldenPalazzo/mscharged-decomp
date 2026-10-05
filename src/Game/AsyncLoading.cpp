@@ -145,7 +145,6 @@ void fn_80056EA8();
 void DestroyCharacters();
 
 extern SlotPool<cSAnimCallback> lbl_805840D8;
-extern SlotPoolBase lbl_8057AB80;
 
 bool g_VerboseAudio;
 bool g_bDumpMemoryStatsOnLoad;
@@ -1396,8 +1395,7 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
 
     fn_80111658(2);
     manager->mLoadingState = 0;
@@ -1671,8 +1669,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
 
     glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
     glDestroyResourcePool(glGetCurrentResourcePool());
@@ -2053,8 +2050,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
     FreeFunctionMemoryPools();
     glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
     glDestroyResourcePool(glGetCurrentResourcePool());

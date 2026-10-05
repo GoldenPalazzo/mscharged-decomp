@@ -197,8 +197,17 @@ public:
     /* 0xBAC */ bool mScriptStarted;
 };
 
+template <typename T>
+class SlotPool;
+
+struct PendingAnimationRequest
+{
+    Nis::PendingAnimation* animation;
+    bool active;
+};
 
 extern GLView* g_pNisRenderView;
+extern SlotPool<PendingAnimationRequest> g_PendingAnimationRequestPool;
 
 void ClearNisAnimatedCharacters();
 
