@@ -7057,7 +7057,7 @@ FindOrDefault<10TLInstance>__28FEFinder<14TLTextInstance,3>FP10TLInstance12Inlin
 FindOrDefault<19TLComponentInstance>__28FEFinder<14TLTextInstance,3>FP19TLComponentInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P14TLTextInstance = .text:0x801F9F98; // type:function size:0x54 scope:weak
 FindOrDefault<10TLInstance>__24FEFinder<10TLInstance,4>FP10TLInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P10TLInstance = .text:0x801F9FEC; // type:function size:0xD8
 FindOrDefault<7TLSlide>__24FEFinder<10TLInstance,5>FP7TLSlide12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P10TLInstance = .text:0x801FA0C4; // type:function size:0xD8
-fn_801FA19C__Fv = .text:0x801FA19C; // type:function size:0x8 scope:weak
+GetHBMManager__Fv = .text:0x801FA19C; // type:function size:0x8 scope:weak
 __cl__Q217Function2<v,i,Pv>151FunctorImpl<135BindExp3<v,Q26Detail51MemFunImpl<v,M23ChallengePreviewOverlayFPCvPviPv_v>,P23ChallengePreviewOverlay,14Placeholder<0>,14Placeholder<1>>>FiPv = .text:0x801FA1A4; // type:function size:0x30 scope:weak
 Clone__Q217Function2<v,i,Pv>151FunctorImpl<135BindExp3<v,Q26Detail51MemFunImpl<v,M23ChallengePreviewOverlayFPCvPviPv_v>,P23ChallengePreviewOverlay,14Placeholder<0>,14Placeholder<1>>>CFv = .text:0x801FA1D4; // type:function size:0x74 scope:weak
 __dt__Q217Function2<v,i,Pv>151FunctorImpl<135BindExp3<v,Q26Detail51MemFunImpl<v,M23ChallengePreviewOverlayFPCvPviPv_v>,P23ChallengePreviewOverlay,14Placeholder<0>,14Placeholder<1>>>Fv = .text:0x801FA248; // type:function size:0x44 scope:weak
