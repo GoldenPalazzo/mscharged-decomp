@@ -1830,6 +1830,25 @@ static inline int GetSyncPlayerIndex(cPlayer* pPlayer)
     return pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
 }
 
+// Walks the players in their current randomized update order.
+class RandomPlayerIterator
+{
+public:
+    RandomPlayerIterator(cGame* game)
+        : mGame(game)
+        , mIndex(0)
+    {
+    }
+    bool HasNext() const { return mIndex < 10; }
+    cPlayer* const& GetPlayer() const { return mGame->m_pRandomPlayersArray[mIndex]; }
+    int GetIndex() const { return mIndex; }
+    void Next() { ++mIndex; }
+
+private:
+    cGame* mGame;
+    int mIndex;
+};
+
 // Writes the deterministic game state to the network sync log.
 void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
 {
@@ -1890,9 +1909,10 @@ void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
         pCopy->mTeamTouch[0] = GetSyncPlayerIndex(m_pTeamTouch[0]);
         pCopy->mTeamTouch[1] = GetSyncPlayerIndex(m_pTeamTouch[1]);
         int* pRandomPlayers = pCopy->mRandomPlayers;
-        for (int i = 0; i < 10; i++)
+        for (RandomPlayerIterator players(this); players.HasNext(); players.Next())
         {
-            pRandomPlayers[i] = GetSyncPlayerIndex(m_pRandomPlayersArray[i]);
+            cPlayer* pPlayer = players.GetPlayer();
+            pRandomPlayers[players.GetIndex()] = pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
         }
         cache->ChecksumData(lbl_806DBAB4, pCopy, context);
     }
