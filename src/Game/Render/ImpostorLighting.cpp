@@ -31,50 +31,7 @@ static TweakValueInt g_HighlightBlue(
     "g_HighlightBlue", gLastTweakCategory, 255);
 
 static u32 sImpostorLightingTexture = -1;
-static LightingLookup* spImpostorLightingLookup;
-
-LightingLookup::LightingLookup()
-    : mValues(0)
-    , mWidth(0)
-    , mHeight(0)
-{
-}
-
-LightingLookup::~LightingLookup()
-{
-    if (mValues != 0)
-    {
-        delete[] mValues;
-    }
-}
-
-static inline void GetImpostorLightingCoordinate(nlVector2& coordinate, const nlVector3* position)
-{
-    float x = position->x;
-    x = x * gShadowLookupScaleX.value;
-    x = x + gShadowLookupTransX.value;
-    float y = position->y;
-    y = y * gShadowLookupScaleY.value;
-    y = y + gShadowLookupTransY.value;
-    nlVec2Set(coordinate, 0.5f * x + 0.5f, -0.5f * y + 0.5f);
-}
-
-static inline nlColour SampleImpostorLighting(LightingLookup* lookup, const nlVector2& coordinate)
-{
-    int height = lookup->mHeight;
-    int width = lookup->mWidth;
-    int x = (int)(coordinate.x * (width - 1));
-    int y = (int)(coordinate.y * (height - 1));
-    if (x >= width)
-    {
-        x = width - 1;
-    }
-    if (y >= height)
-    {
-        y = height - 1;
-    }
-    return lookup->SampleColour(x, y, true);
-}
+LightingLookup* spImpostorLightingLookup;
 
 void UpdateImpostorLighting()
 {
@@ -90,23 +47,6 @@ void UpdateImpostorLighting()
     {
         entry->mColour = GetImpostorLightingColour(&entry->mPosition);
     }
-}
-
-nlColour GetImpostorLightingColour(const nlVector3* position)
-{
-    nlColour colour;
-    if (spImpostorLightingLookup == 0)
-    {
-        nlColourSet(colour, 255, 255, 255, 255);
-    }
-    else
-    {
-        LightingLookup* lookup = spImpostorLightingLookup;
-        nlVector2 coordinate;
-        GetImpostorLightingCoordinate(coordinate, position);
-        colour = SampleImpostorLighting(lookup, coordinate);
-    }
-    return colour;
 }
 
 void SetImpostorLightingTexture(u32 textureHandle)
@@ -135,6 +75,21 @@ void FreeImpostorLighting()
     {
         delete spImpostorLightingLookup;
         spImpostorLightingLookup = 0;
+    }
+}
+
+LightingLookup::LightingLookup()
+    : mValues(0)
+    , mWidth(0)
+    , mHeight(0)
+{
+}
+
+LightingLookup::~LightingLookup()
+{
+    if (mValues != 0)
+    {
+        delete[] mValues;
     }
 }
 
@@ -279,8 +234,13 @@ nlColour LightingLookup::SampleFilteredColour(
 u8 LightingLookup::ReadTextureIntensity(
     const PlatTexture* texture, int x, int y) const
 {
-    int block = (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
-    int offset = (block << 5) + ((y & 3) << 3) + (x & 7);
+    int tileX = x >> 3;
+    int tileY = y >> 2;
+    int tilesPerRow = texture->m_Width >> 3;
+    int tile = tileY * tilesPerRow + tileX;
+    int texelX = x & 7;
+    int texelY = y & 3;
+    int offset = (tile << 5) + (texelY << 3) + texelX;
     u8 paletteIndex = ((u8*)texture->m_SwizzledData)[offset];
     u16 value = texture->m_PaletteData[paletteIndex];
     if (value & 0x8000)
@@ -288,7 +248,9 @@ u8 LightingLookup::ReadTextureIntensity(
         int component = (value >> 10) & 0x1F;
         return component * 255 / 31;
     }
-
-    int component = (value >> 8) & 0x0F;
-    return component * 255 / 15;
+    else
+    {
+        int component = (value >> 8) & 0x0F;
+        return component * 255 / 15;
+    }
 }

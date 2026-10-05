@@ -1448,14 +1448,18 @@ Game/Render/CrowdImpostors.cpp:
 	.sbss       start:0x806E1580 end:0x806E15B8
 	.sdata2     start:0x806E5108 end:0x806E5148
 
+Game/Render/tu_801A508C.cpp:
+	.text       start:0x801A508C end:0x801A51D8
+	.sdata2     start:0x806E5148 end:0x806E5158
+
 Game/Render/ImpostorLighting.cpp:
-	.text       start:0x801A508C end:0x801A5F10
+	.text       start:0x801A51D8 end:0x801A5F10
 	.ctors      start:0x804DB710 end:0x804DB714
 	.data       start:0x80514140 end:0x805141C0
 	.bss        start:0x80572238 end:0x805722F8
 	.sdata      start:0x806DCF90 end:0x806DCF98
 	.sbss       start:0x806E15B8 end:0x806E15C0
-	.sdata2     start:0x806E5148 end:0x806E5178
+	.sdata2     start:0x806E5158 end:0x806E5178
 
 Game/Render/Jumbotron.cpp:
 	.text       start:0x801A5F10 end:0x801A5F30
