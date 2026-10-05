@@ -48,6 +48,7 @@ public:
     void KillBlurHandler();
     void ClearBallBlur();
     void SetOwner(cPlayer* pOwner);
+    cPlayer* GetOwner() const { return m_pOwner; }
     const nlVector3& GetPosition() const
     {
         return m_v3Position;
@@ -206,6 +207,7 @@ extern "C" void fn_8001B314(unsigned int nNumTrails);
 
 
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
+extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
 extern "C" float fn_800156A8(cBall* pBall);
 extern "C" bool fn_80016768(cBall* pBall);
 extern "C" bool fn_800167A8(cBall* pBall);
