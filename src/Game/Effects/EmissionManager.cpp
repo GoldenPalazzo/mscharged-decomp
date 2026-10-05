@@ -1316,8 +1316,8 @@ void EmissionManager::Replay(LoadFrame& frame)
     oldControllers.Clear();
 }
 
-// Replay drops the controllers created while recording so the stashed ones
-// can be restored.
+// Leaving replay with m_bDiscardOnReplay set destroys the current context's
+// non-persistent controllers instead of restoring the stashed ones.
 static inline void DestroyReplayedControllers(EmissionManager* manager)
 {
     nlDLListIterator<EmissionController*> iterator = manager->mControllers.Begin();
