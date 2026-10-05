@@ -541,7 +541,7 @@ bool IsConcurrentStateActive(
     return false;
 }
 
-extern "C" void fn_8031A02C(ScriptQuestionCache*)
+void ResetScriptFrameTime(ScriptQuestionCache*)
 {
     if (gScriptFrameTime > gScriptPeakCompletedFrameTime)
     {
@@ -582,7 +582,7 @@ float AccumulateScriptExecutionTime(float start, float end)
     return gScriptFrameTime;
 }
 
-extern "C" void fn_8031A0FC(float value)
+void SetScriptTimeBudget(float value)
 {
     gScriptTimeBudget[0] = value;
 }

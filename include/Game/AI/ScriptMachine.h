@@ -85,9 +85,9 @@ shdStateMachine* ActivateConcurrentState(ScriptMachine* machine, int state, Unid
 shdStateMachine* GetScriptMachineState(ScriptMachine* machine, int state);
 shdStateMachine* GetConcurrentState(ScriptMachine* machine, int state);
 bool IsConcurrentStateActive(ScriptMachine* machine, int state);
-extern "C" void fn_8031A02C(ScriptQuestionCache*);
+void ResetScriptFrameTime(ScriptQuestionCache*);
 bool CheckScriptTimeBudget();
 float AccumulateScriptExecutionTime(float start, float end);
-extern "C" void fn_8031A0FC(float value);
+void SetScriptTimeBudget(float value);
 
 #endif // GAME_AI_SCRIPT_MACHINE_H
