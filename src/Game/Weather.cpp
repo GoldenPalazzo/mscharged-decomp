@@ -18,7 +18,7 @@
 #include "Game/Render/tu_8027AE14.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Player.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Physics/PhysicsCharacter.h"

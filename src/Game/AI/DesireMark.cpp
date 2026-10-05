@@ -1,5 +1,5 @@
 #include "Game/AI/Desire.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.inl"

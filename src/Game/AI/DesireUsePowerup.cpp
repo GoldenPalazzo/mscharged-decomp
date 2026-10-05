@@ -1,5 +1,5 @@
 #include "Game/AI/DesireUsePowerup.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 

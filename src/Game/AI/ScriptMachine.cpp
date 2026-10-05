@@ -1,4 +1,4 @@
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/ScriptState.h"
 #include "Game/Sys/debug.h"
 #include "Game/AI/AIContext.h"
@@ -11,8 +11,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include <string.h>
-
-class ScriptQuestionCache;
 
 char gScriptTransitionMissingReturnWarning[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";

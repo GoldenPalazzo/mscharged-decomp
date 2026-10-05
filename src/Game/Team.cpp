@@ -7,6 +7,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"

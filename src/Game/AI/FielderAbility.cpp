@@ -8,7 +8,7 @@
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/DesireUpdate.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Field.h"
 #include "Game/Game.h"

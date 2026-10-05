@@ -11,7 +11,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/DB/CharacterInfo.h"

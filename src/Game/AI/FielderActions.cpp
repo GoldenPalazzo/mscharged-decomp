@@ -18,7 +18,7 @@
 
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/Fuzzy.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AnimInventory.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/HeadTrack.h"

@@ -4,7 +4,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/DesireUpdate.inl"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Variant.h"
 #include <stddef.h>
 #include "Game/AI/SpaceSearch.h"

@@ -11,7 +11,7 @@
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/AI/SkillTweaks.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AI/Fuzzy.h"
 #include "Game/Game.h"

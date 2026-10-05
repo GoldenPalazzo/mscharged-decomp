@@ -1,6 +1,6 @@
 #include "Game/AI/ScriptState.h"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/InterpreterCore.h"

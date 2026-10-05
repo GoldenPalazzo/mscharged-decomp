@@ -3,7 +3,7 @@
 
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/DesireUpdate.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 
 float GetTickerMilliseconds();
 

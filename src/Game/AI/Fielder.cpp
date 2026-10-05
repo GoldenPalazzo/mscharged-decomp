@@ -2,7 +2,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fielder.inl"
 #include "Game/PoseAccumulator.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/DetInput.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
