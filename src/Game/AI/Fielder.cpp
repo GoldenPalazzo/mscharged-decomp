@@ -1817,9 +1817,10 @@ void cFielder::ShootBallDueToContact(unsigned short aShootDirection)
     g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
 }
 
-void cFielder::DoClearBall()
+static inline void AimClearBallAtTeammate(cFielder* player, int index, float fClearDistance,
+    u16& aClearingAngle, nlVector3& v3Direction, nlPolar& pDirection)
 {
-    cFielder* pFielder;
+    cFielder* const pFielder = GetAIOrderedFielder(player->m_pTeam, index);
     bool bCanReceivePass;
     bool bCondition6;
     bool bCondition5;
@@ -1828,6 +1829,120 @@ void cFielder::DoClearBall()
     bool bCondition2;
     bool bCondition1;
     bool bCondition0;
+    if (pFielder != player)
+    {
+        bCanReceivePass = false;
+        bCondition6 = false;
+        bCondition5 = false;
+        bCondition4 = false;
+        bCondition3 = false;
+        bCondition2 = false;
+        bCondition1 = false;
+        bCondition0 = false;
+
+        if (!pFielder->IsFallenDown())
+        {
+            bool bAllowedAction = true;
+            unsigned int nActionIndex
+                = (unsigned int)(pFielder->m_eActionState - 1);
+            if (nActionIndex <= 0x1F
+                && ((1U << nActionIndex) & 0x90000001U) != 0)
+            {
+                bAllowedAction = false;
+            }
+
+            if (bAllowedAction)
+            {
+                bCondition0 = true;
+            }
+        }
+
+        if (bCondition0
+            && pFielder->m_eActionState != (eFielderActionState)0x21)
+        {
+            bCondition1 = true;
+        }
+
+        if (bCondition1)
+        {
+            bool bExcluded = pFielder->fn_8003EA44();
+            if (!bExcluded)
+            {
+                bCondition2 = true;
+            }
+        }
+
+        if (bCondition2)
+        {
+            bool bExcluded = pFielder->fn_8003EA6C();
+            if (!bExcluded)
+            {
+                bCondition3 = true;
+            }
+        }
+
+        if (bCondition3)
+        {
+            bool bExcluded
+                = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
+               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+            if (!bExcluded)
+            {
+                bCondition4 = true;
+            }
+        }
+
+        if (bCondition4)
+        {
+            bool bExcluded
+                = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
+               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+            if (!bExcluded)
+            {
+                bCondition5 = true;
+            }
+        }
+
+        if (bCondition5)
+        {
+            bool bExcluded = pFielder->fn_8003E8F4();
+            if (!bExcluded)
+            {
+                bCondition6 = true;
+            }
+        }
+
+        if (bCondition6)
+        {
+            bool bActionActive = pFielder->fn_80038918();
+            if (!bActionActive)
+            {
+                bCanReceivePass = true;
+            }
+        }
+
+        if (bCanReceivePass
+            && AIsgn(pFielder->mUnidentified024.m_v3Position.x) != AIsgn(player->mUnidentified024.m_v3Position.x))
+        {
+            if (nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
+                    player->mUnidentified024.m_v3Position), true) > 0.5f * fClearDistance)
+            {
+                nlVec3Sub(v3Direction, pFielder->mUnidentified024.m_v3Position, player->mUnidentified024.m_v3Position);
+                nlCartesianToPolar(pDirection, v3Direction);
+                aClearingAngle = pDirection.a;
+            }
+        }
+    }
+}
+
+static inline void UpdateClearingAngleForTeammate(cFielder* player, int index, float distance,
+    u16& angle, nlVector3& direction, nlPolar& polar)
+{
+    AimClearBallAtTeammate(player, index, distance, angle, direction, polar);
+}
+
+void cFielder::DoClearBall()
+{
     u16 aClearingAngle;
     int i;
     nlVector3 v3Target;
@@ -1858,120 +1973,10 @@ void cFielder::DoClearBall()
         aClearingAngle = (u16)nlRandom(0xFFFF);
         for (i = 0; i < 4; i++)
         {
-            pFielder = GetAIOrderedFielder(m_pTeam, i);
-            if (pFielder != this)
-            {
-                bCanReceivePass = false;
-                bCondition6 = false;
-                bCondition5 = false;
-                bCondition4 = false;
-                bCondition3 = false;
-                bCondition2 = false;
-                bCondition1 = false;
-                bCondition0 = false;
-
-                if (!pFielder->IsFallenDown())
-                {
-                    bool bAllowedAction = true;
-                    unsigned int nActionIndex
-                        = (unsigned int)(pFielder->m_eActionState - 1);
-                    if (nActionIndex <= 0x1F
-                        && ((1U << nActionIndex) & 0x90000001U) != 0)
-                    {
-                        bAllowedAction = false;
-                    }
-
-                    if (bAllowedAction)
-                    {
-                        bCondition0 = true;
-                    }
-                }
-
-                if (bCondition0
-                    && pFielder->m_eActionState != (eFielderActionState)0x21)
-                {
-                    bCondition1 = true;
-                }
-
-                if (bCondition1)
-                {
-                    bool bExcluded = pFielder->fn_8003EA44();
-                    if (!bExcluded)
-                    {
-                        bCondition2 = true;
-                    }
-                }
-
-                if (bCondition2)
-                {
-                    bool bExcluded = pFielder->fn_8003EA6C();
-                    if (!bExcluded)
-                    {
-                        bCondition3 = true;
-                    }
-                }
-
-                if (bCondition3)
-                {
-                    bool bExcluded
-                        = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
-                       && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
-                    if (!bExcluded)
-                    {
-                        bCondition4 = true;
-                    }
-                }
-
-                if (bCondition4)
-                {
-                    bool bExcluded
-                        = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
-                       && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
-                    if (!bExcluded)
-                    {
-                        bCondition5 = true;
-                    }
-                }
-
-                if (bCondition5)
-                {
-                    bool bExcluded = pFielder->fn_8003E8F4();
-                    if (!bExcluded)
-                    {
-                        bCondition6 = true;
-                    }
-                }
-
-                if (bCondition6)
-                {
-                    DesireFrozen* pAction = (DesireFrozen*)
-                        fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D);
-                    bool bActionActive = false;
-                    if (pAction != 0 && pAction->mActive
-                        && pAction->meFrozenState != 0)
-                    {
-                        bActionActive = true;
-                    }
-                    if (!bActionActive)
-                    {
-                        bCanReceivePass = true;
-                    }
-                }
-
-                if (bCanReceivePass
-                    && AIsgn(pFielder->mUnidentified024.m_v3Position.x) != AIsgn(mUnidentified024.m_v3Position.x))
-                {
-                    if (nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
-                            mUnidentified024.m_v3Position), true) > 0.5f * fClearDistance)
-                    {
-                        nlVector3 v3Direction;
-                        nlVec3Sub(v3Direction, pFielder->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position);
-                        nlPolar pDirection;
-                        nlCartesianToPolar(pDirection, v3Direction);
-                        aClearingAngle = pDirection.a;
-                    }
-                }
-            }
+            nlVector3 v3Direction;
+            nlPolar pDirection;
+            UpdateClearingAngleForTeammate(this, i, fClearDistance,
+                aClearingAngle, v3Direction, pDirection);
         }
     }
 
@@ -1997,9 +2002,9 @@ void cFielder::DoClearBall()
         u32 aNet = pNet.a;
         u32 aTop = pClearingTopAngle.a;
         u32 aBottom = pClearingBottomAngle.a;
-        s16 nDelta = GetAngleDifference(aNet, aClearingAngle);
-        s16 nBottomDelta = GetAngleDifference(aNet, aBottom);
         s16 nTopDelta = GetAngleDifference(aNet, aTop);
+        s16 nBottomDelta = GetAngleDifference(aNet, aBottom);
+        s16 nDelta = GetAngleDifference(aNet, aClearingAngle);
         if (abs_ang16(nDelta) < abs_ang16(nTopDelta)
             && abs_ang16(nDelta) < abs_ang16(nBottomDelta))
         {
@@ -2031,8 +2036,8 @@ void cFielder::DoClearBall()
         }
         else
         {
-            nBottomDelta = GetAngleDifference(aBottom, aClearingAngle);
             nTopDelta = GetAngleDifference(aTop, aClearingAngle);
+            nBottomDelta = GetAngleDifference(aBottom, aClearingAngle);
             aClearingAngle = abs_ang16(nTopDelta) < abs_ang16(nBottomDelta)
                 ? pClearingTopAngle.a : pClearingBottomAngle.a;
         }
