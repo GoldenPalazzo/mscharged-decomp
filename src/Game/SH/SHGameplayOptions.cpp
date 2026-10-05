@@ -56,8 +56,8 @@ SHGameplayOptions::SHGameplayOptions()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        mSettings = gameInfo->mUserInfo.mUnidentified4C;
-        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mUnidentified68;
+        mSettings = gameInfo->mUserInfo.mAltGameplayOptions;
+        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mAltCheatOptions;
     }
     else
     {
@@ -695,9 +695,9 @@ void SHGameplayOptions::CommitSettings()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        gameInfo->mUserInfo.mUnidentified4C = mSettings;
+        gameInfo->mUserInfo.mAltGameplayOptions = mSettings;
         GameInfoManager::Instance()->mNoCheatSettings = mSettings;
-        GameInfoManager::Instance()->mUserInfo.mUnidentified68 = mPowerupSettings;
+        GameInfoManager::Instance()->mUserInfo.mAltCheatOptions = mPowerupSettings;
         GameInfoManager::Instance()->mRulesA = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
     }
