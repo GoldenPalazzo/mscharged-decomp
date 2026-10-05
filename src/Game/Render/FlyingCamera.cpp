@@ -8,55 +8,8 @@
 #include "Game/ReplayManager.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/WorldTriggers.h"
+#include "NL/nlArrayAllocator.h"
 #include "NL/nlMath.h"
-#include "NL/nlSlotPool.h"
-
-struct FlyingCameraPool
-{
-    FlyingCameraPool(void* entries)
-        : mFreeList((SlotPoolEntry*)entries)
-        , mEntries((FlyingCamera*)entries)
-    {
-        Reset();
-    }
-
-    ~FlyingCameraPool()
-    {
-    }
-
-    void Reset()
-    {
-        for (int i = 0; i < 10 - 1; ++i)
-        {
-            ((SlotPoolEntry*)&mEntries[i])->next
-                = (SlotPoolEntry*)(&mEntries[i] + 1);
-        }
-        ((SlotPoolEntry*)&mEntries[10 - 1])->next = 0;
-    }
-
-    void Free(FlyingCamera* camera)
-    {
-        SlotPoolEntry* entry = (SlotPoolEntry*)camera;
-        entry->next = mFreeList;
-        mFreeList = entry;
-    }
-
-    void Allocate(FlyingCamera*& camera)
-    {
-        if (mFreeList == 0)
-        {
-            camera = 0;
-        }
-        else
-        {
-            camera = (FlyingCamera*)mFreeList;
-            mFreeList = mFreeList->next;
-        }
-    }
-
-    SlotPoolEntry* mFreeList;
-    FlyingCamera* mEntries;
-};
 
 FlyingCamera* gFlyingCameras[10];
 nlVector3 gFlyingCameraTargetPosition;
@@ -81,7 +34,7 @@ UnidentifiedOwnerConnection gPeachCameraFlashConnection;
 UnidentifiedOwnerConnection gResetEffectsConnection;
 UnidentifiedOwnerConnection gMegaStrikeMeterEndConnection;
 FlyingCamera gFlyingCameraStorage[10];
-FlyingCameraPool gFlyingCameraPool(gFlyingCameraStorage);
+nlArrayAllocator<FlyingCamera> gFlyingCameraAllocator(gFlyingCameraStorage, 10);
 
 char sPeachCameraFlashEventName[] = "PeachCameraFlash";
 char sResetEffectsEventName[] = "ResetEffects";
@@ -300,7 +253,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     {
         if (*slot != 0)
         {
-            gFlyingCameraPool.Free(*slot);
+            gFlyingCameraAllocator.Free(*slot);
         }
         *slot = 0;
     }
@@ -309,7 +262,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     unsigned int oldCount = gFlyingCameraCount;
     for (unsigned int i = oldCount; i < (unsigned int)count; ++i)
     {
-        gFlyingCameraPool.Allocate(camera);
+        gFlyingCameraAllocator.Allocate(camera);
 
         if (camera != 0)
         {
