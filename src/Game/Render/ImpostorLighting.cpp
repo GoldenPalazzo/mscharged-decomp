@@ -48,39 +48,32 @@ LightingLookup::~LightingLookup()
     }
 }
 
-nlColour GetImpostorLightingColour(const nlVector3* position)
+static inline void GetImpostorLightingCoordinate(nlVector2& coordinate, const nlVector3* position)
 {
-    nlColour colour;
-    if (spImpostorLightingLookup == 0)
+    float x = position->x;
+    x = x * gShadowLookupScaleX.value;
+    x = x + gShadowLookupTransX.value;
+    float y = position->y;
+    y = y * gShadowLookupScaleY.value;
+    y = y + gShadowLookupTransY.value;
+    nlVec2Set(coordinate, 0.5f * x + 0.5f, -0.5f * y + 0.5f);
+}
+
+static inline nlColour SampleImpostorLighting(LightingLookup* lookup, const nlVector2& coordinate)
+{
+    int height = lookup->mHeight;
+    int width = lookup->mWidth;
+    int x = (int)(coordinate.x * (width - 1));
+    int y = (int)(coordinate.y * (height - 1));
+    if (x >= width)
     {
-        nlColourSet(colour, 255, 255, 255, 255);
+        x = width - 1;
     }
-    else
+    if (y >= height)
     {
-        LightingLookup* lookup = spImpostorLightingLookup;
-        nlVector2 coordinate;
-        float x = position->x * gShadowLookupScaleX.value;
-        x += gShadowLookupTransX.value;
-        x = 0.5f * x + 0.5f;
-        float y = position->y * gShadowLookupScaleY.value;
-        y += gShadowLookupTransY.value;
-        y = -0.5f * y + 0.5f;
-        nlVec2Set(coordinate, x, y);
-        int width = lookup->mWidth;
-        int height = lookup->mHeight;
-        int lookupX = (int)(coordinate.x * (width - 1));
-        int lookupY = (int)(coordinate.y * (height - 1));
-        if (lookupX >= width)
-        {
-            lookupX = width - 1;
-        }
-        if (lookupY >= height)
-        {
-            lookupY = height - 1;
-        }
-        colour = lookup->SampleColour(lookupX, lookupY, true);
+        y = height - 1;
     }
-    return colour;
+    return lookup->SampleColour(x, y, true);
 }
 
 void UpdateImpostorLighting()
@@ -97,6 +90,23 @@ void UpdateImpostorLighting()
     {
         entry->mColour = GetImpostorLightingColour(&entry->mPosition);
     }
+}
+
+nlColour GetImpostorLightingColour(const nlVector3* position)
+{
+    nlColour colour;
+    if (spImpostorLightingLookup == 0)
+    {
+        nlColourSet(colour, 255, 255, 255, 255);
+    }
+    else
+    {
+        LightingLookup* lookup = spImpostorLightingLookup;
+        nlVector2 coordinate;
+        GetImpostorLightingCoordinate(coordinate, position);
+        colour = SampleImpostorLighting(lookup, coordinate);
+    }
+    return colour;
 }
 
 void SetImpostorLightingTexture(u32 textureHandle)
