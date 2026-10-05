@@ -42,6 +42,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feModelManager.h"
+#include "Game/Render/ImpostorLighting.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/FE/feResourceManager.h"
 #include "Game/Render/CrowdManager.h"
@@ -139,8 +140,6 @@ bool IsNetworkOrRecordedGame();
 void ShutdownWarbleRendering(void*);
 extern "C" void fn_8001FE80();
 void fn_80056CF4(void*, int, bool);
-
-void FreeImpostorLighting();
 
 void fn_80056EA8();
 void DestroyCharacters();
