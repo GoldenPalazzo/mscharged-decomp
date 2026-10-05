@@ -13,23 +13,15 @@
 #include "NL/gl/glMemory.h"
 #include "string.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
+#include "Game/Sys/audio.h"
 
 class MemoryAllocator;
-
-extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
 
 namespace
 {
 static WiperCallback wiperCallback;
-}
-
-void WiperCallback::TransitionFinished()
-{
-    mTransitionActive = false;
-}
-
-void WiperCallback::TransitionProgressed(float fDeltaT)
-{
 }
 
 void Wiper::Reset()
@@ -80,7 +72,7 @@ void Wiper::DoWipe(const char* wipe)
 
         if (nlStrICmp<char>(wipe, "out") == 0 || nlStrICmp<char>(wipe, "in") == 0)
         {
-            fn_800EBBFC(10, 0xE7013118, 0, 0);
+            PlaySound(10, 0xE7013118, 0, 0);
         }
 
         if (strcmp(wipe, "cut") == 0)
@@ -100,6 +92,11 @@ void Wiper::DoWipe(const char* wipe)
         ScreenTransitionManager::Instance()->EnableRandomTransition(wipe);
         g_ForceDoubleBallTransition = false;
     }
+}
+
+void WiperCallback::TransitionFinished()
+{
+    mTransitionActive = false;
 }
 
 void Wiper::Run(float dt)
@@ -123,14 +120,10 @@ void Wiper::Render()
     ScreenTransitionManager::Instance()->Render();
 }
 
+void WiperCallback::TransitionProgressed(float fDeltaT)
+{
+}
+
 void ScreenTransitionCallback::fn_80188764()
-{
-}
-
-void ScreenTransitionCallback::Cut()
-{
-}
-
-void ScreenTransitionCallback::SequenceSwitch()
 {
 }
