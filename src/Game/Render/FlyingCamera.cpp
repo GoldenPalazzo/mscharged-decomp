@@ -201,6 +201,11 @@ static inline DrawableFlyingCamera* GetDrawableFlyingCamera(int index)
     return &ReplayManager::Instance()->mRender->_2298[index];
 }
 
+static inline float GetFlyingCameraResetHeight()
+{
+    return lbl_806DCE38 - 0.5f;
+}
+
 void UpdateFlyingCameras(float dt)
 {
     bool shouldReset = true;
@@ -271,8 +276,7 @@ void UpdateFlyingCameras(float dt)
         gFlyingCameras[i]->mTargetPosition = targetPosition;
         UpdateFlyingCamera(gFlyingCameras[i], dt);
 
-        float resetHeightThreshold = lbl_806DCE38 - 0.5f;
-        if (gFlyingCameras[i]->mPosition.z < resetHeightThreshold)
+        if (gFlyingCameras[i]->mPosition.z < GetFlyingCameraResetHeight())
         {
             shouldReset = false;
         }
