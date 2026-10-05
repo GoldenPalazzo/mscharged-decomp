@@ -1405,7 +1405,7 @@ Game/Render/FlyingCamera.cpp:
 	.rodata     start:0x804DCE20 end:0x804DCE30
 	.data       start:0x80511DF0 end:0x80511E28
 	.bss        start:0x80571C08 end:0x80572008
-	.sdata      start:0x806DCE18 end:0x806DCE48
+	.sdata      start:0x806DCE18 end:0x806DCE40
 	.sbss       start:0x806E1538 end:0x806E1560
 	.sdata2     start:0x806E5020 end:0x806E5058
 
@@ -1415,7 +1415,7 @@ Game/Render/HammerObject.cpp:
 	.rodata     start:0x804DCE30 end:0x804DCE48
 	.data       start:0x80511E28 end:0x80511E38
 	.bss        start:0x80572008 end:0x80572020
-	.sdata      start:0x806DCE48 end:0x806DCE58
+	.sdata      start:0x806DCE40 end:0x806DCE58
 	.sdata2     start:0x806E5058 end:0x806E5078
 
 Game/Render/HighRange.cpp:

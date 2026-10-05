@@ -71,8 +71,6 @@ float lbl_806DCE30 = 3.0f;
 float lbl_806DCE34 = 10.0f;
 float lbl_806DCE38 = 10.0f;
 int gNextFlyingCameraFlashIndex = 100;
-float gHammerGrowScale = 1.4f;
-float gHammerGrowDuration = 0.15f;
 
 unsigned int gFlyingCameraCount;
 cFielder* gFlyingCameraTarget;
