@@ -740,6 +740,19 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     }
 }
 
+static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
+{
+    if (game->m_eGameState != 4)
+    {
+        game->mUnidentified49C.mEvent06.Deliver(data);
+    }
+}
+
+static inline int GetTeamScoreDifference(cTeam* team)
+{
+    return team->m_nScore - team->GetOtherTeam()->m_nScore;
+}
+
 void cGame::CheckForGoal()
 {
     struct GoalScoredDataExt
@@ -755,7 +768,6 @@ void cGame::CheckForGoal()
         nSide = (nSide + 1) % 2;
         m_nLastTeamToScore = nSide;
         g_pTeams[nSide]->m_nScore += 1;
-        int score;
 
         if (GameInfoManager::Instance()->IsInMode4()
             && g_pStrikerChallenge->mCondition == 2 && nSide == 1)
@@ -767,8 +779,7 @@ void cGame::CheckForGoal()
             ChangeGameState(3);
         }
         else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
-            && (score = g_pTeams[nSide]->m_nScore,
-                score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
+            && g_pTeams[nSide]->GetScore() >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
         {
             ChangeGameState(3);
         }
@@ -801,23 +812,7 @@ void cGame::CheckForGoal()
                 g_pBall->m_uGoalType = 3;
             }
 
-            cPlayer* pPlayer = g_pBall->m_pLastTouch;
-            if (m_pScorer != NULL && pPlayer != NULL && m_pScorer != pPlayer
-                && m_pScorer->IsOnSameTeam(pPlayer))
-            {
-                m_pAssister = m_pScorer;
-            }
-            else
-            {
-                m_pAssister = NULL;
-            }
-
-            m_pScorer = pPlayer;
-
-            if (pPlayer != NULL && pPlayer->m_eClassType == FIELDER)
-            {
-                m_pTeamTouch[pPlayer->m_pTeam->m_nSide] = pPlayer;
-            }
+            SetPotentialScorer(g_pBall->m_pLastTouch);
         }
         else if (m_pScorer != NULL)
         {
@@ -859,20 +854,16 @@ void cGame::CheckForGoal()
         goalScored.data.pLastTouch[1] = m_pTeamTouch[1];
         mUnidentified020 = true;
 
-        cGame* game = g_pGame;
-        if (game->m_eGameState != 4)
-        {
-            game->mUnidentified49C.mEvent06.Deliver(&goalScored.data);
-        }
+        DeliverGoalScored(g_pGame, &goalScored.data);
 
         if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
         {
             unsigned long soundID;
-            if (g_pTeams[nSide]->m_nScore - g_pTeams[nSide]->GetOtherTeam()->m_nScore == 0)
+            if (GetTeamScoreDifference(g_pTeams[nSide]) == 0)
             {
                 soundID = 0x9D796D7D;
             }
-            else if (g_pTeams[nSide]->m_nScore - g_pTeams[nSide]->GetOtherTeam()->m_nScore == 1)
+            else if (GetTeamScoreDifference(g_pTeams[nSide]) == 1)
             {
                 soundID = 0xC272152B;
                 if (nSide == 0)
@@ -892,6 +883,7 @@ void cGame::CheckForGoal()
         }
 
         Goalie::HandleGoalScored(nSide);
+        g_pBall->m_uGoalType = 4;
     }
 }
 
