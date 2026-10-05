@@ -469,14 +469,21 @@ inline unsigned int AudioReadState::GetStreamDataStart()
     return GetChannelCount() * sizeof(AudioStreamHeader) + GetStreamHeaderOffset();
 }
 
-inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* channel)
+inline unsigned int AudioReadState::GetChannelBlockOffset(AudioStreamChannel* channel, unsigned int blockSize)
 {
-    return m_Unknown1C * GetChannelCount() + ((channel - GetFirstChannel()) * GetStreamBlockSize() + GetStreamDataStart());
+    unsigned int offset = channel - GetFirstChannel();
+    offset *= blockSize;
+    return offset;
+}
+
+inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* channel, unsigned int blockSize)
+{
+    return m_Unknown1C * GetChannelCount() + (GetChannelBlockOffset(channel, blockSize) + GetStreamDataStart());
 }
 
 static inline void QueuePrimeRead(AudioReadCallbackEntry* entry)
 {
-    entry->m_State->QueueStreamRead(entry->m_State->GetChannelDataOffset(entry->m_Channel), entry->m_Channel->m_Unknown08,
+    entry->m_State->QueueStreamRead(entry->m_State->GetChannelDataOffset(entry->m_Channel, entry->m_State->GetStreamBlockSize()), entry->m_Channel->m_Unknown08,
         entry->m_State->GetStreamBlockSize(), OnAudioStreamPrimeRead, (unsigned long)entry);
     entry->m_Channel->AdvanceReadPosition(entry->m_State->GetStreamBlockSize());
     entry->m_State->CompleteRead();
@@ -643,7 +650,7 @@ inline void AudioReadState::QueueChannelRead(AudioStreamChannel* channel, unsign
 {
     unsigned int readPos = channel->m_Unknown10_00;
     unsigned int space = channel->GetBufferSize() - readPos;
-    unsigned int offset = GetChannelDataOffset(channel);
+    unsigned int offset = GetChannelDataOffset(channel, GetStreamBlockSize());
     if (space < size)
     {
         QueueStreamRead(offset, (char*)channel->m_Unknown08 + readPos, space,

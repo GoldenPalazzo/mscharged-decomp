@@ -192,7 +192,8 @@ public:
     nlFile* GetStreamFile();
     unsigned int GetStreamBlockSize();
     unsigned int GetStreamDataStart();
-    unsigned int GetChannelDataOffset(AudioStreamChannel* channel);
+    unsigned int GetChannelBlockOffset(AudioStreamChannel* channel, unsigned int blockSize);
+    unsigned int GetChannelDataOffset(AudioStreamChannel* channel, unsigned int blockSize);
     void QueueStreamRead(unsigned int offset, void* buffer, unsigned int size,
         ReadAsyncCallback callback, unsigned long userParam);
     void QueueChannelRead(AudioStreamChannel* channel, unsigned int size);
