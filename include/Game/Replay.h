@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "NL/nlDebug.h"
 #include "NL/nlMath.h"
 
 class LoadFrame;
@@ -138,8 +139,6 @@ inline void Replayable(FrameType& frame, T& current)
             frame, current, ReplayableCategoryOf(current));
     }
 }
-
-void nlBreak();
 
 class cPoseNode;
 template <int N>
