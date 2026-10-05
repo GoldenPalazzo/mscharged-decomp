@@ -70,6 +70,11 @@ NetworkStatsManager* NetworkStatsManager::Instance()
     return sNetworkStatsManager;
 }
 
+static inline void SetRankingGroup(int& group, int value)
+{
+    group = value;
+}
+
 void NetworkStatsManager::Reset(bool)
 {
     mLeaderboardRequestComplete = false;
@@ -112,8 +117,11 @@ void NetworkStatsManager::Reset(bool)
     bool european = GetRegion() == 1;
     if (european)
     {
-        int alternate = UsesEuropeanRankings();
-        alternate = alternate == 0 ? alternate : IsAlternateOnlineCountryGroup();
+        int alternate;
+        if (UsesEuropeanRankings() == false)
+            SetRankingGroup(alternate, 0);
+        else
+            SetRankingGroup(alternate, IsAlternateOnlineCountryGroup());
         mPersistentCategories[0] =
             alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
         mPersistentCategories[1] =
