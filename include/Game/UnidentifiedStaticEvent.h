@@ -142,7 +142,6 @@ void UnidentifiedStaticEvent<T, Count>::Disconnect(void* owner)
     Remove(listener);
 }
 
-
 template <typename T, int Count>
 void UnidentifiedStaticEvent<T, Count>::Add(
     const Callback& callback, unsigned int value, int flags)
@@ -156,6 +155,5 @@ void UnidentifiedStaticEvent<T, Count>::Add(
     listener->callback.UnidentifiedTransfer(callback);
     RegisterEventConnection(this, listener, value, flags);
 }
-
 
 #endif // GAME_UNIDENTIFIED_STATIC_EVENT_H

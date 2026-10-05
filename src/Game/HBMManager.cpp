@@ -1,6 +1,8 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/SH/SHBootLoading.h"
+#include "Game/SH/SHLoading.h"
 #include "Game/FE/feMusic.h"
 #include "NL/plat/PlatPadManager.h"
 
@@ -8,9 +10,6 @@
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/GameSceneManager.h"
-#include "Game/Event.h"
-#include "Game/UnidentifiedStaticEvent.h"
-#include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
 #include "Game/Game.h"
 #include "Game/Render/HomeButtonFade.h"
@@ -31,23 +30,24 @@
 #include <revolution/tpl.h>
 #include <string.h>
 
-class UnidentifiedHBMScene : public BaseSceneHandler
-{
-public:
-    virtual void UnidentifiedVirtual2C();
-};
+#include "Game/HBMHideEvent.h"
+#include "Game/HBMManager.h"
 
-static inline void CallHomeButtonWarning(UnidentifiedHBMScene* scene)
+static inline void CallHomeButtonWarning(BootLoadingScene* scene)
 {
     if (scene != 0)
     {
-        scene->UnidentifiedVirtual2C();
+        scene->ShowHomeButtonWarning();
     }
 }
 
-#include "Game/HBMHideEvent.h"
-
-#include "Game/HBMManager.h"
+static inline void CallHomeButtonWarning(BaseLoadingScene* scene)
+{
+    if (scene != 0)
+    {
+        scene->OnHomeButtonPressed();
+    }
+}
 
 static HBMHideEvent sHBMHideEvent;
 
@@ -124,29 +124,29 @@ void HBMManager::LoadResources()
     mDataInfo.region = SCGetLanguage();
     switch (mDataInfo.region)
     {
-    case 0:
+    case SC_LANG_JP:
         archiveName = "/homeBtn.arc";
         break;
-    case 1:
+    case SC_LANG_EN:
         archiveName = "/homeBtn_ENG.arc";
         break;
-    case 2:
+    case SC_LANG_DE:
         archiveName = "/homeBtn_GER.arc";
         break;
-    case 3:
+    case SC_LANG_FR:
         archiveName = "/homeBtn_FRA.arc";
         break;
-    case 4:
+    case SC_LANG_SP:
         archiveName = "/homeBtn_SPA.arc";
         break;
-    case 5:
+    case SC_LANG_IT:
         archiveName = "/homeBtn_ITA.arc";
         break;
-    case 6:
+    case SC_LANG_NL:
         archiveName = "/homeBtn_NED.arc";
         break;
     default:
-        mDataInfo.region = 0;
+        mDataInfo.region = SC_LANG_JP;
         archiveName = "/homeBtn.arc";
         break;
     }
@@ -287,18 +287,18 @@ void HBMManager::Update()
     {
         switch (g_pPlatPadManager->type[i])
         {
-        case 0:
+        case PLAT_PAD_NONE:
             mControllerData.wiiCon[i].kpad = 0;
             break;
-        case 1:
+        case PLAT_PAD_REMOTE:
             mControllerData.wiiCon[i].kpad
                 = &g_pPlatPadManager->GetRemoteStatus(i)->kpad;
             break;
-        case 2:
+        case PLAT_PAD_FREESTYLE:
             mControllerData.wiiCon[i].kpad
                 = &g_pPlatPadManager->GetFreestyleStatus(i)->kpad;
             break;
-        case 3:
+        case PLAT_PAD_CLASSIC:
             mControllerData.wiiCon[i].kpad
                 = &g_pPlatPadManager->GetClassicStatus(i)->kpad;
             break;
@@ -426,15 +426,15 @@ void HBMManager::OnHomeButtonPressed()
             if (g_pLocalization->m_CurrentLanguage
                 == nlLocalization::LangJapanese)
             {
-                scene = GameSceneManager::Instance()->GetScene((SceneList)19);
+                scene = GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING_JPN);
             }
             else
             {
-                scene = GameSceneManager::Instance()->GetScene((SceneList)18);
+                scene = GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING);
             }
             if (scene != 0)
             {
-                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
+                CallHomeButtonWarning(static_cast<BootLoadingScene*>(scene));
             }
         }
     }
@@ -442,10 +442,10 @@ void HBMManager::OnHomeButtonPressed()
     {
         if (g_pOverlayManager != 0)
         {
-            scene = g_pOverlayManager->GetScene((SceneList)25);
+            scene = g_pOverlayManager->GetScene(SCENE_ASYNC_LOADING);
             if (scene != 0)
             {
-                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
+                CallHomeButtonWarning(static_cast<BaseLoadingScene*>(scene));
             }
         }
     }
@@ -453,10 +453,10 @@ void HBMManager::OnHomeButtonPressed()
     {
         if (GameSceneManager::Instance() != 0)
         {
-            scene = GameSceneManager::Instance()->GetScene((SceneList)25);
+            scene = GameSceneManager::Instance()->GetScene(SCENE_ASYNC_LOADING);
             if (scene != 0)
             {
-                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
+                CallHomeButtonWarning(static_cast<BaseLoadingScene*>(scene));
             }
         }
     }
