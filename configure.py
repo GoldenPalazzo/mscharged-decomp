@@ -597,7 +597,7 @@ config.libs = [
             Object(Matching, "Game/Audio/AudioSequenceEvent.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioSequenceInstance.cpp", extra_cflags=["-ipa file", "-inline auto,depth=3"]),
             Object(Matching, "Game/Audio/AudioSlider.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/Audio/AudioSource.cpp"),
+            Object(Matching, "Game/Audio/AudioSource.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioSystem.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/AuxEffectMap.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/CategoryVolume.cpp", extra_cflags=["-ipa file"]),

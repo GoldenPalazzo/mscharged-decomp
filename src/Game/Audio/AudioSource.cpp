@@ -2,14 +2,18 @@
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioBackend.h"
+#include "Game/Audio/AudioGlobals.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlMath.h"
+#include "NL/nlPrint.h"
 #include "NL/nlRing.h"
 #include "revolution/mix.h"
 #include "revolution/os/OSInterrupt.h"
+
+#include <string.h>
 
 unsigned int gResidentVoiceDropCount;
 unsigned int gStreamVoiceDropCount;
@@ -17,7 +21,6 @@ unsigned int gAudioStreamSourceCount;
 unsigned int gAudioSampleSourceCount;
 unsigned int gAudioSourceCount;
 unsigned int gAudioStreamChannelCount;
-AXPBLPF sVoiceLowPassFilter;
 
 SlotPool<AudioSampleSource> gAudioSampleSourcePool(64, 16);
 SlotPool<AudioMonoStreamSource> gAudioMonoStreamSourcePool(16, 16);
@@ -26,12 +29,13 @@ SlotPool<AudioReadQueueEntry> gAudioReadQueueEntryPool(32, 16);
 
 struct AudioReadCallbackEntry
 {
-    void* m_Unknown00;
-    void* m_Unknown04;
+    AudioReadState* m_State;
+    AudioStreamChannel* m_Channel;
 };
 
 AudioReadCallbackEntry lbl_80585CB0[24];
 nlArrayAllocator<AudioReadCallbackEntry> lbl_806E2228(lbl_80585CB0, 24);
+AXPBLPF sVoiceLowPassFilter;
 
 void SetVoiceInputVolume(AXVPB* voice, float value)
 {
@@ -358,14 +362,61 @@ void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
     AXSetVoiceAdpcm(m_Voice, &adpcm);
 }
 
-void OnAudioStreamReadComplete(nlFile*, void*, unsigned int, unsigned long userParam)
+static inline unsigned int GetVoiceLoopAddress(AXVPB* voice)
 {
-    AudioReadState* state = ((AudioStreamChannel*)userParam)->m_Unknown00;
-    --state->m_Unknown20_00;
+    return (voice->pb.addr.loopAddressHi << 16) | voice->pb.addr.loopAddressLo;
+}
+
+static inline unsigned int GetVoiceEndAddress(AXVPB* voice)
+{
+    return (voice->pb.addr.endAddressHi << 16) | voice->pb.addr.endAddressLo;
+}
+
+static inline unsigned int GetVoiceCurrentAddress(AXVPB* voice)
+{
+    return (voice->pb.addr.currentAddressHi << 16) | voice->pb.addr.currentAddressLo;
+}
+
+inline nlFile* AudioReadState::GetStreamFile()
+{
+    return ((AudioFileLoader*)m_SourceInfo->m_BankLoader)->GetFile();
+}
+
+inline unsigned int AudioReadState::GetStreamBlockSize()
+{
+    return m_SourceInfo->m_BankLoader->m_Chunk23200->m_StreamBlockSize;
+}
+
+inline unsigned int AudioStreamChannel::GetBufferSize()
+{
+    return m_Unknown00->GetStreamBlockSize() * 2;
+}
+
+inline void AudioStreamChannel::AdvanceReadPosition(unsigned int size)
+{
+    m_Unknown10_00 += size;
+    m_Unknown10_00 %= GetBufferSize();
+}
+
+inline void AudioReadState::QueueStreamRead(unsigned int offset, void* buffer, unsigned int size,
+    ReadAsyncCallback callback, unsigned long userParam)
+{
+    g_pAudioBackend->QueueRead(GetStreamFile(), offset, buffer, size, callback, userParam, this);
+    ++m_Unknown20_00;
+}
+
+inline void AudioReadState::CompleteRead()
+{
+    --m_Unknown20_00;
     nlGetCurrentAsyncRead();
 
-    AudioReadQueueEntry* entry = nlRingRemoveStart(&state->m_Unknown24);
+    AudioReadQueueEntry* entry = nlRingRemoveStart(&m_Unknown24);
     gAudioReadQueueEntryPool.Free(entry);
+}
+
+void OnAudioStreamReadComplete(nlFile*, void*, unsigned int, unsigned long userParam)
+{
+    ((AudioStreamChannel*)userParam)->m_Unknown00->CompleteRead();
 }
 
 void AudioStreamChannel::OnVoiceDropped(void* pointer)
@@ -413,6 +464,90 @@ AudioReadState::~AudioReadState()
     --gAudioSourceCount;
 }
 
+inline unsigned int AudioReadState::GetStreamDataStart()
+{
+    return GetChannelCount() * sizeof(AudioStreamHeader) + GetStreamHeaderOffset();
+}
+
+inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* channel)
+{
+    return m_Unknown1C * GetChannelCount() + ((channel - GetFirstChannel()) * GetStreamBlockSize() + GetStreamDataStart());
+}
+
+static inline void QueuePrimeRead(AudioReadCallbackEntry* entry)
+{
+    entry->m_State->QueueStreamRead(entry->m_State->GetChannelDataOffset(entry->m_Channel), entry->m_Channel->m_Unknown08,
+        entry->m_State->GetStreamBlockSize(), OnAudioStreamPrimeRead, (unsigned long)entry);
+    entry->m_Channel->AdvanceReadPosition(entry->m_State->GetStreamBlockSize());
+    entry->m_State->CompleteRead();
+}
+
+void OnAudioStreamHeaderRead(nlFile*, void* buffer, unsigned int, unsigned long userParam)
+{
+    AudioReadCallbackEntry* entry = (AudioReadCallbackEntry*)userParam;
+    if (entry->m_State->m_Unknown28 == 6)
+    {
+        entry->m_State->CompleteRead();
+        lbl_806E2228.Free(entry);
+    }
+    else if (buffer == 0)
+    {
+        entry->m_State->Stop();
+    }
+    else
+    {
+        AudioStreamHeader* header = (AudioStreamHeader*)buffer;
+        entry->m_State->m_Unknown18 = header->num_adpcm_nibbles / 2;
+        entry->m_State->m_SampleRateRatio = (float)header->sample_rate / 32000.0f;
+        entry->m_Channel->PrepareVoice(header);
+
+        QueuePrimeRead(entry);
+    }
+    if (buffer != 0)
+        g_pAudioStreamBlockPool->Free((AudioStreamBlock*)buffer);
+}
+
+inline void AudioReadState::OnChannelPrepared(AudioStreamChannel* channel)
+{
+    if (channel == GetFirstChannel() + GetChannelCount() - 1)
+    {
+        m_Unknown10 = 3;
+        switch (m_Unknown28)
+        {
+        case 3:
+            break;
+        case 5:
+        {
+            AudioStreamChannel* voiceChannel = GetChannelIterator();
+            while ((voiceChannel = GetNextChannel(voiceChannel)) != 0)
+                AXSetVoiceState(voiceChannel->m_Voice, AX_VOICE_RUN);
+            m_Unknown10 = 4;
+            break;
+        }
+        case 1:
+            m_Unknown10 = 3;
+            break;
+        }
+    }
+}
+
+void OnAudioStreamPrimeRead(nlFile* file, void* buffer, unsigned int size, unsigned long userParam)
+{
+    AudioReadCallbackEntry* entry = (AudioReadCallbackEntry*)userParam;
+    AudioReadState* state = entry->m_State;
+    if (state->m_Unknown28 == 6)
+    {
+        state->CompleteRead();
+        lbl_806E2228.Free(entry);
+        return;
+    }
+
+    OnAudioStreamReadComplete(file, buffer, size, (unsigned long)entry->m_Channel);
+    entry->m_State->m_Unknown1C = size;
+    entry->m_State->OnChannelPrepared(entry->m_Channel);
+    lbl_806E2228.Free(entry);
+}
+
 void AudioReadState::Initialize(AudioSourceInfo* info)
 {
     m_SourceInfo = info;
@@ -429,6 +564,24 @@ void AudioReadState::Initialize(AudioSourceInfo* info)
     }
     SetPan(0.0f);
     m_Unknown10 = 1;
+}
+
+bool AudioReadState::Prepare()
+{
+    AudioStreamChannel* channel = GetChannelIterator();
+    while ((channel = GetNextChannel(channel)) != 0)
+    {
+        AudioReadCallbackEntry* entry = lbl_806E2228.Allocate();
+        entry->m_State = this;
+        entry->m_Channel = channel;
+        int index = channel - GetFirstChannel();
+        AudioStreamBlock* header = g_pAudioStreamBlockPool->Allocate();
+        unsigned int offset = GetStreamHeaderOffset() + index * sizeof(AudioStreamHeader);
+        QueueStreamRead(offset, header, sizeof(AudioStreamHeader), OnAudioStreamHeaderRead, (unsigned long)entry);
+    }
+    SetInputVolume(-96.0f);
+    m_Unknown10 = 2;
+    return true;
 }
 
 bool AudioReadState::Play(unsigned int value)
@@ -482,6 +635,126 @@ void AudioReadState::Stop()
         m_Unknown10 = 6;
         break;
     case 5:
+        break;
+    }
+}
+
+inline void AudioReadState::QueueChannelRead(AudioStreamChannel* channel, unsigned int size)
+{
+    unsigned int readPos = channel->m_Unknown10_00;
+    unsigned int space = channel->GetBufferSize() - readPos;
+    unsigned int offset = GetChannelDataOffset(channel);
+    if (space < size)
+    {
+        QueueStreamRead(offset, (char*)channel->m_Unknown08 + readPos, space,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(space);
+        unsigned int remainder = size - space;
+        QueueStreamRead(offset + space, channel->m_Unknown08, remainder,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(remainder);
+    }
+    else
+    {
+        QueueStreamRead(offset, (char*)channel->m_Unknown08 + readPos, size,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(size);
+    }
+}
+
+void AudioReadState::Update()
+{
+    switch (m_Unknown10)
+    {
+    case 6:
+        m_Unknown10 = m_Unknown20_00 == 0 ? 1 : 6;
+        break;
+    case 4:
+    {
+        AXVPB* voice = GetFirstChannel()->m_Voice;
+        if (GetVoiceCurrentAddress(voice) > GetVoiceEndAddress(voice))
+            Stop();
+        if (GetFirstChannel()->m_Voice->pb.state == AX_VOICE_STOP)
+        {
+            Stop();
+            break;
+        }
+        if (m_Unknown20_1F)
+            break;
+
+        voice = GetFirstChannel()->m_Voice;
+        if ((GetVoiceCurrentAddress(voice) - GetVoiceLoopAddress(voice)) / 2 < m_Unknown20_07)
+        {
+            AudioStreamChannel* channel = GetChannelIterator();
+            while ((channel = GetNextChannel(channel)) != 0)
+            {
+                unsigned int end = GetVoiceLoopAddress(channel->m_Voice) + m_Unknown20_07 * 2;
+                AXSetVoiceLoop(channel->m_Voice, false);
+                AXSetVoiceLoopAddr(channel->m_Voice, (unsigned long)g_pAudioSilenceBuffer * 2);
+                AXSetVoiceEndAddr(channel->m_Voice, end);
+                m_Unknown20_1F = true;
+            }
+            break;
+        }
+
+        AudioStreamChannel* first = GetFirstChannel();
+        voice = first->m_Voice;
+        unsigned int played = (GetVoiceCurrentAddress(voice) - GetVoiceLoopAddress(voice)) / 2;
+        int playPos = played - played % 32;
+        int readPos = first->m_Unknown10_00;
+        int blockSize = first->m_Unknown00->GetStreamBlockSize();
+        bool needRead;
+        if (playPos < readPos)
+            needRead = readPos - playPos < blockSize;
+        else
+            needRead = playPos - readPos > blockSize;
+        if (!needRead)
+            break;
+        if (m_Unknown20_07 != 0)
+            break;
+        if (m_Unknown20_00 > 2)
+        {
+            nlPrintf("\t\t\t\t\t\t******* STARVE *******\n");
+            ++gAudioStreamChannelCount;
+            Stop();
+            break;
+        }
+
+        unsigned int remaining = m_Unknown18 - m_Unknown1C;
+        if (remaining <= GetStreamBlockSize())
+        {
+            AudioStreamChannel* channel = GetChannelIterator();
+            while ((channel = GetNextChannel(channel)) != 0)
+                QueueChannelRead(channel, nlAlignUp(remaining, 32));
+            m_Unknown1C = 0;
+            bool loop = m_Unknown14_0C < m_PlayCount || m_PlayCount == 0xFFFF;
+            if (!loop)
+            {
+                m_Unknown20_07 = GetFirstChannel()->m_Unknown10_00;
+                unsigned int end = nlAlignUp(m_Unknown20_07, GetStreamBlockSize());
+                channel = GetChannelIterator();
+                while ((channel = GetNextChannel(channel)) != 0)
+                    memset((char*)channel->m_Unknown08 + m_Unknown20_07, 0, end - m_Unknown20_07);
+                m_Unknown20_07 = end;
+            }
+            else
+            {
+                m_Unknown14_0C++;
+            }
+        }
+        else
+        {
+            AudioStreamChannel* channel = GetChannelIterator();
+            while ((channel = GetNextChannel(channel)) != 0)
+                QueueChannelRead(channel, nlAlignUp(GetStreamBlockSize(), 32));
+            m_Unknown1C += GetStreamBlockSize();
+        }
+        break;
+    }
+    case 2:
+    case 3:
+    case 5:
+    case 7:
         break;
     }
 }
@@ -544,128 +817,7 @@ void CancelAudioReads(AudioReadState* state)
     state->m_Unknown24 = pending;
 }
 
-void OnAudioReadCancelled(nlFile* file, void* buffer, unsigned int size,
-    unsigned long userParam, ReadAsyncCallback callback)
+bool AudioStereoStreamSource::Prepare()
 {
-    callback(file, buffer, size, userParam);
-}
-
-void AudioSampleSource::SetAuxiliaryVolume(int auxiliary, int value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoiceAuxiliaryVolume(m_Unknown1C, auxiliary, value);
-    OSRestoreInterrupts(enabled);
-}
-
-bool AudioSampleSource::HasVoice()
-{
-    return m_Unknown1C != 0;
-}
-
-void AudioSampleSource::SetLowPassFilter(bool on, unsigned int frequency, bool unchanged)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoiceLowPassFilter(m_Unknown1C, on, frequency, unchanged);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetSurroundPan(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoiceSurroundPan(m_Unknown1C, value);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetInterauralDelay(int value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoiceInterauralDelay(m_Unknown1C, value);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetPan(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoicePan(m_Unknown1C, value);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetPitch(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoicePitch(m_Unknown1C, m_SampleRateRatio, value);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetMixVolume(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    SetVoiceMixVolume(m_Unknown1C, value);
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioSampleSource::SetInputVolume(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    if (m_Unknown14_18)
-        MIXRmtSetFader(m_Unknown1C, m_Unknown14_19, (int)(10.0f * value));
-    if (g_pAudioBackend->m_MixControllerSpeakersToMain || !m_Unknown14_18)
-        SetVoiceInputVolume(m_Unknown1C, value);
-    OSRestoreInterrupts(enabled);
-}
-
-AXVPB* AudioSampleSource::GetVoice()
-{
-    return m_Unknown1C;
-}
-
-bool AudioSampleSource::WasVoiceDropped()
-{
-    return m_Unknown28;
-}
-
-bool AudioSampleSource::Prepare()
-{
-    m_Unknown10 = 3;
-    return false;
+    return AudioReadState::Prepare();
 }
