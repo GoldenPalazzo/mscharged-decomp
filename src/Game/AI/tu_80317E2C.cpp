@@ -14,17 +14,10 @@
 
 class ScriptQuestionCache;
 
-inline bool ScriptState::Reinitialize(void* context)
-{
-    return Initialize(context);
-}
-
-
 char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";
 float lbl_806DF5B0[2] = { -1.0f, 0.0f };
 char lbl_806DF5B8[] = "Init_%s";
-extern int lbl_806DF5C0[2];
 
 float lbl_806E20C0;
 float lbl_806E20C4;
@@ -66,6 +59,11 @@ extern "C" bool fn_80317E88(const shdStateMachine* machine)
         }
     }
     return result;
+}
+
+bool ScriptState::Reinitialize(void* context)
+{
+    return Initialize(context);
 }
 
 extern const float lbl_806E6880 = 0.0f;
@@ -208,7 +206,7 @@ void UnidentifiedScriptMachine::Reset(bool param)
 void UnidentifiedScriptMachine::Update(float deltaTime)
 {
     bool selectState = false;
-    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
+    UnidentifiedVariant_80054AB8 update(0, -1.0f, -1.0f);
     shdStateMachine* active = mUnidentified004;
 
     if (active != 0)

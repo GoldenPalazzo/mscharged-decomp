@@ -74,7 +74,6 @@ public:
     virtual void UnidentifiedVirtual2();
     virtual void Update(float deltaTime);
     virtual void UnidentifiedVirtual7();
-    virtual void UnidentifiedVirtual8();
 };
 
 class TeamDesire : public shdStateMachine

@@ -59,7 +59,3 @@ TeamPlayMachine::TeamPlayMachine()
     : UnidentifiedScriptMachine(7, true, false, gTeamPlayMachineName)
 {
 }
-
-void TeamPlayMachine::UnidentifiedVirtual8()
-{
-}
