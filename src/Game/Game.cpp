@@ -1559,7 +1559,7 @@ void cGame::fn_8005DF38()
     ResumeSuddenDeathMusic();
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
-    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(lbl_806E3770);
+    static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDIn(lbl_806E3770);
     static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->DisplayNewScore();
 
     if (mpWeatherManager != 0)

@@ -1732,7 +1732,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameState2");
     fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
-    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E1514();
+    static_cast<OverlayManager*>(g_pOverlayManager)->RegisterEventHandlers();
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
     StatsTracker::Instance()->CreateEventHandler();

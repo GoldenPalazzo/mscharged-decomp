@@ -319,7 +319,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, true, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->mUnidentified10E = false;
+                ->mIsInHighlights = false;
         }
         break;
     case 44:
@@ -347,7 +347,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, false, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->mUnidentified10E = true;
+                ->mIsInHighlights = true;
             StopOverlay();
             PlayOverlay("highlight", 0.5f, 30.0f);
         }
