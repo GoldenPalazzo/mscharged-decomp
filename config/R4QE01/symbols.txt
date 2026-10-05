@@ -7186,7 +7186,7 @@ __cl__Q217Function2<v,i,Pv>156FunctorImpl<140BindExp3<v,Q26Detail54MemFunImpl<v,
 Clone__Q217Function2<v,i,Pv>156FunctorImpl<140BindExp3<v,Q26Detail54MemFunImpl<v,M25RoadToStrikersCupHubSceneFPCvPvUiPv_v>,P25RoadToStrikersCupHubScene,14Placeholder<0>,14Placeholder<1>>>CFv = .text:0x80206C2C; // type:function size:0x74
 __dt__Q217Function2<v,i,Pv>156FunctorImpl<140BindExp3<v,Q26Detail54MemFunImpl<v,M25RoadToStrikersCupHubSceneFPCvPvUiPv_v>,P25RoadToStrikersCupHubScene,14Placeholder<0>,14Placeholder<1>>>Fv = .text:0x80206CA0; // type:function size:0x44
 CycleCupPage__Fib = .text:0x80206CE4; // type:function size:0x14
-fn_80206CF8__Fib = .text:0x80206CF8; // type:function size:0x104 scope:local
+CycleCupStatsPage__Fib = .text:0x80206CF8; // type:function size:0x104 scope:local
 CycleCupRoundPage__Fib = .text:0x80206DFC; // type:function size:0x198
 ShowFirstCupPage__Fv = .text:0x80206F94; // type:function size:0x20
 ShowCurrentCupRoundPage__Fv = .text:0x80206FB4; // type:function size:0xAC
@@ -24068,7 +24068,7 @@ __vt__11CupHubScene = .data:0x8051B524; // type:object size:0x2C
 @12753 = .data:0x8051B718; // type:object size:0x11 scope:local data:string
 __vt__Q217Function2<v,i,Pv>156FunctorImpl<140BindExp3<v,Q26Detail54MemFunImpl<v,M25RoadToStrikersCupHubSceneFPCvPvUiPv_v>,P25RoadToStrikersCupHubScene,14Placeholder<0>,14Placeholder<1>>> = .data:0x8051B72C; // type:object size:0x14
 __vt__25RoadToStrikersCupHubScene = .data:0x8051B740; // type:object size:0x2C
-lbl_8051B770 = .data:0x8051B770; // type:object size:0x48 data:4byte
+gCupTrophyUnlockFlags = .data:0x8051B770; // type:object size:0x48 data:4byte
 @9276 = .data:0x8051B7B8; // type:object size:0x10 scope:local data:string
 @9277 = .data:0x8051B7C8; // type:object size:0x1B scope:local data:string
 @9467 = .data:0x8051B7E4; // type:object size:0x1F scope:local data:string

@@ -34,7 +34,7 @@ extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
 extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
 
-struct CupTrophyUnlock_8051B770
+struct CupTrophyUnlock
 {
     unsigned long key;
     unsigned int flag;
@@ -43,7 +43,7 @@ struct CupTrophyUnlock_8051B770
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 
-CupTrophyUnlock_8051B770 lbl_8051B770[] = {
+CupTrophyUnlock gCupTrophyUnlockFlags[] = {
     { nlStringHash("0"), 0x001 },
     { nlStringHash("1"), 0x008 },
     { nlStringHash("2"), 0x010 },
@@ -55,13 +55,13 @@ CupTrophyUnlock_8051B770 lbl_8051B770[] = {
     { nlStringHash("8"), 0x100 },
 };
 
-static void fn_80206CF8(int currentPage, bool advance);
+static void CycleCupStatsPage(int currentPage, bool advance);
 
 void CycleCupPage(int currentPage, bool advance)
 {
     if ((unsigned int)(currentPage - 4) <= 2)
     {
-        fn_80206CF8(currentPage, advance);
+        CycleCupStatsPage(currentPage, advance);
     }
     else
     {
@@ -69,7 +69,7 @@ void CycleCupPage(int currentPage, bool advance)
     }
 }
 
-static void fn_80206CF8(int currentPage, bool advance)
+static void CycleCupStatsPage(int currentPage, bool advance)
 {
     int currentIndex = 0;
     for (int i = 0; i < 3; ++i)
@@ -773,9 +773,9 @@ void SetLockedTrophyVisibility(bool visible)
         unsigned int flag = 0x200000;
         for (int j = 0; j < gCupAwardModelCount; ++j)
         {
-            if (lbl_8051B770[j].key == gCupAwardModels[i]->m_uCupTrophyKey)
+            if (gCupTrophyUnlockFlags[j].key == gCupAwardModels[i]->m_uCupTrophyKey)
             {
-                flag = lbl_8051B770[j].flag;
+                flag = gCupTrophyUnlockFlags[j].flag;
                 break;
             }
         }
