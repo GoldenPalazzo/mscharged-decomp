@@ -212,7 +212,7 @@ void NetworkInputRecording::WriteData(const void* data, int size)
         nlBufferedWriterWrite(&mWriter, data, size);
 }
 
-void NetworkInputRecording::WriteNetworkInputRecord(s8 machine, const PackedDetInput* record, u8 connected)
+void NetworkInputRecording::WriteNetworkInputRecord(s8 player, const PackedDetInput* record, u8 connected)
 {
     NetworkRecordedInput input;
     input.mRecord = *record;
@@ -264,7 +264,7 @@ bool NetworkInputRecording::ReadNetworkInputData(int size, void* data)
     return true;
 }
 
-bool NetworkInputRecording::ReadNetworkInputRecord(s8 machine, PackedDetInput* record, u8* connected)
+bool NetworkInputRecording::ReadNetworkInputRecord(s8 player, PackedDetInput* record, u8* connected)
 {
     NetworkRecordedInput input;
     if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(input))
