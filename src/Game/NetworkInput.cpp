@@ -28,16 +28,16 @@ void NetworkPeer::ResetNetworkPeerInputs()
     for (int channel = 0; channel < (int)mPlayerCount; ++channel)
     {
         NetworkPeerChannel* entry = &mChannels[channel];
-        entry->mInput0.Reset();
-        entry->mInput1.Reset();
-        entry->mInput2.Reset();
-        entry->mInput3.Reset();
-        mChannels[channel].mInput0.m_pMyUser = entry;
-        mChannels[channel].mInput1.m_pMyUser = entry;
-        mChannels[channel].mInput2.m_pMyUser = entry;
-        mChannels[channel].mInput3.m_pMyUser = entry;
-        mChannels[channel].mInput1.m_pPrevInput = &entry->mInput0;
-        mChannels[channel].mInput3.m_pPrevInput = &entry->mInput2;
+        entry->mPrevInput.Reset();
+        entry->mInput.Reset();
+        entry->mPrevLocalInput.Reset();
+        entry->mLocalInput.Reset();
+        mChannels[channel].mPrevInput.m_pMyUser = entry;
+        mChannels[channel].mInput.m_pMyUser = entry;
+        mChannels[channel].mPrevLocalInput.m_pMyUser = entry;
+        mChannels[channel].mLocalInput.m_pMyUser = entry;
+        mChannels[channel].mInput.m_pPrevInput = &entry->mPrevInput;
+        mChannels[channel].mLocalInput.m_pPrevInput = &entry->mPrevLocalInput;
     }
 }
 
@@ -46,16 +46,16 @@ NetworkPeerChannel::NetworkPeerChannel()
     , mChannelIndex(-1)
     , mGlobalPadIndex(0)
 {
-    mInput0.Reset();
-    mInput1.Reset();
-    mInput2.Reset();
-    mInput3.Reset();
-    mInput0.m_pMyUser = this;
-    mInput1.m_pMyUser = this;
-    mInput2.m_pMyUser = this;
-    mInput3.m_pMyUser = this;
-    mInput1.m_pPrevInput = &mInput0;
-    mInput3.m_pPrevInput = &mInput2;
+    mPrevInput.Reset();
+    mInput.Reset();
+    mPrevLocalInput.Reset();
+    mLocalInput.Reset();
+    mPrevInput.m_pMyUser = this;
+    mInput.m_pMyUser = this;
+    mPrevLocalInput.m_pMyUser = this;
+    mLocalInput.m_pMyUser = this;
+    mInput.m_pPrevInput = &mPrevInput;
+    mLocalInput.m_pPrevInput = &mPrevLocalInput;
 }
 
 void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int globalPadIndex)
@@ -68,7 +68,7 @@ void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int glob
 
 DetInput* NetworkPeerChannel::GetNetworkPeerChannelInput()
 {
-    return &mInput1;
+    return &mInput;
 }
 
 s8 NetworkPeerChannel::GetNetworkPeerChannelId()
@@ -92,43 +92,43 @@ cGlobalPad* NetworkPeerChannel::GetLocalChannelPad()
 
 void NetworkPeerChannel::CaptureNetworkPeerChannelInput()
 {
-    mInput2.CopyState(mInput3);
+    mPrevLocalInput.CopyState(mLocalInput);
     cGlobalPad* pad = this->GetLocalChannelPad();
     if (pad != 0 && !gInputManager->mFrameProvider->IsInPauseMenu())
     {
-        mInput3.ReadFromPad(pad);
+        mLocalInput.ReadFromPad(pad);
     }
     else
     {
-        mInput3.Reset();
+        mLocalInput.Reset();
     }
-    mInput3.m_aRemapAngle
+    mLocalInput.m_aRemapAngle
         = gInputManager->mFrameProvider->GetInputRemapAngle();
 }
 
-void NetworkPeerChannel::ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 tick, u8 connected)
+void NetworkPeerChannel::ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 remapAngle, u8 connected)
 {
-    mInput0.CopyState(mInput1);
-    UnpackDetInput(record, &mInput1);
-    mInput1.m_aRemapAngle = tick;
-    mInput1.m_nConnected = connected;
-    mInput1.UpdatePolarAnalog();
-    mInput1.UpdateButtonStateTicks();
+    mPrevInput.CopyState(mInput);
+    UnpackDetInput(record, &mInput);
+    mInput.m_aRemapAngle = remapAngle;
+    mInput.m_nConnected = connected;
+    mInput.UpdatePolarAnalog();
+    mInput.UpdateButtonStateTicks();
 }
 
 void NetworkPeerChannel::PackNetworkPeerChannelInput(PackedDetInput* record)
 {
-    PackDetInput(record, &mInput3);
+    PackDetInput(record, &mLocalInput);
 }
 
 u16 NetworkPeerChannel::GetNetworkPeerChannelRemapAngle()
 {
-    return mInput3.m_aRemapAngle;
+    return mLocalInput.m_aRemapAngle;
 }
 
 u8 NetworkPeerChannel::GetNetworkPeerChannelConnectionStatus()
 {
-    return mInput3.GetConnectionStatus();
+    return mLocalInput.GetConnectionStatus();
 }
 
 s8 GetNetworkPlayerId(s8 player, s8 machine)
