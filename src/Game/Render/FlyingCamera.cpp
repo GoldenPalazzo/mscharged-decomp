@@ -43,7 +43,7 @@ char sMegaStrikeMeterEndEventName[] = "MegaStrikeMeterEnd";
 void OnPeachCameraFlash(void*);
 void OnResetFlyingCameras(void*);
 
-void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
+void RandomizeFlyingCamera(FlyingCamera* camera)
 {
     camera->mPositionGain = gFlyingCameraPositionGain + nlRandomf(0.006f, &nlDefaultSeed);
     camera->mPositionDamping = gFlyingCameraPositionDamping + nlRandomf(0.006f, &nlDefaultSeed);
@@ -269,7 +269,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
             camera->mIndex = i;
             camera->mAngle = 0;
             camera->mVisible = true;
-            UnidentifiedRandomizeFlyingCamera(camera);
+            RandomizeFlyingCamera(camera);
 
             camera->mOrientation.z = 0.0f;
             camera->mOrientation.y = 0.0f;
