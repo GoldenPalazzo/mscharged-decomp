@@ -631,10 +631,10 @@ void Nis::Trigger::Fire(Nis& nis) const
     case NIS_TRIGGER_TYPE_EFFECT:
         FireEffect(nis);
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_6:
+    case NIS_TRIGGER_TYPE_STADIUM_EFFECTS:
         fn_802789A8(BasicStadium::GetCurrentStadium(), params.param1);
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_7:
+    case NIS_TRIGGER_TYPE_CHARACTER_DIRT:
     {
         int charIdx;
         if (nis.mMainCharacterIndex >= 0)
@@ -667,7 +667,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             PlaySound(params.param1, params.param2, 0, 0);
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_4:
+    case NIS_TRIGGER_TYPE_RUMBLE:
         for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
         {
             cPlayer* player = (cPlayer*)g_pCharacters[i];
@@ -677,7 +677,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             }
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_5:
+    case NIS_TRIGGER_TYPE_CROWD_EXCITEMENT:
         if (params.param1 != 0)
         {
             SetCrowdImpostorsExcited();
@@ -687,7 +687,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             SetCrowdImpostorsIdle();
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_8:
+    case NIS_TRIGGER_TYPE_DEPTH_OF_FIELD:
         if (params.param1 != 0)
         {
             DepthOfFieldManager::instance.TurnOff();
@@ -697,10 +697,10 @@ void Nis::Trigger::Fire(Nis& nis) const
             DepthOfFieldManager::instance.TurnOn();
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_9:
+    case NIS_TRIGGER_TYPE_SHOW_ELECTRIC_FENCE:
         DisplayElectricFence();
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_10:
+    case NIS_TRIGGER_TYPE_HIDE_ELECTRIC_FENCE:
         StopDisplayingElectricFence();
         break;
     }
