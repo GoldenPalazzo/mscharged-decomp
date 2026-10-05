@@ -391,7 +391,8 @@ void HBMManager::Render()
 
 bool HBMManager::IsBlocked()
 {
-    if (g_pGame != 0 && g_pGame->mbCaptainShotToScoreOn)
+    cGame* game = g_pGame;
+    if (game != 0 && game->mbCaptainShotToScoreOn)
     {
         return true;
     }
@@ -402,12 +403,14 @@ bool HBMManager::IsBlocked()
         return true;
     }
 
-    if (GameInfoManager::Instance()->mIsOnlineMode)
+    GameInfoManager* gameInfo = GameInfoManager::Instance();
+    if (gameInfo->mIsOnlineMode)
     {
         return true;
     }
 
-    if ((state & 4) == 0 && !IsIdleAndNoShotInProgress(GetPresentation()))
+    bool skipPresentationCheck = (state & 4) != 0;
+    if (!skipPresentationCheck && !IsIdleAndNoShotInProgress(GetPresentation()))
     {
         return true;
     }
