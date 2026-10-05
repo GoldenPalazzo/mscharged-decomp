@@ -742,7 +742,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
 
 static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
 {
-    if (game->m_eGameState != 4)
+    if (game->GetGameState() != 4)
     {
         game->mUnidentified49C.mEvent06.Deliver(data);
     }
@@ -750,7 +750,7 @@ static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
 
 static inline int GetTeamScoreDifference(cTeam* team)
 {
-    return team->m_nScore - team->GetOtherTeam()->m_nScore;
+    return team->GetScore() - team->GetOtherTeam()->GetScore();
 }
 
 void cGame::CheckForGoal()
