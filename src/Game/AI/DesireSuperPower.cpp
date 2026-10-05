@@ -174,7 +174,7 @@ DesireSuperPower::DesireSuperPower()
  * Offset/Address/Size: 0x60 | 0x800C875C | size: 0x274
  */
 void DesireSuperPower::SetContext(
-    UnidentifiedScriptMachine* context)
+    ScriptMachine* context)
 {
     Desire::SetContext(context);
 
@@ -314,7 +314,7 @@ bool DesireSuperPower::Initialize(void* context)
     if (result)
     {
         mScriptMachine->SetTransition("SuperPowerPlayDesire");
-        fn_803198F4(fn_800A6968(m_pFielder->m_pTeam));
+        DeactivateScriptMachine(fn_800A6968(m_pFielder->m_pTeam));
         cFielder* fielder = m_pFielder;
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
         {
@@ -402,7 +402,7 @@ void DesireSuperPower::Update(
  */
 void DesireSuperPower::Cleanup()
 {
-    fn_803198F4(fn_800A6968(m_pFielder->m_pTeam));
+    DeactivateScriptMachine(fn_800A6968(m_pFielder->m_pTeam));
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {

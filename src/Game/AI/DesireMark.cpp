@@ -182,7 +182,7 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
     {
         result = 1;
     }
-    else if (fn_8031A04C() && !input->IsTimerRunning(key))
+    else if (CheckScriptTimeBudget() && !input->IsTimerRunning(key))
     {
         input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");

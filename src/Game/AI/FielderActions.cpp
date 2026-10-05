@@ -2996,7 +2996,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
             if (pCaptain != pFielder && fn_8003881C(pFielder)
                 && g_pGame->mUnidentified030 == 0)
             {
-                RequestStateMachineDeactivation(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
+                RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
             }
         }
     }

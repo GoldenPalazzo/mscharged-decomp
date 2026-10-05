@@ -3,20 +3,20 @@
 
 #include "Game/AI/TeamPlayMachine.h"
 
-class FielderDesireMachine : public UnidentifiedScriptMachine
+class FielderDesireMachine : public ScriptMachine
 {
 public:
     FielderDesireMachine();
     virtual ~FielderDesireMachine();
 
-    virtual void UnidentifiedVirtual2();
+    virtual void Initialize();
     virtual void Update(float deltaTime);
     virtual void Reset(bool deleting);
-    virtual shdStateMachine* UnidentifiedVirtual5(
+    virtual shdStateMachine* ActivateState(
         int state, UnidentifiedVariantCollection* params, bool force);
-    virtual void UnidentifiedVirtual6();
-    virtual void UnidentifiedVirtual7();
-    virtual void UnidentifiedVirtual8();
+    virtual void DeactivateState();
+    virtual void SelectState();
+    virtual void OnBudgetCheckFailed();
 
 private:
     cFielder* GetFielder() const;

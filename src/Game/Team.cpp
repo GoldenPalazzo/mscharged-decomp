@@ -315,7 +315,7 @@ cTeam::cTeam(int nSide)
     mUnidentified0F0 = new (8, false) AIContext(this,
         new (8, false) TeamPlayMachine(),
         new (8, false) FuzzyAIRuntime());
-    mUnidentified0F0->mScriptMachine->UnidentifiedVirtual2();
+    mUnidentified0F0->mScriptMachine->Initialize();
 }
 
 SkillTweaks* fn_800A636C(cTeam* pTeam)
@@ -550,7 +550,7 @@ extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam* pTeam)
     return pTeam->mUnidentified0F0->mRuntime;
 }
 
-extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam* pTeam)
+extern "C" ScriptMachine* fn_800A6968(cTeam* pTeam)
 {
     return pTeam->mUnidentified0F0->mScriptMachine;
 }

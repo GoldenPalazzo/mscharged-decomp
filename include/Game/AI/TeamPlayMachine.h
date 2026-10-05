@@ -9,25 +9,25 @@ class cTeam;
 class ScriptQuestionCache;
 class UnidentifiedVariantCollection;
 
-class UnidentifiedScriptMachine
+class ScriptMachine
 {
 public:
-    UnidentifiedScriptMachine(
+    ScriptMachine(
         int, bool, AIContext*, const char*);
-    virtual ~UnidentifiedScriptMachine();
+    virtual ~ScriptMachine();
 
-    virtual bool UnidentifiedVirtual1() const
+    virtual bool IsIdle() const
     {
-        return mUnidentified004 == 0;
+        return mActiveState == 0;
     }
-    virtual void UnidentifiedVirtual2();
+    virtual void Initialize();
     virtual void Update(float deltaTime);
     virtual void Reset(bool);
-    virtual shdStateMachine* UnidentifiedVirtual5(
+    virtual shdStateMachine* ActivateState(
         int, UnidentifiedVariantCollection*, bool);
-    virtual void UnidentifiedVirtual6();
-    virtual void UnidentifiedVirtual7();
-    virtual void UnidentifiedVirtual8()
+    virtual void DeactivateState();
+    virtual void SelectState();
+    virtual void OnBudgetCheckFailed()
     {
     }
 
@@ -37,43 +37,43 @@ public:
         mTransition = transition.mValue;
     }
 
-    void UnidentifiedAddState(int, shdStateMachine*, bool);
+    void AddState(int, shdStateMachine*, bool);
 
-    shdStateMachine* UnidentifiedGet06C(int state) const
+    shdStateMachine* GetState(int state) const
     {
-        if (state >= 0 && state < mUnidentified074)
+        if (state >= 0 && state < mStateCount)
         {
-            return mUnidentified06C[state];
+            return mStates[state];
         }
         return 0;
     }
 
-    shdStateMachine* fn_800C2F20() const { return mUnidentified004; }
+    shdStateMachine* GetActiveState() const { return mActiveState; }
     FuzzyRuntimeBase* GetFuzzyRuntime();
 
-    shdStateMachine* mUnidentified004;
-    shdStateMachine* mUnidentified008;
+    shdStateMachine* mActiveState;
+    shdStateMachine* mPreviousState;
     UnsetTransitionFunc mTransition;
-    int mUnidentified014;
-    UnidentifiedVariantCollection mUnidentified018;
+    int mPendingState;
+    UnidentifiedVariantCollection mPendingParameters;
     AIContext* mAIContext;
-    bool mUnidentified068;
+    bool mOwnsStates;
     u8 mPadding069[3];
-    shdStateMachine** mUnidentified06C;
-    shdStateMachine** mUnidentified070;
-    int mUnidentified074;
-    char mUnidentified078[0x40];
+    shdStateMachine** mStates;
+    shdStateMachine** mConcurrentStates;
+    int mStateCount;
+    char mName[0x40];
 };
 
-class TeamPlayMachine : public UnidentifiedScriptMachine
+class TeamPlayMachine : public ScriptMachine
 {
 public:
     TeamPlayMachine();
     virtual ~TeamPlayMachine();
 
-    virtual void UnidentifiedVirtual2();
+    virtual void Initialize();
     virtual void Update(float deltaTime);
-    virtual void UnidentifiedVirtual7();
+    virtual void SelectState();
 };
 
 class TeamDesire : public shdStateMachine
@@ -89,7 +89,7 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void SetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(ScriptMachine*);
 
 protected:
     cTeam* m_pTeam;
@@ -112,34 +112,34 @@ public:
 };
 
 class cFielder;
-UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
+ScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 
-extern "C" void fn_80319904(UnidentifiedScriptMachine* machine, shdStateMachine* state);
-extern "C" AIContext* fn_80317E2C(UnidentifiedScriptMachine* machine);
-extern "C" bool fn_80317E88(const shdStateMachine* machine);
-extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
-extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
-extern "C" void fn_8031998C(UnidentifiedScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
+void DeactivateScriptMachineState(ScriptMachine* machine, shdStateMachine* state);
+AIContext* GetScriptMachineAIContext(ScriptMachine* machine);
+bool HasStateMachineTimedOut(const shdStateMachine* machine);
+UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
+UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
+void QueueScriptMachineState(ScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
 
-extern const float lbl_806E6880;
-extern const float lbl_806E6884;
-extern const float lbl_806E6888;
-extern const float lbl_806E688C;
+extern const float gStateMachineZeroDuration;
+extern const float gStateMachineUnsetDuration;
+extern const float gStateMachineNeverActiveTime;
+extern const float gStateMachineAgeThreshold;
 
 bool IsTransitionFuncSet(const TransitionFunc* transition);
 bool HasTransitionFunc(const TransitionFunc* transition);
-extern "C" void fn_80318D34( UnidentifiedScriptMachine* machine, int state, const char* name, bool secondary);
-extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
-extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
-extern "C" void fn_80319E58(UnidentifiedScriptMachine* machine, int state);
-extern "C" shdStateMachine* fn_80319E84(UnidentifiedScriptMachine* machine, int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
-extern "C" shdStateMachine* fn_80319F94( UnidentifiedScriptMachine* machine, int state);
-extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine* machine, int state);
-extern "C" bool fn_80319FEC(UnidentifiedScriptMachine* machine, int state);
+void AddScriptState( ScriptMachine* machine, int state, const char* name, bool secondary);
+void DeactivateConcurrentStates(ScriptMachine* machine);
+void DeactivateScriptMachine(ScriptMachine* machine);
+void DeactivateConcurrentState(ScriptMachine* machine, int state);
+shdStateMachine* ActivateConcurrentState(ScriptMachine* machine, int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
+shdStateMachine* GetScriptMachineState( ScriptMachine* machine, int state);
+shdStateMachine* GetConcurrentState(ScriptMachine* machine, int state);
+bool IsConcurrentStateActive(ScriptMachine* machine, int state);
 extern "C" void fn_8031A02C(ScriptQuestionCache*);
-extern "C" bool fn_8031A04C();
-extern "C" float fn_8031A0C8(float start, float end);
+bool CheckScriptTimeBudget();
+float AccumulateScriptExecutionTime(float start, float end);
 extern "C" void fn_8031A0FC(float value);
 
 #endif // GAME_AI_TEAM_PLAY_MACHINE_H

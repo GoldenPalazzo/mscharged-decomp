@@ -89,7 +89,7 @@ Desire::Desire(int state, TransitionFunc& transition)
     mDefaultMaxDuration = 1.0f;
 }
 
-void Desire::SetContext(UnidentifiedScriptMachine* context)
+void Desire::SetContext(ScriptMachine* context)
 {
     shdStateMachine::SetContext(context);
     if (context != 0)
