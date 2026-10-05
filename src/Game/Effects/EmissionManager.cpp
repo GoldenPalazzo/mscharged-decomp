@@ -281,6 +281,20 @@ void OnEffectsTexturesLoaded(void* data, unsigned long size, void* userData)
     nlFree(data);
 }
 
+void LoadResidentEffects(bool allocateAtStart)
+{
+    nlLoadEntireFileAsync("art/effects/effects.bun", OnEffectsDataLoaded,
+        &gEffectsData, 0x20,
+        allocateAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+}
+
+void LoadNonResidentEffects(bool allocateNonResidentAtStart)
+{
+    nlLoadEntireFileAsync("art/effects/effectsNonRes.bun", OnEffectsDataLoaded,
+        &gEffectsNonResidentData, 0x20,
+        allocateNonResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+}
+
 /**
  * Offset/Address/Size: 0x6BC | 0x802E6620 | size: 0x154
  */
@@ -293,9 +307,7 @@ void EmissionManager::StartLoading(bool allocateAtStart,
     gEffectsGeometryData = 0;
     gEffectsTextureData = 0;
 
-    nlLoadEntireFileAsync("art/effects/effects.bun", OnEffectsDataLoaded,
-        &gEffectsData, 0x20,
-        allocateAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+    LoadResidentEffects(allocateAtStart);
 
     if (compressedNonResident)
     {
@@ -306,9 +318,7 @@ void EmissionManager::StartLoading(bool allocateAtStart,
     }
     else
     {
-        nlLoadEntireFileAsync("art/effects/effectsNonRes.bun", OnEffectsDataLoaded,
-            &gEffectsNonResidentData, 0x20,
-            allocateNonResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
+        LoadNonResidentEffects(allocateNonResidentAtStart);
     }
 
     nlLoadEntireFileAsync("art/objects/effectsgeometry.bun", OnEffectsGeometryLoaded,
@@ -364,8 +374,8 @@ EmissionManager::EmissionManager()
     , m_bRecording(true)
     , mContext(0)
     , mDiscardOnReplay(false)
-    , mReplayControllers()
-    , mControllers()
+    , mReplayControllers(0)
+    , mControllers(0)
     , mErrors()
     , mParticleMemory(0)
     , mParticles()
@@ -468,8 +478,9 @@ void EmissionManager::Shutdown()
             "EmissionManager being deleted non-empty\n");
     }
 
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
-    while (iterator.hasNext())
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
+    while (!iterator.IsDone())
     {
         EmissionController* current = *iterator;
         delete current;
@@ -477,8 +488,8 @@ void EmissionManager::Shutdown()
     }
     mControllers.Clear();
 
-    nlDLListIterator<char*> errorIterator
-        = mErrors.Begin();
+    nlDLListIterator<char*> errorIterator;
+    errorIterator = mErrors.Begin();
     while (errorIterator.hasNext())
     {
         delete *errorIterator;
@@ -561,7 +572,8 @@ void EmissionManager::Update(float dt)
     CurrentAllocator = allocator;
     lbl_806E1FD8 = 0;
 
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     while (iterator.hasNext())
     {
         EmissionController* p = *iterator;
@@ -571,7 +583,7 @@ void EmissionManager::Update(float dt)
         }
         else
         {
-            mControllers.RemoveEntry(iterator.next());
+            mControllers.Remove(&iterator);
             delete p;
         }
     }
@@ -662,7 +674,8 @@ void EmissionManager::Render()
     }
 
     int renderedParticles = 0;
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
@@ -783,8 +796,8 @@ EmissionController* EmissionManager::Create(EffectsGroup* pEffectsGroup, int vie
  */
 EmissionController* EmissionManager::FindController(unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -812,7 +825,8 @@ EmissionController* EmissionManager::FindController(unsigned long userData, cons
  */
 bool EmissionManager::IsStillAlive(EmissionController* controller)
 {
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -839,7 +853,8 @@ bool EmissionManager::IsStillAlive(EmissionController* controller)
 void EmissionManager::Kill(
     unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -871,8 +886,8 @@ void EmissionManager::Kill(const EffectsGroup* pEffectsGroup)
         return;
     }
 
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
@@ -892,7 +907,8 @@ bool EmissionManager::IsPlaying(
 {
     if (pEffectsGroup != 0)
     {
-        nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+        nlDLListIterator<EmissionController*> iterator;
+        iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
         DLListEntry<EmissionController*>* head = iterator.m_Head;
         DLListEntry<EmissionController*>* current = iterator.m_Curr;
         while (current != 0)
@@ -923,8 +939,8 @@ bool EmissionManager::IsDying(unsigned long userData, const EffectsGroup* pEffec
 {
     if (pEffectsGroup != 0)
     {
-        nlDLListIterator<EmissionController*> iterator
-            = mControllers.Begin();
+        nlDLListIterator<EmissionController*> iterator;
+        iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
         DLListEntry<EmissionController*>* head = iterator.m_Head;
         DLListEntry<EmissionController*>* current = iterator.m_Curr;
         while (current != 0)
@@ -953,13 +969,14 @@ bool EmissionManager::IsDying(unsigned long userData, const EffectsGroup* pEffec
  */
 void EmissionManager::DestroyAll(int view, bool exceptPersistent)
 {
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
     {
         EmissionController* controller = current->entry;
-        if (controller->m_pContext == mContext
+        if (controller->GetContext() == mContext
             && controller->m_View == view
             && (!exceptPersistent
                 || !controller->m_pGroup->IsPersistent()))
@@ -997,13 +1014,14 @@ void EmissionManager::DestroyAll(int view, bool exceptPersistent)
  */
 void EmissionManager::DestroyAll(bool exceptPersistent)
 {
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
     {
         EmissionController* controller = current->entry;
-        if (controller->m_pContext == mContext
+        if (controller->GetContext() == mContext
             && (!exceptPersistent
                 || !controller->m_pGroup->IsPersistent()))
         {
@@ -1040,7 +1058,8 @@ void EmissionManager::DestroyAll(bool exceptPersistent)
 void EmissionManager::Destroy(
     unsigned long userData, const EffectsGroup* pEffectsGroup)
 {
-    nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -1087,8 +1106,8 @@ void EmissionManager::Destroy(const EffectsGroup* pEffectsGroup)
         return;
     }
 
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
@@ -1110,8 +1129,8 @@ void EmissionManager::Destroy(const EffectsGroup* pEffectsGroup)
 void EmissionManager::ForEachController(
     const Function1<void, EmissionController&>& callback)
 {
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = static_cast<const nlDLListContainer<EmissionController*>&>(mControllers).Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -1136,16 +1155,15 @@ void EmissionManager::AddError(const char* format, ...)
 {
 }
 
-// Expanded only through Replayable<0>(LoadFrame&, EmissionController&) in this
-// unit; retail keeps no standalone copy.
+// Controller state read by the manager's replay path.
 inline void EmissionController::Replay(LoadFrame& frame)
 {
-    ::Replayable<0>(frame, (unsigned int&)m_pPose);
-    ::Replayable<0>(frame, (unsigned int&)m_pAnimController);
+    frame.Replayable<0>((unsigned int&)m_pPose);
+    frame.Replayable<0>((unsigned int&)m_pAnimController);
     frame.Replayable<0>(m_uUserData);
     ::Replayable<0>(frame, m_fGround);
     ::Replayable<0>(frame, m_aFacing);
-    ::Replayable<0>(frame, m_View);
+    frame.Replayable<0>(m_View);
     ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.x));
     ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.y));
     ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.z));
@@ -1172,7 +1190,7 @@ inline void EmissionController::Replay(LoadFrame& frame)
     }
 
     unsigned int updateCallback = 0;
-    ::Replayable<0>(frame, updateCallback);
+    frame.Replayable<0>(updateCallback);
     mUpdateCallback.Clear();
     if (updateCallback != 0)
     {
@@ -1182,7 +1200,7 @@ inline void EmissionController::Replay(LoadFrame& frame)
     // Retail clears the position callback while restoring the finished one,
     // and the finished callback while restoring the position one.
     unsigned int finishedCallback = 0;
-    ::Replayable<0>(frame, finishedCallback);
+    frame.Replayable<0>(finishedCallback);
     mPositionCallback.Clear();
     if (finishedCallback != 0)
     {
@@ -1192,7 +1210,7 @@ inline void EmissionController::Replay(LoadFrame& frame)
 
     unsigned int positionCallback
         = (unsigned int)mPositionCallback.GetFreeFunction();
-    ::Replayable<0>(frame, positionCallback);
+    frame.Replayable<0>(positionCallback);
     mFinishedCallback.Clear();
     if (positionCallback != 0)
     {
@@ -1266,19 +1284,19 @@ void EmissionManager::Replay(LoadFrame& frame)
         unsigned short id;
         unsigned int view;
         EffectsGroup* group = 0;
-        Replayable<0>(frame, id);
+        frame.Replayable<0>(id);
         Replayable<0>(frame, view);
         Replayable<0>(frame, (unsigned int&)group);
 
         bool found = false;
-        nlDLListIterator<EmissionController*> iterator
-            = oldControllers.Begin();
+        nlDLListIterator<EmissionController*> iterator;
+        iterator.Copy(oldControllers.Begin());
         while (!iterator.IsDone())
         {
             EmissionController* controller = *iterator;
             if (id == controller->GetId())
             {
-                Replayable<0>(frame, *controller);
+                frame.Replayable<0>(*controller);
                 oldControllers.Remove(&iterator);
                 mControllers.AddStart(controller);
                 found = true;
@@ -1291,12 +1309,12 @@ void EmissionManager::Replay(LoadFrame& frame)
         {
             EmissionController* controller
                 = Create(group, view, true, id);
-            Replayable<0>(frame, *controller);
+            frame.Replayable<0>(*controller);
         }
     }
 
-    nlDLListIterator<EmissionController*> iterator
-        = oldControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator.Copy(oldControllers.Begin());
     while (!iterator.IsDone())
     {
         EmissionController* controller = *iterator;
@@ -1317,7 +1335,8 @@ void EmissionManager::Replay(LoadFrame& frame)
 // non-persistent controllers instead of restoring the stashed ones.
 static inline void DestroyReplayedControllers(EmissionManager* manager)
 {
-    nlDLListIterator<EmissionController*> iterator = manager->mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = manager->mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -1390,8 +1409,8 @@ void EmissionManager::Replay(SaveFrame& frame)
     int numEffects = nlDLRingCountElements(mControllers.m_Head);
     Replayable<0>(frame, numEffects);
 
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = mControllers.Begin();
     while (!iterator.IsDone())
     {
         EmissionController* controller = *iterator;
@@ -1473,8 +1492,8 @@ void EmissionManager::KillOldest(int num, bool lingeringOnly)
  */
 void EmissionManager::KillAll()
 {
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)
@@ -1516,8 +1535,8 @@ void EmissionManager::PrepareForReplay()
 void EmissionManager::SetContext(void* context)
 {
     mContext = context;
-    nlDLListIterator<EmissionController*> iterator
-        = mControllers.Begin();
+    nlDLListIterator<EmissionController*> iterator;
+    iterator = mControllers.Begin();
     DLListEntry<EmissionController*>* head = iterator.m_Head;
     DLListEntry<EmissionController*>* current = iterator.m_Curr;
     while (current != 0)

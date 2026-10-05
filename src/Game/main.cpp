@@ -716,7 +716,8 @@ void BuildParticleQuads(GLTexturedColourMeshWriter* writer,
     ParticleReturn ret;
     if (writer->Begin(source->m_NumParticles * 4, GLP_QuadList, 0))
     {
-        nlDLListIterator<Particle*> iterator = vertices->Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = vertices->Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
@@ -749,7 +750,8 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter* writer,
     ParticleReturn ret;
     if (writer->Begin(source->m_NumParticles * 4, 3, 0))
     {
-        nlDLListIterator<Particle*> iterator = vertices->Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = vertices->Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;

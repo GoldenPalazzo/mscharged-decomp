@@ -14,7 +14,8 @@ static int numLingeringSystems;
 
 void EmissionController::ClearParticles()
 {
-    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> iterator;
+    iterator = m_Systems.Begin();
     while (iterator.hasNext())
     {
         ParticleSystem* p = *iterator;
@@ -201,7 +202,8 @@ void EmissionController::Die()
 
     m_bDying = true;
 
-    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> iterator;
+    iterator = m_Systems.Begin();
     while (iterator.hasNext())
     {
         ParticleSystem* p = *iterator;
@@ -218,7 +220,8 @@ void EmissionController::Die()
 float EmissionController::GetRemainingTime() const
 {
     float maxRemainingTime = 0.0f;
-    nlDLListIterator<ParticleSystem*> node = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> node;
+    node = m_Systems.Begin();
 
     while (node.hasNext())
     {
@@ -441,7 +444,8 @@ bool EmissionController::Update(float dt)
         }
     }
 
-    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> iterator;
+    iterator = m_Systems.Begin();
     while (iterator.hasNext())
     {
         ParticleSystem* pSys = *iterator;
@@ -511,7 +515,8 @@ int EmissionController::Render()
     }
 
     int numParticles = 0;
-    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> iterator;
+    iterator = m_Systems.Begin();
 
     while (iterator.hasNext())
     {
@@ -554,7 +559,8 @@ void EmissionController::SetFinishedCallback(
 float EmissionController::GetBoundingRadius() const
 {
     float maxRadius = 0.0f;
-    nlDLListIterator<ParticleSystem*> node = m_Systems.Begin();
+    nlDLListIterator<ParticleSystem*> node;
+    node = m_Systems.Begin();
 
     while (node.hasNext())
     {
