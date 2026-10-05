@@ -833,13 +833,9 @@ extern "C" bool fn_8003E948(const cFielder* pFielder)
 
 bool cFielder::fn_8003E9F0() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0xB
-        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, YOSHI, active);
+    return active;
 }
 
 bool cFielder::fn_8003EA44() const
