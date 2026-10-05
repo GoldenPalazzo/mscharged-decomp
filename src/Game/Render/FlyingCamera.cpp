@@ -14,15 +14,15 @@
 FlyingCamera* gFlyingCameras[10];
 nlVector3 gFlyingCameraTargetPosition;
 
-float lbl_806DCE18 = 0.03f;
-float lbl_806DCE1C = -0.88f;
-float lbl_806DCE20 = 1.0f;
-float lbl_806DCE24 = -1.0f;
-float lbl_806DCE28 = 1.0f;
-float lbl_806DCE2C = 40.0f;
-float lbl_806DCE30 = 3.0f;
-float lbl_806DCE34 = 10.0f;
-float lbl_806DCE38 = 10.0f;
+float gFlyingCameraPositionGain = 0.03f;
+float gFlyingCameraPositionDamping = -0.88f;
+float gFlyingCameraIntegralGain = 1.0f;
+float gFlyingCameraIntegralMin = -1.0f;
+float gFlyingCameraIntegralMax = 1.0f;
+float gFlyingCameraOrientationRate = 40.0f;
+float gFlyingCameraOrbitSpeed = 3.0f;
+float gFlyingCameraSpawnHeight = 10.0f;
+float gFlyingCameraExitHeight = 10.0f;
 int gNextFlyingCameraFlashIndex = 100;
 
 unsigned int gFlyingCameraCount;
@@ -45,9 +45,9 @@ void OnResetFlyingCameras(void*);
 
 void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
 {
-    camera->mPositionGain = lbl_806DCE18 + nlRandomf(0.006f, &nlDefaultSeed);
-    camera->mPositionDamping = lbl_806DCE1C + nlRandomf(0.006f, &nlDefaultSeed);
-    camera->mIntegralGain = lbl_806DCE20 + nlRandomf(0.2f, &nlDefaultSeed);
+    camera->mPositionGain = gFlyingCameraPositionGain + nlRandomf(0.006f, &nlDefaultSeed);
+    camera->mPositionDamping = gFlyingCameraPositionDamping + nlRandomf(0.006f, &nlDefaultSeed);
+    camera->mIntegralGain = gFlyingCameraIntegralGain + nlRandomf(0.2f, &nlDefaultSeed);
     camera->mOrbitRadius = 3.5f + nlRandomf(1.0f, &nlDefaultSeed);
     camera->mHeightOffset = 4.5f + nlRandomf(1.0f, &nlDefaultSeed);
 }
@@ -101,7 +101,7 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     nlMultQuat(targetOrientation, targetOrientation, facing);
 
-    float orientationBlend = lbl_806DCE2C * dt;
+    float orientationBlend = gFlyingCameraOrientationRate * dt;
     orientationBlend = orientationBlend <= 1.0f
                          ? orientationBlend
                          : 1.0f;
@@ -117,17 +117,17 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     nlVec3Scale(directChange, delta, camera->mPositionGain * rate);
     nlVec3Add(camera->mPositionIntegral, camera->mPositionIntegral, delta);
 
-    float minAccumulatedChange = lbl_806DCE24;
-    float maxAccumulatedChange = lbl_806DCE28;
+    float minIntegral = gFlyingCameraIntegralMin;
+    float maxIntegral = gFlyingCameraIntegralMax;
     camera->mPositionIntegral.x = MinOf(
-        MaxOf(camera->mPositionIntegral.x, minAccumulatedChange),
-        maxAccumulatedChange);
+        MaxOf(camera->mPositionIntegral.x, minIntegral),
+        maxIntegral);
     camera->mPositionIntegral.y = MinOf(
-        MaxOf(camera->mPositionIntegral.y, minAccumulatedChange),
-        maxAccumulatedChange);
+        MaxOf(camera->mPositionIntegral.y, minIntegral),
+        maxIntegral);
     camera->mPositionIntegral.z = MinOf(
-        MaxOf(camera->mPositionIntegral.z, minAccumulatedChange),
-        maxAccumulatedChange);
+        MaxOf(camera->mPositionIntegral.z, minIntegral),
+        maxIntegral);
 
     nlVec3Scale(accumulatedChange, camera->mPositionIntegral, camera->mIntegralGain * rate * 0.001f);
     nlVec3Sub(previousDelta, camera->mPreviousPosition, camera->mPosition);
@@ -156,7 +156,7 @@ static inline DrawableFlyingCamera* GetDrawableFlyingCamera(int index)
 
 static inline float GetFlyingCameraResetHeight()
 {
-    return lbl_806DCE38 - 0.5f;
+    return gFlyingCameraExitHeight - 0.5f;
 }
 
 void UpdateFlyingCameras(float dt)
@@ -173,7 +173,7 @@ void UpdateFlyingCameras(float dt)
     if (gFlyingCameraTarget == 0)
     {
         nlVec3Set(targetPosition, gFlyingCameraTargetPosition.x,
-            gFlyingCameraTargetPosition.y, lbl_806DCE38);
+            gFlyingCameraTargetPosition.y, gFlyingCameraExitHeight);
     }
     else
     {
@@ -220,7 +220,7 @@ void UpdateFlyingCameras(float dt)
     }
 
     float angleAdvance = 6553.6f * dt;
-    gFlyingCameraAngle += (s32)(angleAdvance * lbl_806DCE30);
+    gFlyingCameraAngle += (s32)(angleAdvance * gFlyingCameraOrbitSpeed);
 
     for (unsigned int i = 0; i < gFlyingCameraCount; ++i)
     {
@@ -293,7 +293,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     }
 
     nlVector3 initialPosition = { 0.0f, 0.0f, 0.0f };
-    initialPosition.z = lbl_806DCE34;
+    initialPosition.z = gFlyingCameraSpawnHeight;
 
     SetFlyingCameraTarget(fielder);
 
