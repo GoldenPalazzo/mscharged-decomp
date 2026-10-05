@@ -206,8 +206,7 @@ void UpdateFlyingCameras(float dt)
         }
     }
 
-    float angleAdvance = 6553.6f * dt;
-    gFlyingCameraAngle += (s32)(angleAdvance * gFlyingCameraOrbitSpeed);
+    gFlyingCameraAngle += (s32)(6553.6f * dt * gFlyingCameraOrbitSpeed);
 
     for (unsigned int i = 0; i < gFlyingCameraCount; ++i)
     {
@@ -246,8 +245,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     }
 
     FlyingCamera* camera;
-    unsigned int oldCount = gFlyingCameraCount;
-    for (unsigned int i = oldCount; i < (unsigned int)count; ++i)
+    for (unsigned int i = gFlyingCameraCount; i < (unsigned int)count; ++i)
     {
         gFlyingCameraAllocator.Allocate(camera);
 
@@ -279,8 +277,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
         gFlyingCameras[i] = camera;
     }
 
-    nlVector3 initialPosition = { 0.0f, 0.0f, 0.0f };
-    initialPosition.z = gFlyingCameraSpawnHeight;
+    nlVector3 initialPosition = { 0.0f, 0.0f, gFlyingCameraSpawnHeight };
 
     SetFlyingCameraTarget(fielder);
 
