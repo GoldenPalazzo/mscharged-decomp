@@ -6968,9 +6968,9 @@ FindChecked<10TLInstance>__28FEFinder<14TLTextInstance,3>FP10TLInstance12InlineH
 Find<7TLSlide>__25FEFinder<10TLInstance,-1>FP7TLSlide12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P10TLInstance = .text:0x801F1634; // type:function size:0xC8
 __dt__11GoalOverlayFv = .text:0x801F16FC; // type:function size:0x40
 Update__11GoalOverlayFf = .text:0x801F173C; // type:function size:0x50
-fn_801F178C__11GoalOverlayFP14GoalScoredData = .text:0x801F178C; // type:function size:0x44
-fn_801F17D0__11GoalOverlayFi = .text:0x801F17D0; // type:function size:0x24
-fn_801F17F4__11GoalOverlayFP17MegaStrikeEndData = .text:0x801F17F4; // type:function size:0x4
+OnGoalScored__11GoalOverlayFP14GoalScoredData = .text:0x801F178C; // type:function size:0x44
+UpdateCaptainS2SGoalInfo__11GoalOverlayFi = .text:0x801F17D0; // type:function size:0x24
+OnMegastrikeEnd__11GoalOverlayFP17MegaStrikeEndData = .text:0x801F17F4; // type:function size:0x4
 Restart__11GoalOverlayFv = .text:0x801F17F8; // type:function size:0x68
 Reset__11GoalOverlayFv = .text:0x801F1860; // type:function size:0x68
 __ct__11GoalOverlayFv = .text:0x801F18C8; // type:function size:0x4C0

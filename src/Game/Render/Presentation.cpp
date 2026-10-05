@@ -1047,7 +1047,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     int teamScore;
     const char* gameEndFunction;
     ((GoalOverlay*)g_pOverlayManager->GetScene((SceneList)0x5F))
-        ->fn_801F17D0(scoringSide);
+        ->UpdateCaptainS2SGoalInfo(scoringSide);
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
