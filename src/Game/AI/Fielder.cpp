@@ -2067,15 +2067,15 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     cBall* pBall = g_pBall;
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
 
-    float kBallAllowance = 0.18f + cNet::m_fNetPostRadius;
+    float kBallAllowance = 0.18f + cNet::GetPostRadius();
     kBallAllowance += gGameTweaks.m_pGameTweaks->fShotPostOffset;
-    float fDist2NetSide = 0.5f * cNet::m_fNetWidth - kBallAllowance;
+    float fDist2NetSide = 0.5f * cNet::GetNetWidth() - kBallAllowance;
     cNet* pNet = m_pTeam->GetOtherNet();
     nlVector3 v3Target;
     v3Target.x = pNet->m_v3NetLocation.x;
     v3Target.y = nlMinEquals(nlMaxEquals(pBall->m_v3Position.y, -fDist2NetSide), fDist2NetSide);
     v3Target.z = nlMinEquals(nlMaxEquals(pBall->m_v3Position.z, 0.18f),
-        cNet::m_fNetHeight - kBallAllowance);
+        cNet::GetNetHeight() - kBallAllowance);
     float fShotDist = nlSqrt(nlVec3DistanceSquared2D(pBall->m_v3Position, v3Target), true);
 
     if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
@@ -2106,9 +2106,9 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     }
 
     float fAbsBallX = fabsf(pBall->m_v3Position.x);
+    float fAbsBallY = fabsf(pBall->m_v3Position.y);
     float fAimValue = m_pShotMeter->GetShotAimValue();
     float fAbsAimValue = fabsf(fAimValue);
-    float fAbsBallY = fabsf(pBall->m_v3Position.y);
 
     if (fAbsBallY < 1.5f + fDist2NetSide
         && (fAbsBallX > fabsf(pGoalie->mUnidentified024.m_v3Position.x)
@@ -2122,7 +2122,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             fShotSpeed = 12.0f;
         }
         if (fAbsBallY < fDist2NetSide
-            && pBall->m_v3Position.z < cNet::m_fNetHeight - kBallAllowance)
+            && pBall->m_v3Position.z < cNet::GetNetHeight() - kBallAllowance)
         {
             v3PositionOut.x = 1.1f * pNet->m_v3NetLocation.x;
         }
@@ -2142,12 +2142,12 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         nlVec3Sub(v3Post2Delta, v3Post2, pBall->m_v3Position);
         nlVec3Sub(v3GoalieDelta, pGoalie->mUnidentified024.m_v3Position, pBall->m_v3Position);
 
-        u16 aAngPost1 = nlVector3ToAngle(v3Post1Delta);
-        u16 aAngPost2 = nlVector3ToAngle(v3Post2Delta);
-        u16 aAngGoalie = nlVector3ToAngle(v3GoalieDelta);
-        u16 uAbsP1G = (u16)abs_s16(nlAngleDiff(aAngPost1, aAngGoalie));
-        u16 uAbsP2G = (u16)abs_s16(nlAngleDiff(aAngPost2, aAngGoalie));
-        u16 uAbsP1P2 = (u16)abs_s16(nlAngleDiff(aAngPost1, aAngPost2));
+        u32 aAngPost1 = nlVector3ToAngle(v3Post1Delta);
+        u32 aAngPost2 = nlVector3ToAngle(v3Post2Delta);
+        u32 aAngGoalie = nlVector3ToAngle(v3GoalieDelta);
+        u16 uAbsP1G = (u16)abs_s16(GetAngleDifference(aAngPost1, aAngGoalie));
+        u16 uAbsP2G = (u16)abs_s16(GetAngleDifference(aAngPost2, aAngGoalie));
+        u16 uAbsP1P2 = (u16)abs_s16(GetAngleDifference(aAngPost1, aAngPost2));
 
         v3PositionOut.x = 1.005f * pNet->m_v3NetLocation.x;
 
@@ -2185,11 +2185,11 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             {
                 if (uAbsP1G < uAbsP2G)
                 {
-                    fProbability = nlMaxEquals(0.05f, 0.5f * (int)(3 * uAbsP1G - uAbsP2G) / (int)(uAbsP1G + uAbsP2G));
+                    fProbability = nlMaxEquals(0.05f, 0.5f * (int)(3U * uAbsP1G - uAbsP2G) / (int)(uAbsP1G + uAbsP2G));
                 }
                 else
                 {
-                    fProbability = nlMinEquals(0.95f, 1.0f - 0.5f * (int)(3 * uAbsP2G - uAbsP1G) / (int)(uAbsP1G + uAbsP2G));
+                    fProbability = nlMinEquals(0.95f, 1.0f - 0.5f * (int)(3U * uAbsP2G - uAbsP1G) / (int)(uAbsP1G + uAbsP2G));
                 }
             }
             else
@@ -2222,12 +2222,12 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
 
         if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
         {
-            v3PositionOut.z = cNet::m_fNetHeight * lbl_806DB754;
+            v3PositionOut.z = cNet::GetNetHeight() * lbl_806DB754;
             v3PositionOut.y = 0.0f;
         }
         else if (bIsModified)
         {
-            v3PositionOut.z = cNet::m_fNetHeight - kBallAllowance;
+            v3PositionOut.z = cNet::GetNetHeight() - kBallAllowance;
             nlVector3 v3Direction = v3Zero;
             nlVector3 v3BallPosition = pBall->m_v3Position;
             v3BallPosition.z = v3PositionOut.z;
@@ -2247,8 +2247,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         else
         {
             float fHeightVariance = InterpolateRangeClamped(1.0f, 0.2f, 1.0f, 0.0f, m_pTweaks->fShooting);
-            float fHeightAllowance = 0.18f + gGameTweaks.m_pGameTweaks->fShotHeightOffsetFromPost;
-            float fAllowableHeight = cNet::m_fNetHeight - 2.0f * fHeightAllowance;
+            float fHeightAllowance = 0.18f + gGameTweaks.m_pGameTweaks->fShotHeightOffsetFromPost.GetValue();
+            float fAllowableHeight = cNet::GetNetHeight() - 2.0f * fHeightAllowance;
             float fMinimumHeight = (1.0f - fHeightVariance) * fAllowableHeight;
             float fHeightRange = fHeightVariance * fAllowableHeight;
             v3PositionOut.z = fMinimumHeight + fHeightAllowance + nlRandomf(fHeightRange);
