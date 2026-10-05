@@ -340,7 +340,7 @@ void ReplayChoreo::LoadNextHighlight()
         mCurrentHighlight = highlight;
         if (mReplayManager->LoadReplay(highlight->mSlot) == true)
         {
-            fn_802C7FC0(mReplayManager->mReplay, mCurrentHighlight->mBegin, mCurrentHighlight->mEnd, mCurrentHighlight->mCurrent);
+            SetRecordingFrames(mReplayManager->mReplay, mCurrentHighlight->mBegin, mCurrentHighlight->mEnd, mCurrentHighlight->mCurrent);
             mCamera.SetSideOfInterest(mCurrentHighlight->mReplayPad);
             mGoalScoredData = mCurrentHighlight->mGoalScoredData;
         }
@@ -508,7 +508,7 @@ void ReplayChoreo::SaveHighlight(int quality)
                 }
             }
 
-            fn_802C7FA4(mReplayManager->mReplay, &highlight->mBegin, &highlight->mEnd, &highlight->mCurrent);
+            GetRecordingFrames(mReplayManager->mReplay, &highlight->mBegin, &highlight->mEnd, &highlight->mCurrent);
         }
     }
 }
