@@ -14,7 +14,6 @@ public:
     union
     {
         float e[4]; // offset 0x0, size 0x10
-        u32 as_u32[4];
         struct
         {
             float x; // offset 0x0, size 0x4
