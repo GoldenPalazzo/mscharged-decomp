@@ -1392,7 +1392,7 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
@@ -1667,7 +1667,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
@@ -2049,7 +2049,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
