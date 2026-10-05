@@ -333,8 +333,8 @@ inline void cGame::RegisterEventListeners()
 }
 
 cGame::cGame(void* param1, int param2, bool param3)
-    : mUnidentified0C0((bool*)mUnidentified0D0, 0, 0, 100)
-    , mUnidentified134((bool*)mUnidentified144, 0, 0, 16)
+    : mUnidentified0C0((bool*)mUnidentified0D0, 100)
+    , mUnidentified134((bool*)mUnidentified144, 16)
 {
     mpTerrain = 0;
     mpWeatherManager = 0;
@@ -360,10 +360,10 @@ cGame::cGame(void* param1, int param2, bool param3)
     gGameTweaks.m_pGameTweaks->fn_800756B4();
 
     ResetGameFields();
-    mUnidentified0C0.mStart = 0;
-    mUnidentified0C0.mSize = 0;
-    mUnidentified134.mStart = 0;
-    mUnidentified134.mSize = 0;
+    mUnidentified0C0.mHead = 0;
+    mUnidentified0C0.mCount = 0;
+    mUnidentified134.mHead = 0;
+    mUnidentified134.mCount = 0;
 
     m_fGameDuration = gGameTweaks.m_pGameTweaks->fGameDuration;
     m_pGameClock = new (nlMalloc(sizeof(Clock), 8, false))
@@ -517,39 +517,27 @@ void DestroyPowerups()
 
 void cGame::fn_80057FC0()
 {
-    mUnidentified0C0.mStart = 0;
-    mUnidentified0C0.mSize = 0;
-    mUnidentified134.mStart = 0;
-    mUnidentified134.mSize = 0;
+    mUnidentified0C0.mHead = 0;
+    mUnidentified0C0.mCount = 0;
+    mUnidentified134.mHead = 0;
+    mUnidentified134.mCount = 0;
 }
 
 void cGame::fn_80057FD8(bool param1)
 {
-    u8* ptr;
-    if (mUnidentified134.mSize >= mUnidentified134.mCapacity)
-    {
-        ptr = 0;
-    }
-    else
-    {
-        ptr = (u8*)mUnidentified134.mData
-            + ((mUnidentified134.mStart + mUnidentified134.mSize)
-                % mUnidentified134.mCapacity);
-        mUnidentified134.mSize++;
-    }
-    *ptr = param1;
+    mUnidentified134.Push(param1);
 
-    if (mUnidentified134.mSize < lbl_806DBAAC)
+    if (mUnidentified134.mCount < lbl_806DBAAC)
     {
         return;
     }
 
-    int count = mUnidentified134.mSize;
+    int count = mUnidentified134.mCount;
     NetworkMessageType35 message;
     message.mCount = count;
     for (int i = 0; i < count; i++)
     {
-        message.mValues[i] = mUnidentified134.UnidentifiedRemoveStart();
+        message.mValues[i] = mUnidentified134.Pop();
     }
 
     u8 buffer[50];
@@ -567,11 +555,11 @@ void cGame::fn_80057FD8(bool param1)
 
 void cGame::fn_80058180()
 {
-    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB238, mUnidentified134.mSize);
+    tDebugPrintManager::Print(DC_NETWORK, lbl_804FB238, mUnidentified134.mCount);
 
-    while (mUnidentified134.mSize > 0)
+    while (mUnidentified134.mCount > 0)
     {
-        int count = mUnidentified134.mSize;
+        int count = mUnidentified134.mCount;
         if (count > 8)
         {
             count = 8;
@@ -582,7 +570,7 @@ void cGame::fn_80058180()
         for (int i = 0; i < count; i++)
         {
             message.mValues[i]
-                = mUnidentified134.UnidentifiedRemoveStart();
+                = mUnidentified134.Pop();
         }
 
         u8 buffer[50];
@@ -926,10 +914,10 @@ void cGame::fn_80058498(bool param1, int param2, int param3)
     else
     {
         mUnidentified028 = 0;
-        mUnidentified0C0.mStart = 0;
-        mUnidentified0C0.mSize = 0;
-        mUnidentified134.mStart = 0;
-        mUnidentified134.mSize = 0;
+        mUnidentified0C0.mHead = 0;
+        mUnidentified0C0.mCount = 0;
+        mUnidentified134.mHead = 0;
+        mUnidentified134.mCount = 0;
     }
 
     mUnidentified02C = 0;
@@ -1410,18 +1398,7 @@ int cGame::ProcessMessage(NetworkMessage* message)
         NetworkMessageType35* pMessage = (NetworkMessageType35*)message;
         for (int i = 0; i < pMessage->mCount; i++)
         {
-            u8* ptr;
-            if (mUnidentified0C0.mCapacity <= mUnidentified0C0.mSize)
-            {
-                ptr = 0;
-            }
-            else
-            {
-                ptr = (u8*)mUnidentified0C0.mData
-                    + ((mUnidentified0C0.mStart + mUnidentified0C0.mSize++)
-                        % mUnidentified0C0.mCapacity);
-            }
-            *ptr = pMessage->mValues[i];
+            mUnidentified0C0.Push(pMessage->mValues[i]);
         }
         break;
     }

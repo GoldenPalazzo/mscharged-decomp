@@ -5,6 +5,7 @@
 #include "Game/NetworkMessage.h"
 #include "types.h"
 #include "NL/nlMath.h"
+#include "NL/CircularQueue.h"
 
 class Clock;
 class FuzzyTweaks;
@@ -24,42 +25,6 @@ struct CollisionPlayerWallData;
 struct PeachPhotoData;
 class cFielder;
 class cPlayer;
-
-struct UnidentifiedCircularByteQueue
-{
-    UnidentifiedCircularByteQueue(bool* data, u32 start, int size, u32 capacity)
-    {
-        mStart = start;
-        mSize = size;
-        mCapacity = capacity;
-        mData = data;
-    }
-
-    bool UnidentifiedRemoveStart()
-    {
-        bool* entry;
-        if (mSize == 0)
-        {
-            entry = mData + (mStart & mCapacity);
-        }
-        else
-        {
-            --mSize;
-            entry = mData + mStart;
-            ++mStart;
-            if (mStart % mCapacity == 0)
-            {
-                mStart = 0;
-            }
-        }
-        return *entry;
-    }
-
-    /* 0x00 */ bool* mData;
-    /* 0x04 */ u32 mStart;
-    /* 0x08 */ int mSize;
-    /* 0x0C */ u32 mCapacity;
-};
 
 void DestroyPowerups();
 void DestroyGame();
@@ -236,13 +201,13 @@ private:
     /* 0xBE */ u8 mUnidentified0BE[0x02];
 
 public:
-    /* 0xC0 */ UnidentifiedCircularByteQueue mUnidentified0C0;
+    /* 0xC0 */ CircularQueueBase<bool> mUnidentified0C0;
 
 private:
     /* 0xD0 */ u8 mUnidentified0D0[0x64];
 
 public:
-    /* 0x134 */ UnidentifiedCircularByteQueue mUnidentified134;
+    /* 0x134 */ CircularQueueBase<bool> mUnidentified134;
 
 private:
     /* 0x144 */ u8 mUnidentified144[0x10];
