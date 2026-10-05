@@ -84,7 +84,7 @@ inline void OverlayManager::SlideHUDOut()
     mHUDDelay = 0.0f;
     if (mIsHUDSlideIn == true)
     {
-        static_cast<HUDOverlay*>(GetScene((SceneList)89))->SetSlideOut();
+        static_cast<HUDOverlay*>(GetScene(OVERLAY_HUD))->SetSlideOut();
         mIsHUDSlideIn = false;
         gpNumberDisplay->mVisible = false;
     }
@@ -186,7 +186,7 @@ void OverlayManager::SlideHUDIn(float delay)
     }
     else if (!mIsHUDSlideIn)
     {
-        static_cast<HUDOverlay*>(GetScene((SceneList)89))->SetSlideIn();
+        static_cast<HUDOverlay*>(GetScene(OVERLAY_HUD))->SetSlideIn();
         mIsHUDSlideIn = true;
         gpNumberDisplay->mVisible = true;
     }
@@ -249,7 +249,7 @@ void OverlayManager::OnGameOver()
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
     GetPresentation()->StopOverlay();
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->ResetScores();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->ResetScores();
 }
 
 void OverlayManager::OnMegaStrikeMeterStart(MegaStrikeMeterData* eventData)
@@ -318,5 +318,5 @@ void OverlayManager::OnGoalScored(GoalScoredData* eventData)
         static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
         gpNumberDisplay->mVisible = true;
     }
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->UpdateScore();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->UpdateScore();
 }
