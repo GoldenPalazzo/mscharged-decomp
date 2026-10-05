@@ -7,7 +7,7 @@
 #include "NL/nlTicker.h"
 
 
-static inline float GetParameterFloat(
+static inline float GetActionFloatParameter(
     UnidentifiedVariant_80054AB8* pAction, int index,
     float defaultValue)
 {
@@ -119,20 +119,20 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
     UnidentifiedVariant_80054AB8* pNewAction)
 {
     if (pNewAction->ExtraData.IsSet(5)
-        && GetParameterFloat(pNewAction, 4, 0.0f)
+        && GetActionFloatParameter(pNewAction, 4, 0.0f)
                < pNewAction->ExtraData.Get(5)->mData.f)
     {
         delete pNewAction;
         return 0;
     }
 
-    if (GetParameterFloat(pNewAction, 6, 1.0f) == 0.0f)
+    if (GetActionFloatParameter(pNewAction, 6, 1.0f) == 0.0f)
     {
         delete pNewAction;
         return 0;
     }
 
-    if (GetParameterFloat(pNewAction, 4, 0.0f) == 0.0f)
+    if (GetActionFloatParameter(pNewAction, 4, 0.0f) == 0.0f)
     {
         nlPrintf("This should never happen!.\n");
     }
@@ -140,10 +140,10 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
     UnidentifiedVariant_80054AB8* pAction = FindQueuedAction(pNewAction);
     if (pAction != 0)
     {
-        float oldValue = GetParameterFloat(pAction, 4, 0.0f)
-                       * GetParameterFloat(pAction, 6, 1.0f);
-        float newValue = GetParameterFloat(pNewAction, 4, 0.0f)
-                       * GetParameterFloat(pNewAction, 6, 1.0f);
+        float oldValue = GetActionFloatParameter(pAction, 4, 0.0f)
+                       * GetActionFloatParameter(pAction, 6, 1.0f);
+        float newValue = GetActionFloatParameter(pNewAction, 4, 0.0f)
+                       * GetActionFloatParameter(pNewAction, 6, 1.0f);
         if (oldValue < newValue)
         {
             nlListRemoveElement(&m_lQueuedActions.m_pStart, pAction,
@@ -280,9 +280,9 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
                 weight = m_pSelectionWeights[weightIndex];
             }
 
-            float chance = GetParameterFloat(pAction, 6, 1.0f);
+            float chance = GetActionFloatParameter(pAction, 6, 1.0f);
             chance = weight * chance;
-            float confidence = GetParameterFloat(
+            float confidence = GetActionFloatParameter(
                 pAction, 4, 0.0f);
             chances[count] = chance * confidence;
             total += chances[count];
@@ -322,7 +322,7 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
         int index = 0;
         for (; pAction != 0; pAction = pAction->next, ++index)
         {
-            float chance = GetParameterFloat(pAction, 6, 1.0f);
+            float chance = GetActionFloatParameter(pAction, 6, 1.0f);
             if (m_pSelectionWeights != 0)
             {
                 int weightIndex = nlMin(mNumSelectionWeights - 1, index);
@@ -344,8 +344,8 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
                  pBest != 0; pBest = pBest->next)
             {
                 if (pSelectedAction == 0
-                    || GetParameterFloat(pBest, 6, 1.0f)
-                           > GetParameterFloat(
+                    || GetActionFloatParameter(pBest, 6, 1.0f)
+                           > GetActionFloatParameter(
                                pSelectedAction, 6, 1.0f))
                 {
                     pSelectedAction = pBest;
