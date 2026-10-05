@@ -1448,7 +1448,7 @@ Game/Render/CrowdImpostors.cpp:
 	.sbss       start:0x806E1580 end:0x806E15B8
 	.sdata2     start:0x806E5108 end:0x806E5148
 
-Game/Render/tu_801A508C.cpp:
+Game/Render/ImpostorLightingColour.cpp:
 	.text       start:0x801A508C end:0x801A51D8
 	.sdata2     start:0x806E5148 end:0x806E5158
 
