@@ -71,14 +71,12 @@ void OverlayManager::Pop()
     BaseGameSceneManager::Pop();
 }
 
-extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName)
+void OverlayManager::SetCurrentTextOverlaySlide(OverlaySlideName slideName)
 {
-    void* overlay = *(void**)((char*)manager + 264);
-    if (overlay == 0)
+    if (mInGameTextOverlay != 0)
     {
-        return;
+        mInGameTextOverlay->SetSlide(slideName);
     }
-    ((InGameTextOverlay*)overlay)->SetSlide(slideName);
 }
 
 inline void OverlayManager::SlideHUDOut()
@@ -207,9 +205,9 @@ void OverlayManager::ShowDemoSlide()
     }
 }
 
-extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager)
+void OverlayManager::RestartGoalOverlay()
 {
-    ((GoalOverlay*)manager->GetScene((SceneList)95))->Restart();
+    ((GoalOverlay*)GetScene((SceneList)95))->Restart();
 }
 
 void OverlayManager::OnGetReadyForKickoff()
@@ -305,11 +303,11 @@ void OverlayManager::SetMegaStrikeMeterPosition(nlVector3 position)
     ov->SetPosition(position);
 }
 
-extern "C" void fn_801E2A14(void* p)
+void OverlayManager::ResetStrikerTimesVariants()
 {
-    *(int*)((char*)p + 276) = -1;
-    *(int*)((char*)p + 280) = -1;
-    *(int*)((char*)p + 284) = -1;
+    mStrikerTimesStoryVariant = -1;
+    mStrikerTimesHeadlineVariant = -1;
+    mStrikerTimesImageVariant = -1;
 }
 
 void OverlayManager::OnGoalScored(GoalScoredData* eventData)

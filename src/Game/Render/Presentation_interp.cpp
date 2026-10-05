@@ -314,8 +314,8 @@ void Presentation::DoFunctionCall(unsigned int function)
                 nlTaskManager::SetNextState(8);
             }
             ReplayChoreo::Instance().StartAutoReplay(false);
-            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
-                SLIDE_NAME_TEXT_REPLAY);
+            static_cast<OverlayManager*>(g_pOverlayManager)
+                ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, true, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
@@ -342,8 +342,8 @@ void Presentation::DoFunctionCall(unsigned int function)
                 nlTaskManager::SetNextState(8);
             }
             ReplayChoreo::Instance().StartAutoReplay(true);
-            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
-                SLIDE_NAME_TEXT_REPLAY);
+            static_cast<OverlayManager*>(g_pOverlayManager)
+                ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, false, true);
             static_cast<OverlayManager*>(g_pOverlayManager)

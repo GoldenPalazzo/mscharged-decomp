@@ -17,8 +17,10 @@ public:
     virtual ~OverlayManager();
     virtual BaseSceneHandler* Push(SceneList scene, ScreenMovement movement, bool popfirst);
     virtual void Pop();
+    void SetCurrentTextOverlaySlide(OverlaySlideName slideName);
 
     void ShowDemoSlide();
+    void RestartGoalOverlay();
     void Update(float deltaTime);
     void SetVisible(SceneList scene, bool visibility, bool overrideStateSettings);
     void HandleStateTransition(u32 from, u32 to);
@@ -50,6 +52,8 @@ public:
         mStrikerTimesImageVariant = image;
     }
 
+    void ResetStrikerTimesVariants();
+
     /* 0x108 */ InGameTextOverlay* mInGameTextOverlay;
     /* 0x10C */ bool mIsHUDSlideIn;
     /* 0x10D */ bool mDoHUDSlideIn;
@@ -64,8 +68,5 @@ public:
 private:
     void SlideHUDOut();
 }; // size 0x124
-
-extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager);
-extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName);
 
 #endif // GAME_OVERLAY_MANAGER_H

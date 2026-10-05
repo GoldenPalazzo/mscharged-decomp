@@ -619,7 +619,7 @@ void Presentation::Update(float deltaT)
             static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, true, true);
             if (mOverlayToDisplay == 0x5F)
             {
-                RestartGoalOverlay(g_pOverlayManager);
+                static_cast<OverlayManager*>(g_pOverlayManager)->RestartGoalOverlay();
             }
             mOverlayDisplayed = true;
             mOverlayDelay = 0.0f;
