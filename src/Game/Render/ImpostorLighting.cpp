@@ -31,7 +31,7 @@ static TweakValueInt g_HighlightBlue(
     "g_HighlightBlue", gLastTweakCategory, 255);
 
 static u32 sImpostorLightingTexture = -1;
-LightingLookup* spImpostorLightingLookup;
+LightingLookup* gpImpostorLightingLookup;
 
 void UpdateImpostorLighting()
 {
@@ -62,19 +62,19 @@ void SetImpostorLightingTexture(u32 textureHandle)
                          : (u32)-1;
     }
 
-    if (sImpostorLightingTexture != (u32)-1 && spImpostorLightingLookup == 0)
+    if (sImpostorLightingTexture != (u32)-1 && gpImpostorLightingLookup == 0)
     {
-        spImpostorLightingLookup = new (8, false) LightingLookup;
-        spImpostorLightingLookup->LoadTexture(textureHandle);
+        gpImpostorLightingLookup = new (8, false) LightingLookup;
+        gpImpostorLightingLookup->LoadTexture(textureHandle);
     }
 }
 
 void FreeImpostorLighting()
 {
-    if (spImpostorLightingLookup != 0)
+    if (gpImpostorLightingLookup != 0)
     {
-        delete spImpostorLightingLookup;
-        spImpostorLightingLookup = 0;
+        delete gpImpostorLightingLookup;
+        gpImpostorLightingLookup = 0;
     }
 }
 
