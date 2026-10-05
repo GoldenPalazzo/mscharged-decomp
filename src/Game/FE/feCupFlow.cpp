@@ -202,7 +202,7 @@ void ShowCurrentCupRoundPage()
     GameSceneManager::Instance()->Push((SceneList)scene, SCREEN_NOTHING, true);
 }
 
-extern "C" void AdvanceCupFlow(bool pad)
+void AdvanceCupFlow(bool pad)
 {
     CupManager* cupManager = g_pCupManager;
     if (cupManager->GetCurrentRoundNumber() == -5)
@@ -328,7 +328,7 @@ void HandleCupBack(int fromSubPage)
     }
 }
 
-extern "C" void UpdateCupBreadcrumbs(int currentPage)
+void UpdateCupBreadcrumbs(int currentPage)
 {
     int currentIndex = 0;
     int pageCount = 0;
@@ -381,7 +381,7 @@ extern "C" void UpdateCupBreadcrumbs(int currentPage)
     }
 }
 
-extern "C" void ExitCupToMainMenu()
+void ExitCupToMainMenu()
 {
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
     GameSceneManager::Instance()->Pop();
@@ -399,7 +399,7 @@ void ShowCupStartOptions()
                   Function<FnVoidVoid>(RequestMainMenuInputReset));
 }
 
-extern "C" void ShowNewCupPrompt()
+void ShowNewCupPrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -408,7 +408,7 @@ extern "C" void ShowNewCupPrompt()
                   Function<FnVoidVoid>(ShowCupStartOptions));
 }
 
-extern "C" void ShowCupSavePrompt()
+void ShowCupSavePrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -450,7 +450,7 @@ void StartNewCup()
     gNextFETransition = "TransitionMainMenuToNewStrikerCup";
 }
 
-extern "C" void ContinueStrikerCup()
+void ContinueStrikerCup()
 {
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
@@ -681,7 +681,7 @@ void ShowCupTrophyRewardsPopup()
     }
 }
 
-extern "C" void UpdatePlayButtonText()
+void UpdatePlayButtonText()
 {
     CupManager* cupManager = g_pCupManager;
     SHNavigation* navigation = GetNavigationScene();
@@ -702,8 +702,7 @@ extern "C" void UpdatePlayButtonText()
     }
 }
 
-extern "C" void UpdateCupTitleText(TLComponentInstance* component,
-                              unsigned short* buffer, unsigned long capacity)
+void UpdateCupTitleText(TLComponentInstance* component, unsigned short* buffer, unsigned long capacity)
 {
     TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find<>(
         component->GetActiveSlide(), "TITLE");
@@ -792,7 +791,7 @@ void SetLockedTrophyVisibility(bool visible)
     }
 }
 
-extern "C" void ResetCupFlow()
+void ResetCupFlow()
 {
     CupManager* cupManager = g_pCupManager;
     cupManager->mState = -1;
