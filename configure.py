@@ -1172,7 +1172,7 @@ config.libs = [
             Object(Matching, "NL/plat/GameCubePad.cpp"),
             Object(Matching, "NL/plat/globalpad.cpp"),
             Object(Matching, "NL/plat/PadBackend.cpp"),
-            Object(NonMatching, "NL/plat/platqmath.cpp"),
+            Object(Matching, "NL/plat/platqmath.cpp"),
             Object(Matching, "NL/plat/platvmath.cpp"),
             Object(Matching, "NL/plat/ReliableSocket.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/plat/SwappablePad.cpp", extra_cflags=["-sym on", "-ipa file"]),
