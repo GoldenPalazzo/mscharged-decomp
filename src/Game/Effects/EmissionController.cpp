@@ -316,7 +316,7 @@ void EmissionController::ComputePositionAndVelocity(EffectsSpec& spec, nlVector3
         }
     }
 
-    if (m_pManager->unknown_0x1F8 && spec.m_bGround)
+    if (m_pManager->mSnapToGround && spec.m_bGround)
     {
         pos.z = m_fGround + m_pManager->GetShadowHeight();
     }

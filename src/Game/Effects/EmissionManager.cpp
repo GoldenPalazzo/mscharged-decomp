@@ -67,7 +67,7 @@ typedef nlAVLTreeIterator<unsigned long, LingerMessage*,
     DefaultKeyCompare<unsigned long> > LingerTreeIterator;
 
 static int lbl_806E1FD8;
-static int lbl_806E1FDC;
+static int sNumRenderedParticles;
 static LingerTree* lingerers;
 static unsigned int sResourceIdCounter;
 static const char* sDefaultResourceNames[2] = { "Default", "World" };
@@ -233,14 +233,14 @@ inline void EmissionResourceStats::Configure(const char* name, int budget)
 {
     nlStrNCpy(mName, name, sizeof(mName));
     mBudget = budget;
-    unknown_0x32_bit15 = mBudget != 0;
+    mEnabled = mBudget != 0;
 }
 
 inline EmissionResourceStats::EmissionResourceStats()
     : mId(sResourceIdCounter++)
 {
-    unknown_0x32_bit15 = 0;
-    unknown_0x32_bit14 = 0;
+    mEnabled = 0;
+    mInitialized = 0;
     mBudgetTweak = 0;
     mHighWaterMark = 0;
     mCount = 0;
@@ -287,8 +287,8 @@ void OnEffectsTexturesLoaded(void* data, unsigned long size, void* userData)
 /**
  * Offset/Address/Size: 0x6BC | 0x802E6620 | size: 0x154
  */
-void EmissionManager::StartLoading(
-    bool first, bool second, bool third, bool fourth)
+void EmissionManager::StartLoading(bool allocateResidentAtStart,
+    bool allocateNonResidentAtStart, bool, bool compressedNonResident)
 {
     gEffectsData = 0;
     gEffectsNonResidentData = 0;
@@ -298,28 +298,28 @@ void EmissionManager::StartLoading(
 
     nlLoadEntireFileAsync("art/effects/effects.bun", OnEffectsDataLoaded,
         &gEffectsData, 0x20,
-        first ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
 
-    if (fourth)
+    if (compressedNonResident)
     {
         nlLoadCompressedFileAsync("art/effects/effectsNonRes.bun.zlib", OnEffectsDataLoaded,
             &gEffectsNonResidentData, 0x20,
-            second ? AllocateStart : AllocateEnd, 0x40000,
+            allocateNonResidentAtStart ? AllocateStart : AllocateEnd, 0x40000,
             0, 0, 0, 0, 0);
     }
     else
     {
         nlLoadEntireFileAsync("art/effects/effectsNonRes.bun", OnEffectsDataLoaded,
             &gEffectsNonResidentData, 0x20,
-            second ? AllocateStart : AllocateEnd, 0, 0, 0);
+            allocateNonResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
     }
 
     nlLoadEntireFileAsync("art/objects/effectsgeometry.bun", OnEffectsGeometryLoaded,
         &gEffectsGeometryData, 0x20,
-        first ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
     nlLoadEntireFileAsync("art/objects/effectsgeometrytextures.rlt",
         OnEffectsTexturesLoaded, &gEffectsTextureData, 0x20,
-        first ? AllocateStart : AllocateEnd, 0, 0, 0);
+        allocateResidentAtStart ? AllocateStart : AllocateEnd, 0, 0, 0);
 
     gEffectsModelInventory = glGetCurrentResourcePool()->m_inventory;
 }
@@ -366,16 +366,16 @@ EmissionManager::EmissionManager()
     : mNextControllerId(1)
     , m_bRecording(true)
     , mContext(0)
-    , unknown_0x1B0(false)
+    , m_bDiscardOnReplay(false)
     , mReplayControllers()
     , mControllers()
-    , mUnidentifiedControllers()
+    , mErrors()
     , mParticleMemory(0)
     , mParticles()
     , mUpdateEnabled(false)
     , mRenderPersistentOnly(false)
     , mShadowHeight(0.0f)
-    , unknown_0x1F8(true)
+    , mSnapToGround(true)
 {
 }
 
@@ -481,13 +481,13 @@ void EmissionManager::Shutdown()
     mControllers.Clear();
 
     nlDLListIterator<char*> errorIterator
-        = mUnidentifiedControllers.Begin();
+        = mErrors.Begin();
     while (errorIterator.hasNext())
     {
         delete *errorIterator;
         errorIterator.Step();
     }
-    mUnidentifiedControllers.Clear();
+    mErrors.Clear();
 
     if (lingerers != 0)
     {
@@ -676,7 +676,7 @@ void EmissionManager::Render()
         }
         iterator.Step();
     }
-    lbl_806E1FDC = renderedParticles;
+    sNumRenderedParticles = renderedParticles;
 }
 
 /**
@@ -1246,7 +1246,7 @@ void EmissionManager::Replay(LoadFrame& frame)
 {
     if (m_bRecording)
     {
-        if (unknown_0x1B0)
+        if (m_bDiscardOnReplay)
         {
             DestroyAll(true);
         }
@@ -1379,7 +1379,7 @@ void EmissionManager::Replay(SaveFrame& frame)
 {
     if (!m_bRecording)
     {
-        if (unknown_0x1B0)
+        if (m_bDiscardOnReplay)
         {
             DestroyReplayedControllers(this);
         }
@@ -1542,7 +1542,7 @@ void EmissionManager::SetContext(void* context)
  */
 void EmissionResourceStats::Initialize()
 {
-    if (!unknown_0x32_bit15)
+    if (!mEnabled)
     {
         return;
     }
@@ -1573,12 +1573,12 @@ void EmissionResourceStats::Initialize()
     mBudgetTweak->BindWithDefault(
         name, 0, category, false, 0.0f, 0.0f, 0.0f);
     *mBudgetTweak = mBudget;
-    unknown_0x32_bit14 = 1;
+    mInitialized = 1;
 }
 
 inline void EmissionResourceStats::ResetCount()
 {
-    if (unknown_0x32_bit14)
+    if (mInitialized)
     {
         *mCount = 0;
     }
