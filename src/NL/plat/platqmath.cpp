@@ -1,14 +1,6 @@
+#include <revolution/mtx.h>
+
 #include "NL/nlMath.h"
-
-struct Quaternion;
-
-extern "C"
-{
-    void PSQUATScale(const Quaternion* q, Quaternion* r, float scale);
-    f32 PSQUATDotProduct(const Quaternion* p, const Quaternion* q);
-    void C_QUATSlerp(const Quaternion* p, const Quaternion* q,
-        Quaternion* r, float t);
-}
 
 void nlQuatSlerp(
     nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t)
