@@ -3,7 +3,6 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feMusic.h"
 #include "NL/plat/PlatPadManager.h"
-#include "Game/HBMManager.h"
 
 #include "Game/Render/Presentation.h"
 
@@ -46,17 +45,9 @@ static inline void CallHomeButtonWarning(UnidentifiedHBMScene* scene)
     }
 }
 
-class HBMHideEvent
-    : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
-{
-public:
-    HBMHideEvent()
-        : UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>("HBMHide", -1)
-    {
-    }
+#include "Game/HBMHideEvent.h"
 
-    virtual ~HBMHideEvent() { }
-};
+#include "Game/HBMManager.h"
 
 static HBMHideEvent sHBMHideEvent;
 
