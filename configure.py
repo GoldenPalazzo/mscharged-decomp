@@ -558,7 +558,7 @@ config.libs = [
             Object(Matching, "Game/AI/FielderDesireTransitions.cpp"),
             Object(Matching, "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/AIContext.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/AI/tu_8030F5DC.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-inline noauto"]),
+            Object(Matching, "Game/AI/tu_8030F5DC.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-inline noauto", "-sym on"]),
             Object(Matching, "Game/AI/tu_803115F4.cpp", cflags=[*cflags_game, "-char signed"]),
             Object(Matching, "Game/AI/Scripts/ScriptCaching.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/FuzzyRuntimeBase.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
