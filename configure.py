@@ -566,7 +566,7 @@ config.libs = [
             Object(Matching, "Game/AI/FuzzyRuntimeBase.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/TransitionFunc.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/shdStateMachine.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
-            Object(Matching, "Game/AI/tu_80317E2C.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AI/ScriptMachine.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/TutorialMegastrikeDesire.cpp"),
             Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/Scripts/FuzzyAIRuntime.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
