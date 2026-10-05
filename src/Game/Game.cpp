@@ -1284,13 +1284,15 @@ void cGame::fn_8005A028(DetermDataEvent* pEvent)
     case 5:
     {
         // Which players are on screen, one bit per player.
+        u8* data = pEvent->mData;
         for (int i = 0; i < 2; i++)
         {
             cTeam* pTeam = g_pTeams[i];
-            u8 flags = pEvent->mData[1 + i];
+            u8 flags = data[1 + i];
             for (int j = 0; j < 5; j++)
             {
-                pTeam->GetPlayer(j)->mUnidentified024.m_bOnScreen = (flags & (u8)(1 << j)) != 0;
+                cPlayer* pPlayer = pTeam->GetPlayer(j);
+                pPlayer->mUnidentified024.m_bOnScreen = (flags & (u8)(1 << j)) != 0;
             }
         }
         break;
@@ -1362,20 +1364,7 @@ void cGame::fn_8005A028(DetermDataEvent* pEvent)
         // CleanupMegastrikeGameplay
         tDebugPrintManager::Print(DC_NETWORK, lbl_804FB568,
             gInputManager->mFrameProvider->GetFrame());
-        Goalie* pGoalie = mUnidentified03C->m_pTeam->GetOtherTeam()->GetGoalie();
-        if (mUnidentified030 != 0)
-        {
-            pGoalie->InitActionMove(false);
-        }
-        else
-        {
-            if (pGoalie->m_pBall == 0 && g_pBall->m_pOwner != 0)
-            {
-                g_pBall->m_pOwner->ReleaseBall(0);
-            }
-            pGoalie->PickupBall(g_pBall);
-            pGoalie->InitActionMoveWB();
-        }
+        fn_80058400();
         break;
     }
 
