@@ -56,13 +56,13 @@ SHGameplayOptions::SHGameplayOptions()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C);
-        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68);
+        mSettings = gameInfo->mUserInfo.mUnidentified4C;
+        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mUnidentified68;
     }
     else
     {
-        mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions);
-        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions);
+        mSettings = gameInfo->mUserInfo.mGameplayOptions;
+        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mCheatOptions;
     }
     mNavigation.SetPushBackScene(false);
     mNavigation.SetPopScene(false);
@@ -695,16 +695,16 @@ void SHGameplayOptions::CommitSettings()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C) = mSettings;
-        reinterpret_cast<GameplaySettings&>(GameInfoManager::Instance()->mNoCheatSettings) = mSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68) = mPowerupSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mRulesA) = mPowerupSettings;
+        gameInfo->mUserInfo.mUnidentified4C = mSettings;
+        GameInfoManager::Instance()->mNoCheatSettings = mSettings;
+        GameInfoManager::Instance()->mUserInfo.mUnidentified68 = mPowerupSettings;
+        GameInfoManager::Instance()->mRulesA = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
     }
     else
     {
-        reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions) = mSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions) = mPowerupSettings;
+        gameInfo->mUserInfo.mGameplayOptions = mSettings;
+        GameInfoManager::Instance()->mUserInfo.mCheatOptions = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)2, SCREEN_FORWARD, true);
     }
 }
