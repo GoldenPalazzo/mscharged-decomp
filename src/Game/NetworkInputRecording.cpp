@@ -22,6 +22,13 @@ struct NetworkRecordedFrameHeader
     u32 mDataSize;
 };
 
+struct NetworkRecordedInput
+{
+    PackedDetInput mRecord;
+    u8 mConnected;
+    u8 mPadding[3];
+};
+
 struct NetworkRecordingHeader
 {
     int mType;
@@ -207,12 +214,7 @@ void NetworkInputRecording::WriteData(const void* data, int size)
 
 void NetworkInputRecording::WriteNetworkInputRecord(s8 machine, const PackedDetInput* record, u8 connected)
 {
-    struct RecordedInput
-    {
-        PackedDetInput mRecord;
-        u8 mConnected;
-        u8 mPadding[3];
-    } input;
+    NetworkRecordedInput input;
     input.mRecord = *record;
     input.mConnected = connected;
     input.mPadding[0] = 0;
@@ -264,12 +266,7 @@ bool NetworkInputRecording::ReadNetworkInputData(int size, void* data)
 
 bool NetworkInputRecording::ReadNetworkInputRecord(s8 machine, PackedDetInput* record, u8* connected)
 {
-    struct RecordedInput
-    {
-        PackedDetInput mRecord;
-        u8 mConnected;
-        u8 mPadding[3];
-    } input;
+    NetworkRecordedInput input;
     if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(input))
         return false;
     nlAsyncFileBufferRead(&mReader, &input, sizeof(input));
