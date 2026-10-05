@@ -1,21 +1,14 @@
 #include "Game/Render/ImpostorLighting.h"
-#include "Game/GameObjectLighting.h"
-#include "Game/Render/CrowdImpostorManager.h"
 #include "Game/Render/Impostor.h"
-#include "Game/Render/ImpostorCharacter.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Render/LightingLookup.h"
 #include "Game/TweakValue.h"
 #include "Game/TweakValueInt.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlColour.h"
-#include "NL/nlMath.h"
 #include "NL/nlMemory.h"
-#include "Game/Render/LightingLookup.h"
-#include "Game/Render/CrowdImpostors.h"
-#include "Game/TweakValueFloat.h"
-
 
 static TweakValueInt g_ShadowRed(
     "g_ShadowRed", "/Render/Impostor/Lookup/Tint", 0);
