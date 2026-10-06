@@ -56,6 +56,7 @@
 #include "NL/nlPolygonRegion.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlFunction.inl"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
@@ -442,7 +443,6 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlMultQuat(qRetval, qOrient, mUnidentified1E4.m_BaseBallOrientation);
 }
 
-extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
 
 void cPlayer::SetAnimID(int animID)
 {

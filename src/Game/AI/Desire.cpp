@@ -4,7 +4,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/DesireUpdate.inl"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Variant.h"
 #include <stddef.h>
 #include "Game/AI/SpaceSearch.h"
@@ -89,7 +89,7 @@ Desire::Desire(int state, TransitionFunc& transition)
     mDefaultMaxDuration = 1.0f;
 }
 
-void Desire::SetContext(UnidentifiedScriptMachine* context)
+void Desire::SetContext(ScriptMachine* context)
 {
     shdStateMachine::SetContext(context);
     if (context != 0)
@@ -433,7 +433,7 @@ bool DesireHit::Initialize(void* context)
     UserControlledT(m_pFielder->m_pTeam);
     m_pFielder->InitActionHit(
         (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pPlayer,
-        m_pFielder->mUnidentified024.m_aActualFacingDirection);
+        GetFielder()->GetActualFacing());
     return initialized;
 }
 

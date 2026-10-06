@@ -171,7 +171,8 @@ public:
 
     void Deliver(T* data)
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -187,7 +188,8 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
@@ -199,7 +201,8 @@ public:
 
     void Deliver()
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -215,7 +218,8 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
@@ -264,7 +268,7 @@ template <typename T>
 void UnidentifiedEvent<T>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
-    iterator = mListeners.Begin();
+    iterator.Copy(mListeners.Begin());
     iterator.m_Curr = current;
 }
 
@@ -302,6 +306,20 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
+
+// Concrete immediate events retain their own runtime type while sharing the
+// listener storage and delivery implementation.
+template <typename T>
+class ImmediateEvent : public UnidentifiedEvent<T>
+{
+public:
+    ImmediateEvent(const char* name, int length)
+        : UnidentifiedEvent<T>(name, length)
+    {
+    }
+
+    virtual ~ImmediateEvent() { }
+};
 
 template <typename P1, typename P2, typename P3>
 struct UnidentifiedListener3 : public EventConnection

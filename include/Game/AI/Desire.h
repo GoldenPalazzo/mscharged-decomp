@@ -16,7 +16,7 @@ class cPlayer;
 class cBall;
 class Desire;
 class SpaceSearch;
-class UnidentifiedScriptMachine;
+class ScriptMachine;
 class FuzzyRuntimeBase;
 typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
@@ -34,11 +34,13 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void SetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(ScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 protected:
+    cFielder* GetFielder() const { return m_pFielder; }
+
     cFielder* m_pFielder;
     nlVector3 mvDesiredPosition;
     int mTurboRequest;

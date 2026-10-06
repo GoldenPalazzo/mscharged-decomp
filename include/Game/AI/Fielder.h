@@ -173,9 +173,11 @@ extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
 extern "C" bool fn_800D1C34(const cFielder*);
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
+extern "C" float fn_80030750(cFielder* pFielder);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
+class ScriptMachine;
 class FuzzyRuntimeBase;
 struct BulletBillObject;
 
@@ -190,6 +192,7 @@ class cFielder : public cPlayer
     friend class DesireShrink;
     friend bool fn_800D1C34(const cFielder*);
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
+    friend float fn_80030750(cFielder*);
 
 public:
     void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
@@ -201,7 +204,7 @@ public:
     FuzzyRuntimeBase* GetFuzzyRuntime() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
-    unsigned int IsFrozen();
+    unsigned int IsFrozen() const;
     unsigned int IsShattered();
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
@@ -743,10 +746,12 @@ extern float lbl_806E342C;
 
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 
-extern "C" bool fn_8003877C(cFielder* pFielder);
+extern "C" bool fn_8003877C(const cFielder* pFielder);
 
 extern "C" void fn_800395C0(cFielder* pFielder);
 
 extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
+
+ScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 #endif // GAME_AI_FIELDER_H

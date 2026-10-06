@@ -15,12 +15,14 @@
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
+#include "Game/OverlayManager.h"
 #include "Game/PassBallData.h"
 #include "Game/Team.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFormat.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlFunction.inl"
 
 struct PowerupStatsData
 {
@@ -62,7 +64,6 @@ public:
     virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
 };
 
-extern "C" void fn_801E2A14(BaseGameSceneManager* manager);
 extern "C" int fn_80380C34(FILE* file, long offset, int origin);
 extern "C" int fn_8037FA00(FILE* file);
 
@@ -320,7 +321,7 @@ void StatsTracker::ResetCurrentStats()
         InitializePlayerStats(mCurrentUserStats[i], i, TYPE_USER);
     }
 
-    fn_801E2A14(g_pOverlayManager);
+    static_cast<OverlayManager*>(g_pOverlayManager)->ResetStrikerTimesVariants();
 }
 
 void StatsTracker::CreateEventHandler()

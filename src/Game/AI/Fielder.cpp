@@ -1,6 +1,8 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/Fielder.inl"
+#include "Game/PoseAccumulator.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/DetInput.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
@@ -39,6 +41,9 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Sys/audio.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/YoshiEggObject.h"
+#include "Game/Render/BirdoEgg.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
@@ -50,12 +55,13 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/CharacterTriggers.h"
 
-extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
+extern "C" bool fn_8003E8A0(const cFielder* pFielder);
+extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_80097358(cPlayer*, float);
 extern FuzzyVariant fvNotSet;
 
@@ -109,25 +115,6 @@ float lbl_806DB838 = 1.5f;
 bool lbl_806E0C53;
 bool lbl_806E0C58;
 bool lbl_806E0C59;
-
-static LooseBallContactAnimInfo gOneTimerIdleGroundContactAnims[4] = {
-    { 0x38, 9.0f, 0xE000, 0x2000 },
-    { 0x39, 9.0f, 0xA000, 0xE000 },
-    { 0x3B, 9.0f, 0x6000, 0xA000 },
-    { 0x3A, 9.0f, 0x2000, 0x6000 },
-};
-
-static LooseBallContactAnimInfo gOneTimerIdleVolleyContactAnims[4] = {
-    { 0x44, 4.0f, 0xE000, 0x2000 },
-    { 0x45, 4.0f, 0xA000, 0xE000 },
-    { 0x47, 4.0f, 0x6000, 0xA000 },
-    { 0x46, 4.0f, 0x2000, 0x6000 },
-};
-
-static LooseBallContactAnimInfo gOneTimerLeadGroundContactAnims[2] = {
-    { 0x48, 6.0f, 0xC000, 0x4000 },
-    { 0x49, 6.0f, 0x4000, 0xC000 },
-};
 
 static inline cFielder* GetAIOrderedFielder(cTeam* pTeam, s32 i)
 {
@@ -235,7 +222,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     mUnidentified428 = new (8, false) AIContext(this,
         new (8, false) FielderDesireMachine(),
         new (8, false) FuzzyAIRuntime());
-    mUnidentified428->mScriptMachine->UnidentifiedVirtual2();
+    mUnidentified428->mScriptMachine->Initialize();
 
     bIsModified = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
@@ -290,10 +277,10 @@ float cFielder::fn_8002E058()
 extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
 {
     shdStateMachine* pAction
-        = fn_80319F94(pFielder->mUnidentified428->mScriptMachine, nAction);
+        = GetScriptMachineState(pFielder->mUnidentified428->mScriptMachine, nAction);
     if (pAction == 0)
     {
-        pAction = fn_80319FC0(
+        pAction = GetConcurrentState(
             pFielder->mUnidentified428->mScriptMachine, nAction);
     }
     return (Desire*)pAction;
@@ -332,6 +319,145 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     return nUnidentified;
 }
 
+static inline bool IsPowerupBlockedByAction(eFielderActionState eActionState)
+{
+    switch (eActionState)
+    {
+    case 3:
+    case 0x18:
+        return true;
+    default:
+        return false;
+    }
+}
+
+extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
+{
+    if (nPowerupType == -1)
+    {
+        nPowerupType = pFielder->m_pTeam->GetCurrentPowerUp().eType;
+    }
+
+    eFielderActionState eActionState = pFielder->m_eActionState;
+    if (IsPowerupBlockedByAction(eActionState))
+    {
+        return false;
+    }
+
+    if (eActionState == (eFielderActionState)0x23)
+    {
+        return false;
+    }
+
+    bool bFrozen = fn_8003877C(pFielder) || pFielder->IsFrozen();
+    if (bFrozen)
+    {
+        return false;
+    }
+
+    if (pFielder->fn_8003EA6C())
+    {
+        return false;
+    }
+
+    if (pFielder->fn_8002E060() == (eFielderDesireState)0x20)
+    {
+        if (pFielder->m_eActionState == ACTION_SHOT)
+        {
+            return false;
+        }
+        if (nPowerupType >= 9 && nPowerupType <= 0x14)
+        {
+            return false;
+        }
+    }
+
+    if (pFielder->m_nPowerupAnimID >= 0)
+    {
+        return false;
+    }
+
+    if (pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    {
+        return false;
+    }
+
+    if (pFielder->m_eActionState == ACTION_ELECTROCUTION && pFielder->m_eAnimID != 0x78
+        && pFielder->m_eAnimID != 0x7B)
+    {
+        return false;
+    }
+
+    if (pFielder->IsFallenDown()
+        && (nPowerupType == POWER_UP_MUSHROOM || nPowerupType == POWER_UP_STAR))
+    {
+        return false;
+    }
+
+    if (pFielder->m_eActionState == ACTION_UNKNOWN_32
+        && (nPowerupType == POWER_UP_MUSHROOM || nPowerupType == POWER_UP_STAR))
+    {
+        return false;
+    }
+
+    if (fn_8003E948(pFielder) || fn_8003E8A0(pFielder) || pFielder->fn_8003E9F0())
+    {
+        if (pFielder->IsFallenDown())
+        {
+            return false;
+        }
+
+        switch (pFielder->m_eActionState)
+        {
+        case 1:
+        case ACTION_HIT:
+        case ACTION_LATE_ONETIMER_FROM_VOLLEY:
+        case ACTION_LOOSE_BALL_PASS:
+        case ACTION_LOOSE_BALL_SHOT:
+        case ACTION_SHOOT_TO_SCORE:
+        case ACTION_ONETIMER:
+        case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
+        case ACTION_PASS:
+        case ACTION_RECEIVE_PASS:
+        case (eFielderActionState)0x13:
+        case ACTION_UNKNOWN_15:
+        case ACTION_SLIDE_ATTACK:
+            return false;
+        case ACTION_UNKNOWN_30:
+            if (fn_8003E948(pFielder))
+            {
+                return false;
+            }
+            break;
+        }
+    }
+
+    cFielder* pCaptain = pFielder->m_pTeam->GetCaptain();
+    if (pFielder->m_pTeam->fn_800A6764())
+    {
+        eCharacterClass eCaptainClass = pCaptain->mUnidentified024.m_eCharacterClass;
+        if (eCaptainClass == DAISY || eCaptainClass == YOSHI || eCaptainClass == MARIO)
+        {
+            switch (pFielder->m_eActionState)
+            {
+            case ACTION_HIT:
+                return false;
+            case 1:
+                return false;
+            case (eFielderActionState)0x1C:
+                return false;
+            }
+
+            if ((eCaptainClass == MARIO || eCaptainClass == DAISY || eCaptainClass == YOSHI)
+                && pFielder->IsFallenDown())
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool cFielder::CanGetElectrocuted(
     const CollisionPlayerWallData* eventData)
 {
@@ -358,7 +484,7 @@ bool cFielder::CanGetElectrocuted(
             float netPostRadius = cNet::GetPostRadius();
             float netWidth = m_pTeam->m_pNet->GetNetWidth();
             float minYElectrocutionPosition
-                = netWidth * lbl_806E3424 + netPostRadius;
+                = netWidth / 2.0f + netPostRadius;
             float netHeight = m_pTeam->m_pNet->GetNetHeight();
             nlVector3 jointPos
                 = GetJointPosition(m_nBip01JointIndex_0xA4);
@@ -376,7 +502,7 @@ bool cFielder::CanGetElectrocuted(
         float netPostRadius = cNet::GetPostRadius();
         float netWidth = m_pTeam->m_pNet->GetNetWidth();
         float minYElectrocutionPosition
-            = netWidth * lbl_806E3424 + netPostRadius;
+            = netWidth / 2.0f + netPostRadius;
         float netHeight = m_pTeam->m_pNet->GetNetHeight();
         nlVector3 jointPos
             = GetJointPosition(m_nBip01JointIndex_0xA4);
@@ -386,7 +512,7 @@ bool cFielder::CanGetElectrocuted(
         {
             bool bUnidentified = false;
             if (mUnidentified024.m_eCharacterClass == MARIO
-                && fn_80319FEC(
+                && IsConcurrentStateActive(
                     mUnidentified428->mScriptMachine, 0x17))
             {
                 bUnidentified = true;
@@ -404,8 +530,8 @@ bool cFielder::CanGetElectrocuted(
                     || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
                 && m_eActionState == (eFielderActionState)1)
             {
-                if (m_pCurrentAnimController->m_fTime > lbl_806E3428
-                    || mUnidentified024.m_v3Position.z > lbl_806E3418)
+                if (m_pCurrentAnimController->m_fTime > 0.7f
+                    || mUnidentified024.m_v3Position.z > 1.0f)
                 {
                     return true;
                 }
@@ -441,14 +567,14 @@ static inline bool CanShootFromPosition(cFielder* pFielder, bool requireBall)
     float radius = 0.0f;
     pFielder->m_pPhysicsCharacter->GetRadius(&radius);
 
-    float offset = lbl_806E342C + radius;
+    float offset = 0.1f + radius;
     float maxX = offset + pFielder->GetPosition().x;
     float minX = pFielder->GetPosition().x - offset;
-    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= 0.0f;
     bool inAttackingHalf = true;
     if (!maxXInHalf)
     {
-        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= 0.0f;
         if (!minXInHalf)
         {
             inAttackingHalf = false;
@@ -504,6 +630,80 @@ bool cFielder::CanDoCaptainShootToScore()
     return false;
 }
 
+bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
+{
+    nlVector3 v3BallPos;
+    nlVector3 v3ContactPos;
+    if (mfAirInterceptHeight[0] < 0.0f)
+    {
+        const LooseBallContactAnimInfo* pLeadAnimInfo = GetOneTimerLeadGroundContactAnims();
+        float fAnimContactFrame = pLeadAnimInfo->fAnimContactFrame;
+        const cSAnim* pLeadAnim = m_pAnimInventory->GetAnim(pLeadAnimInfo->nAnimID);
+        GetJointPositionFuture(&v3ContactPos, pLeadAnimInfo->nAnimID, m_nBallJointIndex,
+            GetNormalizedContactTime(pLeadAnim, fAnimContactFrame), true, true, false, true);
+        mfAirInterceptHeight[0] = v3ContactPos.z;
+    }
+
+    float fInterceptHeight = mfAirInterceptHeight[0] * GetPlayerScale();
+    if (g_pBall->m_v3Position.z > 3.0f * fInterceptHeight)
+    {
+        return false;
+    }
+
+    if (g_pBall->m_pOwner == 0 && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0)
+    {
+        bool bPassInFlight = false;
+        if ((g_pBall->meBallState == 5 || g_pBall->meBallState == 3) && g_pBall->m_pPassTarget != 0)
+        {
+            bPassInFlight = true;
+        }
+
+        if (!(bPassInFlight && requireBestInterceptor) && !fn_80014E20(g_pBall))
+        {
+            bool bHasGlobalPad = GetGlobalPad() != 0;
+            if (bHasGlobalPad && fn_8002E060() >= 0x14)
+            {
+                return true;
+            }
+
+            float fGroundContactFrame = GetOneTimerIdleGroundContactAnims()[0].fAnimContactFrame;
+            const cSAnim* pGroundAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleGroundContactAnims()[0].nAnimID];
+            float fGroundContactTime = GetNormalizedContactTime(pGroundAnim, fGroundContactFrame);
+            const cSAnim* pVolleyAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleVolleyContactAnims()[0].nAnimID];
+            float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, GetOneTimerIdleVolleyContactAnims()[0].fAnimContactFrame);
+
+            for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
+            {
+                fn_800180F4(g_pBall, &v3BallPos, fTime);
+                u16 aMoveDirection = mUnidentified024.m_aActualMovementDirection;
+                float fDeltaX = v3BallPos.x - mUnidentified024.m_v3Position.x;
+                float fDeltaY = v3BallPos.y - mUnidentified024.m_v3Position.y;
+                u16 aBallDirection = RadToAng16(nlATan2f(fDeltaY, fDeltaX));
+                u16 aDelta = abs_s16((s16)(aBallDirection - aMoveDirection));
+                float fReachScale = InterpolateRangeClamped(1.25f, 3.0f, 32768.0f, 0.0f, aDelta);
+                nlVector2 v2Delta;
+                v2Delta.x = v3BallPos.x - mUnidentified024.m_v3Position.x;
+                v2Delta.y = v3BallPos.y - mUnidentified024.m_v3Position.y;
+                if (nlVec2Length(v2Delta) <= fReachScale * mUnidentified024.m_fPlayerScale)
+                {
+                    if (requireBestInterceptor)
+                    {
+                        if (m_pTeam->GetGoalie()->fn_8009670C(&v3BallPos, true) == this)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool cFielder::CanDoSidekickShootToScore()
 {
     bool canShoot = CanShootFromPosition(this, false);
@@ -540,17 +740,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(
     return fn_80041B0C(runtime, fielder, name);
 }
 
-cFielder* cFielder::DoFindBestHitTarget()
-{
-    UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
-        FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
-    if (vBestTarget.IsPointerType())
-    {
-        return (cFielder*)vBestTarget.mData.pPlayer;
-    }
-    return 0;
-}
-
 static inline void GetCharacterSpecialActive(
     const cFielder* fielder, eCharacterClass character, bool& active)
 {
@@ -568,7 +757,7 @@ static inline void GetCharacterSpecialActive(
 
 bool cFielder::fn_8003E6EC() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17);
 }
 
 void cFielder::SetSlideAttackSuccessFlag()
@@ -583,27 +772,27 @@ FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
 
 bool cFielder::fn_8003E6FC() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x18);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x18);
 }
 
 bool cFielder::fn_8003E70C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E);
 }
 
 bool cFielder::fn_8003E71C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x19);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x19);
 }
 
 bool cFielder::fn_8003E72C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1A);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1A);
 }
 
 bool cFielder::fn_8003E73C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C);
 }
 
 bool cFielder::fn_8003E74C() const
@@ -635,15 +824,18 @@ bool cFielder::fn_8003E8F4() const
     return active;
 }
 
+extern "C" bool fn_8003E948(const cFielder* pFielder)
+{
+    bool active;
+    GetCharacterSpecialActive(pFielder, MARIO, active);
+    return active;
+}
+
 bool cFielder::fn_8003E9F0() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0xB
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, YOSHI, active);
+    return active;
 }
 
 bool cFielder::fn_8003EA44() const
@@ -750,7 +942,7 @@ bool cFielder::CanReceivePass()
     if (bCondition6)
     {
         DesireFrozen* pAction = (DesireFrozen*)
-            fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+            GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
         bool bActionActive = false;
         if (pAction != 0 && pAction->mActive
             && pAction->meFrozenState != 0)
@@ -768,13 +960,13 @@ bool cFielder::CanReceivePass()
 
 void cFielder::Unknown8(unsigned short aParam, bool bParam)
 {
-    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E))
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E))
     {
         DesireConfused* pAction = (DesireConfused*)
-            fn_80319F94(mUnidentified428->mScriptMachine, 0x1E);
+            GetScriptMachineState(mUnidentified428->mScriptMachine, 0x1E);
         if (pAction == 0)
         {
-            pAction = (DesireConfused*)fn_80319FC0(
+            pAction = (DesireConfused*)GetConcurrentState(
                 mUnidentified428->mScriptMachine, 0x1E);
         }
         pAction->fn_800BED24(&aParam);
@@ -786,10 +978,10 @@ void cFielder::Unknown8(unsigned short aParam, bool bParam)
 void cFielder::fn_8003057C(int nParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
+        GetScriptMachineState(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
-        pAction = (DesireSteering*)fn_80319FC0(
+        pAction = (DesireSteering*)GetConcurrentState(
             mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_ThingsToAvoid = nParam;
@@ -798,10 +990,10 @@ void cFielder::fn_8003057C(int nParam)
 void cFielder::fn_800305DC(float fParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
+        GetScriptMachineState(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
-        pAction = (DesireSteering*)fn_80319FC0(
+        pAction = (DesireSteering*)GetConcurrentState(
             mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_fAvoidanceMult = fParam;
@@ -855,6 +1047,37 @@ bool cFielder::fn_800306F4(cFielder* pParam)
     return false;
 }
 
+extern "C" float fn_80030750(cFielder* pFielder)
+{
+    if (pFielder->mUnidentified35C < 0.0001f)
+    {
+        cSAnim* pAnim = pFielder->m_pAnimInventory->GetAnim(0x67);
+        nlVector3 v3Start;
+        nlVector3 v3End;
+        if (pFielder->mUnidentified024.m_eCharacterClass != TOAD)
+        {
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D020(pFielder->m_pTweaks)), &v3Start);
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D050(pFielder->m_pTweaks)), &v3End);
+        }
+        else
+        {
+            int nJointIndex = pFielder->m_pPoseAccumulator->GetBaseHierarchy()->GetNodeIndexByID(
+                nlStringLowerHash("bip01 Ponytail12"));
+            pFielder->GetJointPositionFuture(&v3Start, 0x67, nJointIndex, 2.0f / pAnim->GetNumFrames(),
+                true, true, true, true);
+            pFielder->GetJointPositionFuture(&v3End, 0x67, nJointIndex, 6.0f / pAnim->GetNumFrames(),
+                true, true, true, true);
+        }
+        nlVector3 v3Delta;
+        nlVec3Set(v3Delta, v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
+        pFielder->mUnidentified35C = nlVec3Length(v3Delta);
+    }
+    float fScale = pFielder->mUnidentified024.m_fMovementScale;
+    float fReach = pFielder->mUnidentified35C * fScale;
+    fReach += fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale());
+    return fReach;
+}
+
 static inline u8 IsHittingForCollision(const cFielder* fielder)
 {
     return fielder->IsHitting();
@@ -876,9 +1099,28 @@ static inline int HasBallForCollision(const cFielder* fielder)
     return fielder->HasBall();
 }
 
+static inline void ResolveSlideAttack(cFielder* pWinner, cFielder* pLoser)
+{
+    int bHadBall = HasBallForCollision(pLoser);
+    bool bBallTooHigh = g_pBall->m_v3Position.z > 0.66f;
+    pLoser->InitActionSlideAttackReact(pWinner, false);
+    pWinner->bAttackSucceeded = true;
+    if (bHadBall && !bBallTooHigh)
+    {
+        pWinner->PickupBall(g_pBall);
+        fn_80036594(pWinner, pLoser, 2);
+    }
+    else
+    {
+        fn_80036594(pWinner, pLoser, 3);
+    }
+}
+
 void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
     cPlayer* pPlayerCollidedWith = pData->player2;
+    // Never read: only emits 0.75f here so the .sdata2 literal order matches retail.
+    float fUnused = 0.75f;
     if (pPlayerCollidedWith->m_eClassType != FIELDER)
         return;
 
@@ -998,85 +1240,25 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 if (m_pTweaks->mUnidentified064
                     < pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    int bHadBall = HasBallForCollision(this);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    InitActionSlideAttackReact(pFielderCollidedWith, false);
-                    pFielderCollidedWith->bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        pFielderCollidedWith->PickupBall(g_pBall);
-                        fn_80036594(pFielderCollidedWith, this, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(pFielderCollidedWith, this, 3);
-                    }
+                    ResolveSlideAttack(pFielderCollidedWith, this);
                 }
                 else if (m_pTweaks->mUnidentified064
                     > pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    pFielderCollidedWith->InitActionSlideAttackReact(this, false);
-                    bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        PickupBall(g_pBall);
-                        fn_80036594(this, pFielderCollidedWith, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(this, pFielderCollidedWith, 3);
-                    }
+                    ResolveSlideAttack(this, pFielderCollidedWith);
                 }
                 else if (GetActualSpeed() < pFielderCollidedWith->GetActualSpeed())
                 {
-                    int bHadBall = HasBallForCollision(this);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    InitActionSlideAttackReact(pFielderCollidedWith, false);
-                    pFielderCollidedWith->bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        pFielderCollidedWith->PickupBall(g_pBall);
-                        fn_80036594(pFielderCollidedWith, this, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(pFielderCollidedWith, this, 3);
-                    }
+                    ResolveSlideAttack(pFielderCollidedWith, this);
                 }
                 else
                 {
-                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    pFielderCollidedWith->InitActionSlideAttackReact(this, false);
-                    bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        PickupBall(g_pBall);
-                        fn_80036594(this, pFielderCollidedWith, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(this, pFielderCollidedWith, 3);
-                    }
+                    ResolveSlideAttack(this, pFielderCollidedWith);
                 }
             }
             else
             {
-                int bHadBall = HasBallForCollision(this);
-                bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                InitActionSlideAttackReact(pFielderCollidedWith, false);
-                pFielderCollidedWith->bAttackSucceeded = true;
-                if (bHadBall && !bUnidentified)
-                {
-                    pFielderCollidedWith->PickupBall(g_pBall);
-                    fn_80036594(pFielderCollidedWith, this, 2);
-                }
-                else
-                {
-                    fn_80036594(pFielderCollidedWith, this, 3);
-                }
+                ResolveSlideAttack(pFielderCollidedWith, this);
             }
         }
         else if (m_eActionState == ACTION_LOOSE_BALL_PASS
@@ -1124,13 +1306,99 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     }
 }
 
+extern "C" void fn_800318F8(cFielder* pFielder)
+{
+    if (pFielder->m_pBall != 0 && pFielder->mUnidentified1E4.m_eLastPadAction == 0x1B)
+    {
+        cPlayer* pPassTarget;
+        if (pFielder->GetGlobalPad() == 0)
+        {
+            UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+                FuzzyAIGetFielderRuntime(pFielder), "BestPassTarget", pFielder);
+            pPassTarget = vBestTarget.GetPlayer();
+        }
+        else
+        {
+            pPassTarget = fn_80096F54(pFielder,
+                pFielder->GetGlobalPad() != 0 ? pFielder->GetGlobalPad()->IsPressed(0x17, true) : false);
+        }
+
+        if (pPassTarget != 0)
+        {
+            pFielder->DoRegularPassing(pPassTarget, pFielder->bIsModified, true, false, false,
+                GetSlowestVolleyPassSpeed(pFielder->GetTweaks()),
+                GetFastestVolleyPassSpeed(pFielder->GetTweaks()));
+        }
+        pFielder->mUnidentified1E4.m_eLastPadAction = 0x32;
+    }
+}
+
+extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenTime)
+{
+    bool bHasEgg = false;
+    if (pFielder->mUnidentified024.m_eCharacterClass == TOAD
+        && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17))
+    {
+        bHasEgg = true;
+    }
+
+    if (bHasEgg)
+    {
+        gNPCManager->mpYoshiEgg->Suspend(false, fFrozenTime);
+    }
+    else if (pFielder->m_pBall != 0)
+    {
+        pFielder->ReleaseBall(0);
+        if ((pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xE
+                || pFielder->mUnidentified024.m_eCharacterClass == MYSTERY)
+            && pFielder->m_eActionState == (eFielderActionState)0x15)
+        {
+            if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
+            {
+                gNPCManager->mpKoopaShell->Deactivate(false);
+            }
+            if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
+            {
+                gNPCManager->mpBirdoEgg->Hide(false);
+            }
+        }
+
+        if (pFielder->mUnidentified024.m_eCharacterClass == DAISY
+            && pFielder->m_eActionState == (eFielderActionState)1)
+        {
+            nlVector3 v3WarpPos = pFielder->mUnidentified024.m_v3Position;
+            v3WarpPos.z = 0.18f;
+            nlVector3 v3Offset;
+            u16 aFacing = pFielder->mUnidentified024.m_aActualFacingDirection;
+            nlPolarToCartesian(v3Offset.x, v3Offset.y, aFacing,
+                fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale()));
+            v3Offset.z = 0.18f;
+            nlVec3Add(v3WarpPos, v3WarpPos, v3Offset);
+            g_pBall->WarpTo(v3WarpPos);
+        }
+
+        if (nFrozenState != 2)
+        {
+            nlVector3 v3ReleaseVelocity;
+            nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
+                pFielder->mUnidentified024.m_aActualFacingDirection,
+                2.0f + pFielder->GetActualSpeed());
+            v3ReleaseVelocity.z = 0.5f;
+            g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
+        }
+    }
+
+    ((DesireFrozen*)GetConcurrentState(pFielder->mUnidentified428->mScriptMachine, 0x1D))
+        ->fn_800BE0BC(fFrozenTime, nFrozenState);
+}
+
 void cFielder::CollideWithWallCallback(
     const CollisionPlayerWallData* eventData)
 {
     cPlayer::CollideWithWallCallback(eventData);
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
@@ -1181,15 +1449,15 @@ void cFielder::CollideWithWallCallback(
             {
                 soundID = 0x5089F33E;
             }
-            fn_800ED92C(soundID);
+            PlayCrowdReaction(soundID);
         }
     }
     else if (m_eActionState != (eFielderActionState)3
              && GameInfoManager::Instance()->GetStadium() == 0x0B)
     {
         float distance = (float)fabs(mUnidentified024.m_v3Position.y);
-        distance -= fn_8002BFA8(m_pTweaks, lbl_806E3418);
-        if (distance > cField::GetSidelineY(1) + lbl_806E3424)
+        distance -= fn_8002BFA8(m_pTweaks, 1.0f);
+        if (distance > cField::GetSidelineY(1) + 0.5f)
         {
             fn_80046244();
         }
@@ -1198,9 +1466,9 @@ void cFielder::CollideWithWallCallback(
 
 bool cFielder::IsStuck() const
 {
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
+    return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(1)
-        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
+        || ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(2);
 }
 
@@ -1235,8 +1503,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
         {
             UnidentifiedVariantCollection params;
             params.Set(7, FuzzyVariant(lbl_806DB750));
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1E, &params,
-                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E));
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1E, &params,
+                IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E));
         }
     }
     else if (type == 2)
@@ -1286,8 +1554,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 AddRandomDirt();
                 fn_8001F1C0(1);
             }
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1B, &params,
-                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1B));
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1B, &params,
+                IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1B));
         }
     }
     else if (type == 3)
@@ -1325,13 +1593,13 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 return;
             }
             fn_800470B4(this, eventData->mUnidentified10->m_pOwner);
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C))
             {
                 return;
             }
             UnidentifiedVariantCollection params;
             params.Set(14, FuzzyVariant(pOwner));
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1C, &params, false);
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1C, &params, false);
         }
     }
     else if (type == 6)
@@ -1364,7 +1632,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 12)
     {
-        fn_80319E84(mUnidentified428->mScriptMachine, 0x19, 0, true);
+        ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x19, 0, true);
     }
     else if (type == 8 || type == 9)
     {
@@ -1660,7 +1928,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_tMoveToTurboTimer.UnidentifiedClear();
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
                 RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
@@ -1684,7 +1952,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         mUnidentified1E4.m_eLastPadAction = 50;
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
                 RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
@@ -1885,7 +2153,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
-               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
                 bCondition4 = true;
@@ -1896,7 +2164,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
-               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
                 bCondition5 = true;
@@ -2060,6 +2328,17 @@ void cFielder::DoClearBall()
     g_pBall->ShootAtFast(v3ClearBallVelocity, v3Target, fDesiredTime);
     g_pBall->ShootRelease(v3ClearBallVelocity, SPINTYPE_BACK);
     SetNoPickUpTime(0.2f);
+}
+
+cFielder* cFielder::DoFindBestHitTarget()
+{
+    UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+        FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
+    if (vBestTarget.IsPointerType())
+    {
+        return (cFielder*)vBestTarget.mData.pPlayer;
+    }
+    return 0;
 }
 
 void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed, int nParam)
@@ -2266,9 +2545,9 @@ void cFielder::DoRegularShooting(bool bParam)
     if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
         nBallState = 8;
-        if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C))
         {
-            fn_80319E58(mUnidentified428->mScriptMachine, 0x1C);
+            DeactivateConcurrentState(mUnidentified428->mScriptMachine, 0x1C);
         }
         if (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12)
         {
@@ -2452,6 +2731,25 @@ void cFielder::SetAction(eFielderActionState actionState)
     m_eActionState = actionState;
 }
 
+static LooseBallContactAnimInfo gOneTimerIdleGroundContactAnims[4] = {
+    { 0x38, 9.0f, 0xE000, 0x2000 },
+    { 0x39, 9.0f, 0xA000, 0xE000 },
+    { 0x3B, 9.0f, 0x6000, 0xA000 },
+    { 0x3A, 9.0f, 0x2000, 0x6000 },
+};
+
+static LooseBallContactAnimInfo gOneTimerIdleVolleyContactAnims[4] = {
+    { 0x44, 4.0f, 0xE000, 0x2000 },
+    { 0x45, 4.0f, 0xA000, 0xE000 },
+    { 0x47, 4.0f, 0x6000, 0xA000 },
+    { 0x46, 4.0f, 0x2000, 0x6000 },
+};
+
+static LooseBallContactAnimInfo gOneTimerLeadGroundContactAnims[2] = {
+    { 0x48, 6.0f, 0xC000, 0x4000 },
+    { 0x49, 6.0f, 0x4000, 0xC000 },
+};
+
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims()
 {
     return gOneTimerIdleGroundContactAnims;
@@ -2634,40 +2932,30 @@ bool cFielder::IsFallenDown() const
 bool cFielder::fn_80038918() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
-    bool bActionActive = false;
-    if (pAction != 0 && pAction->mActive
-        && pAction->meFrozenState != 0)
-    {
-        bActionActive = true;
-    }
-    return bActionActive;
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
+    return pAction != 0 && pAction->mActive && pAction->meFrozenState != 0;
+}
+
+static inline bool CanStartHit(const cFielder* fielder)
+{
+    return fielder->GetCharacterClass() != TOAD && !fielder->fn_80038918();
+}
+
+static inline bool IsInHitAction(const cFielder* fielder)
+{
+    return CanStartHit(fielder) && fielder->m_eActionState == ACTION_HIT;
+}
+
+static inline bool HasHitWindowStarted(const cFielder* fielder, float fAnimTime)
+{
+    return IsInHitAction(fielder) && fAnimTime >= fn_8002D020(fielder->m_pTweaks);
 }
 
 bool cFielder::IsHitting() const
 {
     const float fAnimTime
         = m_pCurrentAnimController->m_fTime * m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
-
-    bool isHitting, hitStarted, hitAction, canHit;
-    canHit = hitAction = hitStarted = isHitting = false;
-    if (mUnidentified024.m_eCharacterClass != TOAD && !fn_80038918())
-    {
-        canHit = true;
-    }
-    if (canHit && m_eActionState == ACTION_HIT)
-    {
-        hitAction = true;
-    }
-    if (hitAction && fAnimTime >= fn_8002D020(m_pTweaks))
-    {
-        hitStarted = true;
-    }
-    if (hitStarted && fAnimTime <= fn_8002D050(m_pTweaks))
-    {
-        isHitting = true;
-    }
-    return isHitting;
+    return HasHitWindowStarted(this, fAnimTime) && fAnimTime <= fn_8002D050(m_pTweaks);
 }
 
 bool cFielder::fn_80038660() const
@@ -2697,6 +2985,16 @@ bool cFielder::IsDefense() const
     return m_eRole == ROLE_DEFENCE;
 }
 
+unsigned int cFielder::IsFrozen() const
+{
+    return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
+}
+
+extern "C" bool fn_8003877C(const cFielder* pFielder)
+{
+    return ((DesireFrozen*)GetConcurrentState(pFielder->mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(1);
+}
+
 bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
 {
     if (IsStuck())
@@ -2711,7 +3009,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
 
     bool bUnidentified = false;
     if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
     {
         bUnidentified = true;
     }
@@ -2734,7 +3032,7 @@ bool cFielder::InitDesire(eFielderDesireState eDesireType, float fConfidence,
     params.Set(1, FuzzyVariant(opt2));
 
     bool bDesireInitSuccess = mUnidentified428->mScriptMachine
-        ->UnidentifiedVirtual5(eDesireType, &params, true) != 0;
+        ->ActivateState(eDesireType, &params, true) != 0;
     return bDesireInitSuccess;
 }
 
@@ -2750,7 +3048,7 @@ void cFielder::PrePhysicsUpdate()
     cPlayer::PrePhysicsUpdate();
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
@@ -2814,13 +3112,13 @@ void cFielder::Update(float fDeltaT)
 
 ePowerUpType cFielder::GetPowerupType()
 {
-    return ((DesireUsePowerup*)fn_80319FC0(
+    return ((DesireUsePowerup*)GetConcurrentState(
         mUnidentified428->mScriptMachine, 0x11))->GetPowerupType();
 }
 
 void cFielder::UseTeamPowerup(cFielder* pTarget)
 {
-    ((DesireUsePowerup*)fn_80319FC0(
+    ((DesireUsePowerup*)GetConcurrentState(
         mUnidentified428->mScriptMachine, 0x11))->fn_800D3968(
         pTarget, POWER_UP_NONE, true);
 }
@@ -3146,7 +3444,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         return;
     }
 
-    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E)
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E)
         && !IsFallenDown()
         && (mUnidentified024.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
@@ -3951,17 +4249,17 @@ void cFielder::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_eRole, sizeof(m_eRole));
 }
 
-UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder)
+ScriptMachine* fn_8002E1A4(cFielder* pFielder)
 {
     return pFielder->mUnidentified428->mScriptMachine;
 }
 
 eFielderDesireState cFielder::fn_8002E060()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
-    if (machine != 0 && machine->mUnidentified004 != 0)
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
+    if (machine != 0 && machine->mActiveState != 0)
     {
-        return (eFielderDesireState)machine->mUnidentified004->mState;
+        return (eFielderDesireState)machine->mActiveState->mState;
     }
     return (eFielderDesireState)-1;
 }
@@ -3980,14 +4278,13 @@ PlayerTweaks* cFielder::GetTweaks() const
     return m_pTweaks;
 }
 
-extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
 
 void cFielder::EndDesire()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
-        fn_803198F4(machine);
+        DeactivateScriptMachine(machine);
     }
 }
 
@@ -4024,20 +4321,20 @@ void cFielder::IncrementPowerupMeter(int nParam, float fAmount)
 
 void cFielder::fn_8002E0FC()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
-        fn_803198F4(machine);
-        fn_80319DA0(mUnidentified428->mScriptMachine);
+        DeactivateScriptMachine(machine);
+        DeactivateConcurrentStates(mUnidentified428->mScriptMachine);
     }
 }
 
 int cFielder::fn_8002E9D0() const
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
-    if (machine != 0 && machine->mUnidentified008 != 0)
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
+    if (machine != 0 && machine->mPreviousState != 0)
     {
-        return machine->mUnidentified008->mState;
+        return machine->mPreviousState->mState;
     }
     return -1;
 }
@@ -4047,9 +4344,9 @@ bool cFielder::fn_8003499C() const
     bool result = false;
     int state;
     if (mUnidentified428->mScriptMachine != 0
-        && mUnidentified428->mScriptMachine->mUnidentified004 != 0)
+        && mUnidentified428->mScriptMachine->mActiveState != 0)
     {
-        state = mUnidentified428->mScriptMachine->mUnidentified004
+        state = mUnidentified428->mScriptMachine->mActiveState
                     ->GetState();
     }
     else
@@ -4059,7 +4356,7 @@ bool cFielder::fn_8003499C() const
     if (state == 0x16)
     {
         result = ((DesireReceivePass*)
-            mUnidentified428->mScriptMachine->mUnidentified004)->fn_800C0E54();
+            mUnidentified428->mScriptMachine->mActiveState)->fn_800C0E54();
     }
     return result;
 }

@@ -3,9 +3,7 @@
 
 #include "Game/Event.h"
 
-// An event whose listeners come from a fixed-size pool. Its virtual members
-// are defined out of class, in a file apart from the typed-event base, so a
-// unit emits them with its own event's destructor, after its vtables.
+// An event whose listeners come from a fixed-size pool.
 template <typename T, int Count>
 class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
 {
@@ -33,12 +31,13 @@ public:
         }
     }
 
-    virtual void Disconnect(void* owner);
     virtual void Add(const Callback& callback, unsigned int value, int flags);
+    virtual void Disconnect(void* owner);
 
     void Deliver(typename UnidentifiedEventCallback<T>::Parameter data)
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -54,7 +53,8 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
@@ -66,7 +66,8 @@ public:
 
     void Deliver()
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -82,12 +83,12 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
-                entry->~ListenerEntry();
-                mListeners.m_Allocator.Free(entry);
+                mListeners.DeleteEntry(entry);
             }
         }
         this->mCurrentConnection = 0;

@@ -18,7 +18,7 @@
 
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/Fuzzy.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AnimInventory.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/HeadTrack.h"
@@ -2996,7 +2996,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
             if (pCaptain != pFielder && fn_8003881C(pFielder)
                 && g_pGame->mUnidentified030 == 0)
             {
-                RequestStateMachineDeactivation(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
+                RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
             }
         }
     }
@@ -3308,26 +3308,26 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
         else if (g_pNetworkSession->IsLiveNetworkGame()
-                 && g_pGame->mUnidentified0C0.mSize != 0)
+                 && g_pGame->mUnidentified0C0.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.Pop(),
                 nParam);
         }
     }
     else if (g_pNetworkSession->IsLiveNetworkGame() && nParam == 0
-             && g_pGame->mUnidentified0C0.mSize != 0)
+             && g_pGame->mUnidentified0C0.mCount != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
-            g_pGame->mUnidentified0C0.mSize,
+            g_pGame->mUnidentified0C0.mCount,
             mUnidentified478);
 
-        while (g_pGame->mUnidentified0C0.mSize != 0)
+        while (g_pGame->mUnidentified0C0.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.Pop(),
                 nParam);
         }
     }
@@ -3465,7 +3465,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     if (nParam != 0)
     {
         if (g_pNetworkSession->IsLiveNetworkGame()
-            && g_pGame->mUnidentified134.mSize > 0)
+            && g_pGame->mUnidentified134.mCount > 0)
         {
             g_pGame->fn_80058180();
         }
