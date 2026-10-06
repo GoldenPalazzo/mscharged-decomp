@@ -10714,7 +10714,7 @@ __cl__Q239Function2<b,RCUi,P18AudioEffectBinding>142FunctorImpl<126BindExp3<b,PF
 Clone__Q239Function2<b,RCUi,P18AudioEffectBinding>142FunctorImpl<126BindExp3<b,PFRCUiP18AudioEffectBindingP22AudioScriptUpdateState_b,14Placeholder<0>,14Placeholder<1>,P22AudioScriptUpdateState>>CFv = .text:0x802F8300; // type:function size:0x64
 __dt__Q239Function2<b,RCUi,P18AudioEffectBinding>142FunctorImpl<126BindExp3<b,PFRCUiP18AudioEffectBindingP22AudioScriptUpdateState_b,14Placeholder<0>,14Placeholder<1>,P22AudioScriptUpdateState>>Fv = .text:0x802F8364; // type:function size:0x44
 __dt__28SlotPool<16AudioBindingNode>Fv = .text:0x802F83A8; // type:function size:0x70
-Unidentified8418__18AudioEffectBindingFUi = .text:0x802F8418; // type:function size:0x4
+OnBindingCreated__18AudioEffectBindingFUi = .text:0x802F8418; // type:function size:0x4
 OnSoundStarted__18AudioEffectBindingFUi = .text:0x802F841C; // type:function size:0x2C8
 NotifyEffectSoundStarted__FRCUiPP15AudioEffectBaseUi = .text:0x802F86E4; // type:function size:0x3C
 OnSoundStopped__18AudioEffectBindingFUi = .text:0x802F8720; // type:function size:0x2D4
