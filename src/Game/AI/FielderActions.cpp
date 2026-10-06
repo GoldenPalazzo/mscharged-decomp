@@ -171,7 +171,6 @@ extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
-extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
 extern "C" float fn_80038970(

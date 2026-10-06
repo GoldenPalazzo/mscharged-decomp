@@ -1,4 +1,3 @@
-#include "NL/nlDLListContainer.inl"
 #include "Game/AI/ShotMeter.h"
 
 #include "Game/AI/AIPad.h"
@@ -11,8 +10,6 @@
 #include "Game/Game.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMath.h"
-
-extern "C" float fn_800A0508(cFielder*, bool, bool);
 
 float lbl_806DBE58 = 1.55f;
 float lbl_806DBE5C = 1.55f;

@@ -5,6 +5,8 @@
 
 class cFielder;
 
+extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
+
 enum eShotMeterState
 {
     SHOT_METER_INACTIVE = 0,
