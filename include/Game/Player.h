@@ -35,11 +35,11 @@ enum ePadActions
     PAD_SWITCH = 26,
 };
 
-struct UnidentifiedPlayerState_1E4
+struct PlayerGameplayState
 {
 
-    UnidentifiedPlayerState_1E4() { UnidentifiedReset(); }
-    void UnidentifiedReset()
+    PlayerGameplayState() { Reset(); }
+    void Reset()
     {
         m_nFeatherAnimID = 0;
         m_bIsContactingWall = false;
@@ -140,7 +140,7 @@ public:
     void DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
         bool bFindPosition, bool bPerfectPass, bool bParam4,
         float fMinPassSpeed, float fMaxPassSpeed);
-    void fn_80095DF4(float fDeltaT);
+    void UpdateGameplayTimers(float fDeltaT);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     bool UnidentifiedPowerupPredicate();
     void PickupBall(cBall* pBall);
@@ -189,7 +189,7 @@ public:
         float fInitialWeight);
 
 public:
-    /* 0x1E4 */ UnidentifiedPlayerState_1E4 mUnidentified1E4;
+    /* 0x1E4 */ PlayerGameplayState mUnidentified1E4;
     /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:

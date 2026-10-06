@@ -59,7 +59,7 @@
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
-extern "C" cPlayer* fn_80096514(
+cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 extern "C" void fn_8002E3F8(cFielder*);
@@ -322,7 +322,7 @@ u8 cPlayer::SwapController(bool bParam)
     return 0;
 }
 
-void cPlayer::fn_80095DF4(float fDeltaT)
+void cPlayer::UpdateGameplayTimers(float fDeltaT)
 {
     if (g_pGame->IsGameplayOrOvertime())
     {
@@ -402,7 +402,7 @@ void cPlayer::Update(float fDeltaT)
         mUnidentified1E4.m_UserControlledTime = 0.0f;
     }
 
-    fn_80095DF4(fDeltaT);
+    UpdateGameplayTimers(fDeltaT);
 
     FieldLocToAILoc(
         mUnidentified1E4.m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
@@ -500,7 +500,7 @@ void cPlayer::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
 }
 
-extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
+cPlayer* FindClosestTeamPlayer(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam)
 {
     cPlayer* pClosestPlayer = NULL;
@@ -534,19 +534,19 @@ extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
 cFielder* cPlayer::GetClosestOpponentFielder(
     nlVector3* pPosition, bool bParam)
 {
-    return (cFielder*)::fn_80096514(
+    return (cFielder*)::FindClosestTeamPlayer(
         this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
 }
 
 cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
 {
-    return ::fn_80096514(
+    return ::FindClosestTeamPlayer(
         this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
 }
 
 cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
 {
-    return ::fn_80096514(this, m_pTeam, 5, pPosition, bParam);
+    return ::FindClosestTeamPlayer(this, m_pTeam, 5, pPosition, bParam);
 }
 
 void cPlayer::PickupBall(cBall* pBall)
@@ -1303,7 +1303,7 @@ void cPlayer::UnidentifiedVirtual1C()
 void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
     cCharacter::Reset(v3Position, aDirection);
-    mUnidentified1E4.UnidentifiedReset();
+    mUnidentified1E4.Reset();
     mUnidentified1E4.m_ResetBaseBallOrientation = true;
     FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
     ClearSwapControllerTimer();
@@ -1514,7 +1514,7 @@ u16 lbl_806DBD96 = 0xFFFF;
 #define REGISTER_PLAYER_FIELD(type, field) \
     cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&field - (u8*)&m_ID, #field)
 
-inline void UnidentifiedPlayerState_1E4::SyncLog(void* context, DebugWriteCache* cache)
+inline void PlayerGameplayState::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DBD96 == 0xFFFF)
     {
