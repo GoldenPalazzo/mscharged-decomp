@@ -41,7 +41,7 @@ typedef char UnidentifiedFunctionSize5[sizeof(Function<PlayerAttackData*>)];
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 bool gCameraEffectsEnabled = true;
-float gCameraTargetVerticalOffsetScale = 0.6f;
+float gCameraTargetYOffsetScale = 0.6f;
 float gShotPresentationZoom = -6.0f;
 float gShotPresentationInitialTimeScale = 0.65f;
 float gShotPresentationEndTimeScale = 0.1f;
@@ -87,7 +87,7 @@ float gCameraClearFieldersZoomAdjustment = 0.4f;
 float gCameraFielderClearRadius = 9.0f;
 float gCameraMaxStadiumTilt = 8.0f;
 float gCameraTiltTargetOffset = -3.0f;
-float gStadium10CameraHeightRate = -1.0f;
+float gStadium10CameraHeightZoomAdjustment = -1.0f;
 
 float lbl_806E0F20[2];
 float gShotPresentationPassTimeOffset;
@@ -467,7 +467,7 @@ nlVector3 UnidentifiedCameraEffects::RotateCameraVector(
     return result;
 }
 
-void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
+void UnidentifiedCameraEffects::AdjustCameraVectors(float zoom,
     nlVector3* camera, nlVector3* target) const
 {
     if ((mCameraFlags & 0x40) != 0)
@@ -481,7 +481,7 @@ void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
     }
     else if (GameInfoManager::Instance()->GetStadium() == 10)
     {
-        camera->z += gStadium10CameraHeightRate * deltaTime;
+        camera->z += gStadium10CameraHeightZoomAdjustment * zoom;
     }
 }
 
@@ -513,7 +513,7 @@ nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
         ReplayManager::Instance();
         nlVec3Sub(offset, target, finalCameraTarget);
         result.x = Interpolate(0.0f, offset.x, mTransitionBlend);
-        result.y = gCameraTargetVerticalOffsetScale
+        result.y = gCameraTargetYOffsetScale
                  * Interpolate(0.0f, offset.y, mTransitionBlend);
     }
 
