@@ -167,10 +167,7 @@ extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
-extern "C" void fn_8005F03C(void* pParam, cFielder** ppFielder);
-extern "C" void fn_8005CBF0(void* pParam);
 
-extern "C" void fn_8005CDD0(void* pParam);
 extern "C" float fn_80030750(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
@@ -178,7 +175,6 @@ extern "C" void fn_8002E340(cFielder* pFielder);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
-extern "C" void fn_8005EBF8(void* pParam, void* pNode);
 extern "C" void fn_8005ED64(void* pParam, void* pNode);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
@@ -195,10 +191,7 @@ struct UnidentifiedActionTarget806E0C94
     /* 0x14 */ nlVector3 mUnidentified14;
 };
 
-extern "C" void fn_8005CA10(cGame* pGame);
-extern "C" void fn_8005C830(cGame* pGame);
 extern bool gbUseTurboCharging;
-extern "C" void fn_8005F238(cGame* pGame, void* pEvent);
 
 class UnidentifiedHandler8011166C
 {
@@ -222,8 +215,6 @@ public:
     /* 0x04 */ u8 mUnknown04[0x28];
     /* 0x2C */ float mUnidentified2C;
 };
-extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
-extern "C" void fn_8005F630(cGame* pGame, void* pEvent);
 
 struct UnidentifiedOnlineState
 {
@@ -232,7 +223,6 @@ struct UnidentifiedOnlineState
 };
 extern UnidentifiedOnlineState* gNetworkInputRecording;
 bool IsNetworkOrRecordedGame(void);
-extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
 
 struct UnidentifiedSkillshotNode
 {
@@ -2210,7 +2200,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pData->pTarget = pTarget;
         pData->mUnidentified10 = false;
-        fn_8005EBF8(g_pGame, pData);
+        QueueAttackAttemptEvent(g_pGame, pData);
 
         if (mUnidentified024.m_eCharacterClass == TOAD)
         {
@@ -2454,7 +2444,7 @@ void cFielder::fn_800474FC(float fDeltaT)
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB8EC)
         && mUnidentified360)
     {
-        fn_8005CA10(g_pGame);
+        DeliverCaptainClashPresentationEvent(g_pGame);
     }
 
     if (ShouldStartCrossBlend(4))
@@ -2548,7 +2538,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
     else
     {
         DoRegularShooting(false);
-        fn_8005C830(g_pGame);
+        DeliverShotPresentationEndEvent(g_pGame);
     }
 
     EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, 0, bShotNormally);
@@ -3135,7 +3125,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         nlVector3 v3Column;
         glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
         event.v3Position = v3Column;
-        fn_8005F238(g_pGame, &event);
+        DeliverMegaStrikeMeterStartEvent(g_pGame, &event);
 
         g_pGame->mpWeatherManager->Pause();
 
@@ -3368,7 +3358,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         g_pGame->mpWeatherManager->Stop(false);
         g_pGame->fn_80058704();
         g_pGame->mpMegaStrikeShooter = this;
-        fn_8005F82C(g_pGame, this);
+        DeliverMegaStrikeIntroEvent(g_pGame, this);
     }
 }
 
@@ -3388,7 +3378,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F434(g_pGame, &event);
+    DeliverMegaStrikeMeterFirstEvent(g_pGame, &event);
 
     if (mUnidentified3AC >= 0.0f)
     {
@@ -3461,7 +3451,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F630(g_pGame, &event);
+    DeliverMegaStrikeMeterSecondEvent(g_pGame, &event);
 
     if (nParam != 0)
     {
@@ -4152,9 +4142,10 @@ void cFielder::fn_8004B658()
             mUnidentified024.m_fActualSpeed = this->GetTweaks()->GetRunningSpeed();
         }
 
-        cFielder* pFielder = this;
-        fn_8005F03C(g_pGame, &pFielder);
-        fn_8005CBF0(g_pGame);
+        ShotAtGoalData event;
+        event.pShooter = this;
+        DeliverWindupShotEvent(g_pGame, &event);
+        DeliverWindupPresentationEvent(g_pGame);
 
         PlaySound(0, 0x900862AC, "Windup", this);
 
@@ -4373,7 +4364,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
         }
     }
 
-    fn_8005CDD0(g_pGame);
+    DeliverWindupPresentationEndEvent(g_pGame);
 }
 
 void cFielder::fn_8004C02C(float fDeltaT)
@@ -4567,7 +4558,7 @@ void cFielder::InitActionSlideAttack(
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->GetPadID() : -1;
         pNode->pTarget = 0;
         pNode->mUnidentified10 = true;
-        fn_8005EBF8(g_pGame, pNode);
+        QueueAttackAttemptEvent(g_pGame, pNode);
     }
 }
 

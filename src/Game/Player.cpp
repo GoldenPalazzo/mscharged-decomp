@@ -617,7 +617,7 @@ void cPlayer::PickupBall(cBall* pBall)
         else if (pBall->m_pPassTarget->m_pTeam != m_pTeam)
             data.eResult = RECEIVEBALL_PASS_INTERCEPT;
     }
-    g_pGame->mUnidentified49C.mEvent15.Deliver(&data);
+    g_pGame->mUnidentified49C.mReceiveBallEvent.Deliver(&data);
     if (data.eResult == RECEIVEBALL_PASS_COMPLETE)
     {
         bool bOneTouchShot = false;

@@ -107,12 +107,12 @@ struct PlayerDistanceSnapshot
     float mBallDistances[10];
 };
 
-extern "C" EventDispatcher* fn_800721C4();
-extern "C" void fn_80072134(LightningStrikeData* node);
-extern "C" void fn_8007214C(ShotAtGoalData* node);
-extern "C" void fn_80072164(NISData* node);
-extern "C" void fn_8007217C(CollisionCrowdData* node);
-extern "C" void fn_80072194(PlayerAttackData* node);
+EventDispatcher* GetGameEventDispatcher();
+void FreeLightningStrikeData(LightningStrikeData* node);
+void FreeShotAtGoalData(ShotAtGoalData* node);
+void FreeNISData(NISData* node);
+void FreeCollisionCrowdData(CollisionCrowdData* node);
+void FreePlayerAttackData(PlayerAttackData* node);
 void PostResetCallback(unsigned long param1, unsigned long param2);
 
 // Tweak "Megastrike/Score differential": when positive, it overrides the
@@ -225,7 +225,7 @@ static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
 {
     if (game->GetGameState() != 4)
     {
-        game->mUnidentified49C.mEvent06.Deliver(data);
+        game->mUnidentified49C.mGoalScoredEvent.Deliver(data);
     }
 }
 
@@ -277,11 +277,11 @@ float GetGameTickerMilliseconds()
 {
     return nlTicksToMilliseconds(nlGetTicker());
 }
-void fn_80056CF4(void* param1, int param2, bool param3)
+void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
 {
     ++lbl_806E2130;
 
-    cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(param1, param2, param3);
+    cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
     g_pGame = game;
 
     cTeam* team = new (8, false) cTeam(0);
@@ -378,7 +378,7 @@ void DestroyPowerups()
 static inline const char* SuddenDeathEventName();
 static inline const char* GameOverEventName();
 
-cGame::cGame(void* param1, int param2, bool param3)
+cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     : mReceivedMegaStrikeMeter((bool*)mReceivedMegaStrikeMeterStorage, 100)
     , mPendingMegaStrikeMeter((bool*)mPendingMegaStrikeMeterStorage, 16)
 {
@@ -392,14 +392,14 @@ cGame::cGame(void* param1, int param2, bool param3)
     m_pPostResetClock->m_uParam1 = (unsigned long)this;
 
     mpTerrain = new (nlMalloc(sizeof(Terrain), 8, false))
-        Terrain((int)param1);
+        Terrain((int)terrainIndex);
 
     mpWeatherManager = new (nlMalloc(sizeof(WeatherManager), 8, false)) WeatherManager();
 
-    mpWeatherManager->Initialize(param2);
+    mpWeatherManager->Initialize(weatherType);
 
     mpCrowdRiot = new (nlMalloc(sizeof(CrowdRiot), 8, false))
-        CrowdRiot(param3);
+        CrowdRiot(startCrowdRiot);
 
     m_pFuzzyTweaks = new (nlMalloc(sizeof(FuzzyTweaks), 8, false))
         FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
@@ -516,9 +516,9 @@ void cGame::ResetMegaStrikeMeterQueues()
     mPendingMegaStrikeMeter.mHead = 0;
     mPendingMegaStrikeMeter.mCount = 0;
 }
-void cGame::SendMegaStrikeMeter(bool param1)
+void cGame::SendMegaStrikeMeter(bool value)
 {
-    mPendingMegaStrikeMeter.Push(param1);
+    mPendingMegaStrikeMeter.Push(value);
 
     if (mPendingMegaStrikeMeter.mCount < gMegaStrikeMeterBatchSize)
     {
@@ -592,10 +592,10 @@ void cGame::InitMegaStrikeGameplay()
 
     g_pBall->m_uGoalType = 6;
 
-    float param3 = mpMegaStrikeShooter->mUnidentified394;
-    float param2 = mpMegaStrikeShooter->mUnidentified390;
+    float accuracy = mpMegaStrikeShooter->mUnidentified394;
+    float numBalls = mpMegaStrikeShooter->mUnidentified390;
     Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
-    pGoalie->InitActionMegaStrike(param2, param3);
+    pGoalie->InitActionMegaStrike(numBalls, accuracy);
     mpMegaStrikeShooter->EndAction();
     fn_80038158(mpMegaStrikeShooter, 0);
 }
@@ -620,21 +620,21 @@ void cGame::ClearMegaStrikeCleanupPending()
 {
     mbMegaStrikeCleanupPending = false;
 }
-void cGame::SetMegaStrikeGameplay(bool param1, int param2, int param3)
+void cGame::SetMegaStrikeGameplay(bool enabled, int defendingSide, int numShots)
 {
-    mbCaptainShotToScoreOn = param1;
-    if (param1)
+    mbCaptainShotToScoreOn = enabled;
+    if (enabled)
     {
-        mbMegaStrikePositiveNet = g_pTeams[param2]->m_pNet->m_v3NetLocation.x > 0.0f;
+        mbMegaStrikePositiveNet = g_pTeams[defendingSide]->m_pNet->m_v3NetLocation.x > 0.0f;
         if (gMegaStrikeShotCountOverride.mValue > 0)
         {
             m_uMegastrikeNumShots = gMegaStrikeShotCountOverride.mValue;
         }
         else
         {
-            m_uMegastrikeNumShots = param3;
+            m_uMegastrikeNumShots = numShots;
         }
-        m_nMegastrikeDefendingTeam = param2;
+        m_nMegastrikeDefendingTeam = defendingSide;
     }
     else
     {
@@ -722,7 +722,7 @@ void cGame::ResetForKickOff()
         CleanupMegaStrikeGameplay();
         mbMegaStrikeCleanupPending = false;
     }
-    mUnidentified49C.mEvent11.Queue();
+    mUnidentified49C.mGetReadyForKickoffEvent.Queue();
 
     SetFieldTilt(0, 0.0f, 0.0f);
     gNPCManager->ResetNPCs();
@@ -764,7 +764,7 @@ void PostResetCallback(unsigned long, unsigned long)
 {
     cGame* game = g_pGame;
     game->ResumeAfterPresentation();
-    game->mUnidentified49C.mEvent12.Queue();
+    game->mUnidentified49C.mKickoffEvent.Queue();
 
     GameplayCamera* camera = cCameraManager::GetCamera<GameplayCamera>(eCameraType_Gameplay);
     if (camera != 0)
@@ -1069,9 +1069,9 @@ void cGame::ResetCachedPlayerDistances()
         m_fCachedBallPlayerDistances[i] = 0.0f;
     }
 }
-void cGame::CopyPlayerDistanceSnapshot(void* param1)
+void cGame::CopyPlayerDistanceSnapshot(void* snapshotData)
 {
-    PlayerDistanceSnapshot* snapshot = static_cast<PlayerDistanceSnapshot*>(param1);
+    PlayerDistanceSnapshot* snapshot = static_cast<PlayerDistanceSnapshot*>(snapshotData);
 
     for (int i = 0; i < 10; i++)
     {
@@ -1106,43 +1106,43 @@ void cGame::PlayEndGamePresentation()
     GetPresentation()->Call("GameEndNoSuddenDeath", "");
 }
 
-void cGame::SendNISLoadedCustomDeterm(u8 param1)
+void cGame::SendNISLoadedCustomDeterm(u8 machineBits)
 {
     struct Message
     {
         u8 type;
-        u8 param1;
+        u8 machineBits;
     } message;
 
     message.type = 29;
-    message.param1 = param1;
+    message.machineBits = machineBits;
 
     u32 frame = gInputManager->mFrameProvider->GetFrame();
-    tDebugPrintManager::Print(DC_NETWORK, "Sending NIS Loaded %d at frame %d\n", message.param1, frame);
+    tDebugPrintManager::Print(DC_NETWORK, "Sending NIS Loaded %d at frame %d\n", message.machineBits, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 void cGame::SendMegaStrike(
-    int param1, int param2, float param3, float param4)
+    int side, int playerId, float numBalls, float accuracy)
 {
     struct Message
     {
         u8 type;
-        u8 param1;
-        u8 param2;
+        u8 side;
+        u8 playerId;
         u8 padding;
-        float param3;
-        float param4;
+        float numBalls;
+        float accuracy;
     } message;
 
     message.type = 181;
-    message.param1 = param1;
-    message.param2 = param2;
+    message.side = side;
+    message.playerId = playerId;
     message.padding = 0;
-    message.param3 = param3;
-    message.param4 = param4;
+    message.numBalls = numBalls;
+    message.accuracy = accuracy;
 
     u32 frame = gInputManager->mFrameProvider->GetFrame();
-    tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", message.param1, message.param2, message.param3, message.param4, frame);
+    tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", message.side, message.playerId, message.numBalls, message.accuracy, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 void cGame::SendMegaStrikePlayerReady()
@@ -1159,25 +1159,25 @@ void cGame::SendMegaStrikeKillCursor()
     tDebugPrintManager::Print(DC_NETWORK, "Sending SendMegaStrikeKillCursor at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::SendMegaStrikeGoalie(unsigned int param1, unsigned int param2, float param3)
+void cGame::SendMegaStrikeGoalie(unsigned int side, unsigned int target, float score)
 {
     struct Message
     {
         u8 type;
-        u8 param1;
-        u8 param2;
+        u8 side;
+        u8 target;
         u8 padding;
-        float param3;
+        float score;
     } message;
 
     message.type = 182;
-    message.param1 = param1;
-    message.param2 = param2;
+    message.side = side;
+    message.target = target;
     message.padding = 0;
-    message.param3 = param3;
+    message.score = score;
 
     u32 frame = gInputManager->mFrameProvider->GetFrame();
-    tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", message.param1, message.param2, message.param3, frame);
+    tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", message.side, message.target, message.score, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 void cGame::SendSlowDownEnd()
@@ -1687,21 +1687,21 @@ extern "C" void fn_8005B330(
     nlVec3Scale(*pVector, temp_f1);
 }
 int ComparePlayerDistances(
-    cPlayer* const* param1, cPlayer* const* param2)
+    cPlayer* const* first, cPlayer* const* second)
 {
     int referenceIndex = GetPlayerIndex(gPlayerDistanceSortReference);
-    cPlayer* firstPlayer = *param1;
+    cPlayer* firstPlayer = *first;
     int firstIndex = GetPlayerIndex(firstPlayer);
-    cPlayer* secondPlayer = *param2;
-    float first = g_pGame->fn_8005B748(referenceIndex, firstIndex);
-    float second = g_pGame->fn_8005B748(
+    cPlayer* secondPlayer = *second;
+    float firstDistance = g_pGame->fn_8005B748(referenceIndex, firstIndex);
+    float secondDistance = g_pGame->fn_8005B748(
         referenceIndex, GetPlayerIndex(secondPlayer));
 
-    if (first == second)
+    if (firstDistance == secondDistance)
     {
         return 0;
     }
-    if (first < second)
+    if (firstDistance < secondDistance)
     {
         return -1;
     }
@@ -1763,17 +1763,17 @@ void cGame::UpdateCachedGameData(float fDeltaT)
     }
     gPlayerDistanceSortReference = 0;
 }
-float cGame::fn_8005B748(int param1, int param2)
+float cGame::fn_8005B748(int firstIndex, int secondIndex)
 {
-    if (param1 > param2)
+    if (firstIndex > secondIndex)
     {
-        return m_fCachedPlayerDistances[param1][param2];
+        return m_fCachedPlayerDistances[firstIndex][secondIndex];
     }
-    return m_fCachedPlayerDistances[param2][param1];
+    return m_fCachedPlayerDistances[secondIndex][firstIndex];
 }
-cPlayer* cGame::GetClosestPlayer(int param1, int param2, int param3)
+cPlayer* cGame::GetClosestPlayer(int playerIndex, int side, int rank)
 {
-    return m_nClosestPlayers[param1][param2][param3];
+    return m_nClosestPlayers[playerIndex][side][rank];
 }
 void cGame::SetPotentialScorer(cPlayer* pPlayer)
 {
@@ -1976,7 +1976,7 @@ void cGame::InitGameState(int state)
 {
     if (m_eGameState == 5 && state == 6)
     {
-        mUnidentified49C.mEvent13.Queue();
+        mUnidentified49C.mSuddenDeathEvent.Queue();
     }
 
     m_eGameState = state;
@@ -2100,54 +2100,54 @@ void cGame::SetDifficulty(
         g_pTeams[1]->SetDifficulty(diff1, param4, param5);
     }
 }
-extern "C" void fn_8005C650(cGame* pGame)
+void DeliverShotPresentationEvent(cGame* pGame)
 {
-    pGame->mUnidentified49C.mEvent48.Deliver();
+    pGame->mUnidentified49C.mShotPresentationEvent.Deliver();
 }
-extern "C" void fn_8005C830(cGame* pGame)
+void DeliverShotPresentationEndEvent(cGame* pGame)
 {
-    pGame->mUnidentified49C.mEvent49.Deliver();
+    pGame->mUnidentified49C.mShotPresentationEndEvent.Deliver();
 }
-extern "C" void fn_8005CA10(cGame* pGame)
+void DeliverCaptainClashPresentationEvent(cGame* pGame)
 {
-    pGame->mUnidentified49C.mEvent50.Deliver();
+    pGame->mUnidentified49C.mCaptainClashPresentationEvent.Deliver();
 }
-extern "C" void fn_8005CBF0(cGame* pGame)
+void DeliverWindupPresentationEvent(cGame* pGame)
 {
-    pGame->mUnidentified49C.mEvent52.Deliver();
+    pGame->mUnidentified49C.mWindupPresentationEvent.Deliver();
 }
-extern "C" void fn_8005CDD0(cGame* pGame)
+void DeliverWindupPresentationEndEvent(cGame* pGame)
 {
-    pGame->mUnidentified49C.mEvent53.Deliver();
+    pGame->mUnidentified49C.mWindupPresentationEndEvent.Deliver();
 }
 void cGame::SendPauseGameEvent()
 {
-    mUnidentified49C.mEvent00.Queue(Function<FnVoidVoid>());
+    mUnidentified49C.mPauseGameEvent.Queue(Function<FnVoidVoid>());
 }
 void cGame::SendResumingGameEvent()
 {
-    mUnidentified49C.mEvent01.Queue(Function<FnVoidVoid>());
+    mUnidentified49C.mResumingGameEvent.Queue(Function<FnVoidVoid>());
 }
 extern "C" void fn_8005D210(cGame* pGame, LightningStrikeData* pData)
 {
-    pGame->mUnidentified49C.mEvent44.Queue(
-        pData, Function<LightningStrikeData*>(fn_80072134));
+    pGame->mUnidentified49C.mLightningStrikeEvent.Queue(
+        pData, Function<LightningStrikeData*>(FreeLightningStrikeData));
 }
-extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData)
+void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent17.Deliver((GoalieSaveData*)pData);
+    pGame->mUnidentified49C.mGoalieSaveEvent.Deliver((GoalieSaveData*)pData);
 }
-extern "C" void fn_8005D550(cGame* pGame, const GoalieSaveData* pData)
+void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent18.Deliver((GoalieSaveData*)pData);
+    pGame->mUnidentified49C.mGoalieKickEvent.Deliver((GoalieSaveData*)pData);
 }
 extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
 {
@@ -2155,28 +2155,28 @@ extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent20.Deliver((GoalieSaveData*)pData);
+    pGame->mUnidentified49C.mGoalieCatchEvent.Deliver((GoalieSaveData*)pData);
 }
-extern "C" void fn_8005D948(cGame* pGame, const GoalieSaveData* pData)
+void DeliverGoalieExertEvent(cGame* pGame, const GoalieSaveData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent21.Deliver((GoalieSaveData*)pData);
+    pGame->mUnidentified49C.mGoalieExertEvent.Deliver((GoalieSaveData*)pData);
 }
-void cGame::SetMegaStrikeSaveResult(int param1, bool param2)
+void cGame::SetMegaStrikeSaveResult(int shotIndex, bool saved)
 {
-    if (param2)
+    if (saved)
     {
-        m_uMegastrikeResults |= 1 << param1;
+        m_uMegastrikeResults |= 1 << shotIndex;
     }
     else
     {
-        m_uMegastrikeResults &= ~(1 << param1);
+        m_uMegastrikeResults &= ~(1 << shotIndex);
     }
 }
-extern "C" void fn_8005DB7C(cGame* pGame)
+void FinishMegaStrike(cGame* pGame)
 {
     if (g_pGame->m_eGameState == 4)
     {
@@ -2244,7 +2244,7 @@ extern "C" void fn_8005DB7C(cGame* pGame)
     }
 
     g_pGame->SetMegaStrikeGameplay(false, 0, 0);
-    g_pGame->mUnidentified49C.mEvent47.Deliver(&data);
+    g_pGame->mUnidentified49C.mMegaStrikeEndEvent.Deliver(&data);
     g_pBall->m_uGoalType = 4;
     SetPlayerAudioController(0);
 }
@@ -2276,72 +2276,70 @@ void cGame::QueueChainNisEnd(ShotAtGoalData* data)
         g_ShotAtGoalDataPool.Free(data);
         return;
     }
-    mUnidentified49C.mEvent37.Queue(
-        data, Function<ShotAtGoalData*>(fn_8007214C));
+    mUnidentified49C.mChainNisEndEvent.Queue(
+        data, Function<ShotAtGoalData*>(FreeShotAtGoalData));
 }
-void cGame::fn_8005E130(NISData* pData)
+void cGame::QueueNIS(NISData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         g_NISDataPool.Free(pData);
         return;
     }
-    mUnidentified49C.mEvent05.Queue(
-        (UnidentifiedEventData_80065E10*)pData,
-        Function<UnidentifiedEventData_80065E10*>(
-            (void (*)(UnidentifiedEventData_80065E10*))fn_80072164));
+    mUnidentified49C.mNISEvent.Queue(
+        pData, Function<NISData*>(FreeNISData));
 }
-extern "C" void fn_8005E29C(cGame* pGame, CollisionCrowdData* pData)
+void QueueCollisionCrowdEvent(cGame* pGame, CollisionCrowdData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         g_CollisionCrowdDataPool.Free(pData);
         return;
     }
-    pGame->mUnidentified49C.mEvent32.Queue(
-        pData, Function<CollisionCrowdData*>(fn_8007217C));
+    pGame->mUnidentified49C.mCollisionCrowdEvent.Queue(
+        pData, Function<CollisionCrowdData*>(FreeCollisionCrowdData));
 }
-extern "C" void fn_8005E408(cGame* pGame, const PlayerAttackData* pData)
+void DeliverGoalieDekeAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent24.Deliver((PlayerAttackData*)pData);
+    pGame->mUnidentified49C.mGoalieDekeAttackAttemptEvent.Deliver((PlayerAttackData*)pData);
 }
-extern "C" void fn_8005E604(cGame* pGame, const PlayerAttackData* pData)
+void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent25.Deliver((PlayerAttackData*)pData);
+    pGame->mUnidentified49C.mGoalieDekeAttackSuccessEvent.Deliver((PlayerAttackData*)pData);
 }
-extern "C" void fn_8005E800(cGame* pGame, const PlayerAttackData* pData)
+void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent26.Deliver((PlayerAttackData*)pData);
+    pGame->mUnidentified49C.mGoalieSlamAttackAttemptEvent.Deliver((PlayerAttackData*)pData);
 }
-extern "C" void fn_8005E9FC(cGame* pGame, const PlayerAttackData* pData)
+void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent27.Deliver((PlayerAttackData*)pData);
+    pGame->mUnidentified49C.mGoalieSlamAttackSuccessEvent.Deliver((PlayerAttackData*)pData);
 }
-extern "C" void fn_8005EBF8(cGame* pGame, PlayerAttackData* pData)
+void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         g_PlayerAttackDataPool.Free(pData);
         return;
     }
-    pGame->mUnidentified49C.mEvent28.Queue(
-        pData, Function<PlayerAttackData*>(fn_80072194));
+    pGame->mUnidentified49C.mAttackAttemptEvent.Queue(
+        pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
 {
@@ -2350,8 +2348,8 @@ extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
         g_PlayerAttackDataPool.Free(pData);
         return;
     }
-    pGame->mUnidentified49C.mEvent29.Queue(
-        pData, Function<PlayerAttackData*>(fn_80072194));
+    pGame->mUnidentified49C.mAttackSuccessEvent.Queue(
+        pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
 extern "C" void fn_8005EED0(cGame* pGame, ShotAtGoalData* pData)
 {
@@ -2360,89 +2358,89 @@ extern "C" void fn_8005EED0(cGame* pGame, ShotAtGoalData* pData)
         g_ShotAtGoalDataPool.Free(pData);
         return;
     }
-    pGame->mUnidentified49C.mEvent22.Queue(
-        pData, Function<ShotAtGoalData*>(fn_8007214C));
+    pGame->mUnidentified49C.mShotAtGoalEvent.Queue(
+        pData, Function<ShotAtGoalData*>(FreeShotAtGoalData));
 }
-extern "C" void fn_8005F03C(cGame* pGame, ShotAtGoalData* pData)
+void DeliverWindupShotEvent(cGame* pGame, ShotAtGoalData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent23.Deliver(pData);
+    pGame->mUnidentified49C.mWindupShotEvent.Deliver(pData);
 }
-extern "C" void fn_8005F238(cGame* pGame, MegaStrikeMeterData* pData)
+void DeliverMegaStrikeMeterStartEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent40.Deliver(pData);
+    pGame->mUnidentified49C.mMegaStrikeMeterStartEvent.Deliver(pData);
 }
-extern "C" void fn_8005F434(cGame* pGame, MegaStrikeMeterData* pData)
+void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent41.Deliver(pData);
+    pGame->mUnidentified49C.mMegaStrikeMeterFirstEvent.Deliver(pData);
 }
-extern "C" void fn_8005F630(cGame* pGame, MegaStrikeMeterData* pData)
+void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent42.Deliver(pData);
+    pGame->mUnidentified49C.mMegaStrikeMeterSecondEvent.Deliver(pData);
 }
-extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder)
+void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
     PauseAllAudio();
-    pGame->mUnidentified49C.mEvent46.Deliver(pFielder);
+    pGame->mUnidentified49C.mMegaStrikeIntroEvent.Deliver(pFielder);
 }
-extern "C" void fn_8005FA2C(cGame* pGame)
+void DeliverMegaStrikeMeterEndEvent(cGame* pGame)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent43.Deliver();
+    pGame->mUnidentified49C.mMegaStrikeMeterEndEvent.Deliver();
 }
-extern "C" void fn_8005FC1C(cGame* pGame, PeachPhotoData* pEventData)
+void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent55.Deliver(pEventData);
+    pGame->mUnidentified49C.mPeachFlashEvent.Deliver(pEventData);
 }
-extern "C" void fn_8005FE18(cGame* pGame, PeachPhotoData* pEventData)
+void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent54.Deliver(pEventData);
+    pGame->mUnidentified49C.mPeachCameraFlashEvent.Deliver(pEventData);
 }
-extern "C" void fn_80060014(cGame* pGame, PeachPhotoData* pEventData)
+void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent56.Deliver(pEventData);
+    pGame->mUnidentified49C.mPeachCamerasDownEvent.Deliver(pEventData);
 }
-extern "C" void fn_80060210(cGame* pGame, PeachPhotoData* pEventData)
+void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent57.Deliver(pEventData);
+    pGame->mUnidentified49C.mPeachCamerasAwayEvent.Deliver(pEventData);
 }
 extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
 {
@@ -2450,7 +2448,7 @@ extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent58.Deliver(pFielder);
+    pGame->mUnidentified49C.mWaluigiWallStartEvent.Deliver(pFielder);
 }
 extern "C" void fn_80060608(cGame* pGame, cFielder* pFielder)
 {
@@ -2458,7 +2456,7 @@ extern "C" void fn_80060608(cGame* pGame, cFielder* pFielder)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent59.Deliver(pFielder);
+    pGame->mUnidentified49C.mWaluigiWallEndEvent.Deliver(pFielder);
 }
 extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
 {
@@ -2466,7 +2464,7 @@ extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent60.Deliver(pFielder);
+    pGame->mUnidentified49C.mWaluigiWallAbortEvent.Deliver(pFielder);
 }
 extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
 {
@@ -2474,7 +2472,7 @@ extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent64.Deliver(pFielder);
+    pGame->mUnidentified49C.mSuperPresentationEvent.Deliver(pFielder);
 }
 void cGame::fn_80060BFC(CollisionBulletBillData& data)
 {
@@ -2482,15 +2480,15 @@ void cGame::fn_80060BFC(CollisionBulletBillData& data)
     {
         return;
     }
-    mUnidentified49C.mEvent63.Deliver(&data);
+    mUnidentified49C.mBulletBillExplodeEvent.Deliver(&data);
 }
-extern "C" void fn_80060DF8(cGame* pGame, const CharacterImpactEvent* pEventData)
+void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
     if (g_pGame->m_eGameState == 4)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent71.Deliver((CharacterImpactEvent*)pEventData);
+    pGame->mUnidentified49C.mMontyReappearEvent.Deliver((CharacterImpactEvent*)pEventData);
 }
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
@@ -2498,7 +2496,7 @@ extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent72.Deliver((CharacterImpactEvent*)pEventData);
+    pGame->mUnidentified49C.mHammerBroHammerEvent.Deliver((CharacterImpactEvent*)pEventData);
 }
 extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
 {
@@ -2506,84 +2504,84 @@ extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
     {
         return;
     }
-    pGame->mUnidentified49C.mEvent73.Deliver((CharacterImpactEvent*)pEventData);
+    pGame->mUnidentified49C.mWarioGroundPoundEvent.Deliver((CharacterImpactEvent*)pEventData);
 }
-UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
-    : mEvent00(fn_800721C4(), "PauseGame", -1)
-    , mEvent01(fn_800721C4(), "ResumingGame", -1)
-    , mEvent02(fn_800721C4(), "GameOver", -1)
-    , mEvent03(fn_800721C4(), "GameIsWon", -1)
-    , mEvent04(fn_800721C4(), "PresentationBypass", -1)
-    , mEvent05(fn_800721C4(), "NIS", -1)
-    , mEvent06("GoalScored", -1)
-    , mEvent07(GetFixedUpdateEventDispatcher(), "EnterStartScreen", -1)
-    , mEvent08(GetFixedUpdateEventDispatcher(), "DirectionBegin", -1)
-    , mEvent09("CharacterDirectionEnd", -1)
-    , mEvent10("ResetEffects", -1)
-    , mEvent11(GetFixedUpdateEventDispatcher(), "GetReadyForKickoff", -1)
-    , mEvent12(GetFixedUpdateEventDispatcher(), "Kickoff", -1)
-    , mEvent13(GetFixedUpdateEventDispatcher(), "SuddenDeath", -1)
-    , mEvent14("BallStateChange", -1)
-    , mEvent15("ReceiveBall", -1)
-    , mEvent16("PassBall", -1)
-    , mEvent17("GoalieSave", -1)
-    , mEvent18("GoalieKick", -1)
-    , mEvent19("CollisionBallGoalie", -1)
-    , mEvent20("GoalieCatch", -1)
-    , mEvent21("GoalieExert", -1)
-    , mEvent22(GetFixedUpdateEventDispatcher(), "ShotAtGoal", -1)
-    , mEvent23("WindupShot", -1)
-    , mEvent24("GoalieDekeAttackAttempt", -1)
-    , mEvent25("GoalieDekeAttackSuccess", -1)
-    , mEvent26("GoalieSlamAttackAttempt", -1)
-    , mEvent27("GoalieSlamAttackSuccess", -1)
-    , mEvent28(GetFixedUpdateEventDispatcher(), "AttackAttempt", -1)
-    , mEvent29(GetFixedUpdateEventDispatcher(), "AttackSuccess", -1)
-    , mEvent30(GetFixedUpdateEventDispatcher(), "CharGetElectrocuted", -1)
+GameEventQueue::GameEventQueue()
+    : mPauseGameEvent(GetGameEventDispatcher(), "PauseGame", -1)
+    , mResumingGameEvent(GetGameEventDispatcher(), "ResumingGame", -1)
+    , mGameOverEvent(GetGameEventDispatcher(), "GameOver", -1)
+    , mGameIsWonEvent(GetGameEventDispatcher(), "GameIsWon", -1)
+    , mPresentationBypassEvent(GetGameEventDispatcher(), "PresentationBypass", -1)
+    , mNISEvent(GetGameEventDispatcher(), "NIS", -1)
+    , mGoalScoredEvent("GoalScored", -1)
+    , mEnterStartScreenEvent(GetFixedUpdateEventDispatcher(), "EnterStartScreen", -1)
+    , mDirectionBeginEvent(GetFixedUpdateEventDispatcher(), "DirectionBegin", -1)
+    , mCharacterDirectionEndEvent("CharacterDirectionEnd", -1)
+    , mResetEffectsEvent("ResetEffects", -1)
+    , mGetReadyForKickoffEvent(GetFixedUpdateEventDispatcher(), "GetReadyForKickoff", -1)
+    , mKickoffEvent(GetFixedUpdateEventDispatcher(), "Kickoff", -1)
+    , mSuddenDeathEvent(GetFixedUpdateEventDispatcher(), "SuddenDeath", -1)
+    , mBallStateChangeEvent("BallStateChange", -1)
+    , mReceiveBallEvent("ReceiveBall", -1)
+    , mPassBallEvent("PassBall", -1)
+    , mGoalieSaveEvent("GoalieSave", -1)
+    , mGoalieKickEvent("GoalieKick", -1)
+    , mCollisionBallGoalieEvent("CollisionBallGoalie", -1)
+    , mGoalieCatchEvent("GoalieCatch", -1)
+    , mGoalieExertEvent("GoalieExert", -1)
+    , mShotAtGoalEvent(GetFixedUpdateEventDispatcher(), "ShotAtGoal", -1)
+    , mWindupShotEvent("WindupShot", -1)
+    , mGoalieDekeAttackAttemptEvent("GoalieDekeAttackAttempt", -1)
+    , mGoalieDekeAttackSuccessEvent("GoalieDekeAttackSuccess", -1)
+    , mGoalieSlamAttackAttemptEvent("GoalieSlamAttackAttempt", -1)
+    , mGoalieSlamAttackSuccessEvent("GoalieSlamAttackSuccess", -1)
+    , mAttackAttemptEvent(GetFixedUpdateEventDispatcher(), "AttackAttempt", -1)
+    , mAttackSuccessEvent(GetFixedUpdateEventDispatcher(), "AttackSuccess", -1)
+    , mCharGetElectrocutedEvent(GetFixedUpdateEventDispatcher(), "CharGetElectrocuted", -1)
     , mEvent31(GetFixedUpdateEventDispatcher(), "PowerupStats", -1)
-    , mEvent32(GetFixedUpdateEventDispatcher(), "CollisionCrowd", -1)
-    , mEvent33(GetFixedUpdateEventDispatcher(), "CollisionChainPlayer", -1)
-    , mEvent34(GetFixedUpdateEventDispatcher(), "CollisionWindDebrisPlayer", -1)
-    , mEvent35(GetFixedUpdateEventDispatcher(), "CollisionExplosionFragmentPLayer", -1)
-    , mEvent36(GetFixedUpdateEventDispatcher(), "ChainNisStart", -1)
-    , mEvent37(GetFixedUpdateEventDispatcher(), "ChainNisEnd", -1)
-    , mEvent38(GetFixedUpdateEventDispatcher(), "Penalty", -1)
-    , mEvent39(GetFixedUpdateEventDispatcher(), "AwardPowerupStuff", -1)
-    , mEvent40("MegaStrikeMeterStart", -1)
-    , mEvent41("MegaStrikeMeterFirst", -1)
-    , mEvent42("MegaStrikeMeterSecond", -1)
-    , mEvent43("MegaStrikeMeterEnd", -1)
-    , mEvent44(GetFixedUpdateEventDispatcher(), "LightningStrike", -1)
-    , mEvent45(GetFixedUpdateEventDispatcher(), "MegastrikeStart", -1)
-    , mEvent46("MegaStrikeIntro", -1)
-    , mEvent47("MegastrikeEnd", -1)
-    , mEvent48("ShotPresentation", -1)
-    , mEvent49("ShotPresentationEnd", -1)
-    , mEvent50("CaptainClashPresentation", -1)
-    , mEvent51("CaptainClashPresentationEnd", -1)
-    , mEvent52("WindupPresentation", -1)
-    , mEvent53("WindupPresentationEnd", -1)
-    , mEvent54("PeachCameraFlash", -1)
-    , mEvent55("PeachFlash", -1)
-    , mEvent56("PeachCamerasDown", -1)
-    , mEvent57("PeachCamerasAway", -1)
-    , mEvent58("WaluigiWallStart", -1)
-    , mEvent59("WaluigiWallEnd", -1)
-    , mEvent60("WaluigiWallAbort", -1)
-    , mEvent61("WarioGasStart", -1)
-    , mEvent62("WarioGasEnd", -1)
-    , mEvent63("BulletBillExplode", -1)
-    , mEvent64("SuperPresentation", -1)
-    , mEvent65(GetFixedUpdateEventDispatcher(), "StatsPowerupHitData", -1)
-    , mEvent66(GetFixedUpdateEventDispatcher(), "CameraRumbleStart", -1)
-    , mEvent67(GetFixedUpdateEventDispatcher(), "CameraRumbleEnd", -1)
-    , mEvent68(GetFixedUpdateEventDispatcher(), "ExplodableExplode", -1)
-    , mEvent69(GetFixedUpdateEventDispatcher(), "ExplodableExplosionEnd", -1)
-    , mEvent70(GetFixedUpdateEventDispatcher(), "SilenceAllSounds", -1)
-    , mEvent71("MontyReappear", -1)
-    , mEvent72("HammerBroHammer", -1)
-    , mEvent73("WarioGroundPound", -1)
-    , mEvent74(GetFixedUpdateEventDispatcher(), "PowerupAquire", -1)
+    , mCollisionCrowdEvent(GetFixedUpdateEventDispatcher(), "CollisionCrowd", -1)
+    , mCollisionChainPlayerEvent(GetFixedUpdateEventDispatcher(), "CollisionChainPlayer", -1)
+    , mCollisionWindDebrisPlayerEvent(GetFixedUpdateEventDispatcher(), "CollisionWindDebrisPlayer", -1)
+    , mCollisionExplosionFragmentPlayerEvent(GetFixedUpdateEventDispatcher(), "CollisionExplosionFragmentPLayer", -1)
+    , mChainNisStartEvent(GetFixedUpdateEventDispatcher(), "ChainNisStart", -1)
+    , mChainNisEndEvent(GetFixedUpdateEventDispatcher(), "ChainNisEnd", -1)
+    , mPenaltyEvent(GetFixedUpdateEventDispatcher(), "Penalty", -1)
+    , mAwardPowerupStuffEvent(GetFixedUpdateEventDispatcher(), "AwardPowerupStuff", -1)
+    , mMegaStrikeMeterStartEvent("MegaStrikeMeterStart", -1)
+    , mMegaStrikeMeterFirstEvent("MegaStrikeMeterFirst", -1)
+    , mMegaStrikeMeterSecondEvent("MegaStrikeMeterSecond", -1)
+    , mMegaStrikeMeterEndEvent("MegaStrikeMeterEnd", -1)
+    , mLightningStrikeEvent(GetFixedUpdateEventDispatcher(), "LightningStrike", -1)
+    , mMegaStrikeStartEvent(GetFixedUpdateEventDispatcher(), "MegastrikeStart", -1)
+    , mMegaStrikeIntroEvent("MegaStrikeIntro", -1)
+    , mMegaStrikeEndEvent("MegastrikeEnd", -1)
+    , mShotPresentationEvent("ShotPresentation", -1)
+    , mShotPresentationEndEvent("ShotPresentationEnd", -1)
+    , mCaptainClashPresentationEvent("CaptainClashPresentation", -1)
+    , mCaptainClashPresentationEndEvent("CaptainClashPresentationEnd", -1)
+    , mWindupPresentationEvent("WindupPresentation", -1)
+    , mWindupPresentationEndEvent("WindupPresentationEnd", -1)
+    , mPeachCameraFlashEvent("PeachCameraFlash", -1)
+    , mPeachFlashEvent("PeachFlash", -1)
+    , mPeachCamerasDownEvent("PeachCamerasDown", -1)
+    , mPeachCamerasAwayEvent("PeachCamerasAway", -1)
+    , mWaluigiWallStartEvent("WaluigiWallStart", -1)
+    , mWaluigiWallEndEvent("WaluigiWallEnd", -1)
+    , mWaluigiWallAbortEvent("WaluigiWallAbort", -1)
+    , mWarioGasStartEvent("WarioGasStart", -1)
+    , mWarioGasEndEvent("WarioGasEnd", -1)
+    , mBulletBillExplodeEvent("BulletBillExplode", -1)
+    , mSuperPresentationEvent("SuperPresentation", -1)
+    , mStatsPowerupHitDataEvent(GetFixedUpdateEventDispatcher(), "StatsPowerupHitData", -1)
+    , mCameraRumbleStartEvent(GetFixedUpdateEventDispatcher(), "CameraRumbleStart", -1)
+    , mCameraRumbleEndEvent(GetFixedUpdateEventDispatcher(), "CameraRumbleEnd", -1)
+    , mExplodableExplodeEvent(GetFixedUpdateEventDispatcher(), "ExplodableExplode", -1)
+    , mExplodableExplosionEndEvent(GetFixedUpdateEventDispatcher(), "ExplodableExplosionEnd", -1)
+    , mSilenceAllSoundsEvent(GetFixedUpdateEventDispatcher(), "SilenceAllSounds", -1)
+    , mMontyReappearEvent("MontyReappear", -1)
+    , mHammerBroHammerEvent("HammerBroHammer", -1)
+    , mWarioGroundPoundEvent("WarioGroundPound", -1)
+    , mPowerupAcquireEvent(GetFixedUpdateEventDispatcher(), "PowerupAquire", -1)
 {
 }
 
@@ -2653,7 +2651,7 @@ void SetFieldTilt(int relative, float xTilt, float yTilt)
 
 void cGame::QueueCharacterElectrocuted(CollisionPlayerWallData* data)
 {
-    mUnidentified49C.mEvent30.Queue(
+    mUnidentified49C.mCharGetElectrocutedEvent.Queue(
         data, Function<CollisionPlayerWallData*>(FreeCollisionPlayerWallData));
 }
 

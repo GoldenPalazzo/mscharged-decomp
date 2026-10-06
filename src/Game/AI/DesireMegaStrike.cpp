@@ -338,7 +338,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
  */
 void DesireMegaStrike::Cleanup()
 {
-    fn_8005FA2C(g_pGame);
+    DeliverMegaStrikeMeterEndEvent(g_pGame);
     fn_8003A0E4(m_pFielder);
 }
 

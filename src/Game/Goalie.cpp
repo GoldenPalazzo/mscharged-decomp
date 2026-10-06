@@ -556,7 +556,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 data.saveType = pBall->m_uGoalType;
                 data.pShooter = pBall->m_pShooter;
                 data.pGoalie = this;
-                g_pGame->mUnidentified49C.mEvent19.Deliver(&data);
+                g_pGame->mUnidentified49C.mCollisionBallGoalieEvent.Deliver(&data);
             }
             EmitGoalieCatch(this, "goalie_deflect", false);
             float fDistSquared = nlGetLengthSquared1D(gfHandCatchDist);
@@ -592,7 +592,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 data.saveType = pBall->m_uGoalType;
                 data.pShooter = pBall->m_pShooter;
                 data.pGoalie = this;
-                g_pGame->mUnidentified49C.mEvent19.Deliver(&data);
+                g_pGame->mUnidentified49C.mCollisionBallGoalieEvent.Deliver(&data);
             }
             if (mpSkillShooter != NULL && mpSaveData != NULL)
             {
@@ -2733,7 +2733,7 @@ void Goalie::MakeExertEvent()
         pSaveData.padding = 3;
     }
 
-    fn_8005D948(g_pGame, &pSaveData);
+    DeliverGoalieExertEvent(g_pGame, &pSaveData);
 }
 
 void Goalie::MakeSaveEvent(bool bIsSTS)
@@ -2763,7 +2763,7 @@ void Goalie::MakeSaveEvent(bool bIsSTS)
             *= ((GoalieTweaks*)m_pTweaks)->fShotFatigueDefault;
     }
 
-    fn_8005D354(g_pGame, &pSaveData);
+    DeliverGoalieSaveEvent(g_pGame, &pSaveData);
 
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
@@ -3665,7 +3665,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
         DrawableCharacter::RenderAllCharacters();
         if (g_pGame->mbCaptainShotToScoreOn)
         {
-            fn_8005DB7C(g_pGame);
+            FinishMegaStrike(g_pGame);
         }
         SetRenderWorldEffects(1);
         g_pGame->fn_800586C0();
@@ -3699,7 +3699,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
     WorldDarkening::Instance().Fade(100.0f, 0.0f);
     if (g_pGame->mbCaptainShotToScoreOn)
     {
-        fn_8005DB7C(g_pGame);
+        FinishMegaStrike(g_pGame);
     }
     g_pGame->mpWeatherManager->Resume();
     SetRenderWorldEffects(1);
@@ -3780,7 +3780,7 @@ void Goalie::DoPassRelease()
         data.saveType = g_pBall->m_uGoalType;
         data.pShooter = g_pBall->m_pShooter;
         data.pGoalie = this;
-        fn_8005D550(g_pGame, &data);
+        DeliverGoalieKickEvent(g_pGame, &data);
         PlaySound(0, 0x03197C5C, NULL, NULL);
         break;
     }
@@ -4172,7 +4172,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
                 data.pTarget = pTarget;
                 data.mUnidentified0C = 2;
                 data.mUnidentified10 = false;
-                fn_8005E604(g_pGame, &data);
+                DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
             }
             else
                 TacklePlayer(pTarget);
@@ -4196,7 +4196,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
             data.pTarget = pTarget;
             data.mUnidentified0C = 2;
             data.mUnidentified10 = false;
-            fn_8005E604(g_pGame, &data);
+            DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
         }
         else
             TacklePlayer(pTarget);
@@ -4288,7 +4288,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     data.pTarget = pFielder;
     data.mUnidentified0C = 2;
     data.mUnidentified10 = false;
-    fn_8005E9FC(g_pGame, &data);
+    DeliverGoalieSlamAttackSuccessEvent(g_pGame, &data);
 }
 
 void Goalie::StealBall(cPlayer* pPlayer)

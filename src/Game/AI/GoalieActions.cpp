@@ -4942,7 +4942,7 @@ void Goalie::fn_8008BBB0(
         data.pTarget = mpTarget;
         data.mUnidentified0C = 2;
         data.mUnidentified10 = false;
-        fn_8005E408(g_pGame, &data);
+        DeliverGoalieDekeAttackAttemptEvent(g_pGame, &data);
     }
 }
 
@@ -6278,7 +6278,7 @@ void Goalie::InitActionSTSAttackSetup(float fWaitTime)
     data.pTarget = g_pBall->GetOwnerFielder();
     data.mUnidentified0C = 2;
     data.mUnidentified10 = false;
-    fn_8005E800(g_pGame, &data);
+    DeliverGoalieSlamAttackAttemptEvent(g_pGame, &data);
 }
 
 void Goalie::InitActionSTSAttack()
@@ -6540,7 +6540,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
                 data.pTarget = mpShooter;
                 data.mUnidentified0C = 2;
                 data.mUnidentified10 = false;
-                fn_8005E604(g_pGame, &data);
+                DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
 
                 mbPickedUp = true;
             }
@@ -6758,7 +6758,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     muMegaReadyToSave = 0;
     mBallsLaunched = 0;
     mfMegaAccuracy = accuracy;
-    g_pGame->mUnidentified49C.mEvent45.Queue(Function<FnVoidVoid>());
+    g_pGame->mUnidentified49C.mMegaStrikeStartEvent.Queue(Function<FnVoidVoid>());
     g_pGame->mpWeatherManager->Pause();
     for (int i = 0; i < 10; ++i)
     {

@@ -1,3 +1,4 @@
+#include "Game/Game.h"
 /**
  * Address/Size: 0x80288FF8 | size: 0x1444
  */
@@ -398,7 +399,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         NISData* data = g_NISDataPool.Allocate();
         data->Type = type;
         data->Param = param;
-        g_pGame->fn_8005E130(data);
+        g_pGame->QueueNIS(data);
         break;
     }
     case 52:
