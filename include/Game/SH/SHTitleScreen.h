@@ -31,8 +31,8 @@ public:
     /* 0x0DE */ bool mInitialized;
     /* 0x0DF */ bool mPointerOverStartButton;
     /* 0x0E0 */ ScreenMovement mMovement;
-    /* 0x0E4 */ int mControllerDefaults[9];
-    /* 0x108 */ bool mControllerReady[9];
+    /* 0x0E4 */ int mUnlockInputSequence[9];
+    /* 0x108 */ bool mUnlockInputEntered[9];
     /* 0x111 */ u8 mPadding111[3];
 }; // size 0x114
 

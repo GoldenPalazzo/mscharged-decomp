@@ -32,10 +32,9 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
 
-
 static bool sTitleDimmingTimeSet;
 
-extern const int sControllerDefaults[10] = {
+extern const int gTitleUnlockInputSequence[10] = {
     13, 14, 13, 14, 11, 12, 0, 1, 2, 0,
 };
 
@@ -60,8 +59,8 @@ TitleScene::TitleScene(ScreenMovement movement)
 {
     for (int i = 0; i < 9; ++i)
     {
-        mControllerDefaults[i] = sControllerDefaults[i];
-        mControllerReady[i] = false;
+        mUnlockInputSequence[i] = gTitleUnlockInputSequence[i];
+        mUnlockInputEntered[i] = false;
     }
 
     if (!sTitleDimmingTimeSet)
@@ -210,12 +209,12 @@ void TitleScene::Update(float dt)
         bool acceptedInput = false;
         for (int input = 0; input < 6; ++input)
         {
-            if (!mControllerReady[input])
+            if (!mUnlockInputEntered[input])
             {
                 if (g_pFEInput->JustPressed(
-                        (eFEINPUT_PAD)pad, mControllerDefaults[input], true, 0))
+                        (eFEINPUT_PAD)pad, mUnlockInputSequence[input], true, 0))
                 {
-                    mControllerReady[input] = true;
+                    mUnlockInputEntered[input] = true;
                     acceptedInput = true;
                     break;
                 }
@@ -234,7 +233,7 @@ void TitleScene::Update(float dt)
                 {
                     for (int reset = 0; reset < 6; ++reset)
                     {
-                        mControllerReady[reset] = false;
+                        mUnlockInputEntered[reset] = false;
                     }
                 }
             }
@@ -256,14 +255,14 @@ void TitleScene::Update(float dt)
         {
             for (int reset = 0; reset < 6; ++reset)
             {
-                mControllerReady[reset] = false;
+                mUnlockInputEntered[reset] = false;
             }
         }
 
         bool sequenceReady = true;
         for (int input = 0; input < 6; ++input)
         {
-            sequenceReady = sequenceReady && mControllerReady[input];
+            sequenceReady = sequenceReady && mUnlockInputEntered[input];
         }
 
         if (sequenceReady && g_pPlatPadManager->type[pad] == 2)
@@ -274,21 +273,21 @@ void TitleScene::Update(float dt)
 
             for (int input = 6; input < 9; ++input)
             {
-                if (!mControllerReady[input])
+                if (!mUnlockInputEntered[input])
                 {
-                    switch (mControllerDefaults[input])
+                    switch (mUnlockInputSequence[input])
                     {
                     case 1:
                         if (remoteAcceleration > 2.0f)
-                            mControllerReady[input] = true;
+                            mUnlockInputEntered[input] = true;
                         break;
                     case 0:
                         if (freestyleAcceleration > 2.0f)
-                            mControllerReady[input] = true;
+                            mUnlockInputEntered[input] = true;
                         break;
                     case 2:
                         if (freestyleAcceleration > 2.0f && remoteAcceleration > 2.0f)
-                            mControllerReady[input] = true;
+                            mUnlockInputEntered[input] = true;
                         break;
                     }
                 }
@@ -296,7 +295,7 @@ void TitleScene::Update(float dt)
 
             for (int input = 0; input < 9; ++input)
             {
-                sequenceReady = sequenceReady && mControllerReady[input];
+                sequenceReady = sequenceReady && mUnlockInputEntered[input];
             }
 
             if (sequenceReady && !GetUnlockAll())
@@ -305,7 +304,7 @@ void TitleScene::Update(float dt)
                 FEAudio::PlayAnimAudioEvent(0xCF37DAC7, 0, 0, true);
                 for (int input = 0; input < 9; ++input)
                 {
-                    mControllerReady[input] = false;
+                    mUnlockInputEntered[input] = false;
                 }
             }
         }
