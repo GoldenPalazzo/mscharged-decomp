@@ -11,7 +11,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlRing.h"
 #include "revolution/mix.h"
-#include "revolution/os/OSInterrupt.h"
 
 #include <string.h>
 

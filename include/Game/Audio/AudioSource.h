@@ -225,8 +225,6 @@ void TrackAudioRead(AudioReadState*, AsyncEntry*);
 void CancelAudioReads(AudioReadState*);
 void OnAudioReadCancelled(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
 
-void GetSoundSources(void* handle, AudioSource** sources, unsigned int* count);
-
 extern SlotPool<AudioSampleSource> gAudioSampleSourcePool;
 
 inline void* AudioSampleSource::operator new(unsigned long)

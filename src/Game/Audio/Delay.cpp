@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/AudioConfig.h"
 #include "revolution/ax.h"
 #include "revolution/axfx.h"
