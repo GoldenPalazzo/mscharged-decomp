@@ -27,23 +27,19 @@
 #include "NL/nlConfig.h"
 #include "NL/nlMath.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/Render/RLViewLayers.h"
-#include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHLoading.h"
 #include "Game/SH/SHMoviePlayer.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/main.h"
 
-class SHNavigation;
 
-static bool setDimmingTime;
+static bool sTitleDimmingTimeSet;
 
 extern const int sControllerDefaults[10] = {
     13, 14, 13, 14, 11, 12, 0, 1, 2, 0,
 };
 
-void StartMovieCB()
+void StartTitleToMainMenuTransition()
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -59,7 +55,7 @@ TitleScene::TitleScene(ScreenMovement movement)
     , mStartedDemo(false)
     , mStartedMovie(false)
     , mInitialized(false)
-    , mUnidentifiedDF(false)
+    , mPointerOverStartButton(false)
     , mMovement(movement)
 {
     for (int i = 0; i < 9; ++i)
@@ -68,10 +64,10 @@ TitleScene::TitleScene(ScreenMovement movement)
         mControllerReady[i] = false;
     }
 
-    if (!setDimmingTime)
+    if (!sTitleDimmingTimeSet)
     {
         VISetTimeToDimming(VI_DM_15M);
-        setDimmingTime = true;
+        sTitleDimmingTimeSet = true;
     }
 
     LoadMemoryCardIconData();
@@ -388,18 +384,18 @@ void TitleScene::OnControllerPointerPress(int index, void*)
     GameInfoManager::Instance()->mUserInfo.mGameplayOptions.OnSettingsUpdated();
     GameInfoManager::Instance()->mUserInfo.mCheatOptions.OnSettingsUpdated();
     VISetTimeToDimming(VI_DM_DEFAULT);
-    setDimmingTime = false;
+    sTitleDimmingTimeSet = false;
 
     WPADInfo info;
     if (WPADGetInfo(index, &info) == WPAD_ERR_OK && info.battery <= 1)
     {
         FEPopupMenu* popup = static_cast<FEPopupMenu*>(
             GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-        popup->Create(POPUP_LOW_BATTERY, Function<FnVoidVoid>(StartMovieCB));
+        popup->Create(POPUP_LOW_BATTERY, Function<FnVoidVoid>(StartTitleToMainMenuTransition));
     }
     else
     {
-        StartMovieCB();
+        StartTitleToMainMenuTransition();
     }
 }
 
@@ -408,18 +404,18 @@ void TitleScene::OnControllerPointerEnter(int index, void*)
     mTextPressStart->SetActiveSlide("over", true, false);
     mControllerComponent.SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF32, 0, 0, 1);
-    mUnidentifiedDF = true;
+    mPointerOverStartButton = true;
 }
 
 void TitleScene::OnControllerPointerLeave(int index, void*)
 {
     mTextPressStart->SetActiveSlide("off", true, false);
     mControllerComponent.SetPointerState(0, index);
-    mUnidentifiedDF = false;
+    mPointerOverStartButton = false;
 }
 
 HealthWarningSceneV2::HealthWarningSceneV2()
-    : mState(0)
+    : mWarningPhase(PhaseFadeIn)
 {
 }
 
@@ -435,17 +431,17 @@ void HealthWarningSceneV2::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    switch (mState)
+    switch (mWarningPhase)
     {
-    case 0:
+    case PhaseFadeIn:
         if (IsWidescreen())
             mPresentation->SetActiveSlide("fadein_widescreen", true);
         else
             mPresentation->SetActiveSlide("fadein_regular", true);
         mPresentation->Update(0.0f);
-        mState = 1;
+        mWarningPhase = PhaseWaitForInput;
         break;
-    case 1:
+    case PhaseWaitForInput:
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetDuration())
@@ -467,18 +463,18 @@ void HealthWarningSceneV2::Update(float fDeltaT)
                         mPresentation->SetActiveSlide("fadeout_regular", true);
                         mPresentation->Update(0.0f);
                     }
-                    mState = 2;
+                    mWarningPhase = PhaseFadeOut;
                 }
             }
         }
         break;
     }
-    case 2:
+    case PhaseFadeOut:
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-            mState = 3;
+            mWarningPhase = PhaseFinished;
             GameSceneManager::Instance()->Push(SCENE_MAIN_MENU, SCREEN_FORWARD, true);
             FrontEndPresentation::GetInstance()->Call("TransitionTitleScreenToMainMenu");
         }
