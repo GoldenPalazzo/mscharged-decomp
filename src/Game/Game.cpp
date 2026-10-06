@@ -223,14 +223,6 @@ inline void cGame::ResetGameFields()
     mUnidentified0BD = false;
 }
 
-inline void cGame::RegisterEventListeners()
-{
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
-        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
-        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
-}
-
 inline void cGame::ResetCharacters()
 {
     RandomizePlayerUpdateOrder();
@@ -2668,6 +2660,15 @@ UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
     , mEvent74(GetFixedUpdateEventDispatcher(), "PowerupAquire", -1)
 {
 }
+
+inline void cGame::RegisterEventListeners()
+{
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
+}
+
 void cGame::OnSuddenDeath()
 {
     PlaySuddenDeathMusic();
