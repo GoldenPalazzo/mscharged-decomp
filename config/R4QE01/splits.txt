@@ -851,7 +851,7 @@ Game/NetworkMessages.cpp:
 	.data       start:0x8050AC20 end:0x8050AD68
 	.sbss       start:0x806E1108 end:0x806E1160
 
-Game/NetworkMessages_801268E8.cpp:
+Game/NetworkPauseMessages.cpp:
 	.text       start:0x801268E8 end:0x80126A70
 	.data       start:0x8050AD68 end:0x8050AD90
 
@@ -859,7 +859,7 @@ Game/NetworkSkipNisMessages.cpp:
 	.text       start:0x80126A70 end:0x80126BE8
 	.data       start:0x8050AD90 end:0x8050ADB8
 
-Game/NetworkMessages_80126BE8.cpp:
+Game/NetworkMegaStrikeMessages.cpp:
 	.text       start:0x80126BE8 end:0x80126F2C
 	.data       start:0x8050ADB8 end:0x8050ADE0
 
