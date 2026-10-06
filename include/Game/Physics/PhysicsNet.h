@@ -11,15 +11,15 @@
 class PhysicsNet
 {
 public:
-    NetMesh* fn_801949CC() const
+    NetMesh* GetNetMesh() const
     {
         return mpNetMesh;
     }
-    static PhysicsNet* fn_801949D4()
+    static PhysicsNet* GetPositiveXNet()
     {
         return spPhysNetPositiveX;
     }
-    static PhysicsNet* fn_801949DC()
+    static PhysicsNet* GetNegativeXNet()
     {
         return spPhysNetNegativeX;
     }
