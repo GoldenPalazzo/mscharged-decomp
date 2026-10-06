@@ -551,7 +551,7 @@ config.libs = [
             Object(Matching, "Game/AI/GoalieSave.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/HeadTrack.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/Powerups.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/SkillTweaks.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/AI/SpaceSearch.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/AI/TeamDesire.cpp"),
