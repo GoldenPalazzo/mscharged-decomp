@@ -126,6 +126,8 @@ public:
     /* 0x10 */ Clock* m_pPostGameDoneClock;
 
 private:
+    inline void RegisterDetermGameFields(DebugWriteCache* cache);
+
     /* 0x14 */ AIContext* mUnidentified014;
 
 public:

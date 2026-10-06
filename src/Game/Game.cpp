@@ -162,9 +162,7 @@ extern "C" float lbl_806DBAA0 = 1.0f;
 extern "C" float lbl_806DBAA4 = 2.0f;
 extern "C" float lbl_806DBAA8 = 2.0f;
 extern "C" int lbl_806DBAAC = 3;
-// Sync log type ids, registered on first use (fn_8005B840).
-extern "C" u16 lbl_806DBAB2 = 0xFFFF;
-extern "C" u16 lbl_806DBAB4 = 0xFFFF;
+
 
 // .sbss, in retail order. The first two are debug overrides that force the
 // weather and score field tilt on.
@@ -1884,7 +1882,11 @@ void cGame::SetPotentialScorer(cPlayer* pPlayer)
         m_pTeamTouch[pPlayer->m_pTeam->m_nSide] = pPlayer;
     }
 }
-void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
+// Sync log type ids, registered on first use (fn_8005B840).
+extern "C" u16 lbl_806DBAB2 = 0xFFFF;
+extern "C" u16 lbl_806DBAB4 = 0xFFFF;
+
+inline void cGame::RegisterDetermGameFields(DebugWriteCache* cache)
 {
     if (lbl_806DBAB4 == 0xFFFF)
     {
@@ -1921,6 +1923,12 @@ void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
         cache->AddField(DEBUG_FIELD_VECTOR3, gDebugFieldTypes[DEBUG_FIELD_VECTOR3].size, (u8*)&mTiltDirection - (u8*)&m_eGameState, "m_vUpVectorTilt");
         cache->EndType();
     }
+
+}
+
+void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
+{
+    RegisterDetermGameFields(cache);
 
     // The log copy of m_eGameState..m_vUpVectorTilt stores player indices
     // instead of pointers.
