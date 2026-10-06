@@ -469,24 +469,9 @@ inline unsigned int AudioReadState::GetStreamDataStart()
     return GetChannelCount() * sizeof(AudioStreamHeader) + GetStreamHeaderOffset();
 }
 
-inline unsigned int AudioReadState::GetChannelBlockOffset(AudioStreamChannel* channel, unsigned int blockSize)
+inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* channel)
 {
-    unsigned int offset = channel - GetFirstChannel();
-    offset *= blockSize;
-    return offset;
-}
-
-inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* channel, unsigned int blockSize)
-{
-    return m_Unknown1C * GetChannelCount() + (GetChannelBlockOffset(channel, blockSize) + GetStreamDataStart());
-}
-
-static inline void QueuePrimeRead(AudioReadCallbackEntry* entry)
-{
-    entry->m_State->QueueStreamRead(entry->m_State->GetChannelDataOffset(entry->m_Channel, entry->m_State->GetStreamBlockSize()), entry->m_Channel->m_Unknown08,
-        entry->m_State->GetStreamBlockSize(), OnAudioStreamPrimeRead, (unsigned long)entry);
-    entry->m_Channel->AdvanceReadPosition(entry->m_State->GetStreamBlockSize());
-    entry->m_State->CompleteRead();
+    return (GetStreamDataStart() + m_Unknown1C * GetChannelCount()) + (channel - GetFirstChannel()) * GetStreamBlockSize();
 }
 
 void OnAudioStreamHeaderRead(nlFile*, void* buffer, unsigned int, unsigned long userParam)
@@ -508,7 +493,10 @@ void OnAudioStreamHeaderRead(nlFile*, void* buffer, unsigned int, unsigned long 
         entry->m_State->m_SampleRateRatio = (float)header->sample_rate / 32000.0f;
         entry->m_Channel->PrepareVoice(header);
 
-        QueuePrimeRead(entry);
+        entry->m_State->QueueStreamRead(entry->m_State->GetChannelDataOffset(entry->m_Channel), entry->m_Channel->GetBuffer(),
+            entry->m_State->GetStreamBlockSize(), OnAudioStreamPrimeRead, (unsigned long)entry);
+        entry->m_Channel->AdvanceReadPosition(entry->m_State->GetStreamBlockSize());
+        entry->m_State->CompleteRead();
     }
     if (buffer != 0)
         g_pAudioStreamBlockPool->Free((AudioStreamBlock*)buffer);
@@ -646,27 +634,80 @@ void AudioReadState::Stop()
     }
 }
 
-inline void AudioReadState::QueueChannelRead(AudioStreamChannel* channel, unsigned int size)
+static inline unsigned int GetChannelReadSpace(AudioStreamChannel* channel, unsigned int readPos)
 {
+    return channel->GetBufferSize() - readPos;
+}
+
+static inline unsigned int GetAlignedStreamReadSize(const unsigned int& length)
+{
+    return nlAlignUp(length, 32);
+}
+
+inline void AudioReadState::QueueFullChannelRead(AudioStreamChannel* channel)
+{
+    unsigned int size = GetAlignedStreamReadSize(GetStreamBlockSize());
+    unsigned int space = GetChannelReadSpace(channel, channel->m_Unknown10_00);
     unsigned int readPos = channel->m_Unknown10_00;
-    unsigned int space = channel->GetBufferSize() - readPos;
-    unsigned int offset = GetChannelDataOffset(channel, GetStreamBlockSize());
+    unsigned int offset = GetChannelDataOffset(channel);
     if (space < size)
     {
-        QueueStreamRead(offset, (char*)channel->m_Unknown08 + readPos, space,
+        QueueStreamRead(offset, (char*)channel->GetBuffer() + readPos, space,
             OnAudioStreamReadComplete, (unsigned long)channel);
         channel->AdvanceReadPosition(space);
         unsigned int remainder = size - space;
-        QueueStreamRead(offset + space, channel->m_Unknown08, remainder,
+        QueueStreamRead(offset + space, channel->GetBuffer(), remainder,
             OnAudioStreamReadComplete, (unsigned long)channel);
         channel->AdvanceReadPosition(remainder);
     }
     else
     {
-        QueueStreamRead(offset, (char*)channel->m_Unknown08 + readPos, size,
+        QueueStreamRead(offset, (char*)channel->GetBuffer() + readPos, size,
             OnAudioStreamReadComplete, (unsigned long)channel);
         channel->AdvanceReadPosition(size);
     }
+}
+
+inline void AudioReadState::QueueChannelRead(AudioStreamChannel* channel, unsigned int size)
+{
+    unsigned int space = GetChannelReadSpace(channel, channel->m_Unknown10_00);
+    unsigned int readPos = channel->m_Unknown10_00;
+    unsigned int offset = GetChannelDataOffset(channel);
+    if (space < size)
+    {
+        QueueStreamRead(offset, (char*)channel->GetBuffer() + readPos, space,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(space);
+        QueueStreamRead(offset + space, channel->GetBuffer(), size - space,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(size - space);
+    }
+    else
+    {
+        QueueStreamRead(offset, (char*)channel->GetBuffer() + readPos, size,
+            OnAudioStreamReadComplete, (unsigned long)channel);
+        channel->AdvanceReadPosition(size);
+    }
+}
+
+static inline unsigned int GetStreamEndAddress(AXVPB* voice, unsigned int endPosition)
+{
+    unsigned int address = GetVoiceLoopAddress(voice);
+    address += endPosition * 2;
+    return address;
+}
+
+static inline bool NeedsStreamRead(AudioStreamChannel* first)
+{
+    AXVPB* voice = first->m_Voice;
+    unsigned int played = (GetVoiceCurrentAddress(voice) - GetVoiceLoopAddress(voice)) / 2;
+    int playPos = played - played % 32;
+    int readPos = first->m_Unknown10_00;
+    int blockSize = first->m_Unknown00->GetStreamBlockSize();
+
+    if (playPos < readPos)
+        return readPos - playPos < blockSize;
+    return playPos - readPos > blockSize;
 }
 
 void AudioReadState::Update()
@@ -695,7 +736,7 @@ void AudioReadState::Update()
             AudioStreamChannel* channel = GetChannelIterator();
             while ((channel = GetNextChannel(channel)) != 0)
             {
-                unsigned int end = GetVoiceLoopAddress(channel->m_Voice) + m_Unknown20_07 * 2;
+                unsigned int end = GetStreamEndAddress(channel->m_Voice, m_Unknown20_07);
                 AXSetVoiceLoop(channel->m_Voice, false);
                 AXSetVoiceLoopAddr(channel->m_Voice, (unsigned long)g_pAudioSilenceBuffer * 2);
                 AXSetVoiceEndAddr(channel->m_Voice, end);
@@ -705,16 +746,7 @@ void AudioReadState::Update()
         }
 
         AudioStreamChannel* first = GetFirstChannel();
-        voice = first->m_Voice;
-        unsigned int played = (GetVoiceCurrentAddress(voice) - GetVoiceLoopAddress(voice)) / 2;
-        int playPos = played - played % 32;
-        int readPos = first->m_Unknown10_00;
-        int blockSize = first->m_Unknown00->GetStreamBlockSize();
-        bool needRead;
-        if (playPos < readPos)
-            needRead = readPos - playPos < blockSize;
-        else
-            needRead = playPos - readPos > blockSize;
+        bool needRead = NeedsStreamRead(first);
         if (!needRead)
             break;
         if (m_Unknown20_07 != 0)
@@ -732,7 +764,7 @@ void AudioReadState::Update()
         {
             AudioStreamChannel* channel = GetChannelIterator();
             while ((channel = GetNextChannel(channel)) != 0)
-                QueueChannelRead(channel, nlAlignUp(remaining, 32));
+                QueueChannelRead(channel, GetAlignedStreamReadSize(remaining));
             m_Unknown1C = 0;
             bool loop = m_Unknown14_0C < m_PlayCount || m_PlayCount == 0xFFFF;
             if (!loop)
@@ -753,7 +785,7 @@ void AudioReadState::Update()
         {
             AudioStreamChannel* channel = GetChannelIterator();
             while ((channel = GetNextChannel(channel)) != 0)
-                QueueChannelRead(channel, nlAlignUp(GetStreamBlockSize(), 32));
+                QueueFullChannelRead(channel);
             m_Unknown1C += GetStreamBlockSize();
         }
         break;

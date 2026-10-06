@@ -154,6 +154,7 @@ struct AudioStreamChannel
     void ReleaseVoice(bool);
     unsigned int GetBufferSize();
     void AdvanceReadPosition(unsigned int size);
+    void* GetBuffer() { return m_Unknown08; }
     static void OnVoiceDropped(void*);
 
     /* 0x00 */ AudioReadState* m_Unknown00;
@@ -192,12 +193,12 @@ public:
     nlFile* GetStreamFile();
     unsigned int GetStreamBlockSize();
     unsigned int GetStreamDataStart();
-    unsigned int GetChannelBlockOffset(AudioStreamChannel* channel, unsigned int blockSize);
-    unsigned int GetChannelDataOffset(AudioStreamChannel* channel, unsigned int blockSize);
+    unsigned int GetChannelDataOffset(AudioStreamChannel* channel);
     void QueueStreamRead(unsigned int offset, void* buffer, unsigned int size,
         ReadAsyncCallback callback, unsigned long userParam);
     void QueueChannelRead(AudioStreamChannel* channel, unsigned int size);
     void CompleteRead();
+    void QueueFullChannelRead(AudioStreamChannel* channel);
     void OnChannelPrepared(AudioStreamChannel* channel);
 
     /* 0x18 */ unsigned int m_Unknown18;
