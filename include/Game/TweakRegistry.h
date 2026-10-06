@@ -2,6 +2,7 @@
 #define GAME_TWEAK_REGISTRY_H
 
 #include "Game/TweakValue.h"
+#include "Game/TweakRegistration.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "types.h"
@@ -36,7 +37,6 @@ extern u8 gTweakStatePushed;
 extern u8 gDeletePersistentTweakValues;
 extern u8 gResetTweakValueStrings;
 
-void ResetDynamicTweaks(void);
 TweakNode* GetTweakPriorityNode(void);
 TweakEntry* GetUserTweakEntry(void);
 TweakEntry* CreateTweakEntry(TweakValueBase* value, TweakEntry* parent);
@@ -73,7 +73,6 @@ void RecycleTweakNames(void);
 // Node TU.
 void GetTweakNodePath(const TweakNode* node, char* buffer, unsigned long size);
 
-void InitializeTweakRegistry(int fromEnd, u8 flag, unsigned int* sizes);
 float GetTweakFloat(const char* path, float defaultValue);
 int GetTweakInt(const char* path, int defaultValue);
 bool GetTweakBool(const char* path, bool defaultValue);
