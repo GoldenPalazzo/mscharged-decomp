@@ -233,13 +233,13 @@ inline void AudioSampleSource::SetAuxiliaryVolume(int auxiliary, int value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoiceAuxiliaryVolume(m_Unknown1C, auxiliary, value);
+    SetVoiceAuxiliaryVolume(m_Voice, auxiliary, value);
     OSRestoreInterrupts(enabled);
 }
 
 inline bool AudioSampleSource::HasVoice()
 {
-    return m_Unknown1C != 0;
+    return m_Voice != 0;
 }
 
 inline void AudioSampleSource::SetLowPassFilter(bool on, unsigned int frequency, bool unchanged)
@@ -250,7 +250,7 @@ inline void AudioSampleSource::SetLowPassFilter(bool on, unsigned int frequency,
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoiceLowPassFilter(m_Unknown1C, on, frequency, unchanged);
+    SetVoiceLowPassFilter(m_Voice, on, frequency, unchanged);
     OSRestoreInterrupts(enabled);
 }
 
@@ -262,7 +262,7 @@ inline void AudioSampleSource::SetSurroundPan(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoiceSurroundPan(m_Unknown1C, value);
+    SetVoiceSurroundPan(m_Voice, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -274,7 +274,7 @@ inline void AudioSampleSource::SetInterauralDelay(int value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoiceInterauralDelay(m_Unknown1C, value);
+    SetVoiceInterauralDelay(m_Voice, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -286,7 +286,7 @@ inline void AudioSampleSource::SetPan(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoicePan(m_Unknown1C, value);
+    SetVoicePan(m_Voice, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -298,7 +298,7 @@ inline void AudioSampleSource::SetPitch(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoicePitch(m_Unknown1C, m_SampleRateRatio, value);
+    SetVoicePitch(m_Voice, m_SampleRateRatio, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -310,7 +310,7 @@ inline void AudioSampleSource::SetMixVolume(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoiceMixVolume(m_Unknown1C, value);
+    SetVoiceMixVolume(m_Voice, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -322,26 +322,26 @@ inline void AudioSampleSource::SetInputVolume(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    if (m_Unknown14_18)
-        MIXRmtSetFader(m_Unknown1C, m_Unknown14_19, (int)(10.0f * value));
-    if (g_pAudioBackend->m_MixControllerSpeakersToMain || !m_Unknown14_18)
-        SetVoiceInputVolume(m_Unknown1C, value);
+    if (m_ControllerSpeakerEnabled)
+        MIXRmtSetFader(m_Voice, m_ControllerSpeakerChannel, (int)(10.0f * value));
+    if (g_pAudioBackend->m_MixControllerSpeakersToMain || !m_ControllerSpeakerEnabled)
+        SetVoiceInputVolume(m_Voice, value);
     OSRestoreInterrupts(enabled);
 }
 
 inline AXVPB* AudioSampleSource::GetVoice()
 {
-    return m_Unknown1C;
+    return m_Voice;
 }
 
 inline bool AudioSampleSource::WasVoiceDropped()
 {
-    return m_Unknown28;
+    return m_VoiceDropped;
 }
 
 inline bool AudioSampleSource::Prepare()
 {
-    m_Unknown10 = 3;
+    m_InternalState = 3;
     return false;
 }
 
