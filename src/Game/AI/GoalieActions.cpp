@@ -1133,10 +1133,10 @@ void Goalie::InitMegaStrikeTargets()
         MegaBallIndicator* pState = GetMegaBallIndicator(j);
         pState->mActive = false;
 
-        LiveBallTrail* pBallTrail = fn_8001B284(j);
+        LiveBallTrail* pBallTrail = GetBallTrail(j);
         nlVector3 v3Position = { 0.0f, 60.0f, -60.0f };
         pBallTrail->position = v3Position;
-        fn_8001AA0C(pBallTrail, false);
+        SetBallTrailVisible(pBallTrail, false);
     }
 }
 
@@ -1187,7 +1187,7 @@ void Goalie::fn_8008418C(float fDeltaT)
             v3Position.y = v3TargetPosition.y;
             v3Position.z = lbl_806DBC38 + v3TargetPosition.z;
 
-            LiveBallTrail* pBallTrail = fn_8001B284(i);
+            LiveBallTrail* pBallTrail = GetBallTrail(i);
             float fVelocityY = v3TargetPosition.y - v3Position.y;
             float fVelocityX = v3TargetPosition.x - v3Position.x;
             float fVelocityZ = v3TargetPosition.z - v3Position.z;
@@ -1209,9 +1209,9 @@ void Goalie::fn_8008418C(float fDeltaT)
 
             nlVec3Scale(v3Velocity, 1.0f / fSpeed);
             pBallTrail->position = v3Position;
-            fn_8001AA0C(pBallTrail, true);
+            SetBallTrailVisible(pBallTrail, true);
             pBallTrail->velocity = v3Velocity;
-            fn_8001AD24(pBallTrail, mpShooter);
+            InitializeMegaStrikeBallTrail(pBallTrail, mpShooter);
             PlaySound(0, 0x2C17978A, 0, 0);
 
             nlVec3CrossProduct(v3Rotation, v3Axis, v3Velocity);
@@ -1237,7 +1237,7 @@ void Goalie::fn_8008418C(float fDeltaT)
 void Goalie::fn_80084568(unsigned int nIndex, float)
 {
     MegaBallIndicator* pState = GetMegaBallIndicator(nIndex);
-    LiveBallTrail* pBallTrail = fn_8001B284(nIndex);
+    LiveBallTrail* pBallTrail = GetBallTrail(nIndex);
 
     pBallTrail->velocity = v3Zero;
     nlVector3 v3Unidentified2;
@@ -1322,7 +1322,7 @@ bool Goalie::fn_80084724(unsigned int nParam, float* pScore)
 
 void Goalie::fn_80084840(MegaBallIndicator* pState)
 {
-    LiveBallTrail* pBallTrail = fn_8001B284(pState->mIndex);
+    LiveBallTrail* pBallTrail = GetBallTrail(pState->mIndex);
     if (!mbShouldMiss)
     {
         return;
@@ -1381,7 +1381,7 @@ void Goalie::fn_80084AE0(MegaBallIndicator* pState)
     if (m_pBall == 0)
     {
         LiveBallTrail* pBallTrail
-            = fn_8001B284(pState->mIndex);
+            = GetBallTrail(pState->mIndex);
         EmissionController* pController
             = EmitGeneric(this, "mega_ball_explode", 0);
         pController->SetPosition(pBallTrail->position);
@@ -1390,7 +1390,7 @@ void Goalie::fn_80084AE0(MegaBallIndicator* pState)
         nlVector3 v3Velocity = v3Zero;
         pBallTrail->position = v3Zero;
         pBallTrail->velocity = v3Velocity;
-        fn_8001AA0C(pBallTrail, false);
+        SetBallTrailVisible(pBallTrail, false);
 
         PlaySound(0, 0xE335EFF5, 0, 0);
         PlaySound(0, 0x848EBDEB, 0, 0);
@@ -1507,7 +1507,7 @@ inline void Goalie::CheckMegaStrikeGoals()
     bool goal = false;
     for (unsigned int i = 0; i < g_pGame->m_uMegastrikeNumShots; ++i)
     {
-        LiveBallTrail* ball = fn_8001B284(i);
+        LiveBallTrail* ball = GetBallTrail(i);
         if (mUnidentified4D0[i] == 4 && ball->visible
             && nlVec3LengthSquared(ball->velocity) > 1.0f
             && fabsf(ball->position.x) > 2.0f + cField::GetGoalLineX(1U))
@@ -1515,7 +1515,7 @@ inline void Goalie::CheckMegaStrikeGoals()
             ball->position = zero;
             ball->velocity = zero;
             goal = true;
-            fn_8001AA0C(ball, false);
+            SetBallTrailVisible(ball, false);
             PlaySound(0, 0x5CD383D8, 0, 0);
         }
     }
@@ -1560,7 +1560,7 @@ void Goalie::fn_80084EB0(float deltaTime)
 
     DrawableCharacter::RenderOnlyOneCharacter(*this, false);
     UpdateMegaBallIndicators(deltaTime);
-    fn_8001B298(deltaTime);
+    UpdateBallTrails(deltaTime);
     bool noWiiController = true;
     if (m_pController != 0 && m_pController->IsWiiController())
         noWiiController = false;
@@ -3189,7 +3189,7 @@ void Goalie::ActionSave(float fDeltaT)
         {
             if ((g_pBall->m_tShotTimer.m_uPackedTime != 0 || g_pBall->HasActivePassTarget()) && g_pBall->m_pOwner != this
                 && (mpSaveData->muSaveType & 0x80003) != 0
-                && !fn_80016768(g_pBall))
+                && !IsDryBonesSkillshot(g_pBall))
             {
                 bool bState8Shot = g_pBall->UnidentifiedState8Shot();
 
@@ -6814,7 +6814,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     g_pBall->m_pPhysicsBall->m_gravity = 0.0f;
 
     HideMegaStrikeBall();
-    fn_8001B314(g_pGame->m_uMegastrikeNumShots);
+    InitializeBallTrails(g_pGame->m_uMegastrikeNumShots);
     mbRecalcSave = false;
 
     DetInput* input = GetGlobalPad();

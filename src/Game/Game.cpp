@@ -728,7 +728,7 @@ void cGame::ResetForKickOff()
     gNPCManager->ResetNPCs();
     ResetCharacters();
 
-    fn_8001847C(g_pBall, false);
+    ResetBall(g_pBall, false);
     m_bBallInNet = false;
     ResetPowerups(false);
     lbl_806E12C8->ResetEffects();
@@ -794,7 +794,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     mpWeatherManager->Reset();
     mpWeatherManager->Stop(true);
     ResetCharacters();
-    fn_8001847C(g_pBall, false);
+    ResetBall(g_pBall, false);
     m_bBallInNet = false;
     ResetPowerups(true);
     EndPeachPhoto(&gPeachPhotoState, true);
@@ -1418,7 +1418,7 @@ void cGame::Update(float fDeltaT)
 
     // Time is up once fewer than a tenth of a second remain.
     if ((unsigned int)(10.0f * (m_fGameDuration - m_pGameClock->m_fTimer)) == 0
-        && !fn_800167E8(g_pBall))
+        && !IsBallShotActive(g_pBall))
     {
         if (g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
         {

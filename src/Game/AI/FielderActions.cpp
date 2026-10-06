@@ -1892,7 +1892,7 @@ void cFielder::fn_80046244()
         {
             ReleaseBall(0);
             g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
-            fn_8001458C(g_pBall);
+            SetBallFallState(g_pBall);
         }
 
         fn_8002E718(this);

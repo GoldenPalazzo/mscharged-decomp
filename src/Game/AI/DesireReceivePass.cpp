@@ -98,7 +98,7 @@ extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
     float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
 extern "C" void fn_80015B38(cBall*, bool);
-extern "C" void fn_80016DF8(
+void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
 extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
@@ -1470,7 +1470,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         }
     }
 
-    fn_80016DF8(g_pBall, pPasser, &v3BallVelocity,
+    ReleaseBallForPass(g_pBall, pPasser, &v3BallVelocity,
         eSpinType, bVolleyPass && !bHighArc, false);
     pPasser->SetNoPickUpTime(g_fPasserNoPickUpTime);
     EmitBallShot((cFielder*)pPasser, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);

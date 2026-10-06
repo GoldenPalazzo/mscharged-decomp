@@ -123,7 +123,7 @@ u32 FixedUpdateTask::CalculateChecksum()
     float simulationTime = fixedUpdateTask.mSimulationTime;
     checksum.ChecksumData(&simulationTime, sizeof(simulationTime));
     g_pGame->ChecksumState(&checksum);
-    g_pBall->fn_8001A898(&checksum);
+    g_pBall->ChecksumState(&checksum);
     for (int i = 0; i < 2; i++)
     {
         g_pTeams[i]->fn_800A8DE8(&checksum);

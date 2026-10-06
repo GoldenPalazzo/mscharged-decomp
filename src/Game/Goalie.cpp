@@ -831,7 +831,7 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
     case GOALIEACTION_SAVE_SETUP:
     case GOALIEACTION_SAVE_REPOSITION:
     case GOALIEACTION_SAVE:
-        if (!mbBallImpacted && fn_80016768(g_pBall))
+        if (!mbBallImpacted && IsDryBonesSkillshot(g_pBall))
         {
             mbBallImpacted = true;
             fn_800908F8();
@@ -3695,7 +3695,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
     DrawableCharacter::RenderAllCharacters();
     UnFreezeEveryoneButCaptain(0);
     pGoalie->fn_80084C3C(true);
-    fn_8001B314(0);
+    InitializeBallTrails(0);
     WorldDarkening::Instance().Fade(100.0f, 0.0f);
     if (g_pGame->mbCaptainShotToScoreOn)
     {
