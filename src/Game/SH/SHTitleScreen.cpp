@@ -157,7 +157,7 @@ void TitleScene::Update(float dt)
     float demoTimeout = GetConfigFloat(Config::Global(), "fe_demo_mode_time_out", 60.0f);
     if (GetTweakBool("/user/dosoak", false))
     {
-        if (GameInfoManager::Instance()->unknown_0x121 && GetTweakBool("/user/dosoak", false))
+        if (GameInfoManager::Instance()->mSoakDemoMatchEnabled && GetTweakBool("/user/dosoak", false))
         {
             StartDemoMatch();
         }
