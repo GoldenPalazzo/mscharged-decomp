@@ -34,7 +34,7 @@ public:
     void UpdateButtonStateTicks();
     int GetButtonStateTicks(int button, bool remap);
     void ResetButtonStateTicks(int button, bool remap);
-    void CopyState(const DetInput& input);
+    void CopyState(DetInput& input);
     void ReadFromPad(cGlobalPad* pad);
     int GetPadID() const;
 
