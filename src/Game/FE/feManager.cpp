@@ -3,6 +3,7 @@
 #include "NL/plat/PlatPadManager.h"
 #include "Game/HBMManager.h"
 #include "Game/FE/feManager.h"
+#include "Game/RenderSnapshot_fwd.h"
 #include "Game/Sys/debug.h"
 
 #include <math.h>
@@ -46,12 +47,6 @@
 #include "Game/OverlayManager.h"
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
-
-extern "C"
-{
-
-    extern float g_AllActorsHidden;
-}
 
 cAnimCamera* FrontEnd::m_pPauseMenuCamera = 0;
 bool FrontEnd::m_bGameOver = false;
