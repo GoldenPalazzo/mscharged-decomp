@@ -1951,7 +1951,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
             m_v3Position.z - m_v3ShotTarget.z);
         float fDist = nlSqrt(v3Unidentified.GetLengthSq3D(), true);
 
-        fn_8016F06C();
+        DisablePredictedGoaliePlanes();
         FakeBallWorld::GetPredictedPosAtDistance(
             fDist, v3PredPos, v3PredVel, true);
 
@@ -2899,16 +2899,16 @@ void OnBallKickoff()
         return;
     }
 
-    float fUnidentified0
+    float fAbsoluteBallX
         = nlRandomf(lbl_806DB548 * lbl_806E0BD8)
         + lbl_806DB548 * (1.0f - lbl_806E0BD8);
-    float fUnidentified1
+    float fGoalLineContactX
         = nlRandomf(lbl_806E0BD0 * lbl_806E0BD8)
         + lbl_806E0BD0 * (1.0f - lbl_806E0BD8);
 
-    nlVector3 v3Velocity = { fUnidentified0, 0.0f, 0.0f };
+    nlVector3 v3Velocity = { fAbsoluteBallX, 0.0f, 0.0f };
     v3Velocity.y
-        = 0.5f * fUnidentified1 - nlRandomf(fUnidentified1);
+        = 0.5f * fGoalLineContactX - nlRandomf(fGoalLineContactX);
     v3Velocity.x = 0.0f;
     v3Velocity.z
         = 0.75f * lbl_806E0BD4
