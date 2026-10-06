@@ -471,7 +471,7 @@ config.libs = [
             Object(Matching, "Game/NetworkMessageRegistry.cpp"),
             Object(NonMatching, "Game/NetworkMessages.cpp"),
             Object(Matching, "Game/NetworkMessages_801268E8.cpp"),
-            Object(Matching, "Game/NetworkMessages_80126A70.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/NetworkSkipNisMessages.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/NetworkMessages_80126BE8.cpp"),
             Object(Matching, "Game/NetworkMessageSerializer.cpp"),
             Object(Matching, "Game/NetworkRandom.cpp"),
