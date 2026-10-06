@@ -1,4 +1,5 @@
 #include "revolution/types.h"
+#include "revolution/vi_fwd.h"
 #include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
 #include "Game/SH/SHNavigation.h"
@@ -35,7 +36,6 @@
 #include "Game/main.h"
 
 class SHNavigation;
-extern "C" int VISetTimeToDimming(int time);
 
 static bool setDimmingTime;
 
@@ -70,7 +70,7 @@ TitleScene::TitleScene(ScreenMovement movement)
 
     if (!setDimmingTime)
     {
-        VISetTimeToDimming(2);
+        VISetTimeToDimming(VI_DM_15M);
         setDimmingTime = true;
     }
 
@@ -387,7 +387,7 @@ void TitleScene::OnControllerPointerPress(int index, void*)
     GameSceneManager::Instance()->Pop();
     GameInfoManager::Instance()->mUserInfo.mGameplayOptions.OnSettingsUpdated();
     GameInfoManager::Instance()->mUserInfo.mCheatOptions.OnSettingsUpdated();
-    VISetTimeToDimming(0);
+    VISetTimeToDimming(VI_DM_DEFAULT);
     setDimmingTime = false;
 
     WPADInfo info;
