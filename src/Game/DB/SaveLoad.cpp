@@ -1,5 +1,6 @@
 #include "NL/nlSingleton.inl"
 #include "Game/DB/SaveLoad.h"
+#include <revolution/tpl_fwd.h>
 #include "Game/TweakRegistry.h"
 
 #include "Game/GameSceneManager.h"
@@ -46,32 +47,6 @@ struct NANDBanner
     u8 bannerTexture[NAND_BANNER_TEXTURE_SIZE];
     u8 iconTexture[8][NAND_BANNER_ICON_SIZE];
 };
-
-struct TPLHeader
-{
-    u16 height;
-    u16 width;
-    u32 format;
-    char* data;
-};
-
-struct TPLDescriptor
-{
-    TPLHeader* textureHeader;
-    void* CLUTHeader;
-};
-
-struct TPLPalette
-{
-    u32 versionNumber;
-    u32 numDescriptors;
-    TPLDescriptor* descriptorArray;
-};
-
-extern "C" void TPLBind(TPLPalette* palette);
-
-
-
 
 static const char* SaveFileName = "Strikers2";
 static const char* OnlineSaveFileName = "Online";
