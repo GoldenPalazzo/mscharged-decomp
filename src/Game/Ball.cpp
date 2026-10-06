@@ -2899,16 +2899,16 @@ void OnBallKickoff()
         return;
     }
 
-    float fAbsoluteBallX
+    float fUnidentified0
         = nlRandomf(lbl_806DB548 * lbl_806E0BD8)
         + lbl_806DB548 * (1.0f - lbl_806E0BD8);
-    float fGoalLineContactX
+    float fUnidentified1
         = nlRandomf(lbl_806E0BD0 * lbl_806E0BD8)
         + lbl_806E0BD0 * (1.0f - lbl_806E0BD8);
 
-    nlVector3 v3Velocity = { fAbsoluteBallX, 0.0f, 0.0f };
+    nlVector3 v3Velocity = { fUnidentified0, 0.0f, 0.0f };
     v3Velocity.y
-        = 0.5f * fGoalLineContactX - nlRandomf(fGoalLineContactX);
+        = 0.5f * fUnidentified1 - nlRandomf(fUnidentified1);
     v3Velocity.x = 0.0f;
     v3Velocity.z
         = 0.75f * lbl_806E0BD4
