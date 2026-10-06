@@ -177,7 +177,7 @@ LiveBallTrail* GetBallTrail(unsigned int nIndex);
 unsigned int GetNumBallTrails();
 
 extern cBall* g_pBall;
-extern float lbl_806DB5A4;
+extern float gHeaderTargetPredictionHeight;
 
 
 // Shared functions and data from Game/Ball.cpp.

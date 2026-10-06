@@ -171,11 +171,11 @@ void UpdateEmitterFromBallLandingSpot(EmissionController& controller)
     if (controller.m_Replaying == 0)
     {
         cBall* ball = (cBall*)controller.m_uUserData;
-        if (ball->m_v3Position.z > lbl_806DB5A4)
+        if (ball->m_v3Position.z > gHeaderTargetPredictionHeight)
         {
             nlVector3 position;
             ball->PredictLandingSpotAndTime(
-                position, 0, 0, lbl_806DB5A4);
+                position, 0, 0, gHeaderTargetPredictionHeight);
             controller.SetPosition(position);
             controller.SetVelocity(sZeroVelocity);
         }
