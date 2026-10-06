@@ -39,8 +39,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_800EDCE8(cPlayer*);
-extern "C" bool fn_8019C988(void*);
 extern "C" void fn_8009F1B8(EmissionController&);
 
 enum eGameState

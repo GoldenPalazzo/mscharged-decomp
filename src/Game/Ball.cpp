@@ -53,27 +53,12 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
-struct UnidentifiedGameState
-{
-    u8 mUnidentified00[0x28];
-    u32 mUnidentified28;
-    u32 mUnidentified2C;
-    u32 mUnidentified30;
-    u8 mUnidentified34[0x0C];
-    bool mUnidentified40;
-};
-
-extern "C" LiveBallTrail lbl_8056B518[];
-extern "C" unsigned int lbl_806E0C10;
-extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" void fn_800156F8(cBall*, cPlayer*);
-extern "C" void Hide(BirdoEggObject*, bool);
-float Exp(float);
+extern unsigned int lbl_806E0C10;
+extern "C" void fn_80036594(cPlayer*, cFielder*, int);
 
 cBall* g_pBall = NULL;
 unsigned char lbl_806E0BC4;
@@ -1164,9 +1149,8 @@ cFielder* cBall::GetPassTargetFielder() const
 
 bool cBall::GetInNet(int& nSide)
 {
-    UnidentifiedGameState* gameState
-        = (UnidentifiedGameState*)g_pGame;
-    if (gameState->mUnidentified40 == 0)
+    cGame* gameState = g_pGame;
+    if (gameState->mbCaptainShotToScoreOn == 0)
     {
         if (m_pPhysicsBall->mbIsInsideNet)
         {
@@ -1175,8 +1159,8 @@ bool cBall::GetInNet(int& nSide)
             return true;
         }
     }
-    else if (gameState->mUnidentified2C > gameState->mUnidentified28
-             && gameState->mUnidentified30 != 0)
+    else if (gameState->m_uMegastrikeCurShot > gameState->m_uMegastrikeNumShots
+             && gameState->m_uMegastrikeGoals != 0)
     {
         float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
         nSide = !(m_v3Position.x * fDirection > 1.0f);
@@ -3671,4 +3655,4 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
     }
 }
 
-extern "C" unsigned int lbl_806E0C10 = 0;
+unsigned int lbl_806E0C10 = 0;

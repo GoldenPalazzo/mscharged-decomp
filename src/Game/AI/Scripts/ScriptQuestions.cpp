@@ -15,7 +15,6 @@
 #include "Game/AI/ScriptMachine.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AI/Fuzzy.h"
-#include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
 #include "Game/Goalie.h"
@@ -34,12 +33,7 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern cBall* g_pScriptBall;
-extern cTeam* g_pScriptOtherTeam;
-extern cTeam* g_pScriptCurrentTeam;
-extern cFielder* g_pScriptBallOwner;
 extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" float fn_800A0508(cFielder* pFielder, bool bParam1, bool bParam2);
 extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
 extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
@@ -58,10 +52,9 @@ static TweakFloatBinding lbl_8056DB50("Ideal Range", gLastTweakCategory, &lbl_80
 static TweakFloatBinding lbl_8056DB70("Min Angle", gLastTweakCategory, &lbl_806DC3E0.x);
 static TweakFloatBinding lbl_8056DB90("Max Angle", gLastTweakCategory, &lbl_806DC3E0.y);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" float fn_8003C40C(cFielder*, unsigned short);
+extern "C" float fn_8003C40C(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
-extern "C" float fn_80030750(cFielder*);
 
 
 float GenerateFilteredRandom()

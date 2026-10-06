@@ -63,8 +63,6 @@ extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 extern "C" void fn_8002E3F8(cFielder*);
-extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
-    float, const nlVector2&, const nlVector2&, bool, bool);
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
@@ -785,11 +783,11 @@ extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
         float fScore = fn_800DAD84(pSelf->mUnidentified024.m_v3Position,
             pTarget->mUnidentified024.m_v3Position,
             aDirection,
-            fDistanceWeight,
-            v2Distance,
-            v2Angle,
+            &v2Distance,
+            &v2Angle,
             true,
-            false);
+            false,
+            fDistanceWeight);
         if (pBestTarget == NULL || fScore > fBestScore)
         {
             pBestTarget = pTarget;

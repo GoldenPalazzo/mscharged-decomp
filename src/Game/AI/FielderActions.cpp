@@ -36,6 +36,9 @@
 #include "Game/Team.h"
 #include "Game/Weather.h"
 #include "Game/NetworkSession.h"
+#include "Game/InputManager.h"
+#include "Game/NetworkInputRecording.h"
+#include "Game/CrowdRiot.h"
 #include "Game/TweakValue.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/Ball.h"
@@ -161,68 +164,27 @@ extern const float lbl_806E35D4[1];
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
-extern "C" bool fn_8003E948(cFielder* pFielder);
+extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
-extern "C" float fn_80030750(cFielder* pFielder);
-extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
-extern "C" bool fn_8003E8A0(cFielder* pFielder);
+extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
+extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
-extern "C" void fn_8005ED64(void* pParam, void* pNode);
+extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003E99C(cFielder* pFielder);
+extern "C" bool fn_8003E99C(const cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
 extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
 
-extern "C" void ResetButtonStateTicks(void* pPad, int nParam, int nParam2);
-
-struct UnidentifiedActionTarget806E0C94
-{
-    /* 0x00 */ u8 mUnidentified00[0x14];
-    /* 0x14 */ nlVector3 mUnidentified14;
-};
-
-extern bool gbUseTurboCharging;
-
-class UnidentifiedHandler8011166C
-{
-public:
-    virtual void UnidentifiedVirtual00();
-    virtual void UnidentifiedVirtual04();
-    virtual void Allocate();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
-    virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
-    virtual void UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24();
-    virtual void UnidentifiedVirtual28();
-    virtual void UnidentifiedVirtual2C();
-    virtual void UnidentifiedVirtual30();
-    virtual int UnidentifiedVirtual34();
-
-    /* 0x00 vptr */
-    /* 0x04 */ u8 mUnknown04[0x28];
-    /* 0x2C */ float mUnidentified2C;
-};
-
-struct UnidentifiedOnlineState
-{
-    u8 mUnidentified000[4];
-    bool mUnidentified004;
-};
-extern UnidentifiedOnlineState* gNetworkInputRecording;
-bool IsNetworkOrRecordedGame(void);
 
 struct UnidentifiedSkillshotNode
 {
@@ -1033,11 +995,9 @@ void cFielder::fn_80043C18(float fDeltaT)
             else
             {
                 float fBlend = 1.0f - fTime;
-                UnidentifiedActionTarget806E0C94* pTarget
-                    = (UnidentifiedActionTarget806E0C94*)
-                          g_pGame->mpCrowdRiot;
+                CrowdRiot* pTarget = g_pGame->mpCrowdRiot;
                 nlVector3 v3Position;
-                nlVec3WeightedSum(v3Position, fBlend, pTarget->mUnidentified14, fTime, mUnidentified024.m_v3Position);
+                nlVec3WeightedSum(v3Position, fBlend, pTarget->mv3Position, fTime, mUnidentified024.m_v3Position);
                 SetPosition(v3Position);
             }
         }
@@ -3461,7 +3421,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             g_pGame->SendRemainingMegaStrikeMeter();
         }
 
-        if (!gNetworkInputRecording->mUnidentified004)
+        if (!gNetworkInputRecording->mPlaybackReady)
         {
             g_pGame->SendMegaStrike(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
         }

@@ -6,11 +6,10 @@
 #include "Game/Ball.h"
 #include "Game/Team.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Scripts/ScriptDefines.h"
 
 class cGame;
 
-extern cFielder* g_pScriptCurrentFielder;
-extern cFielder* g_pScriptCurrentMark;
 
 enum eScriptFielderDesire
 {
@@ -49,6 +48,11 @@ extern "C" cFielder* fn_800D674C(cPlayer* player);
 extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder);
 extern "C" float fn_800DED80(cPlayer* pPlayer);
 extern "C" cFielder* fn_800DF790(cTeam* pTeam);
+
+extern "C" float fn_800DAD84(const nlVector3& vFrom, const nlVector3& vTo,
+    unsigned short aDirection, const nlVector2* pDistanceRange,
+    const nlVector2* pAngleRange, bool bDistancePeak, bool bRequireInRange,
+    float fDistanceWeight);
 
 float CloseToFormationPosition(cFielder* pFielder);
 float CloseToMyGoalie(cPlayer*);
@@ -220,7 +224,6 @@ extern "C" float fn_800D88B4(cFielder*);
 extern "C" float fn_800D8970(cFielder*);
 extern "C" float fn_800D8A9C(cFielder*);
 extern "C" float fn_800D8BAC(cFielder*);
-extern "C" float fn_800D8C84(cFielder*);
 extern "C" float fn_800D912C(cFielder*);
 extern "C" float fn_800D91BC(cFielder*);
 extern "C" float fn_800D924C(cFielder*);
@@ -294,7 +297,6 @@ extern "C" float fn_800DF390(cPlayer*);
 extern "C" float fn_800DF474(cFielder*);
 extern "C" float fn_800DF590(cBall*);
 extern "C" float fn_800DF838(cPlayer*);
-extern "C" float fn_800DFD74(cTeam*);
 extern "C" float fn_800DFF1C();
 extern "C" float fn_800DFF60();
 extern "C" float fn_800E0034();
