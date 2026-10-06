@@ -386,7 +386,7 @@ void Presentation::Finish()
                 }
                 else
                 {
-                    g_pGame->fn_8005DF38();
+                    g_pGame->ResumeAfterPresentation();
                 }
             }
         }

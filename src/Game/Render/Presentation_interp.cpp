@@ -28,7 +28,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 2:
         ++lbl_806E2130;
-        g_pGame->fn_80058400();
+        g_pGame->CleanupMegaStrikeGameplay();
         --lbl_806E2130;
         break;
     case 3:
@@ -193,7 +193,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 25:
         ++lbl_806E2130;
         gpNumberDisplay->mVisible = false;
-        g_pGame->fn_8005830C();
+        g_pGame->InitMegaStrikeGameplay();
         --lbl_806E2130;
         break;
     case 26:

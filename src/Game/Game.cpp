@@ -99,12 +99,12 @@
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 extern "C" void fn_800406B0(cFielder* pFielder, float numBalls, float accuracy);
 
-struct UnidentifiedGameSnapshot
+struct PlayerDistanceSnapshot
 {
     inline void RegisterDebugFields(DebugWriteCache* cache);
     u8 mPlayerIndices[100];
     float mDistances[100];
-    float mUnidentified1F4[10];
+    float mBallDistances[10];
 };
 
 extern "C" EventDispatcher* fn_800721C4();
@@ -113,50 +113,50 @@ extern "C" void fn_8007214C(ShotAtGoalData* node);
 extern "C" void fn_80072164(NISData* node);
 extern "C" void fn_8007217C(CollisionCrowdData* node);
 extern "C" void fn_80072194(PlayerAttackData* node);
-extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
+void PostResetCallback(unsigned long param1, unsigned long param2);
 
 // Tweak "Megastrike/Score differential": when positive, it overrides the
-// mega strike shot count (fn_80058498).
-TweakValueInt lbl_8056B9A0("Score differential", "Megastrike", -1, false);
+// mega strike shot count (SetMegaStrikeGameplay).
+TweakValueInt gMegaStrikeShotCountOverride("Score differential", "Megastrike", -1, false);
 
 // Game tuning values (.sdata), in retail order.
 // Countdown beeps played before the end of a match.
-int lbl_806DBA68 = 5;
-// Field tilt force scale (fn_80061B1C).
-float lbl_806DBA6C = 0.8f;
+int gEndGameCountdownBeeps = 5;
+// Field tilt force scale (SetFieldTilt).
+float gFieldTiltForceScale = 0.8f;
 // Time the field takes to level out, and the hold before it starts.
-float lbl_806DBA70 = 3.0f;
-float lbl_806DBA74 = 3.0f;
+float gFieldLevelTime = 3.0f;
+float gFieldTiltHoldTime = 3.0f;
 // Weather tilt range scale on each axis.
-float lbl_806DBA78 = 0.5f;
-float lbl_806DBA7C = 8.0f;
-float lbl_806DBA80 = 4.0f;
-float lbl_806DBA84 = 10.0f;
+float gWeatherTiltXRangeScale = 0.5f;
+float gWeatherTiltYRangeScale = 8.0f;
+float gFieldTiltXLimit = 4.0f;
+float gFieldTiltYLimit = 10.0f;
 // Weather tilt ramp-up period.
-float lbl_806DBA88 = 12.0f;
+float gWeatherTiltRampDuration = 12.0f;
 // Score-difference tilt: clamp and scale.
-float lbl_806DBA8C = 6.0f;
-float lbl_806DBA90 = 1.0f;
+float gScoreTiltMaxDifference = 6.0f;
+float gScoreTiltScale = 1.0f;
 // Weather tilt target speed range.
-float lbl_806DBA94 = 12.0f;
-float lbl_806DBA98 = 1.0f;
+float gWeatherTiltInitialSpeed = 12.0f;
+float gWeatherTiltFinalSpeed = 1.0f;
 // Weather tilt direction jitter.
-int lbl_806DBA9C = 1000;
+int gWeatherTiltDirectionJitter = 1000;
 // Seek speeds: weather tilt, levelling during shoot-to-score, score tilt.
-float lbl_806DBAA0 = 1.0f;
-float lbl_806DBAA4 = 2.0f;
-float lbl_806DBAA8 = 2.0f;
-int lbl_806DBAAC = 3;
+float gWeatherTiltSpeedSeekRate = 1.0f;
+float gMegaStrikeTiltLevelRate = 2.0f;
+float gScoreTiltSeekRate = 2.0f;
+int gMegaStrikeMeterBatchSize = 3;
 
 
 // .sbss, in retail order. The first two are debug overrides that force the
 // weather and score field tilt on.
-bool lbl_806E0C90;
-bool lbl_806E0C91;
+bool gForceWeatherTilt;
+bool gForceScoreTilt;
 cGame* g_pGame;
-bool lbl_806E0C98;
+bool gNoGameClock;
 
-static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
+static inline int GetPlayerIndex(cPlayer* pPlayer)
 {
     return pPlayer->mUnidentified120;
 }
@@ -164,17 +164,17 @@ static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
 inline void cGame::ResetGameFields()
 {
     float zero = 0.0f;
-    mUnidentified020 = false;
+    m_bBallInNet = false;
     m_nLastTeamToScore = 1;
-    mUnidentified028 = 0;
-    mUnidentified02C = 0;
-    mUnidentified030 = 0;
-    mUnidentified034 = 0;
-    mUnidentified038 = 0;
-    mUnidentified03C = 0;
+    m_uMegastrikeNumShots = 0;
+    m_uMegastrikeCurShot = 0;
+    m_uMegastrikeGoals = 0;
+    m_nMegastrikeDefendingTeam = 0;
+    m_uMegastrikeResults = 0;
+    mpMegaStrikeShooter = 0;
     mbCaptainShotToScoreOn = false;
-    mUnidentified041 = false;
-    mUnidentified042 = false;
+    mbMegaStrikePositiveNet = false;
+    mbMegaStrikePlayerReady = false;
     m_pScorer = 0;
     m_pAssister = 0;
     m_pTeamTouch[1] = 0;
@@ -183,24 +183,24 @@ inline void cGame::ResetGameFields()
     {
         m_pRandomPlayersArray[i] = 0;
     }
-    mUnidentified07C = zero;
-    mUnidentified080 = zero;
-    mUnidentified084 = zero;
-    mUnidentified088 = -1.0f;
-    mUnidentified08C = 1.0f;
-    mUnidentified090 = -1.0f;
-    mUnidentified094 = 1.0f;
-    mUnidentified098 = zero;
-    mUnidentified09C = zero;
+    mfTiltLevelTimer = zero;
+    mfXTilt = zero;
+    mfYTilt = zero;
+    mfXTiltMin = -1.0f;
+    mfXTiltMax = 1.0f;
+    mfYTiltMin = -1.0f;
+    mfYTiltMax = 1.0f;
+    mfTiltSpeed = zero;
+    mfDesiredTiltSpeed = zero;
     mUnidentified0A0 = zero;
-    mUnidentified0A4 = 0;
-    mUnidentified0A6 = 0;
-    mUnidentified0A8 = 0;
+    maTiltDir = 0;
+    maDesiredTiltDir = 0;
+    muTiltFrames = 0;
     float initialTilt = -zero;
     fn_8005B330(&mTiltDirection, initialTilt, initialTilt);
-    mUnidentified0B8 = lbl_806DBA68;
-    mUnidentified0BC = false;
-    mUnidentified0BD = false;
+    muCountdownBeepsRemaining = gEndGameCountdownBeeps;
+    mbMegaStrikePlayerReadySent = false;
+    mbMegaStrikeCleanupPending = false;
 }
 
 inline void cGame::ResetCharacters()
@@ -247,7 +247,7 @@ inline void cGame::UpdatePowerUpObjects(float fDeltaT)
 
 static inline int GetSyncPlayerIndex(cPlayer* pPlayer)
 {
-    return pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
+    return pPlayer == 0 ? -1 : GetPlayerIndex(pPlayer);
 }
 
 // Walks the players in their current randomized update order.
@@ -269,11 +269,11 @@ private:
     int mIndex;
 };
 
-float fn_80056CA4()
+float GetGameSimulationMilliseconds()
 {
     return 1000.0f * GetFixedUpdateTask()->mSimulationTime;
 }
-float fn_80056CD0()
+float GetGameTickerMilliseconds()
 {
     return nlTicksToMilliseconds(nlGetTicker());
 }
@@ -379,16 +379,16 @@ static inline const char* SuddenDeathEventName();
 static inline const char* GameOverEventName();
 
 cGame::cGame(void* param1, int param2, bool param3)
-    : mUnidentified0C0((bool*)mUnidentified0D0, 100)
-    , mUnidentified134((bool*)mUnidentified144, 16)
+    : mReceivedMegaStrikeMeter((bool*)mReceivedMegaStrikeMeterStorage, 100)
+    , mPendingMegaStrikeMeter((bool*)mPendingMegaStrikeMeterStorage, 16)
 {
     mpTerrain = 0;
     mpWeatherManager = 0;
-    mUnidentified10E0 = 0;
+    mpCrowdRiot = 0;
     m_eGameState = -1;
 
     m_pPostResetClock = new (nlMalloc(sizeof(Clock), 8, false))
-        Clock(0.0f, 0.5f, 1.0f, 2, fn_80058ABC);
+        Clock(0.0f, 0.5f, 1.0f, 2, PostResetCallback);
     m_pPostResetClock->m_uParam1 = (unsigned long)this;
 
     mpTerrain = new (nlMalloc(sizeof(Terrain), 8, false))
@@ -398,7 +398,7 @@ cGame::cGame(void* param1, int param2, bool param3)
 
     mpWeatherManager->Initialize(param2);
 
-    mUnidentified10E0 = new (nlMalloc(sizeof(CrowdRiot), 8, false))
+    mpCrowdRiot = new (nlMalloc(sizeof(CrowdRiot), 8, false))
         CrowdRiot(param3);
 
     m_pFuzzyTweaks = new (nlMalloc(sizeof(FuzzyTweaks), 8, false))
@@ -406,10 +406,10 @@ cGame::cGame(void* param1, int param2, bool param3)
     gGameTweaks.m_pGameTweaks->fn_800756B4();
 
     ResetGameFields();
-    mUnidentified0C0.mHead = 0;
-    mUnidentified0C0.mCount = 0;
-    mUnidentified134.mHead = 0;
-    mUnidentified134.mCount = 0;
+    mReceivedMegaStrikeMeter.mHead = 0;
+    mReceivedMegaStrikeMeter.mCount = 0;
+    mPendingMegaStrikeMeter.mHead = 0;
+    mPendingMegaStrikeMeter.mCount = 0;
 
     m_fGameDuration = gGameTweaks.m_pGameTweaks->fGameDuration;
     m_pGameClock = new (nlMalloc(sizeof(Clock), 8, false))
@@ -419,7 +419,7 @@ cGame::cGame(void* param1, int param2, bool param3)
         Clock(0.0f, 1.5f, 1.0f, 2, 0);
 
     bool noClock = GetTweakBool("user/No Clock", false);
-    lbl_806E0C98 = noClock;
+    gNoGameClock = noClock;
     cGame* game = g_pGame;
     if (game != 0 && game->m_pGameClock != 0)
     {
@@ -442,7 +442,7 @@ cGame::cGame(void* param1, int param2, bool param3)
 
     RegisterEventListeners();
 
-    mUnidentified014 = new (nlMalloc(sizeof(AIContext), 8, false))
+    mpAIContext = new (nlMalloc(sizeof(AIContext), 8, false))
         AIContext(
             this, 0, new (nlMalloc(sizeof(FuzzyAIRuntime), 8, false))
                          FuzzyAIRuntime());
@@ -451,10 +451,10 @@ cGame::cGame(void* param1, int param2, bool param3)
 
     float avoidableWidth = 1.0f;
     nlVector3 avoidableCenter = { 20.6f, 0.0f, 0.0f };
-    mUnidentified10E4[0] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+    mpBoundaryAvoidables[0] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
     avoidableCenter.x *= -1.0f;
-    mUnidentified10E4[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+    mpBoundaryAvoidables[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
 
     if (GameInfoManager::Instance()->GetStadium() == 15)
@@ -465,10 +465,10 @@ cGame::cGame(void* param1, int param2, bool param3)
     avoidableCenter.x = 0.0f;
     avoidableCenter.y = 12.5f;
     avoidableCenter.z = 0.0f;
-    mUnidentified10E4[2] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+    mpBoundaryAvoidables[2] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, 41.2f, avoidableWidth);
     avoidableCenter.y *= -1.0f;
-    mUnidentified10E4[3] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+    mpBoundaryAvoidables[3] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, 41.2f, avoidableWidth);
 }
 static inline const char* SuddenDeathEventName() { return "SuddenDeath"; }
@@ -485,20 +485,20 @@ cGame::~cGame()
 
     delete mpWeatherManager;
 
-    delete mUnidentified10E0;
+    delete mpCrowdRiot;
 
     delete m_pFuzzyTweaks;
     delete m_pPostGameDoneClock;
 
-    mUnidentified014->Cleanup(true, true);
-    delete mUnidentified014;
+    mpAIContext->Cleanup(true, true);
+    delete mpAIContext;
 
     gNetworkMessageRegistry->UnregisterReceiver(34);
     gNetworkMessageRegistry->UnregisterReceiver(35);
 
     for (int i = 0; i < 4; i++)
     {
-        delete mUnidentified10E4[i];
+        delete mpBoundaryAvoidables[i];
     }
 
     if (lbl_806E0C74 != 0)
@@ -509,28 +509,28 @@ cGame::~cGame()
 
     gNextAvoidableObjectId = 0;
 }
-void cGame::fn_80057FC0()
+void cGame::ResetMegaStrikeMeterQueues()
 {
-    mUnidentified0C0.mHead = 0;
-    mUnidentified0C0.mCount = 0;
-    mUnidentified134.mHead = 0;
-    mUnidentified134.mCount = 0;
+    mReceivedMegaStrikeMeter.mHead = 0;
+    mReceivedMegaStrikeMeter.mCount = 0;
+    mPendingMegaStrikeMeter.mHead = 0;
+    mPendingMegaStrikeMeter.mCount = 0;
 }
-void cGame::fn_80057FD8(bool param1)
+void cGame::SendMegaStrikeMeter(bool param1)
 {
-    mUnidentified134.Push(param1);
+    mPendingMegaStrikeMeter.Push(param1);
 
-    if (mUnidentified134.mCount < lbl_806DBAAC)
+    if (mPendingMegaStrikeMeter.mCount < gMegaStrikeMeterBatchSize)
     {
         return;
     }
 
-    int count = mUnidentified134.mCount;
+    int count = mPendingMegaStrikeMeter.mCount;
     NetworkMessageType35 message;
     message.mCount = count;
     for (int i = 0; i < count; i++)
     {
-        message.mValues[i] = mUnidentified134.Pop();
+        message.mValues[i] = mPendingMegaStrikeMeter.Pop();
     }
 
     u8 buffer[50];
@@ -545,13 +545,13 @@ void cGame::fn_80057FD8(bool param1)
         }
     }
 }
-void cGame::fn_80058180()
+void cGame::SendRemainingMegaStrikeMeter()
 {
-    tDebugPrintManager::Print(DC_NETWORK, "SendRemainingMegaStrikeMeter %d\n", mUnidentified134.mCount);
+    tDebugPrintManager::Print(DC_NETWORK, "SendRemainingMegaStrikeMeter %d\n", mPendingMegaStrikeMeter.mCount);
 
-    while (mUnidentified134.mCount > 0)
+    while (mPendingMegaStrikeMeter.mCount > 0)
     {
-        int count = mUnidentified134.mCount;
+        int count = mPendingMegaStrikeMeter.mCount;
         if (count > 8)
         {
             count = 8;
@@ -562,7 +562,7 @@ void cGame::fn_80058180()
         for (int i = 0; i < count; i++)
         {
             message.mValues[i]
-                = mUnidentified134.Pop();
+                = mPendingMegaStrikeMeter.Pop();
         }
 
         u8 buffer[50];
@@ -578,7 +578,7 @@ void cGame::fn_80058180()
         }
     }
 }
-void cGame::fn_8005830C()
+void cGame::InitMegaStrikeGameplay()
 {
     DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
     if (output != 0)
@@ -592,17 +592,17 @@ void cGame::fn_8005830C()
 
     g_pBall->m_uGoalType = 6;
 
-    float param3 = mUnidentified03C->mUnidentified394;
-    float param2 = mUnidentified03C->mUnidentified390;
-    Goalie* pGoalie = mUnidentified03C->m_pTeam->GetOtherTeam()->GetGoalie();
+    float param3 = mpMegaStrikeShooter->mUnidentified394;
+    float param2 = mpMegaStrikeShooter->mUnidentified390;
+    Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->InitActionMegaStrike(param2, param3);
-    mUnidentified03C->EndAction();
-    fn_80038158(mUnidentified03C, 0);
+    mpMegaStrikeShooter->EndAction();
+    fn_80038158(mpMegaStrikeShooter, 0);
 }
-void cGame::fn_80058400()
+void cGame::CleanupMegaStrikeGameplay()
 {
-    Goalie* pGoalie = mUnidentified03C->m_pTeam->GetOtherTeam()->GetGoalie();
-    if (mUnidentified030 != 0)
+    Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
+    if (m_uMegastrikeGoals != 0)
     {
         pGoalie->InitActionMove(false);
     }
@@ -616,41 +616,41 @@ void cGame::fn_80058400()
         pGoalie->InitActionMoveWB();
     }
 }
-void cGame::fn_8005848C()
+void cGame::ClearMegaStrikeCleanupPending()
 {
-    mUnidentified0BD = false;
+    mbMegaStrikeCleanupPending = false;
 }
-void cGame::fn_80058498(bool param1, int param2, int param3)
+void cGame::SetMegaStrikeGameplay(bool param1, int param2, int param3)
 {
     mbCaptainShotToScoreOn = param1;
     if (param1)
     {
-        mUnidentified041 = g_pTeams[param2]->m_pNet->m_v3NetLocation.x > 0.0f;
-        if (lbl_8056B9A0.mValue > 0)
+        mbMegaStrikePositiveNet = g_pTeams[param2]->m_pNet->m_v3NetLocation.x > 0.0f;
+        if (gMegaStrikeShotCountOverride.mValue > 0)
         {
-            mUnidentified028 = lbl_8056B9A0.mValue;
+            m_uMegastrikeNumShots = gMegaStrikeShotCountOverride.mValue;
         }
         else
         {
-            mUnidentified028 = param3;
+            m_uMegastrikeNumShots = param3;
         }
-        mUnidentified034 = param2;
+        m_nMegastrikeDefendingTeam = param2;
     }
     else
     {
-        mUnidentified028 = 0;
-        mUnidentified0C0.mHead = 0;
-        mUnidentified0C0.mCount = 0;
-        mUnidentified134.mHead = 0;
-        mUnidentified134.mCount = 0;
+        m_uMegastrikeNumShots = 0;
+        mReceivedMegaStrikeMeter.mHead = 0;
+        mReceivedMegaStrikeMeter.mCount = 0;
+        mPendingMegaStrikeMeter.mHead = 0;
+        mPendingMegaStrikeMeter.mCount = 0;
     }
 
-    mUnidentified02C = 0;
-    mUnidentified030 = 0;
-    mUnidentified042 = false;
-    mUnidentified0BC = false;
+    m_uMegastrikeCurShot = 0;
+    m_uMegastrikeGoals = 0;
+    mbMegaStrikePlayerReady = false;
+    mbMegaStrikePlayerReadySent = false;
 }
-void cGame::fn_80058528(float timeScale, float transitionTime)
+void cGame::StartSlowDown(float timeScale, float transitionTime)
 {
     if (g_pNetworkSessionBase->GetNumMachines() > 1 && timeScale < 0.3f)
     {
@@ -714,22 +714,22 @@ void cGame::fn_80058704()
         m_pGameClock->Stop();
     }
 }
-void cGame::fn_80058748()
+void cGame::ResetForKickOff()
 {
     ++lbl_806E2130;
-    if (mUnidentified0BD)
+    if (mbMegaStrikeCleanupPending)
     {
-        fn_80058400();
-        mUnidentified0BD = false;
+        CleanupMegaStrikeGameplay();
+        mbMegaStrikeCleanupPending = false;
     }
     mUnidentified49C.mEvent11.Queue();
 
-    fn_80061B1C(0, 0.0f, 0.0f);
+    SetFieldTilt(0, 0.0f, 0.0f);
     gNPCManager->ResetNPCs();
     ResetCharacters();
 
     fn_8001847C(g_pBall, false);
-    mUnidentified020 = false;
+    m_bBallInNet = false;
     ResetPowerups(false);
     lbl_806E12C8->ResetEffects();
     m_pScorer = 0;
@@ -760,10 +760,10 @@ void cGame::fn_80058A78(float seconds)
     m_pPostResetClock->Reset(0.0f, seconds, 1.0f);
     m_pPostResetClock->Start();
 }
-extern "C" void fn_80058ABC(unsigned long, unsigned long)
+void PostResetCallback(unsigned long, unsigned long)
 {
     cGame* game = g_pGame;
-    game->fn_8005DF38();
+    game->ResumeAfterPresentation();
     game->mUnidentified49C.mEvent12.Queue();
 
     GameplayCamera* camera = cCameraManager::GetCamera<GameplayCamera>(eCameraType_Gameplay);
@@ -778,7 +778,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     FixedUpdateTask::SetTimeScale(1.0f);
     ParticleUpdateTask::sInstance->SetTimeScale(1.0f);
 
-    Function<DetermDataEvent*> callback(BindMember(this, &cGame::fn_8005A028));
+    Function<DetermDataEvent*> callback(BindMember(this, &cGame::ReceiveCustomDetermData));
     GetInputRouter();
     GetDetermDataEventQueue()->Add(callback, 0, -1);
 
@@ -789,13 +789,13 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
 
     ResetGameFields();
 
-    fn_80058498(false, 0, 0);
-    fn_80059A1C();
+    SetMegaStrikeGameplay(false, 0, 0);
+    ResetCachedPlayerDistances();
     mpWeatherManager->Reset();
     mpWeatherManager->Stop(true);
     ResetCharacters();
     fn_8001847C(g_pBall, false);
-    mUnidentified020 = false;
+    m_bBallInNet = false;
     ResetPowerups(true);
     EndPeachPhoto(&gPeachPhotoState, true);
     EmissionManager::Instance()->KillAll();
@@ -851,14 +851,14 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     if (IsNetworkOrRecordedGame())
     {
         SetScriptTimeBudget(-1.0f);
-        gAIProfilingClock = fn_80056CA4;
-        gAIActivityClock = fn_80056CA4;
+        gAIProfilingClock = GetGameSimulationMilliseconds;
+        gAIActivityClock = GetGameSimulationMilliseconds;
     }
     else
     {
         SetScriptTimeBudget(1.0f);
-        gAIProfilingClock = fn_80056CD0;
-        gAIActivityClock = fn_80056CA4;
+        gAIProfilingClock = GetGameTickerMilliseconds;
+        gAIActivityClock = GetGameSimulationMilliseconds;
     }
 }
 void cGame::CheckForGoal()
@@ -871,7 +871,7 @@ void cGame::CheckForGoal()
 
     int nSide;
 
-    if (g_pBall->GetInNet(nSide) && !mUnidentified020)
+    if (g_pBall->GetInNet(nSide) && !m_bBallInNet)
     {
         nSide = (nSide + 1) % 2;
         m_nLastTeamToScore = nSide;
@@ -960,7 +960,7 @@ void cGame::CheckForGoal()
 
         goalScored.data.pLastTouch[0] = m_pTeamTouch[0];
         goalScored.data.pLastTouch[1] = m_pTeamTouch[1];
-        mUnidentified020 = true;
+        m_bBallInNet = true;
 
         DeliverGoalScored(g_pGame, &goalScored.data);
 
@@ -1038,7 +1038,7 @@ void cGame::ResetPowerups(bool clearPowerUps)
         }
     }
 }
-void cGame::fn_80059A1C()
+void cGame::ResetCachedPlayerDistances()
 {
     for (int i = 0; i < 2; i++)
     {
@@ -1069,9 +1069,9 @@ void cGame::fn_80059A1C()
         m_fCachedBallPlayerDistances[i] = 0.0f;
     }
 }
-void cGame::fn_80059B70(void* param1)
+void cGame::CopyPlayerDistanceSnapshot(void* param1)
 {
-    UnidentifiedGameSnapshot* snapshot = static_cast<UnidentifiedGameSnapshot*>(param1);
+    PlayerDistanceSnapshot* snapshot = static_cast<PlayerDistanceSnapshot*>(param1);
 
     for (int i = 0; i < 10; i++)
     {
@@ -1080,7 +1080,7 @@ void cGame::fn_80059B70(void* param1)
             for (int k = 0; k < 5; k++)
             {
                 cPlayer* pPlayer = m_nClosestPlayers[i][j][k];
-                snapshot->mPlayerIndices[i * 10 + j * 5 + k] = pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
+                snapshot->mPlayerIndices[i * 10 + j * 5 + k] = pPlayer == 0 ? -1 : GetPlayerIndex(pPlayer);
             }
         }
     }
@@ -1096,7 +1096,7 @@ void cGame::fn_80059B70(void* param1)
 
     for (int i = 0; i < 10; i++)
     {
-        snapshot->mUnidentified1F4[i]
+        snapshot->mBallDistances[i]
             = m_fCachedBallPlayerDistances[i];
     }
 }
@@ -1121,7 +1121,7 @@ void cGame::SendNISLoadedCustomDeterm(u8 param1)
     tDebugPrintManager::Print(DC_NETWORK, "Sending NIS Loaded %d at frame %d\n", message.param1, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_80059DEC(
+void cGame::SendMegaStrike(
     int param1, int param2, float param3, float param4)
 {
     struct Message
@@ -1145,21 +1145,21 @@ void cGame::fn_80059DEC(
     tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", message.param1, message.param2, message.param3, message.param4, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_80059E78()
+void cGame::SendMegaStrikePlayerReady()
 {
     u8 message = 183;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikePlayerReady at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_80059EDC()
+void cGame::SendMegaStrikeKillCursor()
 {
     u8 message = 185;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending SendMegaStrikeKillCursor at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_80059F40(unsigned int param1, unsigned int param2, float param3)
+void cGame::SendMegaStrikeGoalie(unsigned int param1, unsigned int param2, float param3)
 {
     struct Message
     {
@@ -1180,14 +1180,14 @@ void cGame::fn_80059F40(unsigned int param1, unsigned int param2, float param3)
     tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", message.param1, message.param2, message.param3, frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_80059FC4()
+void cGame::SendSlowDownEnd()
 {
     u8 message = 222;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending Slow Down End at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
-void cGame::fn_8005A028(DetermDataEvent* pEvent)
+void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
 {
     u8 type = pEvent->mData[0];
 
@@ -1236,7 +1236,7 @@ void cGame::fn_8005A028(DetermDataEvent* pEvent)
     case 183:
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikePlayerReady at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
-        mUnidentified042 = true;
+        mbMegaStrikePlayerReady = true;
         break;
 
     case 185:
@@ -1285,7 +1285,7 @@ void cGame::fn_8005A028(DetermDataEvent* pEvent)
         // CleanupMegastrikeGameplay
         tDebugPrintManager::Print(DC_NETWORK, "Received CleanupMegastrikeGameplay at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
-        fn_80058400();
+        CleanupMegaStrikeGameplay();
         break;
     }
 
@@ -1330,7 +1330,7 @@ int cGame::ProcessMessage(NetworkMessage* message)
         NetworkMessageType35* pMessage = (NetworkMessageType35*)message;
         for (int i = 0; i < pMessage->mCount; i++)
         {
-            mUnidentified0C0.Push(pMessage->mValues[i]);
+            mReceivedMegaStrikeMeter.Push(pMessage->mValues[i]);
         }
         break;
     }
@@ -1369,9 +1369,9 @@ void cGame::RandomizePlayerUpdateOrder()
         }
     }
 }
-cPlayer* lbl_806E0C9C;
+cPlayer* gPlayerDistanceSortReference;
 
-void cGame::fn_8005A7E8()
+void cGame::SendPlayerVisibility()
 {
     --lbl_806E2130;
 
@@ -1401,7 +1401,7 @@ void cGame::fn_8005A7E8()
 
     ++lbl_806E2130;
 }
-void cGame::fn_8005A8FC(float fDeltaT)
+void cGame::Update(float fDeltaT)
 {
     if (m_eGameState == 4)
     {
@@ -1409,8 +1409,8 @@ void cGame::fn_8005A8FC(float fDeltaT)
     }
 
     AIPadManager::UpdateAccelerationHistory();
-    fn_8005A7E8();
-    fn_8005B508(fDeltaT);
+    SendPlayerVisibility();
+    UpdateCachedGameData(fDeltaT);
     UpdateShockwaves(fDeltaT);
 
     // Retail calls this here and drops the result.
@@ -1452,7 +1452,7 @@ void cGame::fn_8005A8FC(float fDeltaT)
         FuzzyScriptClearGlobals();
     }
 
-    mUnidentified014->Update(true, fDeltaT);
+    mpAIContext->Update(true, fDeltaT);
 
     for (int i = 0; i < 10; i++)
     {
@@ -1482,12 +1482,12 @@ void cGame::fn_8005A8FC(float fDeltaT)
         CheckForGoal();
 
         // Countdown beeps over the last seconds of the match.
-        if (mUnidentified0B8 != 0)
+        if (muCountdownBeepsRemaining != 0)
         {
             if (GetGameDuration() - GetGameTime()
-                < 5.0f - (float)(int)(lbl_806DBA68 - mUnidentified0B8))
+                < 5.0f - (float)(int)(gEndGameCountdownBeeps - muCountdownBeepsRemaining))
             {
-                mUnidentified0B8--;
+                muCountdownBeepsRemaining--;
                 PlaySound(15, 0x97E84AE4, 0, 0);
             }
         }
@@ -1503,116 +1503,116 @@ void cGame::fn_8005A8FC(float fDeltaT)
         || awayCaptainAction == 11 || awayCaptainAction == 12)
     {
         // Level the field out while a captain shoots to score.
-        mUnidentified0A4 = 0;
-        mUnidentified07C = 0.0f;
-        mUnidentified098 = 0.0f;
-        mUnidentified09C = 0.0f;
-        mUnidentified0A6 = 0;
-        mUnidentified0A8 = 0;
-        mUnidentified080 = cCharacter::SeekSpeedExponential(
-            mUnidentified080, 0.0f, lbl_806DBAA4, fDeltaT);
-        mUnidentified084 = cCharacter::SeekSpeedExponential(
-            mUnidentified084, 0.0f, lbl_806DBAA4, fDeltaT);
-        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+        maTiltDir = 0;
+        mfTiltLevelTimer = 0.0f;
+        mfTiltSpeed = 0.0f;
+        mfDesiredTiltSpeed = 0.0f;
+        maDesiredTiltDir = 0;
+        muTiltFrames = 0;
+        mfXTilt = cCharacter::SeekSpeedExponential(
+            mfXTilt, 0.0f, gMegaStrikeTiltLevelRate, fDeltaT);
+        mfYTilt = cCharacter::SeekSpeedExponential(
+            mfYTilt, 0.0f, gMegaStrikeTiltLevelRate, fDeltaT);
+        SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if (GameInfoManager::Instance()->IsRule0x4Equal4() || lbl_806E0C91)
+    else if (GameInfoManager::Instance()->IsRule0x4Equal4() || gForceScoreTilt)
     {
         // The field tilts towards the side that is behind.
-        float fMin = -lbl_806DBA8C;
-        float fMax = lbl_806DBA8C;
+        float fMin = -gScoreTiltMaxDifference;
+        float fMax = gScoreTiltMaxDifference;
         float fDiff = (float)(g_pTeams[1]->m_nScore - g_pTeams[0]->m_nScore);
         fDiff = nlMinEquals(nlMaxEquals(fDiff, fMin), fMax);
 
-        mUnidentified080 = cCharacter::SeekSpeedExponential(
-            mUnidentified080, 0.0f, lbl_806DBAA8, fDeltaT);
-        mUnidentified084 = cCharacter::SeekSpeedExponential(
-            mUnidentified084, fDiff * lbl_806DBA90, lbl_806DBAA8, fDeltaT);
-        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+        mfXTilt = cCharacter::SeekSpeedExponential(
+            mfXTilt, 0.0f, gScoreTiltSeekRate, fDeltaT);
+        mfYTilt = cCharacter::SeekSpeedExponential(
+            mfYTilt, fDiff * gScoreTiltScale, gScoreTiltSeekRate, fDeltaT);
+        SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if ((GameInfoManager::Instance()->GetStadium() == 9 || lbl_806E0C90)
+    else if ((GameInfoManager::Instance()->GetStadium() == 9 || gForceWeatherTilt)
         && !GetConfigBool(Config::Global(), "no_weather", false)
         && !GameInfoManager::Instance()->IsRule0x4Equal1())
     {
         // Weather tilt: wander towards random targets, ramping up over time.
         mUnidentified0A0 += fDeltaT;
-        if (mUnidentified0A0 > lbl_806DBA88)
+        if (mUnidentified0A0 > gWeatherTiltRampDuration)
         {
             mUnidentified0A0 = 0.0f;
         }
 
-        if (++mUnidentified0A8 >= 15)
+        if (++muTiltFrames >= 15)
         {
-            mUnidentified0A8 = 0;
+            muTiltFrames = 0;
 
             float fRamp = 1.0f;
-            float fFraction = mUnidentified0A0 / lbl_806DBA88;
+            float fFraction = mUnidentified0A0 / gWeatherTiltRampDuration;
             fRamp = (fRamp <= fFraction) ? fRamp : fFraction;
 
             float fHalfRamp = 0.5f * fRamp;
-            float fRangeX = fHalfRamp * lbl_806DBA78;
-            float fRangeY = fHalfRamp * lbl_806DBA7C;
+            float fRangeX = fHalfRamp * gWeatherTiltXRangeScale;
+            float fRangeY = fHalfRamp * gWeatherTiltYRangeScale;
 
             if (fRangeX > 0.0f)
             {
-                mUnidentified088 = -fRangeX - nlRandomf(fRangeX);
-                mUnidentified08C = fRangeX + nlRandomf(fRangeX);
+                mfXTiltMin = -fRangeX - nlRandomf(fRangeX);
+                mfXTiltMax = fRangeX + nlRandomf(fRangeX);
             }
             else
             {
-                mUnidentified088 = 0.0f;
-                mUnidentified08C = 0.0f;
+                mfXTiltMin = 0.0f;
+                mfXTiltMax = 0.0f;
             }
 
-            mUnidentified090 = -fRangeY - nlRandomf(fRangeY);
-            mUnidentified094 = fRangeY + nlRandomf(fRangeY);
-            mUnidentified09C = nlRandomf(Interpolate(lbl_806DBA94, lbl_806DBA98, fRamp));
-            mUnidentified0A6 = mUnidentified0A4 + nlRandom(lbl_806DBA9C) - lbl_806DBA9C / 2;
+            mfYTiltMin = -fRangeY - nlRandomf(fRangeY);
+            mfYTiltMax = fRangeY + nlRandomf(fRangeY);
+            mfDesiredTiltSpeed = nlRandomf(Interpolate(gWeatherTiltInitialSpeed, gWeatherTiltFinalSpeed, fRamp));
+            maDesiredTiltDir = maTiltDir + nlRandom(gWeatherTiltDirectionJitter) - gWeatherTiltDirectionJitter / 2;
         }
 
         // Turn back once the tilt leaves its range.
-        if (mUnidentified080 < mUnidentified088 || mUnidentified080 > mUnidentified08C)
+        if (mfXTilt < mfXTiltMin || mfXTilt > mfXTiltMax)
         {
-            u16 aAway = (mUnidentified080 < 0.0f) ? 0 : 0x8000;
-            if (nlAbsAngle(nlAngleDelta(mUnidentified0A6, aAway)) > 0x4000)
+            u16 aAway = (mfXTilt < 0.0f) ? 0 : 0x8000;
+            if (nlAbsAngle(nlAngleDelta(maDesiredTiltDir, aAway)) > 0x4000)
             {
-                mUnidentified0A6 = 0x8000 - mUnidentified0A6;
+                maDesiredTiltDir = 0x8000 - maDesiredTiltDir;
             }
-            mUnidentified09C = 0.75f * lbl_806DBA98;
+            mfDesiredTiltSpeed = 0.75f * gWeatherTiltFinalSpeed;
         }
 
-        if (mUnidentified084 < mUnidentified090 || mUnidentified084 > mUnidentified094)
+        if (mfYTilt < mfYTiltMin || mfYTilt > mfYTiltMax)
         {
-            int aAway = (mUnidentified084 < 0.0f) ? 0x4000 : 0xC000;
-            if (nlAbsAngle((s16)(mUnidentified0A6 - aAway)) > 0x4000)
+            int aAway = (mfYTilt < 0.0f) ? 0x4000 : 0xC000;
+            if (nlAbsAngle((s16)(maDesiredTiltDir - aAway)) > 0x4000)
             {
-                mUnidentified0A6 = -mUnidentified0A6;
+                maDesiredTiltDir = -maDesiredTiltDir;
             }
-            mUnidentified09C = 0.75f * lbl_806DBA98;
+            mfDesiredTiltSpeed = 0.75f * gWeatherTiltFinalSpeed;
         }
 
-        mUnidentified0A4 = SeekDirection(
-            mUnidentified0A4, mUnidentified0A6, 30000.0f, 3000.0f, fDeltaT);
-        mUnidentified098 = cCharacter::SeekSpeedExponential(
-            mUnidentified098, mUnidentified09C, lbl_806DBAA0, fDeltaT);
+        maTiltDir = SeekDirection(
+            maTiltDir, maDesiredTiltDir, 30000.0f, 3000.0f, fDeltaT);
+        mfTiltSpeed = cCharacter::SeekSpeedExponential(
+            mfTiltSpeed, mfDesiredTiltSpeed, gWeatherTiltSpeedSeekRate, fDeltaT);
 
         float fDX;
         float fDY;
-        nlPolarToCartesian(fDX, fDY, mUnidentified0A4, mUnidentified098);
-        mUnidentified080 = fDX * fDeltaT + mUnidentified080;
-        mUnidentified084 = fDY * fDeltaT + mUnidentified084;
-        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+        nlPolarToCartesian(fDX, fDY, maTiltDir, mfTiltSpeed);
+        mfXTilt = fDX * fDeltaT + mfXTilt;
+        mfYTilt = fDY * fDeltaT + mfYTilt;
+        SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if (fabsf(mUnidentified080) > 0.001f || fabsf(mUnidentified084) > 0.001f)
+    else if (fabsf(mfXTilt) > 0.001f || fabsf(mfYTilt) > 0.001f)
     {
         // No tilt source: hold, then level the field out.
-        float fTimer = mUnidentified07C;
+        float fTimer = mfTiltLevelTimer;
         float fZero = 0.0f;
         if (fTimer < fZero)
         {
-            mUnidentified07C = fTimer - fDeltaT;
-            if (mUnidentified07C < -lbl_806DBA74)
+            mfTiltLevelTimer = fTimer - fDeltaT;
+            if (mfTiltLevelTimer < -gFieldTiltHoldTime)
             {
-                mUnidentified07C = fZero;
+                mfTiltLevelTimer = fZero;
             }
         }
         else
@@ -1620,20 +1620,20 @@ void cGame::fn_8005A8FC(float fDeltaT)
             float fNewTimer = fTimer + fDeltaT;
             float fX = fZero;
             float fY = fZero;
-            if (fNewTimer >= lbl_806DBA70 - fDeltaT)
+            if (fNewTimer >= gFieldLevelTime - fDeltaT)
             {
                 fNewTimer = fZero;
             }
             else
             {
-                float fStep = fDeltaT / (lbl_806DBA70 - fNewTimer);
+                float fStep = fDeltaT / (gFieldLevelTime - fNewTimer);
                 fStep = (fStep >= fZero) ? fStep : fZero;
                 fStep = (fStep <= 1.0f) ? fStep : 1.0f;
-                fX = Interpolate(mUnidentified080, 0.0f, fStep);
-                fY = Interpolate(mUnidentified084, 0.0f, fStep);
+                fX = Interpolate(mfXTilt, 0.0f, fStep);
+                fY = Interpolate(mfYTilt, 0.0f, fStep);
             }
-            fn_80061B1C(0, fX, fY);
-            mUnidentified07C = fNewTimer;
+            SetFieldTilt(0, fX, fY);
+            mfTiltLevelTimer = fNewTimer;
         }
     }
 
@@ -1686,16 +1686,16 @@ extern "C" void fn_8005B330(
     float temp_f1 = nlRecipSqrt(pVector->GetLengthSq3D(), true);
     nlVec3Scale(*pVector, temp_f1);
 }
-extern "C" int fn_8005B45C(
+int ComparePlayerDistances(
     cPlayer* const* param1, cPlayer* const* param2)
 {
-    int referenceIndex = GetUnidentifiedPlayerIndex(lbl_806E0C9C);
+    int referenceIndex = GetPlayerIndex(gPlayerDistanceSortReference);
     cPlayer* firstPlayer = *param1;
-    int firstIndex = GetUnidentifiedPlayerIndex(firstPlayer);
+    int firstIndex = GetPlayerIndex(firstPlayer);
     cPlayer* secondPlayer = *param2;
     float first = g_pGame->fn_8005B748(referenceIndex, firstIndex);
     float second = g_pGame->fn_8005B748(
-        referenceIndex, GetUnidentifiedPlayerIndex(secondPlayer));
+        referenceIndex, GetPlayerIndex(secondPlayer));
 
     if (first == second)
     {
@@ -1707,7 +1707,7 @@ extern "C" int fn_8005B45C(
     }
     return 1;
 }
-void cGame::fn_8005B508(float fDeltaT)
+void cGame::UpdateCachedGameData(float fDeltaT)
 {
     g_FuzzyQuestionCache.Clear();
     ResetScriptFrameTime(&g_FuzzyQuestionCache);
@@ -1755,13 +1755,13 @@ void cGame::fn_8005B508(float fDeltaT)
 
     for (int i = 0; i < 10; i++)
     {
-        lbl_806E0C9C = static_cast<cPlayer*>(g_pCharacters[i]);
+        gPlayerDistanceSortReference = static_cast<cPlayer*>(g_pCharacters[i]);
         for (int j = 0; j < 2; j++)
         {
-            nlQSort(m_nClosestPlayers[i][j], 5, fn_8005B45C);
+            nlQSort(m_nClosestPlayers[i][j], 5, ComparePlayerDistances);
         }
     }
-    lbl_806E0C9C = 0;
+    gPlayerDistanceSortReference = 0;
 }
 float cGame::fn_8005B748(int param1, int param2)
 {
@@ -1771,7 +1771,7 @@ float cGame::fn_8005B748(int param1, int param2)
     }
     return m_fCachedPlayerDistances[param2][param1];
 }
-cPlayer* cGame::fn_8005B780(int param1, int param2, int param3)
+cPlayer* cGame::GetClosestPlayer(int param1, int param2, int param3)
 {
     return m_nClosestPlayers[param1][param2][param3];
 }
@@ -1796,65 +1796,65 @@ void cGame::SetPotentialScorer(cPlayer* pPlayer)
         m_pTeamTouch[pPlayer->m_pTeam->m_nSide] = pPlayer;
     }
 }
-// Sync log type ids, registered on first use (fn_8005B840).
-u16 lbl_806DBAB2 = 0xFFFF;
-u16 lbl_806DBAB4 = 0xFFFF;
+// Sync log type ids, registered on first use (SyncLog).
+u16 gPlayerDistanceSyncType = 0xFFFF;
+u16 gGameStateSyncType = 0xFFFF;
 
-inline void UnidentifiedGameSnapshot::RegisterDebugFields(DebugWriteCache* cache)
+inline void PlayerDistanceSnapshot::RegisterDebugFields(DebugWriteCache* cache)
 {
-    if (lbl_806DBAB2 == 0xFFFF)
+    if (gPlayerDistanceSyncType == 0xFFFF)
     {
-        lbl_806DBAB2 = cache->BeginType("GenDetPlayerC");
+        gPlayerDistanceSyncType = cache->BeginType("GenDetPlayerC");
         cache->AddArrayField(DEBUG_FIELD_U8, gDebugFieldTypes[DEBUG_FIELD_U8].size, 100, 0, "m_nClosestPlayers[0]");
         cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 100,
             (u8*)mDistances - (u8*)this, "m_fCachedPlayerDistances[0]");
         cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 10,
-            (u8*)mUnidentified1F4 - (u8*)this, "m_fCachedBallPlayerDistances[0]");
+            (u8*)mBallDistances - (u8*)this, "m_fCachedBallPlayerDistances[0]");
         cache->EndType();
     }
 }
 
 inline void cGame::RegisterDetermGameFields(DebugWriteCache* cache)
 {
-    if (lbl_806DBAB4 == 0xFFFF)
+    if (gGameStateSyncType == 0xFFFF)
     {
-        lbl_806DBAB4 = cache->BeginType("DetermGameData");
+        gGameStateSyncType = cache->BeginType("DetermGameData");
         cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, 0, "m_eGameState");
         cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&m_fGameDuration - (u8*)&m_eGameState, "m_fGameDuration");
-        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified020 - (u8*)&m_eGameState, "m_bBallInNet");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&m_bBallInNet - (u8*)&m_eGameState, "m_bBallInNet");
         cache->AddField(DEBUG_FIELD_INT, gDebugFieldTypes[DEBUG_FIELD_INT].size, (u8*)&m_nLastTeamToScore - (u8*)&m_eGameState, "m_nLastTeamToScore");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified028 - (u8*)&m_eGameState, "m_uMegastrikeNumShots");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified02C - (u8*)&m_eGameState, "m_uMegastrikeCurShot");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified030 - (u8*)&m_eGameState, "m_uMegastrikeGoals");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified034 - (u8*)&m_eGameState, "m_uMegastrikeDefendingTeam");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified038 - (u8*)&m_eGameState, "m_uMegastrikeResults");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&m_uMegastrikeNumShots - (u8*)&m_eGameState, "m_uMegastrikeNumShots");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&m_uMegastrikeCurShot - (u8*)&m_eGameState, "m_uMegastrikeCurShot");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&m_uMegastrikeGoals - (u8*)&m_eGameState, "m_uMegastrikeGoals");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&m_nMegastrikeDefendingTeam - (u8*)&m_eGameState, "m_uMegastrikeDefendingTeam");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&m_uMegastrikeResults - (u8*)&m_eGameState, "m_uMegastrikeResults");
         cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbCaptainShotToScoreOn - (u8*)&m_eGameState, "mbMegaStrikeGameplay");
-        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified041 - (u8*)&m_eGameState, "mbMegaStrikePositiveNet");
-        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified042 - (u8*)&m_eGameState, "mbMegaStrikePlayerReady");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbMegaStrikePositiveNet - (u8*)&m_eGameState, "mbMegaStrikePositiveNet");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbMegaStrikePlayerReady - (u8*)&m_eGameState, "mbMegaStrikePlayerReady");
         cache->AddField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, (u8*)&m_pScorer - (u8*)&m_eGameState, "m_pScorer");
         cache->AddField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, (u8*)&m_pAssister - (u8*)&m_eGameState, "m_pAssister");
         cache->AddArrayField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, 2, (u8*)m_pTeamTouch - (u8*)&m_eGameState, "m_pTeamTouch");
         cache->AddArrayField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, 10, (u8*)m_pRandomPlayersArray - (u8*)&m_eGameState, "m_pRandomPlayersArray");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified07C - (u8*)&m_eGameState, "mfCheatTilt");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified080 - (u8*)&m_eGameState, "mfXTilt");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified084 - (u8*)&m_eGameState, "mfYTilt");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified088 - (u8*)&m_eGameState, "mfXTiltMin");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified08C - (u8*)&m_eGameState, "mfXTiltMax");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified090 - (u8*)&m_eGameState, "mfYTiltMin");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified094 - (u8*)&m_eGameState, "mfYTiltMax");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified098 - (u8*)&m_eGameState, "mfTiltSpeed");
-        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified09C - (u8*)&m_eGameState, "mfDesiredTiltSpeed");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfTiltLevelTimer - (u8*)&m_eGameState, "mfCheatTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfXTilt - (u8*)&m_eGameState, "mfXTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfYTilt - (u8*)&m_eGameState, "mfYTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfXTiltMin - (u8*)&m_eGameState, "mfXTiltMin");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfXTiltMax - (u8*)&m_eGameState, "mfXTiltMax");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfYTiltMin - (u8*)&m_eGameState, "mfYTiltMin");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfYTiltMax - (u8*)&m_eGameState, "mfYTiltMax");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfTiltSpeed - (u8*)&m_eGameState, "mfTiltSpeed");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfDesiredTiltSpeed - (u8*)&m_eGameState, "mfDesiredTiltSpeed");
         cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified0A0 - (u8*)&m_eGameState, "mfTiltTime");
-        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&mUnidentified0A4 - (u8*)&m_eGameState, "maTiltDir");
-        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&mUnidentified0A6 - (u8*)&m_eGameState, "maDesiredTiltDir");
-        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified0A8 - (u8*)&m_eGameState, "muTiltFrames");
+        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&maTiltDir - (u8*)&m_eGameState, "maTiltDir");
+        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&maDesiredTiltDir - (u8*)&m_eGameState, "maDesiredTiltDir");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&muTiltFrames - (u8*)&m_eGameState, "muTiltFrames");
         cache->AddField(DEBUG_FIELD_VECTOR3, gDebugFieldTypes[DEBUG_FIELD_VECTOR3].size, (u8*)&mTiltDirection - (u8*)&m_eGameState, "m_vUpVectorTilt");
         cache->EndType();
     }
 
 }
 
-void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
+void cGame::SyncLog(void* context, DebugWriteCache* cache)
 {
     RegisterDetermGameFields(cache);
 
@@ -1871,7 +1871,7 @@ void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
     };
 
     DetermGameDataCopy* pCopy = (DetermGameDataCopy*)cache->WriteData(
-        lbl_806DBAB4, &m_eGameState, sizeof(DetermGameDataCopy));
+        gGameStateSyncType, &m_eGameState, sizeof(DetermGameDataCopy));
     if (pCopy != 0)
     {
         pCopy->mScorer = GetSyncPlayerIndex(m_pScorer);
@@ -1882,30 +1882,30 @@ void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
         for (RandomPlayerIterator players(this); players.HasNext(); players.Next())
         {
             cPlayer* pPlayer = players.GetPlayer();
-            pRandomPlayers[players.GetIndex()] = pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
+            pRandomPlayers[players.GetIndex()] = pPlayer == 0 ? -1 : GetPlayerIndex(pPlayer);
         }
-        cache->ChecksumData(lbl_806DBAB4, pCopy, context);
+        cache->ChecksumData(gGameStateSyncType, pCopy, context);
     }
 
-    UnidentifiedGameSnapshot snapshot;
-    fn_80059B70(&snapshot);
+    PlayerDistanceSnapshot snapshot;
+    CopyPlayerDistanceSnapshot(&snapshot);
 
     snapshot.RegisterDebugFields(cache);
 
-    cache->ChecksumData(lbl_806DBAB2, &snapshot, context);
-    cache->WriteData(lbl_806DBAB2, &snapshot, sizeof(snapshot));
+    cache->ChecksumData(gPlayerDistanceSyncType, &snapshot, context);
+    cache->WriteData(gPlayerDistanceSyncType, &snapshot, sizeof(snapshot));
 
-    mUnidentified10E0->SyncLog(context, cache);
+    mpCrowdRiot->SyncLog(context, cache);
     mpTerrain->SyncLog(context, cache);
     mpWeatherManager->SyncLog(context, cache);
     lbl_806E12C8->SyncLog(context, cache);
     NetMesh::spPositiveXNetMesh->SyncLog(context, cache);
     NetMesh::spNegativeXNetMesh->SyncLog(context, cache);
 }
-void cGame::fn_8005BF50(RunningChecksum* runningChecksum)
+void cGame::ChecksumState(RunningChecksum* runningChecksum)
 {
     runningChecksum->ChecksumData(&m_eGameState, sizeof(m_eGameState));
-    runningChecksum->ChecksumData(&mUnidentified020, sizeof(mUnidentified020));
+    runningChecksum->ChecksumData(&m_bBallInNet, sizeof(m_bBallInNet));
     runningChecksum->ChecksumData(&m_nLastTeamToScore, sizeof(m_nLastTeamToScore));
 }
 void cGame::ChangeGameState(int state)
@@ -1987,7 +1987,7 @@ void cGame::InitGameState(int state)
         {
             m_pGameClock->Stop();
         }
-        fn_80058748();
+        ResetForKickOff();
         break;
 
     case 0:
@@ -2165,15 +2165,15 @@ extern "C" void fn_8005D948(cGame* pGame, const GoalieSaveData* pData)
     }
     pGame->mUnidentified49C.mEvent21.Deliver((GoalieSaveData*)pData);
 }
-void cGame::fn_8005DB44(int param1, bool param2)
+void cGame::SetMegaStrikeSaveResult(int param1, bool param2)
 {
     if (param2)
     {
-        mUnidentified038 |= 1 << param1;
+        m_uMegastrikeResults |= 1 << param1;
     }
     else
     {
-        mUnidentified038 &= ~(1 << param1);
+        m_uMegastrikeResults &= ~(1 << param1);
     }
 }
 extern "C" void fn_8005DB7C(cGame* pGame)
@@ -2183,14 +2183,14 @@ extern "C" void fn_8005DB7C(cGame* pGame)
         return;
     }
 
-    unsigned int side = 1 - pGame->mUnidentified034;
+    unsigned int side = 1 - pGame->m_nMegastrikeDefendingTeam;
     cPlayer* pCaptain = g_pTeams[side]->GetCaptain();
 
     MegaStrikeEndData data;
-    data.defendingSide = pGame->mUnidentified034;
-    data.goals = pGame->mUnidentified030;
-    data.attempts = pGame->mUnidentified028;
-    data.unknown_08 = pGame->mUnidentified038;
+    data.defendingSide = pGame->m_nMegastrikeDefendingTeam;
+    data.goals = pGame->m_uMegastrikeGoals;
+    data.attempts = pGame->m_uMegastrikeNumShots;
+    data.unknown_08 = pGame->m_uMegastrikeResults;
     data.pPlayer = pCaptain;
     data.goalValue = -1;
 
@@ -2199,11 +2199,11 @@ extern "C" void fn_8005DB7C(cGame* pGame)
     pGame->m_pScorer = pCaptain;
     pGame->m_pAssister = 0;
 
-    if (pGame->mUnidentified030 != 0)
+    if (pGame->m_uMegastrikeGoals != 0)
     {
         pGame->m_nLastTeamToScore = side;
         g_pBall->m_uGoalType = 6;
-        g_pTeams[side]->m_nScore += pGame->mUnidentified030;
+        g_pTeams[side]->m_nScore += pGame->m_uMegastrikeGoals;
         int score;
 
         if (GameInfoManager::Instance()->IsInMode4()
@@ -2243,12 +2243,12 @@ extern "C" void fn_8005DB7C(cGame* pGame)
         Goalie::HandleGoalScored(side);
     }
 
-    g_pGame->fn_80058498(false, 0, 0);
+    g_pGame->SetMegaStrikeGameplay(false, 0, 0);
     g_pGame->mUnidentified49C.mEvent47.Deliver(&data);
     g_pBall->m_uGoalType = 4;
     SetPlayerAudioController(0);
 }
-void cGame::fn_8005DF38()
+void cGame::ResumeAfterPresentation()
 {
     if (GetAudioPauseDepth() > 1)
     {
@@ -2604,31 +2604,31 @@ void cGame::OnGameOver()
     lbl_806E12C8->ResetEffects();
     StopSuddenDeathMusic();
 }
-extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
+void SetFieldTilt(int relative, float xTilt, float yTilt)
 {
     cGame* game = g_pGame;
     if (game != 0)
     {
         if (relative != 0)
         {
-            xTilt += game->mUnidentified080;
-            yTilt += game->mUnidentified084;
+            xTilt += game->mfXTilt;
+            yTilt += game->mfYTilt;
         }
 
-        const float xLimit = lbl_806DBA80;
+        const float xLimit = gFieldTiltXLimit;
         xTilt = xTilt >= -xLimit ? xTilt : -xLimit;
         xTilt = xTilt <= xLimit ? xTilt : xLimit;
-        const float yLimit = lbl_806DBA84;
+        const float yLimit = gFieldTiltYLimit;
         yTilt = yTilt >= -yLimit ? yTilt : -yLimit;
         yTilt = yTilt <= yLimit ? yTilt : yLimit;
 
         fn_8005B330(&game->mTiltDirection, -xTilt, -yTilt);
 
-        g_pGame->mUnidentified080 = xTilt;
-        g_pGame->mUnidentified084 = yTilt;
+        g_pGame->mfXTilt = xTilt;
+        g_pGame->mfYTilt = yTilt;
         if (!GameInfoManager::Instance()->IsRule0x4Equal4())
         {
-            g_pGame->mUnidentified07C = -0.01f;
+            g_pGame->mfTiltLevelTimer = -0.01f;
         }
     }
 
@@ -2638,8 +2638,8 @@ extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
         if (nlAbs(xTilt) > 0.01f || nlAbs(yTilt) > 0.01f)
         {
             nlVector3 tiltForce = { 0 };
-            tiltForce.x = yTilt * lbl_806DBA6C;
-            tiltForce.y = xTilt * lbl_806DBA6C;
+            tiltForce.x = yTilt * gFieldTiltForceScale;
+            tiltForce.y = xTilt * gFieldTiltForceScale;
             g_pBall->m_pPhysicsBall->mv3TiltForce = tiltForce;
             g_pBall->m_pPhysicsBall->mbUseTiltForce = true;
         }

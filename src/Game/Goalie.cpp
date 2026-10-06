@@ -404,7 +404,7 @@ bool Goalie::CheckForDaze()
 
 inline void Goalie::CheckForBallOnHead()
 {
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && !g_pGame->mUnidentified020
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && !g_pGame->m_bBallInNet
         && g_pGame->GetGameState() != 3 && mnOffplayPending == GOALIE_OFFPLAY_NONE
         && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0
         && g_pBall->m_pOwner == NULL && g_pBall->m_pPassTarget == NULL
@@ -418,7 +418,7 @@ inline void Goalie::CheckForBallOnHead()
 void Goalie::CollideWithBallCallback(cBall* pBall)
 {
     cPlayer::CollideWithBallCallback(pBall);
-    if (g_pGame->mUnidentified020 || g_pGame->GetGameState() == 3
+    if (g_pGame->m_bBallInNet || g_pGame->GetGameState() == 3
         || mnOffplayPending != GOALIE_OFFPLAY_NONE || IsInOffplay())
     {
         mbBallImpacted = true;

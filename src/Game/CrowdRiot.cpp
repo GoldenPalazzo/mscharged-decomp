@@ -280,7 +280,7 @@ void CrowdRiot::fn_80029460(bool param1)
 static inline void UnidentifiedInline_800298D8()
 {
     CrowdRiot* crowdRiot
-        = (CrowdRiot*)g_pGame->mUnidentified10E0;
+        = (CrowdRiot*)g_pGame->mpCrowdRiot;
     if (crowdRiot->meState == 2)
     {
         nlVector3 velocity;

@@ -2100,7 +2100,7 @@ extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
         for (int player = 0; player < 5 && fTotalScore < 1.0f; player++)
         {
             if (pCurrentPlayer != NULL)
-                pPlayer = g_pGame->fn_8005B780(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
+                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
             else
                 pPlayer = pTeam->GetPlayer(player);
             if (pPlayer == pCurrentPlayer)

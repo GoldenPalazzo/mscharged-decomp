@@ -74,7 +74,7 @@ void cFielder::DoDKSuperHit()
 {
     EmitDKSuperHit(this);
     FireCameraNoiseFilter(*(nlVector3*)sDKSuperHitNoiseAmplitude, gDKSuperHitNoiseFrequency, gDKSuperHitNoiseDuration);
-    fn_80061B1C(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
+    SetFieldTilt(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
         gDKSuperHitTiltScale * mUnidentified024.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);

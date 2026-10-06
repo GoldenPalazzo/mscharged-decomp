@@ -1045,7 +1045,7 @@ void cFielder::fn_80043C18(float fDeltaT)
                 float fBlend = 1.0f - fTime;
                 UnidentifiedActionTarget806E0C94* pTarget
                     = (UnidentifiedActionTarget806E0C94*)
-                          g_pGame->mUnidentified10E0;
+                          g_pGame->mpCrowdRiot;
                 nlVector3 v3Position;
                 nlVec3WeightedSum(v3Position, fBlend, pTarget->mUnidentified14, fTime, mUnidentified024.m_v3Position);
                 SetPosition(v3Position);
@@ -2995,7 +2995,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
             if (pCaptain != pFielder && fn_8003881C(pFielder)
-                && g_pGame->mUnidentified030 == 0)
+                && g_pGame->m_uMegastrikeGoals == 0)
             {
                 RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
             }
@@ -3050,7 +3050,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     mUnidentified3D0 = 0.0f;
     mUnidentified3D4 = 0.0f;
 
-    g_pGame->fn_80057FC0();
+    g_pGame->ResetMegaStrikeMeterQueues();
 
     mUnidentified478 = 0;
 
@@ -3304,31 +3304,31 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             NetworkMessageType35 message;
             if (g_pNetworkSession->IsLiveNetworkGame())
             {
-                g_pGame->fn_80057FD8(bButtonPressed);
+                g_pGame->SendMegaStrikeMeter(bButtonPressed);
             }
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
         else if (g_pNetworkSession->IsLiveNetworkGame()
-                 && g_pGame->mUnidentified0C0.mCount != 0)
+                 && g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.Pop(),
+                g_pGame->mReceivedMegaStrikeMeter.Pop(),
                 nParam);
         }
     }
     else if (g_pNetworkSession->IsLiveNetworkGame() && nParam == 0
-             && g_pGame->mUnidentified0C0.mCount != 0)
+             && g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
-            g_pGame->mUnidentified0C0.mCount,
+            g_pGame->mReceivedMegaStrikeMeter.mCount,
             mUnidentified478);
 
-        while (g_pGame->mUnidentified0C0.mCount != 0)
+        while (g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.Pop(),
+                g_pGame->mReceivedMegaStrikeMeter.Pop(),
                 nParam);
         }
     }
@@ -3367,7 +3367,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
         g_pGame->mpWeatherManager->Stop(false);
         g_pGame->fn_80058704();
-        g_pGame->mUnidentified03C = this;
+        g_pGame->mpMegaStrikeShooter = this;
         fn_8005F82C(g_pGame, this);
     }
 }
@@ -3466,14 +3466,14 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     if (nParam != 0)
     {
         if (g_pNetworkSession->IsLiveNetworkGame()
-            && g_pGame->mUnidentified134.mCount > 0)
+            && g_pGame->mPendingMegaStrikeMeter.mCount > 0)
         {
-            g_pGame->fn_80058180();
+            g_pGame->SendRemainingMegaStrikeMeter();
         }
 
         if (!gNetworkInputRecording->mUnidentified004)
         {
-            g_pGame->fn_80059DEC(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
+            g_pGame->SendMegaStrike(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
         }
 
         mUnidentified478 = 1;
