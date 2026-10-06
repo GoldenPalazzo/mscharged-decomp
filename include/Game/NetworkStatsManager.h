@@ -2,11 +2,9 @@
 #define GAME_NETWORK_STATS_MANAGER_H
 
 #include "Game/NetworkStats.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "NL/CircularQueue.h"
 #include "types.h"
-
-struct DWCDate;
-struct DWCTime;
 
 enum NetworkPersistentCategory
 {
@@ -32,29 +30,6 @@ struct NetworkLeaderboardCategory
     /* 0x0018 */ NetworkStatsPlayer mPlayers[65];
     /* 0x1A80 */ NetworkRankingMeta mMetadata[65];
 }; // size: 0x2098
-
-struct NetworkSeasonDate
-{
-    int mMonth;
-    int mDay;
-}; // size: 0x8
-
-struct NetworkSeasonDateTable
-{
-    NetworkSeasonDateTable(int count, NetworkSeasonDate* dates)
-        : mCount(count)
-        , mDates(dates)
-    {
-    }
-
-    NetworkSeasonDate GetDate(int index) const
-    {
-        return mDates[index];
-    }
-
-    mutable int mCount;
-    NetworkSeasonDate* mDates;
-}; // size: 0x8
 
 class NetworkStatsManager : public NetworkStatsListener
 {
@@ -158,17 +133,4 @@ int CalculateNetworkResultPoints(int result, bool home, int homeScore,
 int GetLocalNetworkPlayingSide();
 bool IsNewNetworkSeason(const NetworkRankingMeta* previous);
 bool IsNewNetworkDay(const NetworkRankingMeta* previous);
-bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time);
-int FindNetworkSeasonBoundary(
-    const NetworkSeasonDateTable* dates, NetworkSeasonDate date);
-int GetDaysUntilNextSeasonBoundary(
-    const NetworkSeasonDateTable* dates, int index, int year);
-int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
-    NetworkSeasonDate date, int year);
-
-extern NetworkSeasonDateTable sNetworkSeasonDateTable;
-
-extern int g_nAddHoursTime;
-extern int g_nAddMinsTime;
-
 #endif // GAME_NETWORK_STATS_MANAGER_H

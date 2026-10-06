@@ -6,6 +6,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/DB/SaveLoad.h"
 
+#include "Game/NetworkSeasonCalendar.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/FriendManager.h"
 

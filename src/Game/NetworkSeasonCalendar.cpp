@@ -1,12 +1,9 @@
 #include <dwc/dwc_nastime.h>
-#include "Game/NetworkStatsManager.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakValue.inl"
 #include <string.h>
-
-extern NetworkSeasonDate sNetworkSeasonDates[52];
-extern int sMonthDays[12];
 
 static int DaysInMonth(int month, int year)
 {

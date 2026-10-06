@@ -9,6 +9,7 @@
 
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/Sys/simpleparser.h"
 #include "Game/TweakValue.h"
