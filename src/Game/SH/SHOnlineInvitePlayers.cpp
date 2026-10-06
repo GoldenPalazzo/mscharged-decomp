@@ -344,11 +344,11 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         int errorCode = g_pNetworkSession->fn_801CA9D8();
         ShowLobbyError(GetOnlineErrorPopup(errorCode, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5B));
     }
-    else if (lobby->mUnidentified052)
+    else if (lobby->mLateCancelRequested)
     {
         lobby->CloseConnectionsAndReset();
         lobby->StartFriendServer();
-        lobby->mUnidentified052 = false;
+        lobby->mLateCancelRequested = false;
     }
     else if (lobby->mCancelRequested)
     {
