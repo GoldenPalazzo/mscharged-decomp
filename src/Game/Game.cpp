@@ -2,6 +2,7 @@
 #include "Game/DetInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/Game.h"
+#include "Game/MathHelpers.h"
 #include "Game/Weather.h"
 #include "Game/Sys/debug.h"
 #include "Game/NetworkDiagnostics.h"
@@ -83,6 +84,7 @@
 #include "NL/nlConfig.h"
 #include "NL/nlMain.h"
 #include "NL/nlMath.h"
+#include "NL/nlMath.inl"
 #include "NL/nlMemory.h"
 #include "NL/nlPolygonRegion.h"
 #include "NL/nlPrint.h"
@@ -1432,7 +1434,7 @@ void cGame::RandomizePlayerUpdateOrder()
     }
 }
 
-extern "C" void fn_8005A7E8()
+void cGame::fn_8005A7E8()
 {
     --lbl_806E2130;
 
@@ -1463,6 +1465,17 @@ extern "C" void fn_8005A7E8()
     ++lbl_806E2130;
 }
 
+inline void cGame::UpdatePowerUpObjects(float fDeltaT)
+{
+    for (int i = 0; i < 25; i++)
+    {
+        if (g_pPowerups[i] != 0)
+        {
+            g_pPowerups[i]->Update(fDeltaT);
+        }
+    }
+}
+
 // cGame::Update: one fixed-update step of the match.
 void cGame::fn_8005A8FC(float fDeltaT)
 {
@@ -1473,7 +1486,7 @@ void cGame::fn_8005A8FC(float fDeltaT)
 
     AIPadManager::UpdateAccelerationHistory();
     fn_8005A7E8();
-    fn_8005B508();
+    fn_8005B508(fDeltaT);
     UpdateShockwaves(fDeltaT);
 
     // Retail calls this here and drops the result.
@@ -1547,8 +1560,8 @@ void cGame::fn_8005A8FC(float fDeltaT)
         // Countdown beeps over the last seconds of the match.
         if (mUnidentified0B8 != 0)
         {
-            float fBeepTime = lbl_806E377C - (float)(int)(lbl_806DBA68 - mUnidentified0B8);
-            if (m_fGameDuration - m_pGameClock->m_fTimer < fBeepTime)
+            if (GetGameDuration() - GetGameTime()
+                < lbl_806E377C - (float)(int)(lbl_806DBA68 - mUnidentified0B8))
             {
                 mUnidentified0B8--;
                 PlaySound(15, 0x97E84AE4, 0, 0);
@@ -1556,13 +1569,7 @@ void cGame::fn_8005A8FC(float fDeltaT)
         }
     }
 
-    for (int i = 0; i < 25; i++)
-    {
-        if (g_pPowerups[i] != 0)
-        {
-            g_pPowerups[i]->Update(fDeltaT);
-        }
-    }
+    UpdatePowerUpObjects(fDeltaT);
 
     // Field tilt.
     int homeCaptainAction = g_pTeams[0]->GetCaptain()->m_eActionState;
@@ -1587,10 +1594,10 @@ void cGame::fn_8005A8FC(float fDeltaT)
     else if (GameInfoManager::Instance()->IsRule0x4Equal4() || lbl_806E0C91)
     {
         // The field tilts towards the side that is behind.
+        float fMin = -lbl_806DBA8C;
         float fMax = lbl_806DBA8C;
         float fDiff = (float)(g_pTeams[1]->m_nScore - g_pTeams[0]->m_nScore);
-        fDiff = (fDiff >= -fMax) ? fDiff : -fMax;
-        fDiff = (fDiff <= fMax) ? fDiff : fMax;
+        fDiff = nlMinEquals(nlMaxEquals(fDiff, fMin), fMax);
 
         mUnidentified080 = cCharacter::SeekSpeedExponential(
             mUnidentified080, kGameTweakZero, lbl_806DBAA8, fDeltaT);
@@ -1642,12 +1649,7 @@ void cGame::fn_8005A8FC(float fDeltaT)
         if (mUnidentified080 < mUnidentified088 || mUnidentified080 > mUnidentified08C)
         {
             u16 aAway = (mUnidentified080 < kGameTweakZero) ? 0 : 0x8000;
-            s16 aDiff = mUnidentified0A6 - aAway;
-            if (aDiff < 0)
-            {
-                aDiff = -aDiff;
-            }
-            if ((u16)aDiff > 0x4000)
+            if (nlAbsAngle(nlAngleDelta(mUnidentified0A6, aAway)) > 0x4000)
             {
                 mUnidentified0A6 = 0x8000 - mUnidentified0A6;
             }
@@ -1656,13 +1658,8 @@ void cGame::fn_8005A8FC(float fDeltaT)
 
         if (mUnidentified084 < mUnidentified090 || mUnidentified084 > mUnidentified094)
         {
-            u16 aAway = (mUnidentified084 < kGameTweakZero) ? 0x4000 : 0xC000;
-            s16 aDiff = mUnidentified0A6 - aAway;
-            if (aDiff < 0)
-            {
-                aDiff = -aDiff;
-            }
-            if ((u16)aDiff > 0x4000)
+            int aAway = (mUnidentified084 < kGameTweakZero) ? 0x4000 : 0xC000;
+            if (nlAbsAngle((s16)(mUnidentified0A6 - aAway)) > 0x4000)
             {
                 mUnidentified0A6 = -mUnidentified0A6;
             }
@@ -1697,12 +1694,11 @@ void cGame::fn_8005A8FC(float fDeltaT)
         else
         {
             float fNewTimer = fTimer + fDeltaT;
-            float fX;
+            float fX = fZero;
             float fY = fZero;
             if (fNewTimer >= lbl_806DBA70 - fDeltaT)
             {
                 fNewTimer = fZero;
-                fX = fZero;
             }
             else
             {
@@ -1722,14 +1718,17 @@ void cGame::fn_8005A8FC(float fDeltaT)
     {
         m_pPostGameDoneClock->Reset(kGameTweakZero, lbl_806E3754, lbl_806E3748);
 
-        int nWinner = g_pTeams[1]->m_nScore > g_pTeams[0]->m_nScore;
+        int awayScore = g_pTeams[1]->m_nScore;
+        int homeScore = g_pTeams[0]->m_nScore;
+        int nWinner = homeScore < awayScore;
         if ((GameInfoManager::Instance()->IsInMode4()
                 && g_pStrikerChallenge->mCondition == 2
                 && g_pTeams[1]->m_nScore > 0)
             || (g_pStrikerChallenge->mCurrentChallenge == 2
                 && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
         {
-            NisPlayer::Instance()->mWinnerSide[0] = 1;
+            NisPlayer* pNisPlayer = NisPlayer::Instance();
+            pNisPlayer->mWinnerSide[0] = 1;
         }
         else
         {
@@ -2626,7 +2625,7 @@ extern "C" int fn_8005B45C(
     return 1;
 }
 
-void cGame::fn_8005B508()
+void cGame::fn_8005B508(float fDeltaT)
 {
     g_FuzzyQuestionCache.Clear();
     ResetScriptFrameTime(&g_FuzzyQuestionCache);

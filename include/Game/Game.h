@@ -90,11 +90,13 @@ public:
     void PreUpdate(float deltaTime);
     void RandomizePlayerUpdateOrder();
     void ResetCharacters();
-    void fn_8005B508();
+    void fn_8005A7E8();
+    void fn_8005B508(float fDeltaT);
     float fn_8005B748(int param1, int param2);
     cPlayer* fn_8005B780(int param1, int param2, int param3);
     void SetPotentialScorer(cPlayer* pPlayer);
     void fn_8005BF50(RunningChecksum* runningChecksum);
+    static void UpdatePowerUpObjects(float fDeltaT);
     void fn_8005A8FC(float fDeltaT);
     void fn_8005B840(void* checksum, DebugWriteCache* cache);
     void ChangeGameState(int state);
