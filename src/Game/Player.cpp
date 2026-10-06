@@ -1312,17 +1312,17 @@ void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
     InitActionPostWhistle();
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData*);
-extern "C" void fn_80098A68(PeachPhotoData*);
-extern "C" void fn_80098A84(PeachPhotoData*);
-extern "C" void fn_80099030(UnidentifiedEventData00*);
+void OnPlayerPeachFlash(PeachPhotoData*);
+void OnPlayerPeachCamerasDown(PeachPhotoData*);
+void OnPlayerPeachCamerasAway(PeachPhotoData*);
+void OnPlayerResetEffects(UnidentifiedEventData00*);
 
 extern "C" void fn_80098750()
 {
-    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(fn_80098AA0), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(fn_80098A68), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(fn_80098A84), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasAway), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(OnPlayerResetEffects), 0, -1);
 }
 
 static nlVector3 lbl_804FF5C8[] = {
@@ -1337,7 +1337,7 @@ static nlVector3 lbl_804FF5C8[] = {
     { 0.824f, 0.972f, 0.0f },
 };
 
-extern "C" void fn_80098A68(PeachPhotoData* pData)
+void OnPlayerPeachCamerasDown(PeachPhotoData* pData)
 {
     PlaySound(
         pData->pPlayer->m_uSoundSlotId,
@@ -1346,7 +1346,7 @@ extern "C" void fn_80098A68(PeachPhotoData* pData)
         NULL);
 }
 
-extern "C" void fn_80098A84(PeachPhotoData* pData)
+void OnPlayerPeachCamerasAway(PeachPhotoData* pData)
 {
     PlaySound(
         pData->pPlayer->m_uSoundSlotId,
@@ -1355,7 +1355,7 @@ extern "C" void fn_80098A84(PeachPhotoData* pData)
         NULL);
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData* pData)
+void OnPlayerPeachFlash(PeachPhotoData* pData)
 {
     nlPolygonRegion region;
     nlVector3 points[9];
@@ -1491,9 +1491,9 @@ extern "C" void fn_80098AA0(PeachPhotoData* pData)
     }
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData*);
 
-extern "C" void fn_80099030(UnidentifiedEventData00*)
+
+void OnPlayerResetEffects(UnidentifiedEventData00*)
 {
     if (gNPCManager != NULL)
     {
