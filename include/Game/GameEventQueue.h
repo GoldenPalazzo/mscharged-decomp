@@ -7,7 +7,6 @@
 struct UnidentifiedEventData_80065E10;
 struct GoalScoredData;
 struct UnidentifiedEventData_80066008;
-struct UnidentifiedEventData_800661C0;
 struct ReceiveBallData;
 struct UnidentifiedEventData_800663A8;
 struct GoalieSaveData;
@@ -44,7 +43,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent11;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent12;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEvent13;
-    ImmediateEvent<UnidentifiedEventData_800661C0> mEvent14;
+    ImmediateEvent<void(int, int)> mEvent14;
     ImmediateEvent<ReceiveBallData> mEvent15;
     ImmediateEvent<UnidentifiedEventData_800663A8> mEvent16;
     ImmediateEvent<GoalieSaveData> mEvent17;

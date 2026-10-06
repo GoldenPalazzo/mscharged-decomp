@@ -67,75 +67,6 @@ struct UnidentifiedGameState
     bool mUnidentified40;
 };
 
-template <typename P1, typename P2>
-class UnidentifiedTypedEvent2 : public EventBase
-{
-public:
-    UnidentifiedTypedEvent2(const char* name, int length)
-        : EventBase(name, length)
-    {
-    }
-
-    virtual ~UnidentifiedTypedEvent2() { }
-    virtual void Disconnect(void*) = 0;
-    virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
-};
-
-template <typename P1, typename P2>
-struct UnidentifiedListener2 : public EventConnection
-{
-    Function<void(P1, P2)> callback;
-};
-
-template <typename P1, typename P2>
-class UnidentifiedEvent2View : public EventBase
-{
-    typedef UnidentifiedListener2<P1, P2> Listener;
-    typedef DLListEntry<Listener> ListenerEntry;
-
-public:
-    void Deliver(P1 p1, P2 p2)
-    {
-        nlDLListIterator<Listener> iterator;
-        iterator = mListeners.Begin();
-        while (iterator.hasNext())
-        {
-            Listener* listener = &*iterator;
-            ListenerEntry* currentEntry = iterator.CurrentEntry();
-            this->mCurrentConnection = listener;
-
-            if ((listener->mFlags >> 31) != 0)
-            {
-                listener->callback(p1, p2);
-                RestartAt(iterator, currentEntry);
-            }
-
-            iterator.next();
-            if (((listener->mFlags >> 29) & 1) != 0)
-            {
-                nlDLListIterator<Listener> position;
-                position = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8));
-                ListenerEntry* entry = position.CurrentEntry();
-                nlDLRingRemove(&mListeners.m_Head, entry);
-                entry->~ListenerEntry();
-                mListeners.m_Allocator.Free(entry);
-            }
-        }
-        this->mCurrentConnection = 0;
-    }
-
-private:
-    void RestartAt(
-        nlDLListIterator<Listener>& iterator, ListenerEntry* current)
-    {
-        iterator = mListeners.Begin();
-        iterator.m_Curr = current;
-    }
-
-    DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
-};
-
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
@@ -1700,8 +1631,8 @@ static inline void UpdateBallShotClock(cBall* pBall)
 
 extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 {
-    UnidentifiedEvent2View<int, int>* event
-        = (UnidentifiedEvent2View<int, int>*)&g_pGame->mUnidentified49C.mEvent14;
+    ImmediateEvent<void(int, int)>* event
+        = &g_pGame->mUnidentified49C.mEvent14;
     event->Deliver(pBall->meBallState, nBallState);
 
     if (pBall->meBallState == 9)
@@ -2795,22 +2726,12 @@ extern "C" void fn_800189C4(cBall* pBall)
     pBall->mUnidentifiedF0 = 0;
 }
 
-template <typename P1, typename P2>
-static inline UnidentifiedTypedEvent2<P1, P2>* UnidentifiedFindEvent2(
-    const char* name, int length)
-{
-    unsigned int hash = HashEventName(name, length);
-    EventRegistryValue* value = 0;
-    g_pEventRegistry->Find(hash, &value, 0);
-    return value != 0 ? (UnidentifiedTypedEvent2<P1, P2>*)value->event : 0;
-}
-
 static const nlVector3 lbl_804DBE48 = { 0.0f, 1.0f, 0.0f };
 
 extern "C" void fn_80018A00()
 {
     UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(fn_800196FC), 0, -1);
-    UnidentifiedFindEvent2<int, int>("BallStateChange", -1)->Add(Function2<void, int, int>(fn_8001A108), 0, -1);
+    UnidentifiedFindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(fn_8001A108), 0, -1);
     UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(fn_800193A0), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800195D8), 0, -1);
     UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(fn_800194A4), 0, -1);

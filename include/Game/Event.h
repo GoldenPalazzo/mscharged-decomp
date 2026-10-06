@@ -89,6 +89,12 @@ struct UnidentifiedEventCallback<void(P1)>
     typedef P1 Parameter;
 };
 
+template <typename P1, typename P2>
+struct UnidentifiedEventCallback<void(P1, P2)>
+{
+    typedef Function<void(P1, P2)> Type;
+};
+
 template <>
 struct UnidentifiedEventCallback<UnidentifiedEventNoData>
 {
@@ -450,5 +456,158 @@ void UnidentifiedQueuedEvent<T>::Queue(const Callback& disposer)
             this, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }
+
+template <typename P1, typename P2>
+class UnidentifiedEvent2 : public UnidentifiedTypedEvent<void(P1, P2)>
+{
+    typedef UnidentifiedListener<void(P1, P2)> Listener;
+    typedef DLListEntry<Listener> ListenerEntry;
+
+public:
+    typedef typename UnidentifiedTypedEvent<void(P1, P2)>::Callback Callback;
+
+    UnidentifiedEvent2(const char* name, int length)
+        : UnidentifiedTypedEvent<void(P1, P2)>(name, length)
+        , mListeners(16, 16)
+    {
+        RegisterEvent(this, UnidentifiedTypedEvent<void(P1, P2)>::sType);
+    }
+
+    virtual ~UnidentifiedEvent2();
+
+    void RemoveAll()
+    {
+        while (mListeners.m_Head != 0)
+        {
+            Remove(&*mListeners.Begin());
+        }
+    }
+
+    virtual void Add(const Callback& callback, unsigned int value, int flags)
+    {
+        UnidentifiedAddListener(callback, value, flags);
+    }
+
+    virtual void Disconnect(void* owner);
+
+    void Deliver(P1 p1, P2 p2)
+    {
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
+        while (iterator.hasNext())
+        {
+            Listener* listener = &*iterator;
+            ListenerEntry* currentEntry = iterator.CurrentEntry();
+            this->mCurrentConnection = listener;
+
+            if ((listener->mFlags >> 31) != 0)
+            {
+                listener->callback(p1, p2);
+                RestartAt(iterator, currentEntry);
+            }
+
+            iterator.next();
+            if (((listener->mFlags >> 29) & 1) != 0)
+            {
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                entry->~ListenerEntry();
+                mListeners.m_Allocator.Free(entry);
+            }
+        }
+        this->mCurrentConnection = 0;
+    }
+
+protected:
+    // Add hands the listener its callback by reference: retail's copies
+    // clear the caller's Function instead of cloning it.
+    void UnidentifiedAddListener(
+        const Callback& callback, unsigned int value, int flags)
+    {
+        Listener* listener = mListeners.AllocateAtEnd(0);
+
+        listener->callback.UnidentifiedTransfer(callback);
+        RegisterEventConnection(this, listener, value, flags);
+    }
+
+    void Remove(Listener* listener);
+    ListenerEntry* GetEntry(Listener* listener);
+    void DeleteListener(Listener* listener);
+    void RestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
+
+public:
+    // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
+    // the plain container rather than nlDLListSlotPool, whose destructor tears
+    // down twice (see Game/Render/ImpostorCharacter.cpp). Its adapter is the
+    // SlotPool level, like EventDispatcher's callback list.
+    DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
+};
+
+template <typename P1, typename P2>
+UnidentifiedEvent2<P1, P2>::~UnidentifiedEvent2()
+{
+    RemoveAll();
+    UnregisterEvent(this);
+}
+
+// The callback may have changed the list while it ran, so the walk is
+// re-anchored on the current list head before it continues past the entry
+// that was just delivered.
+template <typename P1, typename P2>
+void UnidentifiedEvent2<P1, P2>::RestartAt(
+    nlDLListIterator<Listener>& iterator, ListenerEntry* current)
+{
+    iterator.Copy(mListeners.Begin());
+    iterator.m_Curr = current;
+}
+
+template <typename P1, typename P2>
+void UnidentifiedEvent2<P1, P2>::Remove(Listener* listener)
+{
+    UnregisterEventConnection(this, listener);
+    if (this->mCurrentConnection == listener)
+    {
+        listener->mPendingRemoval = 1;
+        return;
+    }
+
+    DeleteListener(listener);
+}
+
+template <typename P1, typename P2>
+DLListEntry<UnidentifiedListener<void(P1, P2)> >*
+UnidentifiedEvent2<P1, P2>::GetEntry(Listener* listener)
+{
+    return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+}
+
+template <typename P1, typename P2>
+void UnidentifiedEvent2<P1, P2>::DeleteListener(Listener* listener)
+{
+    ListenerEntry* entry = GetEntry(listener);
+    nlDLRingRemove(&mListeners.m_Head, entry);
+    mListeners.DeleteEntry(entry);
+}
+
+template <typename P1, typename P2>
+void UnidentifiedEvent2<P1, P2>::Disconnect(void* owner)
+{
+    Listener* listener = (Listener*)FindEventConnection(this, owner);
+    Remove(listener);
+}
+
+template <typename P1, typename P2>
+class ImmediateEvent<void(P1, P2)> : public UnidentifiedEvent2<P1, P2>
+{
+public:
+    ImmediateEvent(const char* name, int length)
+        : UnidentifiedEvent2<P1, P2>(name, length)
+    {
+    }
+    virtual ~ImmediateEvent() { }
+};
 
 #endif // GAME_EVENT_H
