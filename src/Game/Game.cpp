@@ -2165,9 +2165,9 @@ void DeliverGoalieExertEvent(cGame* pGame, const GoalieSaveData* pData)
     }
     pGame->mUnidentified49C.mGoalieExertEvent.Deliver((GoalieSaveData*)pData);
 }
-void cGame::SetMegaStrikeSaveResult(int shotIndex, bool saved)
+void cGame::SetMegaStrikeShotResult(int shotIndex, bool scored)
 {
-    if (saved)
+    if (scored)
     {
         m_uMegastrikeResults |= 1 << shotIndex;
     }

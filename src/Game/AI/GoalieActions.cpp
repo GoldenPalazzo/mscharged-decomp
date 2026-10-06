@@ -1468,13 +1468,13 @@ void Goalie::fn_80084D94(float fParam)
         if (nlRandomf(100.0f) < fChance)
         {
             g_pGame->m_uMegastrikeGoals++;
-            g_pGame->SetMegaStrikeSaveResult(
+            g_pGame->SetMegaStrikeShotResult(
                 g_pGame->m_uMegastrikeCurShot,
                 true);
         }
         else
         {
-            g_pGame->SetMegaStrikeSaveResult(
+            g_pGame->SetMegaStrikeShotResult(
                 g_pGame->m_uMegastrikeCurShot,
                 false);
         }
@@ -1522,7 +1522,7 @@ inline void Goalie::CheckMegaStrikeGoals()
     if (goal)
     {
         ++g_pGame->m_uMegastrikeGoals;
-        g_pGame->SetMegaStrikeSaveResult(g_pGame->m_uMegastrikeCurShot, true);
+        g_pGame->SetMegaStrikeShotResult(g_pGame->m_uMegastrikeCurShot, true);
         SetMegaBallTimerStatus(g_pGame->m_uMegastrikeCurShot, 0);
         ++g_pGame->m_uMegastrikeCurShot;
         mbCheckForMegaGoal = false;
@@ -1944,7 +1944,7 @@ void Goalie::fn_80084EB0(float deltaTime)
                 target->mVisible = false;
                 fn_80084840(target);
                 fn_80084AE0(target);
-                g_pGame->SetMegaStrikeSaveResult(g_pGame->m_uMegastrikeCurShot, false);
+                g_pGame->SetMegaStrikeShotResult(g_pGame->m_uMegastrikeCurShot, false);
                 SetMegaBallTimerStatus(g_pGame->m_uMegastrikeCurShot, 1);
                 ++g_pGame->m_uMegastrikeCurShot;
                 if (g_pGame->m_uMegastrikeCurShot >= g_pGame->m_uMegastrikeNumShots)

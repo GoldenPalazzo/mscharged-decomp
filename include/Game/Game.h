@@ -100,7 +100,7 @@ public:
     void InitGameState(int state);
     void LoadTerrain(int terrain);
     void SetDifficulty(int diff0, int diff1, int diff2, bool param4);
-    void SetMegaStrikeSaveResult(int shotIndex, bool saved);
+    void SetMegaStrikeShotResult(int shotIndex, bool scored);
     void ResumeAfterPresentation();
     void QueueNIS(NISData* pData);
 
@@ -112,7 +112,7 @@ public:
     inline int GetGameState() const { return m_eGameState; }
     inline bool IsLastTeamToScore(int side) const { return m_nLastTeamToScore == side; }
     inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
-    inline u32 GetMegaStrikeSaveMask() const { return m_uMegastrikeResults; }
+    inline u32 GetMegaStrikeGoalMask() const { return m_uMegastrikeResults; }
     float GetXAxisTilt() const { return mfXTilt; }
     float GetYAxisTilt() const { return mfYTilt; }
     const nlVector3& GetTiltDirection() const { return mTiltDirection; }

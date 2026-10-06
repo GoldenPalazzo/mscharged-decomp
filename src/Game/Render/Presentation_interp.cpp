@@ -539,7 +539,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
-            && (g_pGame->GetMegaStrikeSaveMask() & (1 << original)) != 0;
+            && (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) != 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
@@ -550,7 +550,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
-            && g_pGame->GetMegaStrikeSaveMask() == 0;
+            && g_pGame->GetMegaStrikeGoalMask() == 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
@@ -560,7 +560,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 73:
     {
         int original = m_SP[-1];
-        m_SP[-1] = (g_pGame->GetMegaStrikeSaveMask() & (1 << original)) == 0;
+        m_SP[-1] = (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) == 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
