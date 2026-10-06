@@ -719,9 +719,9 @@ void cGame::fn_80058498(bool param1, int param2, int param3)
     if (param1)
     {
         mUnidentified041 = g_pTeams[param2]->m_pNet->m_v3NetLocation.x > 0.0f;
-        if (lbl_8056B9A0.value > 0)
+        if (lbl_8056B9A0.mValue > 0)
         {
-            mUnidentified028 = lbl_8056B9A0.value;
+            mUnidentified028 = lbl_8056B9A0.mValue;
         }
         else
         {
@@ -2769,60 +2769,3 @@ extern "C" EventDispatcher* fn_800721C4()
 }
 
 #include "NL/nlBind_impl.h"
-
-TweakValueInt::~TweakValueInt()
-{
-}
-
-void TweakValueInt::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        value = ((TweakValueInt*)other)->value;
-        break;
-    case 2:
-        value = *((TweakIntBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-int TweakValueInt::GetStorageKind()
-{
-    return 1;
-}
-
-int TweakValueInt::GetValueType()
-{
-    return 3;
-}
-
-void* TweakValueInt::GetValueAddress()
-{
-    return &value;
-}
-
-void TweakValueInt::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%d", value);
-}
-
-void TweakValueInt::ParseValue(
-    const char* string)
-{
-    value = atoi(string);
-}
-
-void TweakValueInt::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-void TweakValueInt::UnidentifiedVirtual18()
-{
-}

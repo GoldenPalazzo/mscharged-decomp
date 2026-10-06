@@ -249,7 +249,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         }
     }
 
-    sNumImpostorsRendered.value = sInitialRenderedImpostorCount;
+    sNumImpostorsRendered.mValue = sInitialRenderedImpostorCount;
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthWrite, 1);
     glSetRasterState(GLS_Culling, 0);
@@ -291,8 +291,8 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         spriteEntry = sprites.m_Curr;
         while (spriteEntry != 0)
         {
-            rendered = sNumImpostorsRendered.value;
-            sNumImpostorsRendered.value = rendered
+            rendered = sNumImpostorsRendered.mValue;
+            sNumImpostorsRendered.mValue = rendered
                 + spriteEntry->entry->Render((GLView*)target, mImpostors, cached, skipCapture);
             if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
             {
