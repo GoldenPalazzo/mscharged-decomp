@@ -316,7 +316,7 @@ static inline int PickRandomCaptain(bool e3Build)
     while (true)
     {
         int captain = nlRandom(12, &nlDefaultSeed);
-        int availability = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).unknown_0x24;
+        int availability = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mRandomSelectionAvailability;
         if ((e3Build && availability == 1) || (!e3Build && availability != 0))
             return captain;
     }
@@ -329,7 +329,7 @@ static inline int PickRandomSidekick(bool e3Build)
         int sidekick = nlRandom(8, &nlDefaultSeed);
         if (sidekick == 3)
             continue;
-        int availability = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick)).unknown_0x24;
+        int availability = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick)).mRandomSelectionAvailability;
         if ((e3Build && availability == 1) || (!e3Build && availability != 0))
             return sidekick;
     }
