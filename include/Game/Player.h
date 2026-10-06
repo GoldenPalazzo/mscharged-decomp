@@ -222,10 +222,10 @@ public:
 
 extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration);
 extern "C" void fn_80098098(cPlayer* pSelf);
-extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam);
+void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam);
 void SetDesiredFacingDirection(cPlayer* pPlayer);
 extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass);
-extern "C" bool fn_800977A4(const cPlayer* pPlayer, float fParam);
+bool IsPlayerBelowHeight(const cPlayer* pPlayer, float fParam);
 extern "C" void fn_80098750();
 
 #endif // GAME_PLAYER_H

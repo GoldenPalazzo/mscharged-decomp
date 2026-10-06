@@ -719,7 +719,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     if ((int)pFldr->mUnidentified024.m_eCharacterClass == 0x12
         && mGoalieActionState != GOALIEACTION_UNIDENTIFIED_30
         && pFldr->IsInvincibleChars() && pFldr->m_eActionState == 0x20
-        && pFldr->mUnidentified178 > 0.4f && !fn_800977A4(pFldr, 0.0f))
+        && pFldr->mUnidentified178 > 0.4f && !IsPlayerBelowHeight(pFldr, 0.0f))
     {
         fn_8008ED44(true);
         return;

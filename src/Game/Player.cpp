@@ -163,7 +163,7 @@ void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
     m_pSpaceSearch = pSpaceSearch;
 }
 
-extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam)
+void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam)
 {
     pPlayer->m_pTeam = pTeam;
     pPlayer->m_uSoundSlotId = pTeam->m_nSide == 0 ? 1 : 5;
@@ -930,7 +930,7 @@ bool cPlayer::IsCharacterInAir(float fParam) const
     return false;
 }
 
-extern "C" bool fn_800977A4(const cPlayer* pPlayer, float fParam)
+bool IsPlayerBelowHeight(const cPlayer* pPlayer, float fParam)
 {
     float leftFootZ = pPlayer->GetJointPosition(pPlayer->m_nLeftFootJointIndex).z;
     float rightFootZ = pPlayer->GetJointPosition(pPlayer->m_nRightFootJointIndex).z;
