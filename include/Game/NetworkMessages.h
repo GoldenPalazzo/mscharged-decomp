@@ -233,14 +233,14 @@ public:
     /* 0x08 */ u8 mMachineMask;
 };
 
-class NetworkMessageType30 : public NetworkMessage
+class NetMessageSkipNis : public NetworkMessage
 {
 public:
-    NetworkMessageType30()
+    NetMessageSkipNis()
         : mByPassNumber(0)
     {
     }
-    NetworkMessageType30(u32 byPassNumber)
+    NetMessageSkipNis(u32 byPassNumber)
         : mByPassNumber(byPassNumber)
     {
     }
@@ -251,14 +251,14 @@ public:
     /* 0x08 */ u32 mByPassNumber;
 };
 
-class NetworkMessageType31 : public NetworkMessage
+class NetMessageSkipNisClient : public NetworkMessage
 {
 public:
-    NetworkMessageType31()
+    NetMessageSkipNisClient()
         : mByPassNumber(0)
     {
     }
-    NetworkMessageType31(u32 byPassNumber)
+    NetMessageSkipNisClient(u32 byPassNumber)
         : mByPassNumber(byPassNumber)
     {
     }
