@@ -34,7 +34,7 @@ static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
 static bool sbDoDKBallStuckHack = true;
 static float sfBallStuckHackShoveMagnitude = 10.0f;
 
-void fn_80142A1C()
+void ClearPlayerPlayerCollisionCache()
 {
     for (int i = 0; i < 100; ++i)
     {
