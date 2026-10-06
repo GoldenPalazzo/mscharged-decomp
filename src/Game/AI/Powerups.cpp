@@ -39,7 +39,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_8009F1B8(EmissionController&);
+void UpdateBobombEmitter(EmissionController&);
 
 enum eGameState
 {
@@ -180,7 +180,7 @@ const unsigned long uBOBOMB_MASTER_OBJECT = nlStringLowerHash("gameplay/bobomb")
 const char* uBANANA_STREAK_TEXTURE;
 } // namespace
 
-extern "C" int fn_80099C80(ePowerUpType eType)
+int IsMushroomPowerup(ePowerUpType eType)
 {
     int nUnidentified = 0;
     switch (eType)
@@ -194,7 +194,7 @@ extern "C" int fn_80099C80(ePowerUpType eType)
     return nUnidentified;
 }
 
-extern "C" bool fn_80099C94(ePowerUpType eType)
+bool IsStarOrChainChompPowerup(ePowerUpType eType)
 {
     bool bUnidentified = false;
     switch (eType)
@@ -209,7 +209,7 @@ extern "C" bool fn_80099C94(ePowerUpType eType)
     return bUnidentified;
 }
 
-extern "C" bool fn_80099CC4(ePowerUpType eType)
+bool IsDrawablePowerup(ePowerUpType eType)
 {
     bool bUnidentified = false;
     switch (eType)
@@ -228,7 +228,7 @@ extern "C" bool fn_80099CC4(ePowerUpType eType)
     return bUnidentified;
 }
 
-extern "C" bool fn_80099CE8(int nUnidentified)
+bool IsCaptainPowerup(int nUnidentified)
 {
     return nUnidentified >= NUM_POWER_UPS && nUnidentified <= 20;
 }
@@ -295,7 +295,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 {
     if (pFirstPowerup->m_eType == POWER_UP_BOBOMB)
     {
-        ((Bobomb*)pNewPowerup)->fn_8009F454(pFirstPowerup, nThrowOrder);
+        ((Bobomb*)pNewPowerup)->ThrowInSequence(pFirstPowerup, nThrowOrder);
         return;
     }
 
@@ -501,7 +501,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
     }
 }
 
-extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
+float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
 {
     float fUnidentified = 0.0f;
 
@@ -559,8 +559,8 @@ extern "C" float fn_8009A478(ePowerUpType eType, ePowerupSize eSize)
     return fUnidentified;
 }
 
-extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, unk_8009A5D8* pUnidentified)
+void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
+    int nnumOfPowerups, PowerupThrowParameters* pUnidentified)
 {
     pUnidentified->bExplode = false;
     pUnidentified->nnumOfPowerups = nnumOfPowerups;
@@ -632,7 +632,7 @@ extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
         }
     }
 
-    pUnidentified->fRadius = fn_8009A478(
+    pUnidentified->fRadius = GetPowerupRadius(
         pUnidentified->eType, pUnidentified->eSize);
 }
 
@@ -648,7 +648,7 @@ inline Bobomb::Bobomb(cFielder* pTarget, int nIndex, float fRadius,
 {
     pMovementEmitter = 0;
     mbIsMine = false;
-    m_unkAC = lbl_806DBDE0;
+    m_fMineTimeRemaining = lbl_806DBDE0;
 }
 
 inline GreenShell::GreenShell(cFielder* pTarget, int nIndex, float fRadius,
@@ -676,7 +676,7 @@ inline SpinyShell::SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
 }
 
 int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
-    unk_8009A5D8 params)
+    PowerupThrowParameters params)
 {
     PowerupBase* pFirstPowerup = 0;
     cTeam* pTargetTeam = pThrower->m_pTeam->GetOtherTeam();
@@ -1016,7 +1016,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
         mtNoHitTimer.SetSeconds(lbl_806DBDC4);
     }
 
-    m_unk4C = lbl_806DBDC8;
+    m_fSpawnGrowTimeRemaining = lbl_806DBDC8;
     m_v3Position.x = 0.0f;
     m_v3Position.y = 0.0f;
     m_v3Position.z = fRadius;
@@ -1029,7 +1029,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_unk34.m_uPackedTime = 0;
 
     nlVector3 v3Unidentified = v3Zero;
-    m_unk50 = v3Unidentified;
+    m_v3SavedVelocity = v3Unidentified;
     m_v3PrevPosition = m_v3Position;
     m_v3Velocity = v3Zero;
 
@@ -1040,7 +1040,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
 
     pUnidentified = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
     pUnidentified = new (pUnidentified) AvoidablePowerup(this);
-    m_unk18 = pUnidentified;
+    m_pAvoidableObject = pUnidentified;
 
     if (eType == POWER_UP_RED_SHELL)
     {
@@ -1068,7 +1068,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
  */
 inline PowerupBase::~PowerupBase()
 {
-    delete m_unk18;
+    delete m_pAvoidableObject;
 
     int type = m_eType;
     DrawableObject* pDrawable = m_pDrawableObj;
@@ -1109,13 +1109,13 @@ void PowerupBase::Update(float dt)
             mtNoHitTimer.Countdown(dt, 0.0f);
         }
 
-        if (m_unk4C > 0.0f)
+        if (m_fSpawnGrowTimeRemaining > 0.0f)
         {
-            m_unk4C -= dt;
+            m_fSpawnGrowTimeRemaining -= dt;
         }
         else
         {
-            m_unk4C = 0.0f;
+            m_fSpawnGrowTimeRemaining = 0.0f;
         }
 
         fn_8009D500();
@@ -1145,8 +1145,8 @@ void PowerupBase::Update(float dt)
             m_unk44.m_uPackedTime = 0;
             m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
             m_unk3C.m_uPackedTime = 0;
-            m_v3Velocity = m_unk50;
-            m_pPhysicsObject->SetLinearVelocity(m_unk50);
+            m_v3Velocity = m_v3SavedVelocity;
+            m_pPhysicsObject->SetLinearVelocity(m_v3SavedVelocity);
             m_pPhysicsObject->EnableCollisions();
             m_unk20 = true;
 
@@ -1702,7 +1702,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             && !pBobomb->mbIsMine)
         {
             pBobomb->mbIsMine = true;
-            pBobomb->m_unkAC = lbl_806DBDE0;
+            pBobomb->m_fMineTimeRemaining = lbl_806DBDE0;
             pObj->m_v3Velocity = v3Zero;
             pObj->m_pPhysicsObject->SetLinearVelocity(v3Zero);
 
@@ -1719,7 +1719,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             EmissionController* pController = EmissionManager::Instance()->Create(pEffectsGroup, 3, true, 0);
             pController->SetPosition(pObj->m_v3Position);
             pController->m_uUserData = (u32)pObj;
-            Function1<void, EmissionController&> callback(fn_8009F1B8);
+            Function1<void, EmissionController&> callback(UpdateBobombEmitter);
             pController->SetUpdateCallback(callback);
         }
         break;
@@ -2229,7 +2229,7 @@ void PowerupBase::PreThrow(cFielder* pFielder)
 void PowerupBase::fn_8009D74C(float seconds, bool bEnableCollisions)
 {
     m_unk44.SetSeconds(seconds);
-    m_unk50 = m_v3Velocity;
+    m_v3SavedVelocity = m_v3Velocity;
     m_unk3C.SetSeconds(0.2f);
 
     if (!bEnableCollisions)
@@ -2331,10 +2331,10 @@ void PowerupBase::UpdateTransform()
     m_scale = fActualRadius / fNormalRadius;
     ((PhysicsSphere*)m_pPhysicsObject)->SetRadius(fActualRadius);
 
-    if (m_unk4C > 0.0f)
+    if (m_fSpawnGrowTimeRemaining > 0.0f)
     {
         m_scale = InterpolateRangeClamped(
-            0.33f, m_scale, lbl_806DBDC8, 0.0f, m_unk4C);
+            0.33f, m_scale, lbl_806DBDC8, 0.0f, m_fSpawnGrowTimeRemaining);
         ((PhysicsSphere*)m_pPhysicsObject)->SetRadius(m_scale * fNormalRadius);
 
         if (m_pBlurHandler != 0 && m_scale <= 1.0f)
@@ -2909,7 +2909,7 @@ void FreezeShell::Destroy(bool bSilent)
 /**
  * Offset/Address/Size: 0x5B58 | 0x8009F1B8 | size: 0x60
  */
-extern "C" void fn_8009F1B8(EmissionController& controller)
+void UpdateBobombEmitter(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == GS_GAMEPLAY)
     {
@@ -2950,8 +2950,8 @@ void Bobomb::Update(float dt)
         m_v3Velocity = v3Zero;
         m_pPhysicsObject->SetLinearVelocity(v3Zero);
 
-        m_unkAC -= dt;
-        if (m_unkAC < 0.0f)
+        m_fMineTimeRemaining -= dt;
+        if (m_fMineTimeRemaining < 0.0f)
         {
             m_bShouldDestroy = true;
         }
@@ -2972,7 +2972,7 @@ void Bobomb::Update(float dt)
 /**
  * Offset/Address/Size: 0x5DF4 | 0x8009F454 | size: 0x3AC
  */
-void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
+void Bobomb::ThrowInSequence(PowerupBase*, int nThrowOrder)
 {
     cFielder* pTarget = m_pThrower;
     if (lbl_806DBDD8 && m_pTarget != 0)
@@ -3039,7 +3039,7 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
     pController->SetPosition(pos);
     pController->m_uUserData = (u32)this;
     pController->SetUpdateCallback(
-        Function1<void, EmissionController&>(fn_8009F1B8));
+        Function1<void, EmissionController&>(UpdateBobombEmitter));
 
     unsigned long soundID = powerupSounds[m_eType].sndActivate;
     if (soundID != 0)
@@ -3060,7 +3060,7 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
  */
 void Bobomb::ThrowAt(cFielder* pThrower)
 {
-    fn_8009F454(0, 0);
+    ThrowInSequence(0, 0);
 }
 
 /**

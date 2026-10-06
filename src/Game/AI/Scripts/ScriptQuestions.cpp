@@ -952,12 +952,12 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     if (pFielder->IsCaptain() && !pFielder->fn_8003E6EC())
     {
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
-        if (fn_80099CE8(powerup) && fn_8002EDC8(pFielder, powerup))
+        if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
             fScore = 1.0f;
         else if (pFielder->m_pTeam->fn_800A6560())
         {
             powerup = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-            if (fn_80099CE8(powerup) && fn_8002EDC8(pFielder, powerup))
+            if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
                 fScore = 1.0f;
         }
     }
