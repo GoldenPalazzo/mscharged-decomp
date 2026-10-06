@@ -8,6 +8,7 @@
 #include "Game/Game.h"
 #include "Game/Render/BulletBill.h"
 #include "Game/ReplayManager.h"
+#include "Game/RenderSnapshot.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBulletBill.h"
@@ -20,7 +21,6 @@
 #include "NL/nlFunction.inl"
 #include "types.h"
 
-extern "C" DrawableBulletBill& fn_8018755C(RenderSnapshot*, unsigned int);
 
 static const nlVector3 sHiddenBulletBillVelocity = { 0.0f, 0.0f, 0.0f };
 static const nlVector3 sHiddenBulletBillPosition = { 0.0f, -20.0f, -10.0f };
@@ -113,7 +113,7 @@ void UpdateBulletBillEmitter(EmissionController& controller)
         BulletBillObject* object = (BulletBillObject*)controller.m_uUserData;
         u32 index = object->index;
         RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;
-        DrawableBulletBill& bill = fn_8018755C(snapshot, index);
+        DrawableBulletBill& bill = GetSnapshotBulletBill(snapshot, index);
         if (bill.mVisible)
         {
             controller.SetPosition(bill.mPosition);
