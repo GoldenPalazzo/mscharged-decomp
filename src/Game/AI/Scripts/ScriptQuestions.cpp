@@ -1711,7 +1711,7 @@ extern "C" float fn_800DA310(cFielder* pFielder)
         return 0.0f;
     }
 
-    return fn_800A0508(pFielder, false, false);
+    return CalcShotScoreValue(pFielder, false, false);
 }
 
 extern "C" float fn_800DA330(cFielder* pFielder)
@@ -1721,7 +1721,7 @@ extern "C" float fn_800DA330(cFielder* pFielder)
         return 0.0f;
     }
 
-    return fn_800A0508(pFielder, true, false);
+    return CalcShotScoreValue(pFielder, true, false);
 }
 
 float PositionIsInFrontOfNet(const nlVector3& v3Position, const cNet* pNet)
@@ -3214,7 +3214,7 @@ extern "C" float fn_800DEBF4(cFielder* pFielder)
         case SHOT_METER_STS_ACTIVE:
             return 1.0f;
         default:
-            return FMIN(FMAX(pMeter->GetTime() / pMeter->UnidentifiedGetShotDuration(), 0.0f), 1.0f);
+            return FMIN(FMAX(pMeter->GetTime() / pMeter->GetShotDuration(), 0.0f), 1.0f);
         }
     }
     return 0.0f;
@@ -3234,11 +3234,11 @@ extern "C" float fn_800DEC88(cFielder* pFielder)
         switch (pMeter->m_eShotMeterState)
         {
         case SHOT_METER_STS_ACTIVE:
-            return FMIN(FMAX((pMeter->GetTime() - pMeter->UnidentifiedGetShotDuration())
-                                / (pMeter->GetTotalDuration() - pMeter->UnidentifiedGetShotDuration()),
+            return FMIN(FMAX((pMeter->GetTime() - pMeter->GetShotDuration())
+                                / (pMeter->GetTotalDuration() - pMeter->GetShotDuration()),
                             0.0f),
                 1.0f);
-        case SHOT_METER_STS_TRANSISTION:
+        case SHOT_METER_STS_TRANSITION:
         case SHOT_METER_STS_RELEASED:
             return 1.0f;
         default:

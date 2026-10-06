@@ -1347,7 +1347,7 @@ void cTeam::fn_800A8098()
                 bIsChipShot = g_pBall->GetOwnerFielder()->GetGlobalPad()->IsPressed(0x17, true);
             }
 
-            float fScoreValue = fn_800A0508(
+            float fScoreValue = CalcShotScoreValue(
                 g_pBall->GetOwnerFielder(), bIsChipShot, false);
             mUnidentified010 = fScoreValue;
             mUnidentified00C = nlMinEquals(
@@ -1377,7 +1377,7 @@ void cTeam::fn_800A8098()
             if (pCaptain->IsOnSameTeam(
                     g_pBall->GetPassTargetFielder()))
             {
-                float fScoreValue = fn_800A0508(
+                float fScoreValue = CalcShotScoreValue(
                     g_pBall->GetPassTargetFielder(),
                     g_pBall->GetPassTargetFielder()->bIsModified, false);
                 mUnidentified010 = fScoreValue;

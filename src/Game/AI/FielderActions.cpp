@@ -3638,8 +3638,8 @@ bool cFielder::fn_8004A330(cFielder* pOther)
         float fOtherScore = fn_800DBAB0(pOther);
 
         bool bResult = false;
-        float fOtherOpen = fn_800A0508(pOther, 0, 0);
-        float fThisOpen = fn_800A0508(this, 0, 0);
+        float fOtherOpen = CalcShotScoreValue(pOther, 0, 0);
+        float fThisOpen = CalcShotScoreValue(this, 0, 0);
 
         nlVector2 v2Delta = {
             pOther->mUnidentified024.m_v3Position.x - mUnidentified024.m_v3Position.x,
@@ -4272,7 +4272,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
     {
         ShotMeter* pShotMeter = m_pShotMeter;
         float fWindow = lbl_806E3538[0];
-        float fReleaseTime = pShotMeter->mUnidentified00C;
+        float fReleaseTime = pShotMeter->m_fTotalDuration;
         float fTime = pShotMeter->m_fTime;
         if (fTime > fReleaseTime - fWindow)
         {
