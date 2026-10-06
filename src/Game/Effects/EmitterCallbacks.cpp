@@ -15,8 +15,6 @@
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern float lbl_806DB5A4;
-
 static const nlVector3 sZeroVelocity = { 0.0f, 0.0f, 0.0f };
 
 DrawableCharacter* GetReplayDrawableCharacter(cCharacter* character)
