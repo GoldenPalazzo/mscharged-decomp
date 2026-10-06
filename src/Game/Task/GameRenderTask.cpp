@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include "Game/BasicStadium.h"
+#include "Game/Render/ChainChomp.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
@@ -66,7 +67,6 @@
 #include <string.h>
 
 const nlVector3 gRenderUpVector = { 0.0f, 0.0f, 1.0f };
-extern void* gpChainChompShadowView;
 
 GameRenderTask* GameRenderTask::sInstance;
 
@@ -214,7 +214,7 @@ void GameRenderTask::Run(float fDeltaT)
 
     if (NisPlayer::Instance()->HasSecondaryNis())
     {
-        void* save14F8;
+        RLView* save14F8;
         GLView* save19D8;
         int saveView;
         GLView* saveStadiumOpaqueView;

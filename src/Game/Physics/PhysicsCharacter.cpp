@@ -26,7 +26,7 @@
 #include "Game/Physics/Physics.h"
 
 
-extern "C" int strcmpi(const char*, const char*);
+#include <extras.h>
 extern "C" bool fn_8003E948(const cFielder*);
 
 

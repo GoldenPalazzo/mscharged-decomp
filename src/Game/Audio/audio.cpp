@@ -6,6 +6,7 @@
 #include "Game/Sys/debug.h"
 
 #include "Game/Task/TextWindowTask.h"
+#include "Game/Task/ResetTask.h"
 
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSlider.h"
@@ -23,11 +24,6 @@
 
 #include "Game/Audio/AudioListener.inl"
 
-extern void* gExclusiveAudioContext;
-extern XSoundHandle* g_pLastAudioHandle;
-extern unsigned long gResidentVoiceDropCount;
-extern unsigned long gStreamVoiceDropCount;
-extern bool s_AudioInInit__9ResetTask;
 
 static char sNoAudio[] = "user/NoAudio";
 static char sDisableControllerSpeaker[] = "user/DisableControllerSpeaker";
@@ -79,9 +75,9 @@ bool GameAudio::Initialize()
     CurrentAllocator = &VirtualAllocator;
     gAudioMemorySize = 0x800000;
 
-    s_AudioInInit__9ResetTask = true;
+    ResetTask::s_AudioInInit = true;
     SetResourcePath(gAudioResourcePath);
-    s_AudioInInit__9ResetTask = false;
+    ResetTask::s_AudioInInit = false;
 
     if (SCGetSoundMode() == 0)
     {
