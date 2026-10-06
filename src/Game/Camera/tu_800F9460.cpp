@@ -97,7 +97,7 @@ float gGoalieSaveTransitionTime;
 bool gGoalieSaveRotateCamera;
 bool gCameraZoomOverrideEnabled;
 float gCameraNoFlagsZoomAdjustment;
-float gCameraCaptainAbilityZoomAdjustment;
+float gCameraCaptainFlagZoomAdjustment;
 float gCameraStadiumTiltZoomAdjustment;
 
 template <>
@@ -359,7 +359,7 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
     if ((mCameraFlags & 0x10) != 0)
         result -= gCameraClearFieldersZoomAdjustment;
     if ((mCameraFlags & 0x20) != 0)
-        result -= gCameraCaptainAbilityZoomAdjustment;
+        result -= gCameraCaptainFlagZoomAdjustment;
     if ((mCameraFlags & 0x40) != 0)
     {
         float gameX = g_pGame->mfXTilt;
