@@ -10,6 +10,7 @@
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/Render/RLView.h"
+#include "Game/Render/RLViewLayers.h"
 #include "Game/Render/Frustum.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/gl.h"
@@ -39,12 +40,7 @@ void fn_8018680C(eCLV layer, const glModel* model,
 }
 
 
-int GetShadowPartitionCount();
-void SetShadowPartitionEnabled(int partition, bool enabled);
-GLView* GetShadowPartitionView(int partition);
-u32 GetShadowPartitionTexture(int partition);
-void SetShadowPartitionCamera(int partition, const nlMatrix4& view,
-    const nlMatrix4& projection);
+
 
 static bool g_bPlanarShadows = true;
 bool g_bProjectedShadows = true;
