@@ -1833,10 +1833,10 @@ float NearToFormationPosition(cFielder* pFielder)
     {
         return 0.0f;
     }
-    return fn_800DA7A8(pFielder, &pFielder->mUnidentified024.m_v3Position);
+    return NearToFormationPosition(pFielder, &pFielder->mUnidentified024.m_v3Position);
 }
 
-extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition)
+float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
 {
     if (pFielder == NULL)
     {
@@ -2072,7 +2072,7 @@ float GoalConeOpenness(const nlVector3& vFrom, const nlVector3& vTo,
     return 1.0f - fClosedScore;
 }
 
-extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
+float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
     cPlayer* pCurrentPlayer, const nlVector2* vOpenRadius, bool bIgnoreIncapacitated,
     float fPredictionTime)
 {
@@ -2130,13 +2130,13 @@ extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
     return FMIN(FMAX(1.0f - fTotalScore, 0.0f), 1.0f);
 }
 
-extern "C" float fn_800DBA68(const nlVector3& v3Position, cTeam* pOpponentTeam,
+float WidePositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
     cPlayer* pCurrentPlayer, bool bIgnoreIncapacitated, float fPredictionTime)
 {
     nlVector2 radius;
     nlVec2Set(radius, g_pGame->m_pFuzzyTweaks->fWideOpenRadiusMin,
         g_pGame->m_pFuzzyTweaks->fWideOpenRadiusMax);
-    return fn_800DB678(v3Position, pOpponentTeam, pCurrentPlayer, &radius,
+    return PositionOpenness(v3Position, pOpponentTeam, pCurrentPlayer, &radius,
         bIgnoreIncapacitated, fPredictionTime);
 }
 
@@ -2144,7 +2144,7 @@ extern "C" float fn_800DBAB0(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DB678(pFielder->mUnidentified024.m_v3Position,
+    return PositionOpenness(pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, NULL, true, 0.0f);
 }
 
@@ -2152,7 +2152,7 @@ extern "C" float fn_800DBB0C(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DBA68(pFielder->mUnidentified024.m_v3Position,
+    return WidePositionOpenness(pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, true, 0.0f);
 }
 
@@ -2592,7 +2592,7 @@ extern "C" float fn_800DD37C(cFielder* pFielder)
     return CloseToSideline(pFielder->mUnidentified024.m_v3PrevVelocity, &v2Range, true, NULL);
 }
 
-extern "C" float fn_800DD3DC(const nlVector3& vFrom, const nlVector3& vTo,
+float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     float fMin, float fMax)
 {
     nlVector2 diff;
@@ -2767,7 +2767,7 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
     return NormalizeVal(fDistance, 0.5f + fRange, 0.66f * fRange);
 }
 
-extern "C" float fn_800DDAC0(const nlVector3& vPosition, const nlVector3& vOffNetPosition,
+float PositionShotDistance(const nlVector3& vPosition, const nlVector3& vOffNetPosition,
     float fShooting)
 {
     float fMin = InterpolateClamped(g_pGame->m_pFuzzyTweaks->fBadShooterDistanceMin,
@@ -2791,7 +2791,7 @@ float PlayerShotDistance(cFielder* pFielder)
     {
         float fShooting = pFielder->GetTweaks()->fShooting;
         const nlVector3& netLocation = pFielder->GetAIOffNetLocation(&v3Position);
-        fScore = fn_800DDAC0(v3Position, netLocation, fShooting);
+        fScore = PositionShotDistance(v3Position, netLocation, fShooting);
     }
     return fScore;
 }

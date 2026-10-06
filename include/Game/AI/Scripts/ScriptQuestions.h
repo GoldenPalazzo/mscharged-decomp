@@ -247,7 +247,7 @@ extern "C" float fn_800DA130(cFielder*);
 extern "C" float fn_800DA310(cFielder*);
 extern "C" float fn_800DA330(cFielder*);
 extern "C" float fn_800DA518(cFielder*);
-extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition);
+float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition);
 extern "C" float fn_800DA91C(cFielder*);
 extern "C" float fn_800DACF4(cPlayer*);
 extern "C" float fn_800DAD3C(cBall*);
