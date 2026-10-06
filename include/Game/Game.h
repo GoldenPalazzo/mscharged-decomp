@@ -44,6 +44,8 @@ class cGame : public NetworkMessageReceiver
     friend void fn_8005DB7C(cGame* pGame);
 
 public:
+    void QueueCharacterElectrocuted(CollisionPlayerWallData* data);
+
     virtual int ProcessMessage(NetworkMessage* message);
     virtual ~cGame();
 

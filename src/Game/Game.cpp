@@ -2751,6 +2751,12 @@ extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
 }
 #include "NL/nlBind_impl.h"
 
+void cGame::QueueCharacterElectrocuted(CollisionPlayerWallData* data)
+{
+    mUnidentified49C.mEvent30.Queue(
+        data, Function<CollisionPlayerWallData*>(FreeCollisionPlayerWallData));
+}
+
 #include "Game/GameEventCallbacks.inl"
 
 #include "Game/EventBase.inl"
