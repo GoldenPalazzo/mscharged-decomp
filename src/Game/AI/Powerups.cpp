@@ -41,10 +41,6 @@
 
 void UpdateBobombEmitter(EmissionController&);
 
-enum eGameState
-{
-    GS_GAMEPLAY = 4,
-};
 
 u8 lbl_806DBDA0 = true;
 float lbl_806DBDA4 = 6.0f;
@@ -1215,7 +1211,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     int nChanceForChainChomp
         = lbl_806DBE14 + (int)(nDifference * lbl_806DBE18);
-    if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == (eGameState)6)
+    if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == 6)
     {
         nChanceForChainChomp = 0;
     }
@@ -1539,7 +1535,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     if (pTeam->SetCurrentPowerUp(powerUpType, nNumOfPowerups))
     {
-        if (g_pGame->m_eGameState == (eGameState)1
+        if (g_pGame->m_eGameState == 1
             && GameInfoManager::Instance()->IsInMode4())
         {
             int mode = g_pStrikerChallenge->mCurrentChallenge;
@@ -2911,7 +2907,7 @@ void FreezeShell::Destroy(bool bSilent)
  */
 void UpdateBobombEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == GS_GAMEPLAY)
+    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
         return;
     }

@@ -186,12 +186,6 @@ extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
 
 
-struct UnidentifiedSkillshotNode
-{
-    /* 0x0 */ cFielder* mUnidentified0;
-    /* 0x4 */ void* mUnidentified4;
-};
-extern BasicSlotPool<UnidentifiedSkillshotNode> lbl_805712F8;
 
 extern int gHitReactAnims[3][4];
 
