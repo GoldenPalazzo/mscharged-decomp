@@ -38,7 +38,7 @@ struct NetworkGameResultDetails
     bool mTied;
     u8 mPadding06[2];
     int mResultPoints;
-    int mScorePoints;
+    int mGoalPoints;
     int mBonusPoints;
 }; // size: 0x14
 
@@ -87,17 +87,17 @@ void NetworkStatsManager::Reset(bool)
 
     mCurrentTime = 0.0f;
     mOperationStartTime = 0.0f;
-    mUnidentifiedC410 = 0;
-    mSaveState = 0;
+    mNextLeaderboardJobIndex = 0;
+    mCachedFriendCount = 0;
     mStatsError = false;
     mSaveDataChanged = false;
     mGameResultReported = false;
     mDisconnectPending = false;
-    mUnidentifiedC41C[0] = 0;
+    mDisconnectPointsLost[0] = 0;
     mDisconnectLossPending[0] = false;
-    mUnidentifiedC41C[1] = 0;
+    mDisconnectPointsLost[1] = 0;
     mDisconnectLossPending[1] = false;
-    mUnidentifiedC41C[2] = 0;
+    mDisconnectPointsLost[2] = 0;
     mDisconnectLossPending[2] = false;
     mJobs.mHead = 0;
     mJobs.mCount = 0;
@@ -106,7 +106,7 @@ void NetworkStatsManager::Reset(bool)
     {
         mCategories[i].mAvailable = false;
         mCategories[i].mCount = 0;
-        mCategories[i].mFirstRank = -1;
+        mCategories[i].mLocalPlayerIndex = -1;
     }
 
     bool european = GetRegion() == 1;
@@ -118,58 +118,58 @@ void NetworkStatsManager::Reset(bool)
         else
             SetRankingGroup(alternate, IsAlternateOnlineCountryGroup());
         mPersistentCategories[0] =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_SEASON : NETWORK_PERSISTENT_SEASON;
         mPersistentCategories[1] =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
-        mPersistentCategories[2] = NETWORK_PERSISTENT_CATEGORY_2;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY : NETWORK_PERSISTENT_STRIKER_OF_DAY;
+        mPersistentCategories[2] = NETWORK_PERSISTENT_FRIENDS;
 
         mCategories[0].mPersistentCategory =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY : NETWORK_PERSISTENT_STRIKER_OF_DAY;
         mCategories[0].mFilter = 0;
-        mCategories[0].mResultType = 1;
+        mCategories[0].mLocalStatsCategory = 1;
         mCategories[1].mPersistentCategory =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_4 : NETWORK_PERSISTENT_CATEGORY_1;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY : NETWORK_PERSISTENT_STRIKER_OF_DAY;
         mCategories[1].mFilter = 2;
-        mCategories[1].mResultType = 1;
+        mCategories[1].mLocalStatsCategory = 1;
         mCategories[2].mPersistentCategory =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_SEASON : NETWORK_PERSISTENT_SEASON;
         mCategories[2].mFilter = 0;
-        mCategories[2].mResultType = 0;
+        mCategories[2].mLocalStatsCategory = 0;
         mCategories[3].mPersistentCategory =
-            alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
+            alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_SEASON : NETWORK_PERSISTENT_SEASON;
         mCategories[3].mFilter = 2;
-        mCategories[3].mResultType = 0;
-        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_2;
+        mCategories[3].mLocalStatsCategory = 0;
+        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_FRIENDS;
         mCategories[4].mFilter = 1;
-        mCategories[4].mResultType = 2;
-        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_2;
+        mCategories[4].mLocalStatsCategory = 2;
+        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_FRIENDS;
         mCategories[5].mFilter = 1;
-        mCategories[5].mResultType = 2;
+        mCategories[5].mLocalStatsCategory = 2;
     }
     else
     {
-        mPersistentCategories[0] = NETWORK_PERSISTENT_CATEGORY_0;
-        mPersistentCategories[1] = NETWORK_PERSISTENT_CATEGORY_1;
-        mPersistentCategories[2] = NETWORK_PERSISTENT_CATEGORY_2;
+        mPersistentCategories[0] = NETWORK_PERSISTENT_SEASON;
+        mPersistentCategories[1] = NETWORK_PERSISTENT_STRIKER_OF_DAY;
+        mPersistentCategories[2] = NETWORK_PERSISTENT_FRIENDS;
 
-        mCategories[0].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_1;
+        mCategories[0].mPersistentCategory = NETWORK_PERSISTENT_STRIKER_OF_DAY;
         mCategories[0].mFilter = 0;
-        mCategories[0].mResultType = 1;
-        mCategories[1].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_1;
+        mCategories[0].mLocalStatsCategory = 1;
+        mCategories[1].mPersistentCategory = NETWORK_PERSISTENT_STRIKER_OF_DAY;
         mCategories[1].mFilter = 2;
-        mCategories[1].mResultType = 1;
-        mCategories[2].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
+        mCategories[1].mLocalStatsCategory = 1;
+        mCategories[2].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
         mCategories[2].mFilter = 0;
-        mCategories[2].mResultType = 0;
-        mCategories[3].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
+        mCategories[2].mLocalStatsCategory = 0;
+        mCategories[3].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
         mCategories[3].mFilter = 2;
-        mCategories[3].mResultType = 0;
-        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
+        mCategories[3].mLocalStatsCategory = 0;
+        mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
         mCategories[4].mFilter = 1;
-        mCategories[4].mResultType = 0;
-        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_CATEGORY_0;
+        mCategories[4].mLocalStatsCategory = 0;
+        mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
         mCategories[5].mFilter = 1;
-        mCategories[5].mResultType = 0;
+        mCategories[5].mLocalStatsCategory = 0;
     }
 }
 
@@ -207,7 +207,7 @@ bool NetworkStatsManager::RequestRankings(int category)
     }
 
     leaderboard.mCount = 0;
-    leaderboard.mFirstRank = -1;
+    leaderboard.mLocalPlayerIndex = -1;
     tDebugPrintManager::Print(DC_NETWORK,
         "Initial failure GetLeaderboardStats cat %d filter %d\n",
         leaderboard.mPersistentCategory,
@@ -232,11 +232,11 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
             if (slot->unknown_0x01C == leaderboard->mPlayers[i].mProfileId
                 && leaderboard->mPlayers[i].mName[0] != 0)
             {
-                leaderboard->mFirstRank = i;
+                leaderboard->mLocalPlayerIndex = i;
                 bool apply = false;
                 if (updateProfile)
                 {
-                    if (leaderboard->mResultType == 2)
+                    if (leaderboard->mLocalStatsCategory == 2)
                     {
                         apply = true;
                     }
@@ -247,11 +247,11 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
                 }
                 if (apply)
                 {
-                    mHasLocalStats[leaderboard->mResultType] = true;
-                    mLocalStats[leaderboard->mResultType] = leaderboard->mMetadata[i];
-                    if (leaderboard->mResultType == 0 && leaderboard->mFilter == 0)
+                    mHasLocalStats[leaderboard->mLocalStatsCategory] = true;
+                    mLocalStats[leaderboard->mLocalStatsCategory] = leaderboard->mMetadata[i];
+                    if (leaderboard->mLocalStatsCategory == 0 && leaderboard->mFilter == 0)
                     {
-                        NetworkRankingMeta& record = mLocalStats[leaderboard->mResultType];
+                        NetworkRankingMeta& record = mLocalStats[leaderboard->mLocalStatsCategory];
                         int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
                         int* pendingLosses = GameInfoManager::GetInstance()->GetUnknown0xA9C(gNetworkSaveSlotIndex);
                         int wins = *pendingWins;
@@ -278,7 +278,7 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
         {
             if (nlStrICmp(gNetworkMiiNameWide, leaderboard->mPlayers[i].mName) == 0)
             {
-                leaderboard->mFirstRank = i;
+                leaderboard->mLocalPlayerIndex = i;
                 if (leaderboard->mFilter == 0)
                 {
                     mHasLocalStats[leaderboard->mPersistentCategory] = true;
@@ -342,7 +342,7 @@ void NetworkStatsManager::UpdateFriendRankingNames(
                 {
                     nlStrNCpy(name, leaderboard->mPlayers[i].mName, 11);
                 }
-                *region = leaderboard->mMetadata[i].mUnidentified14;
+                *region = leaderboard->mMetadata[i].mOnlineRegion;
             }
         }
     }
@@ -353,7 +353,7 @@ void NetworkStatsManager::BuildFriendsLeaderboard()
     NetworkLeaderboardCategory& source = mCategories[4];
     NetworkLeaderboardCategory& friends = mCategories[5];
     friends.mAvailable = true;
-    friends.mFirstRank = -1;
+    friends.mLocalPlayerIndex = -1;
     friends.mCount = 0;
 
     int write = 0;
@@ -419,7 +419,7 @@ static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
         manager->mLeaderboardRequestSucceeded = false;
         manager->mCategories[manager->mRequestedCategory].mAvailable = false;
         manager->mCategories[manager->mRequestedCategory].mCount = 0;
-        manager->mCategories[manager->mRequestedCategory].mFirstRank = -1;
+        manager->mCategories[manager->mRequestedCategory].mLocalPlayerIndex = -1;
         tDebugPrintManager::Print(DC_NETWORK,
             "Unavailable Leaderboard Stats cat %d filter %d\n",
             result.mCategory,
@@ -428,7 +428,7 @@ static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
         {
             manager->mCategories[5].mAvailable = false;
             manager->mCategories[5].mCount = 0;
-            manager->mCategories[5].mFirstRank = -1;
+            manager->mCategories[5].mLocalPlayerIndex = -1;
         }
     }
     else
@@ -440,7 +440,7 @@ static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
             result.mFilter);
         manager->mCategories[manager->mRequestedCategory].mAvailable = true;
         manager->mCategories[manager->mRequestedCategory].mCount = result.mCount;
-        manager->mCategories[manager->mRequestedCategory].mFirstRank = -1;
+        manager->mCategories[manager->mRequestedCategory].mLocalPlayerIndex = -1;
         if (result.mFilter == 1)
         {
             GetRegion();
@@ -478,7 +478,7 @@ bool NetworkStatsManager::PostResetMyPlayerStats(
         mLocalStats[category].mDisplayRank = 0;
         mLocalStats[category].mWins = 0;
         mLocalStats[category].mLosses = 0;
-        mLocalStats[category].mUnidentified14 = 0;
+        mLocalStats[category].mOnlineRegion = 0;
         mLocalStats[category].LoadLocal();
     }
     mHasLocalStats[category] = true;
@@ -520,19 +520,19 @@ void NetworkStatsManager::OnSubmitScoreResult(
     }
 }
 
-int CalculateResultPoints_80130684(int result, bool home, int homeScore,
+int CalculateNetworkResultPoints(int result, bool home, int homeScore,
     int awayScore, bool* won, bool* tied, int* resultPoints,
-    int* scorePoints, int* bonusPoints)
+    int* goalPoints, int* bonusPoints)
 {
     *won = false;
     *tied = false;
     *resultPoints = 0;
-    *scorePoints = 0;
+    *goalPoints = 0;
     *bonusPoints = 0;
 
     if (home)
     {
-        *scorePoints = homeScore > 10 ? 10 : homeScore;
+        *goalPoints = homeScore > 10 ? 10 : homeScore;
         if (homeScore > awayScore)
         {
             *resultPoints = 10;
@@ -545,7 +545,7 @@ int CalculateResultPoints_80130684(int result, bool home, int homeScore,
     }
     else
     {
-        *scorePoints = awayScore > 10 ? 10 : awayScore;
+        *goalPoints = awayScore > 10 ? 10 : awayScore;
         if (awayScore > homeScore)
         {
             *resultPoints = 10;
@@ -565,10 +565,10 @@ int CalculateResultPoints_80130684(int result, bool home, int homeScore,
     else if (result == 2)
     {
         *resultPoints = 0;
-        *scorePoints = 0;
+        *goalPoints = 0;
         *won = false;
     }
-    return *resultPoints + *scorePoints + *bonusPoints;
+    return *resultPoints + *goalPoints + *bonusPoints;
 }
 
 void NetworkStatsManager::UpdateOnlineResultTotals(
@@ -588,11 +588,11 @@ void NetworkStatsManager::UpdateOnlineResultTotals(
     details.mWon = false;
     details.mTied = false;
     details.mResultPoints = 0;
-    details.mScorePoints = 0;
+    details.mGoalPoints = 0;
     details.mBonusPoints = 0;
-    details.mPoints = CalculateResultPoints_80130684(result, home, homeScore,
+    details.mPoints = CalculateNetworkResultPoints(result, home, homeScore,
         awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
-        &details.mScorePoints, &details.mBonusPoints);
+        &details.mGoalPoints, &details.mBonusPoints);
 
     int* wins = GameInfoManager::GetInstance()->GetUnknown0xAA0(gNetworkSaveSlotIndex);
     int* losses = GameInfoManager::GetInstance()->GetUnknown0xAA4(gNetworkSaveSlotIndex);
@@ -662,11 +662,11 @@ void NetworkStatsManager::ReportDefaultDisconnectLoss()
         {
             int oldPoints = mLocalStats[category].mScore;
             int pointsLost = oldPoints < 5 ? oldPoints : 5;
-            mUnidentifiedC41C[category] = pointsLost;
+            mDisconnectPointsLost[category] = pointsLost;
             mDisconnectLossPending[category] = true;
             mLocalStats[category].mScore -= pointsLost;
             ++mLocalStats[category].mLosses;
-            mLocalStats[category].mUnidentified14 = GetOnlineRegion();
+            mLocalStats[category].mOnlineRegion = GetOnlineRegion();
 
             tDebugPrintManager::Print(DC_NETWORK,
                 "ReportDefaultDisconnectLoss: pers cat %d oldPoints %d new points %d New W:L %d:%d OneBasedRegion:%d\n",
@@ -675,7 +675,7 @@ void NetworkStatsManager::ReportDefaultDisconnectLoss()
                 mLocalStats[category].mScore,
                 mLocalStats[category].mWins,
                 mLocalStats[category].mLosses,
-                mLocalStats[category].mUnidentified14);
+                mLocalStats[category].mOnlineRegion);
 
             localStats[category].LoadLocal();
         }
@@ -706,22 +706,22 @@ void NetworkStatsManager::ReportGameResult(int result,
         details.mWon = false;
         details.mTied = false;
         details.mResultPoints = 0;
-        details.mScorePoints = 0;
+        details.mGoalPoints = 0;
         details.mBonusPoints = 0;
 
         if (fallback == 0)
         {
             if (!mGameResultReported)
             {
-                details.mPoints = CalculateResultPoints_80130684(result, reportHome,
+                details.mPoints = CalculateNetworkResultPoints(result, reportHome,
                     homeScore, awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
-                    &details.mScorePoints, &details.mBonusPoints);
-                mCurrentJob = details.mPoints;
-                mUnidentifiedC430 = details.mWon;
-                mUnidentifiedC431 = details.mTied;
-                mUnidentifiedC434 = details.mResultPoints;
-                mUnidentifiedC438 = details.mScorePoints;
-                mUnidentifiedC43C = details.mBonusPoints;
+                    &details.mGoalPoints, &details.mBonusPoints);
+                mLastTotalPoints = details.mPoints;
+                mLastGameWon = details.mWon;
+                mLastGameTied = details.mTied;
+                mLastResultPoints = details.mResultPoints;
+                mLastGoalPoints = details.mGoalPoints;
+                mLastBonusPoints = details.mBonusPoints;
             }
             else if (result == 0)
             {
@@ -732,12 +732,12 @@ void NetworkStatsManager::ReportGameResult(int result,
         }
         else
         {
-            mCurrentJob = 0;
-            mUnidentifiedC430 = false;
-            mUnidentifiedC431 = false;
-            mUnidentifiedC434 = 0;
-            mUnidentifiedC438 = 0;
-            mUnidentifiedC43C = 0;
+            mLastTotalPoints = 0;
+            mLastGameWon = false;
+            mLastGameTied = false;
+            mLastResultPoints = 0;
+            mLastGoalPoints = 0;
+            mLastBonusPoints = 0;
         }
 
         bool restoreDisconnectLoss = result == 0 ? IsCurrentSeriesComplete() : true;
@@ -784,16 +784,16 @@ void NetworkStatsManager::ReportGameResult(int result,
                         ++mLocalStats[category].mLosses;
                     }
                 }
-                mUnidentifiedC41C[category] = 0;
+                mDisconnectPointsLost[category] = 0;
                 mDisconnectLossPending[category] = false;
             }
             else if (mDisconnectLossPending[category]
                 && restoreDisconnectLoss)
             {
-                pointsScored += mUnidentifiedC41C[category];
+                pointsScored += mDisconnectPointsLost[category];
                 mLocalStats[category].mScore += pointsScored;
                 tDebugPrintManager::Print(DC_NETWORK, "Returning Default Disconnect Loss\n");
-                mUnidentifiedC41C[category] = 0;
+                mDisconnectPointsLost[category] = 0;
                 mDisconnectLossPending[category] = false;
                 if (result == 2)
                 {
@@ -837,7 +837,7 @@ void NetworkStatsManager::ReportGameResult(int result,
             {
                 mLocalStats[category].mLosses = 9999;
             }
-            mLocalStats[category].mUnidentified14 = GetOnlineRegion();
+            mLocalStats[category].mOnlineRegion = GetOnlineRegion();
 
             tDebugPrintManager::Print(DC_NETWORK,
                 "ReportGameResult: pers cat %d oldPoints %d + points scored %d = new points %d IWon: %d New W:L %d:%d OneBasedRegion:%d\n",
@@ -848,7 +848,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 details.mWon,
                 mLocalStats[category].mWins,
                 mLocalStats[category].mLosses,
-                mLocalStats[category].mUnidentified14);
+                mLocalStats[category].mOnlineRegion);
 
             localStats->LoadLocal();
         }
@@ -897,9 +897,9 @@ void NetworkStatsManager::SubmitJob(int job)
     tDebugPrintManager::Print(DC_NETWORK, "ERROR JobsQ full failed to submit %d\n", job);
 }
 
-void NetworkStatsManager::RefreshSaveState_801314D0()
+void NetworkStatsManager::RefreshFriendCount()
 {
-    mSaveState = g_pFriendManager->CountBuddies();
+    mCachedFriendCount = g_pFriendManager->CountBuddies();
 }
 
 void NetworkStatsManager::ClearGameResultReported()
@@ -911,11 +911,11 @@ void NetworkStatsManager::ResetPregameDisconnectState()
 {
     mGameResultReported = false;
     mDisconnectPending = false;
-    mUnidentifiedC41C[0] = 0;
+    mDisconnectPointsLost[0] = 0;
     mDisconnectLossPending[0] = false;
-    mUnidentifiedC41C[1] = 0;
+    mDisconnectPointsLost[1] = 0;
     mDisconnectLossPending[1] = false;
-    mUnidentifiedC41C[2] = 0;
+    mDisconnectPointsLost[2] = 0;
     mDisconnectLossPending[2] = false;
     if (IsOnlineRankedMatch())
     {
@@ -958,7 +958,7 @@ void NetworkStatsManager::PreGameRestoreDefaultDisconnectLoss()
     }
 }
 
-bool NetworkStatsManager::RefreshFriendStats_80131B50()
+bool NetworkStatsManager::RefreshRankings()
 {
     if (mOperation == 0 && g_pNetworkSession->mLoginStage == 14)
     {
@@ -970,43 +970,43 @@ bool NetworkStatsManager::RefreshFriendStats_80131B50()
             mSaveDataChanged = false;
         }
         int count = g_pFriendManager->CountBuddies();
-        if (count != mSaveState)
+        if (count != mCachedFriendCount)
         {
-            tDebugPrintManager::Print(DC_NETWORK, "Num friends changed from %d to %d\n", mSaveState, count);
+            tDebugPrintManager::Print(DC_NETWORK, "Num friends changed from %d to %d\n", mCachedFriendCount, count);
             SubmitJob(10);
-            mUnidentifiedC410 = -1;
+            mNextLeaderboardJobIndex = -1;
             for (int i = 0; i < 5; ++i)
             {
                 if (sLeaderboardJobs[i] != 10)
                 {
-                    mUnidentifiedC410 = i;
+                    mNextLeaderboardJobIndex = i;
                     break;
                 }
             }
-            mSaveState = count;
+            mCachedFriendCount = count;
         }
         if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sRankingRequestTimeout)
             PreGameRestoreDefaultDisconnectLoss();
         if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sSecondsPerMinute)
         {
-            SubmitJob(sLeaderboardJobs[mUnidentifiedC410]);
-            ++mUnidentifiedC410;
-            if (mUnidentifiedC410 >= 5)
-                mUnidentifiedC410 = 0;
+            SubmitJob(sLeaderboardJobs[mNextLeaderboardJobIndex]);
+            ++mNextLeaderboardJobIndex;
+            if (mNextLeaderboardJobIndex >= 5)
+                mNextLeaderboardJobIndex = 0;
         }
     }
     return true;
 }
 
-static inline void BeginOnlineGame(NetworkStatsManager* manager)
+static inline void PrepareOnlineGame(NetworkStatsManager* manager)
 {
     manager->mGameResultReported = false;
     manager->mDisconnectPending = false;
-    manager->mUnidentifiedC41C[0] = 0;
+    manager->mDisconnectPointsLost[0] = 0;
     manager->mDisconnectLossPending[0] = false;
-    manager->mUnidentifiedC41C[1] = 0;
+    manager->mDisconnectPointsLost[1] = 0;
     manager->mDisconnectLossPending[1] = false;
-    manager->mUnidentifiedC41C[2] = 0;
+    manager->mDisconnectPointsLost[2] = 0;
     manager->mDisconnectLossPending[2] = false;
     if (!IsOnlineRankedMatch())
     {
@@ -1019,9 +1019,9 @@ static inline void BeginOnlineGame(NetworkStatsManager* manager)
     manager->SubmitJob(10);
 }
 
-void NetworkStatsManager::BeginOnlineGame_80131DB4()
+void NetworkStatsManager::BeginOnlineGame()
 {
-    BeginOnlineGame(this);
+    PrepareOnlineGame(this);
 }
 
 void NetworkStatsManager::Update(float dt)
@@ -1146,14 +1146,14 @@ void NetworkStatsManager::Update(float dt)
 
 }
 
-int GetLocalPlayingSide_801323F4()
+int GetLocalNetworkPlayingSide()
 {
     s8 machine = g_pNetworkSessionBase->GetLocalMachineId();
     s8 player = GetNetworkPlayerId(0, machine);
     return GameInfoManager::GetInstance()->GetPlayingSide(player);
 }
 
-void NetworkStatsManager::HandleDisconnect_8013243C(int result)
+void NetworkStatsManager::ReportDisconnect(int result)
 {
     if (!IsOnlineRankedMatch())
     {
@@ -1163,13 +1163,13 @@ void NetworkStatsManager::HandleDisconnect_8013243C(int result)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "A disc error previously occured.  Exiting PreGameRestoreDefaultDisconnectLoss\n");
-        BeginOnlineGame(this);
+        PrepareOnlineGame(this);
         return;
     }
 
     ReportGameResult(result, 0, 0, false, 0, 0,
         reinterpret_cast<const NetworkScoreSubmission*>(1));
-    BeginOnlineGame(this);
+    PrepareOnlineGame(this);
 }
 
 void NetworkStatsManager::CalculateAndReportGameResult(int result)
@@ -1204,7 +1204,7 @@ void NetworkStatsManager::CalculateAndReportGameResult(int result)
 
     NetworkStatsPlayer home;
     NetworkStatsPlayer away;
-    int playingSide = GetLocalPlayingSide_801323F4();
+    int playingSide = GetLocalNetworkPlayingSide();
 
     NetworkDraftTeam* homeTeam;
     NetworkDraftTeam* awayTeam;

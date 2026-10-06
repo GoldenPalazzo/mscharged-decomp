@@ -581,7 +581,7 @@ void NetworkSession::Update()
                     entries[player].mStats.mDisplayRank = 0;
                     entries[player].mStats.mWins = 0;
                     entries[player].mStats.mLosses = 0;
-                    entries[player].mStats.mUnidentified14 = 0;
+                    entries[player].mStats.mOnlineRegion = 0;
                     entries[player].mStats.mDisplayRank =
                         info->mDisplayRank;
                     entries[player].mStats.mWins =
@@ -1396,7 +1396,7 @@ void NetworkSession::UpdateLogin()
             mLoginStage = 0xE;
             g_pNetworkSession->SetSessionState(2);
             mLoginListener->OnStatsResult(true);
-            NetworkStatsManager::Instance()->RefreshSaveState_801314D0();
+            NetworkStatsManager::Instance()->RefreshFriendCount();
             gNetworkMiiChanged = 0;
         }
         else
@@ -2269,7 +2269,7 @@ void NetworkSession::BaseVirtual48(int reason)
 
     if (GetSessionMode() == 2)
     {
-        NetworkStatsManager::Instance()->BeginOnlineGame_80131DB4();
+        NetworkStatsManager::Instance()->BeginOnlineGame();
     }
 }
 
@@ -2520,7 +2520,7 @@ void NetworkSession::OnGameConnectionLost(u32 connection, int reason)
         {
             if (NetworkStatsManager::Instance()->ShouldRestoreDefaultDisconnectLoss())
             {
-                NetworkStatsManager::Instance()->HandleDisconnect_8013243C(4);
+                NetworkStatsManager::Instance()->ReportDisconnect(4);
             }
         }
         else
