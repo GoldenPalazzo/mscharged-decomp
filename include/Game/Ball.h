@@ -211,6 +211,7 @@ extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
 extern "C" float fn_800156A8(cBall* pBall);
 extern "C" bool fn_80016768(cBall* pBall);
 extern "C" bool fn_800167A8(cBall* pBall);
+extern "C" bool fn_800167E8(cBall* pBall);
 extern "C" void fn_800180F4( cBall* pBall, nlVector3* pPosition, float fTime);
 extern "C" void fn_8001847C(cBall* pBall, bool bParam);
 extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);

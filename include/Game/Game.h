@@ -50,9 +50,6 @@ public:
     virtual ~cGame();
 
     cGame(void* param1, int param2, bool param3);
-    void fn_80061AF0();
-    void fn_80061AF4();
-
     void fn_80057FC0();
     void fn_80057FD8(bool param1);
     void fn_80058180();

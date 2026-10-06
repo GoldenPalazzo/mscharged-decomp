@@ -8,16 +8,14 @@ extern "C" void fn_8007214C(ShotAtGoalData* node)
     g_ShotAtGoalDataPool.Free(node);
 }
 
-extern "C" void fn_80072164(UnidentifiedRegistrationNode* node)
+extern "C" void fn_80072164(NISData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_NISDataPool.m_FreeList;
-    g_NISDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_NISDataPool.Free(node);
 }
 
-extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node)
+extern "C" void fn_8007217C(CollisionCrowdData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_CollisionCrowdDataPool.m_FreeList;
-    g_CollisionCrowdDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_CollisionCrowdDataPool.Free(node);
 }
 
 extern "C" void fn_80072194(PlayerAttackData* node)

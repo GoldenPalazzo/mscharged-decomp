@@ -41,7 +41,6 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Player.h"
-#include "Game/AI/AvoidableObject.h"
 #include "Game/Render/ShootToScoreArrow.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/PeachPhoto.h"
@@ -97,10 +96,7 @@
 #include "Game/NetworkSync.h"
 #include "Game/DB/StadiumInfo.h"
 
-extern PowerupBase* g_pPowerups[];
-extern "C" const nlVector3 lbl_804DBFE8;
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
-extern "C" bool fn_800167E8(cBall* pBall);
 extern "C" void fn_800406B0(cFielder* pFielder, float numBalls, float accuracy);
 
 struct UnidentifiedGameSnapshot
@@ -111,66 +107,52 @@ struct UnidentifiedGameSnapshot
     float mUnidentified1F4[10];
 };
 
-struct UnidentifiedRegistrationNode
-{
-    UnidentifiedRegistrationNode* mNext;
-};
-
 extern "C" EventDispatcher* fn_800721C4();
 extern "C" void fn_80072134(LightningStrikeData* node);
 extern "C" void fn_8007214C(ShotAtGoalData* node);
-extern "C" void fn_80072164(UnidentifiedRegistrationNode* node);
-extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node);
+extern "C" void fn_80072164(NISData* node);
+extern "C" void fn_8007217C(CollisionCrowdData* node);
 extern "C" void fn_80072194(PlayerAttackData* node);
-extern "C" int GetAudioPauseDepth();
-extern "C" void ResumeAllAudio();
-extern "C" void fn_800EDC2C();
-extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
-extern void PlaySuddenDeathMusic();
-extern void StopSuddenDeathMusic();
 
 // Tweak "Megastrike/Score differential": when positive, it overrides the
 // mega strike shot count (fn_80058498).
 TweakValueInt lbl_8056B9A0("Score differential", "Megastrike", -1, false);
-extern "C" char lbl_804FB060[];
 
 // Game tuning values (.sdata), in retail order.
 // Countdown beeps played before the end of a match.
 int lbl_806DBA68 = 5;
 // Field tilt force scale (fn_80061B1C).
-extern "C" float lbl_806DBA6C = 0.8f;
+float lbl_806DBA6C = 0.8f;
 // Time the field takes to level out, and the hold before it starts.
-extern "C" float lbl_806DBA70 = 3.0f;
-extern "C" float lbl_806DBA74 = 3.0f;
+float lbl_806DBA70 = 3.0f;
+float lbl_806DBA74 = 3.0f;
 // Weather tilt range scale on each axis.
-extern "C" float lbl_806DBA78 = 0.5f;
-extern "C" float lbl_806DBA7C = 8.0f;
-extern "C" float lbl_806DBA80 = 4.0f;
-extern "C" float lbl_806DBA84 = 10.0f;
+float lbl_806DBA78 = 0.5f;
+float lbl_806DBA7C = 8.0f;
+float lbl_806DBA80 = 4.0f;
+float lbl_806DBA84 = 10.0f;
 // Weather tilt ramp-up period.
-extern "C" float lbl_806DBA88 = 12.0f;
+float lbl_806DBA88 = 12.0f;
 // Score-difference tilt: clamp and scale.
-extern "C" float lbl_806DBA8C = 6.0f;
-extern "C" float lbl_806DBA90 = 1.0f;
+float lbl_806DBA8C = 6.0f;
+float lbl_806DBA90 = 1.0f;
 // Weather tilt target speed range.
-extern "C" float lbl_806DBA94 = 12.0f;
-extern "C" float lbl_806DBA98 = 1.0f;
+float lbl_806DBA94 = 12.0f;
+float lbl_806DBA98 = 1.0f;
 // Weather tilt direction jitter.
-extern "C" int lbl_806DBA9C = 1000;
+int lbl_806DBA9C = 1000;
 // Seek speeds: weather tilt, levelling during shoot-to-score, score tilt.
-extern "C" float lbl_806DBAA0 = 1.0f;
-extern "C" float lbl_806DBAA4 = 2.0f;
-extern "C" float lbl_806DBAA8 = 2.0f;
-extern "C" int lbl_806DBAAC = 3;
+float lbl_806DBAA0 = 1.0f;
+float lbl_806DBAA4 = 2.0f;
+float lbl_806DBAA8 = 2.0f;
+int lbl_806DBAAC = 3;
 
 
 // .sbss, in retail order. The first two are debug overrides that force the
 // weather and score field tilt on.
-extern "C" {
 bool lbl_806E0C90;
 bool lbl_806E0C91;
-}
 cGame* g_pGame;
 bool lbl_806E0C98;
 
@@ -252,8 +234,6 @@ static inline int GetTeamScoreDifference(cTeam* team)
     return team->GetScore() - team->GetOtherTeam()->GetScore();
 }
 
-// Receives the custom deterministic data queued by the Send* helpers above.
-
 inline void cGame::UpdatePowerUpObjects(float fDeltaT)
 {
     for (int i = 0; i < 25; i++)
@@ -264,8 +244,6 @@ inline void cGame::UpdatePowerUpObjects(float fDeltaT)
         }
     }
 }
-
-// cGame::Update: one fixed-update step of the match.
 
 static inline int GetSyncPlayerIndex(cPlayer* pPlayer)
 {
@@ -290,83 +268,6 @@ private:
     cGame* mGame;
     int mIndex;
 };
-
-// Writes the deterministic game state to the network sync log.
-
-// ShotPresentation
-
-// ShotPresentationEnd
-
-// CaptainClashPresentation
-
-// WindupPresentation
-
-// WindupPresentationEnd
-
-// LightningStrike
-
-// GoalieSave
-
-// GoalieKick
-
-// GoalieCatch
-
-// GoalieExert
-
-// MegastrikeEnd: the captain's mega strike is over. Its goals count for the
-// attacking side, the game state moves on and the result is announced.
-
-// CollisionCrowd
-
-// GoalieDekeAttackAttempt
-
-// GoalieDekeAttackSuccess
-
-// GoalieSlamAttackAttempt
-
-// GoalieSlamAttackSuccess
-
-// AttackAttempt
-
-// AttackSuccess
-
-// ShotAtGoal
-
-// WindupShot
-
-// MegaStrikeMeterStart
-
-// MegaStrikeMeterFirst
-
-// MegaStrikeMeterSecond
-
-// MegaStrikeIntro
-
-// MegaStrikeMeterEnd
-
-// PeachFlash
-
-// PeachCameraFlash
-
-// PeachCamerasDown
-
-// PeachCamerasAway
-
-// WaluigiWallStart
-
-// WaluigiWallEnd
-
-// WaluigiWallAbort
-
-// SuperPresentation
-
-// BulletBillExplode
-
-// MontyReappear
-
-// HammerBroHammer
-
-// WarioGroundPound
 
 float fn_80056CA4()
 {
@@ -1896,8 +1797,8 @@ void cGame::SetPotentialScorer(cPlayer* pPlayer)
     }
 }
 // Sync log type ids, registered on first use (fn_8005B840).
-extern "C" u16 lbl_806DBAB2 = 0xFFFF;
-extern "C" u16 lbl_806DBAB4 = 0xFFFF;
+u16 lbl_806DBAB2 = 0xFFFF;
+u16 lbl_806DBAB4 = 0xFFFF;
 
 inline void UnidentifiedGameSnapshot::RegisterDebugFields(DebugWriteCache* cache)
 {
@@ -2398,8 +2299,7 @@ extern "C" void fn_8005E29C(cGame* pGame, CollisionCrowdData* pData)
         return;
     }
     pGame->mUnidentified49C.mEvent32.Queue(
-        pData, Function<CollisionCrowdData*>(
-                   (void (*)(CollisionCrowdData*))fn_8007217C));
+        pData, Function<CollisionCrowdData*>(fn_8007217C));
 }
 extern "C" void fn_8005E408(cGame* pGame, const PlayerAttackData* pData)
 {

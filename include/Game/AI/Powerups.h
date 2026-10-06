@@ -15,6 +15,8 @@ class SFXEmitter;
 class PowerupBase;
 class AvoidableObject;
 
+extern PowerupBase* g_pPowerups[25];
+
 struct PowerupSounds
 {
     /* 0x00 */ unsigned long sndAcquire;
