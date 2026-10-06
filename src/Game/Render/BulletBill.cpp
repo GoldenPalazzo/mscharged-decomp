@@ -22,9 +22,9 @@
 
 extern "C" DrawableBulletBill& fn_8018755C(RenderSnapshot*, unsigned int);
 
-static const nlVector3 lbl_804DCDB8 = { 0.0f, 0.0f, 0.0f };
-static const nlVector3 lbl_804DCDC4 = { 0.0f, -20.0f, -10.0f };
-static float lbl_806DCD80 = 1.25f;
+static const nlVector3 sHiddenBulletBillVelocity = { 0.0f, 0.0f, 0.0f };
+static const nlVector3 sHiddenBulletBillPosition = { 0.0f, -20.0f, -10.0f };
+static float sBulletBillEndReactionPlaybackSpeed = 1.25f;
 
 BulletBillObject::BulletBillObject(
     RenderObject* pDrawable, u32 nIndex, float radius, float parameter)
@@ -176,13 +176,13 @@ void BulletBillObject::Hide(bool destroyEffect)
             if (!target->IsFallenDown())
             {
                 target->InitActionSlideAttackReact(target, false);
-                target->m_pCurrentAnimController->m_fPlaybackSpeedScale = lbl_806DCD80;
+                target->m_pCurrentAnimController->m_fPlaybackSpeedScale = sBulletBillEndReactionPlaybackSpeed;
             }
             EmitShyGuyBulletEnd(target);
             fn_800367B4(target);
         }
-        position = lbl_804DCDC4;
-        velocity = lbl_804DCDB8;
+        position = sHiddenBulletBillPosition;
+        velocity = sHiddenBulletBillVelocity;
         physics->SetPosition(position, PhysicsObject::WORLD_COORDINATES);
         active = false;
     }
