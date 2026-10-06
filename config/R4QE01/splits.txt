@@ -182,7 +182,7 @@ Game/Game.cpp:
 	.text       start:0x80056CA4 end:0x800739F0
 	.ctors      start:0x804DB524 end:0x804DB528
 	.rodata     start:0x804DBFE8 end:0x804DBFF8
-	.data       start:0x804FB060 end:0x804FC7F0
+	.data       start:0x804FB060 end:0x804FC7B8
 	.bss        start:0x8056B990 end:0x8056BA00
 	.sdata      start:0x806DBA68 end:0x806DBAE8
 	.sbss       start:0x806E0C90 end:0x806E0D10
@@ -195,7 +195,7 @@ Game/TweakFileLoader.cpp:
 Game/GameTweaksManager.cpp:
 	.text       start:0x80073C98 end:0x80074F04
 	.ctors      start:0x804DB528 end:0x804DB52C
-	.data       start:0x804FC7F0 end:0x804FC8C0
+	.data       start:0x804FC7B8 end:0x804FC8C0
 	.bss        start:0x8056BA00 end:0x8056CF28
 	.sdata      start:0x806DBAE8 end:0x806DBB00
 
