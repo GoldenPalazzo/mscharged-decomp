@@ -8,7 +8,7 @@
 #include "NL/plat/WiiRemotePad.h"
 #include "NL/plat/WiiFreestylePad.h"
 #include "NL/plat/GameCubePad.h"
-#include "Game/NetworkInput.h"
+#include "Game/NetworkPeer.h"
 
 static u8 PadPressureToByte(float pressure)
 {
