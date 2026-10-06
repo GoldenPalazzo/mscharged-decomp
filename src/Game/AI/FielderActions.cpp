@@ -3328,7 +3328,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     ShootToScoreMeter::instance.mbShowSavedWhiteBar = true;
 
-    mUnidentified3BC = (float)(s32)fn_800499EC(this, 0);
+    mUnidentified3BC = (float)(s32)GetMegaStrikeShotCount(this, 0);
 
     PlayRumbleAction(1, GetGlobalPad());
 
@@ -3373,7 +3373,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     ShootToScoreMeter::instance.m_v3MeterPosition
         = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 
-    mUnidentified3C0 = fn_80049CC0(this, 0);
+    mUnidentified3C0 = GetMegaStrikeAccuracy(this, 0);
 
     for (int i = 0; i < 2; i++)
     {
@@ -3437,7 +3437,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     }
 }
 
-extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
+float GetMegaStrikeShotCount(cFielder* pFielder, int nParam)
 {
     float fResult = pFielder->fn_800489C4();
     float fMeterMax = pFielder->fn_80048A08();
@@ -3505,7 +3505,7 @@ extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
     return (float)(s32)(fResult + fBias);
 }
 
-extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
+float GetMegaStrikeAccuracy(cFielder* pFielder, int nParam)
 {
     float fNeedle = -9999.0f;
     if (pFielder->mUnidentified3B8)

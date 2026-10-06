@@ -225,8 +225,8 @@ bool DesireMegaStrike::UpdateAIButtonPress(
     DesireUpdate* update, float)
 {
     bool bButtonPressed = false;
-    float fMeterResult = fn_800499EC(m_pFielder, 1);
-    float fMeterPosition = fn_80049CC0(m_pFielder, 1);
+    float fMeterResult = GetMegaStrikeShotCount(m_pFielder, 1);
+    float fMeterPosition = GetMegaStrikeAccuracy(m_pFielder, 1);
 
     if (update->mData.i == 3)
     {
