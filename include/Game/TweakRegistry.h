@@ -84,10 +84,10 @@ class TweakNode
 public:
     TweakNode();
     virtual ~TweakNode();
-    virtual int UnidentifiedVirtual0C();
+    virtual int IsEntry();
     virtual int UnidentifiedVirtual10() { return 1; }
     virtual TweakNode* UnidentifiedVirtual14() { return 0; }
-    virtual TweakEntry* UnidentifiedVirtual18();
+    virtual TweakEntry* AsEntry();
 
     TweakNode* GetNext() const { return m_Next; }
 
@@ -107,8 +107,8 @@ class TweakEntry : public TweakNode
 public:
     TweakEntry();
     virtual ~TweakEntry();
-    virtual int UnidentifiedVirtual0C();
-    virtual TweakEntry* UnidentifiedVirtual18();
+    virtual int IsEntry();
+    virtual TweakEntry* AsEntry();
     virtual int UnidentifiedVirtual1C();
     virtual TweakNode* UnidentifiedVirtual14();
 
@@ -121,11 +121,11 @@ public:
     /* 0x2A */ u8 m_Pad2A[2];
 }; // size: 0x2C
 
-inline int TweakEntry::UnidentifiedVirtual0C()
+inline int TweakEntry::IsEntry()
 {
     return 1;
 }
-inline TweakEntry* TweakEntry::UnidentifiedVirtual18()
+inline TweakEntry* TweakEntry::AsEntry()
 {
     return this;
 }
