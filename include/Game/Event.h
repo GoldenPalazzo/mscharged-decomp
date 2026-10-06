@@ -307,6 +307,20 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
     Remove(listener);
 }
 
+// Concrete immediate events retain their own runtime type while sharing the
+// listener storage and delivery implementation.
+template <typename T>
+class ImmediateEvent : public UnidentifiedEvent<T>
+{
+public:
+    ImmediateEvent(const char* name, int length)
+        : UnidentifiedEvent<T>(name, length)
+    {
+    }
+
+    virtual ~ImmediateEvent() { }
+};
+
 template <typename P1, typename P2, typename P3>
 struct UnidentifiedListener3 : public EventConnection
 {
