@@ -780,7 +780,7 @@ extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
         {
             aDirection = pSelf->m_pController->GetMovementStickDirection();
         }
-        float fScore = fn_800DAD84(pSelf->mUnidentified024.m_v3Position,
+        float fScore = DistanceAndAngleConfidence(pSelf->mUnidentified024.m_v3Position,
             pTarget->mUnidentified024.m_v3Position,
             aDirection,
             &v2Distance,

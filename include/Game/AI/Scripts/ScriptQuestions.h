@@ -49,7 +49,7 @@ extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
 extern "C" float fn_800DED80(cPlayer* pPlayer);
 extern "C" cFielder* fn_800DF790(cTeam* pTeam);
 
-extern "C" float fn_800DAD84(const nlVector3& vFrom, const nlVector3& vTo,
+float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     unsigned short aDirection, const nlVector2* pDistanceRange,
     const nlVector2* pAngleRange, bool bDistancePeak, bool bRequireInRange,
     float fDistanceWeight);
