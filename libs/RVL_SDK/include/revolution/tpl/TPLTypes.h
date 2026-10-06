@@ -22,7 +22,7 @@ typedef struct TPLHeader {
 typedef struct TPLClutHeader {
     unsigned short numEntries;   // at 0x0
     unsigned char unpacked;      // at 0x1
-    unsigned char pad8;          // at 0x2
+    unsigned char pad8;          // at 0x3
     GXTlutFmt format; // at 0x4
     char* data;       // at 0x8
 } TPLClutHeader;
