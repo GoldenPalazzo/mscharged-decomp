@@ -90,7 +90,7 @@ public:
 
     bool IsInFront() const { return (m_uFlags & 1) != 0; }
     bool IsLocalSpace() const { return (m_uFlags & 2) != 0; }
-    bool IsLit() const { return (m_uFlags & 4) != 0; }
+    bool DisablesDepthWrite() const { return (m_uFlags & 4) != 0; }
     float EvaluateProperty(unsigned int index, float time) const
     {
         return mProperties[index]->Evaluate(time);

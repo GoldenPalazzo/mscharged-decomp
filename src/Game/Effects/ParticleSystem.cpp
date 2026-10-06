@@ -952,7 +952,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                     blendType);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTest, 1);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTestRef, 3);
-                if ((m_pTemplate->m_uFlags & 4) != 0)
+                if (m_pTemplate->DisablesDepthWrite())
                     glSetRasterState(
                         pPacket->rasterState, GLS_DepthWrite, 0);
                 pPacket->matrix = hMatrix;
