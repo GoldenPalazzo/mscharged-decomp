@@ -69,8 +69,8 @@ static NetworkMessageFactory<NetMessageSidesChanged> sSidesChangedFactory;
 static NetworkMessageFactory<NetMessageCheckConnection> sFactoryType26;
 static NetworkMessageFactory<NetMessageConnectionDecision> sFactoryType27;
 static NetworkMessageFactory<NetMessageMegaBallPointer> sMegaBallPointerFactory;
-static NetworkMessageFactory<NetworkMessageType35>
-    sFactoryType35;
+static NetworkMessageFactory<NetMessageMegaStrikeMeter>
+    sMegaStrikeMeterFactory;
 
 void RegisterNetworkMessages_801258A8()
 {
@@ -95,5 +95,5 @@ void RegisterNetworkMessages_801258A8()
     gNetworkMessageRegistry->RegisterFactory(32, &sFactoryType32);
     gNetworkMessageRegistry->RegisterFactory(33, &sFactoryType33);
     gNetworkMessageRegistry->RegisterFactory(34, &sMegaBallPointerFactory);
-    gNetworkMessageRegistry->RegisterFactory(35, &sFactoryType35);
+    gNetworkMessageRegistry->RegisterFactory(35, &sMegaStrikeMeterFactory);
 }

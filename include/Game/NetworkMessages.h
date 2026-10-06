@@ -335,10 +335,10 @@ public:
     /* 0x0E */ u8 mStatus;
 };
 
-class NetworkMessageType35 : public NetworkMessage
+class NetMessageMegaStrikeMeter : public NetworkMessage
 {
 public:
-    NetworkMessageType35()
+    NetMessageMegaStrikeMeter()
         : mCount(0)
     {
         for (int i = 0; i < 8; ++i)
@@ -348,7 +348,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType35() { }
+    virtual ~NetMessageMegaStrikeMeter() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mCount;
