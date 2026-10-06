@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/ImpostorCharacter.h"
 #include "NL/gl/glTexture.h"
 

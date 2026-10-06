@@ -134,7 +134,8 @@ struct TweakType<int>
     typedef TweakValue<int> OwnedValue;
     typedef TweakIntBinding Binding;
 };
-inline void FormatOwnedTweakValue(char*, unsigned long, int);
+template <typename T>
+inline void FormatOwnedTweakValue(char*, unsigned long, T);
 inline void ParseOwnedTweakValue(int&, const char*);
 
 template <typename T>

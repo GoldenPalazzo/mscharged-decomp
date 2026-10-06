@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
 #include "NL/plat/WiiPad.h"
 #include "NL/plat/GameCubePad.h"
@@ -205,3 +207,5 @@ int PadMonkey::GetButtonMask(int buttonIndex)
 {
     return GetPadButtonMask(buttonIndex);
 }
+
+#include "Game/EventBase.inl"

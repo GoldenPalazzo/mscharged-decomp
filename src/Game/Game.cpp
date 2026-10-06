@@ -105,6 +105,7 @@ extern "C" void fn_800406B0(cFielder* pFielder, float numBalls, float accuracy);
 
 struct UnidentifiedGameSnapshot
 {
+    inline void RegisterDebugFields(DebugWriteCache* cache);
     u8 mPlayerIndices[100];
     float mDistances[100];
     float mUnidentified1F4[10];
@@ -172,7 +173,6 @@ bool lbl_806E0C91;
 }
 cGame* g_pGame;
 bool lbl_806E0C98;
-cPlayer* lbl_806E0C9C;
 
 static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
 {
@@ -474,6 +474,9 @@ void DestroyPowerups()
     g_pGame->ResetPowerups(false);
     CompactPowerups();
 }
+static inline const char* SuddenDeathEventName();
+static inline const char* GameOverEventName();
+
 cGame::cGame(void* param1, int param2, bool param3)
     : mUnidentified0C0((bool*)mUnidentified0D0, 100)
     , mUnidentified134((bool*)mUnidentified144, 16)
@@ -567,6 +570,9 @@ cGame::cGame(void* param1, int param2, bool param3)
     mUnidentified10E4[3] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, 41.2f, avoidableWidth);
 }
+static inline const char* SuddenDeathEventName() { return "SuddenDeath"; }
+static inline const char* GameOverEventName() { return "GameOver"; }
+
 cGame::~cGame()
 {
     StopSuddenDeathMusic();
@@ -1193,6 +1199,12 @@ void cGame::fn_80059B70(void* param1)
             = m_fCachedBallPlayerDistances[i];
     }
 }
+void cGame::PlayEndGamePresentation()
+{
+    GetPresentation()->PlayGoalEffects("Goal_endgame");
+    GetPresentation()->Call("GameEndNoSuddenDeath", "");
+}
+
 void cGame::SendNISLoadedCustomDeterm(u8 param1)
 {
     struct Message
@@ -1456,6 +1468,8 @@ void cGame::RandomizePlayerUpdateOrder()
         }
     }
 }
+cPlayer* lbl_806E0C9C;
+
 void cGame::fn_8005A7E8()
 {
     --lbl_806E2130;
@@ -1747,8 +1761,7 @@ void cGame::fn_8005A8FC(float fDeltaT)
         UnidentifiedCameraEffects::Instance()->ResetForPresentation((void*)nWinner);
         if (!DuringEndOfGamePresentation(GetPresentation()))
         {
-            GetPresentation()->PlayGoalEffects("Goal_endgame");
-            GetPresentation()->Call("GameEndNoSuddenDeath", "");
+            PlayEndGamePresentation();
         }
     }
 
@@ -1886,6 +1899,20 @@ void cGame::SetPotentialScorer(cPlayer* pPlayer)
 extern "C" u16 lbl_806DBAB2 = 0xFFFF;
 extern "C" u16 lbl_806DBAB4 = 0xFFFF;
 
+inline void UnidentifiedGameSnapshot::RegisterDebugFields(DebugWriteCache* cache)
+{
+    if (lbl_806DBAB2 == 0xFFFF)
+    {
+        lbl_806DBAB2 = cache->BeginType("GenDetPlayerC");
+        cache->AddArrayField(DEBUG_FIELD_U8, gDebugFieldTypes[DEBUG_FIELD_U8].size, 100, 0, "m_nClosestPlayers[0]");
+        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 100,
+            (u8*)mDistances - (u8*)this, "m_fCachedPlayerDistances[0]");
+        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 10,
+            (u8*)mUnidentified1F4 - (u8*)this, "m_fCachedBallPlayerDistances[0]");
+        cache->EndType();
+    }
+}
+
 inline void cGame::RegisterDetermGameFields(DebugWriteCache* cache)
 {
     if (lbl_806DBAB4 == 0xFFFF)
@@ -1962,16 +1989,7 @@ void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
     UnidentifiedGameSnapshot snapshot;
     fn_80059B70(&snapshot);
 
-    if (lbl_806DBAB2 == 0xFFFF)
-    {
-        lbl_806DBAB2 = cache->BeginType("GenDetPlayerC");
-        cache->AddArrayField(DEBUG_FIELD_U8, gDebugFieldTypes[DEBUG_FIELD_U8].size, 100, 0, "m_nClosestPlayers[0]");
-        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 100,
-            (u8*)snapshot.mDistances - (u8*)&snapshot, "m_fCachedPlayerDistances[0]");
-        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 10,
-            (u8*)snapshot.mUnidentified1F4 - (u8*)&snapshot, "m_fCachedBallPlayerDistances[0]");
-        cache->EndType();
-    }
+    snapshot.RegisterDebugFields(cache);
 
     cache->ChecksumData(lbl_806DBAB2, &snapshot, context);
     cache->WriteData(lbl_806DBAB2, &snapshot, sizeof(snapshot));
@@ -2671,9 +2689,9 @@ UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
 
 inline void cGame::RegisterEventListeners()
 {
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+    UnidentifiedFindEvent<UnidentifiedEventNoData>(SuddenDeathEventName(), -1)
         ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+    UnidentifiedFindEvent<UnidentifiedEventNoData>(GameOverEventName(), -1)
         ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
 }
 
@@ -2731,41 +2749,10 @@ extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
         }
     }
 }
-extern "C" void fn_80072134(LightningStrikeData* node)
-{
-    g_LightningStrikeDataPool.Free(node);
-}
-
-extern "C" void fn_8007214C(ShotAtGoalData* node)
-{
-    g_ShotAtGoalDataPool.Free(node);
-}
-
-extern "C" void fn_80072164(UnidentifiedRegistrationNode* node)
-{
-    node->mNext = (UnidentifiedRegistrationNode*)g_NISDataPool.m_FreeList;
-    g_NISDataPool.m_FreeList = (SlotPoolEntry*)node;
-}
-
-extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node)
-{
-    node->mNext = (UnidentifiedRegistrationNode*)g_CollisionCrowdDataPool.m_FreeList;
-    g_CollisionCrowdDataPool.m_FreeList = (SlotPoolEntry*)node;
-}
-
-extern "C" void fn_80072194(PlayerAttackData* node)
-{
-    g_PlayerAttackDataPool.Free(node);
-}
-
-void FreeCollisionPlayerWallData(CollisionPlayerWallData* node)
-{
-    g_CollisionPlayerWallDataPool.Free(node);
-}
-
-extern "C" EventDispatcher* fn_800721C4()
-{
-    return &gDispatchEventsTask->dispatcher;
-}
-
 #include "NL/nlBind_impl.h"
+
+#include "Game/GameEventCallbacks.inl"
+
+#include "Game/EventBase.inl"
+
+#include "NL/nlDLListContainer.inl"

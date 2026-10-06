@@ -127,6 +127,7 @@ public:
 
 private:
     inline void RegisterDetermGameFields(DebugWriteCache* cache);
+    static void PlayEndGamePresentation();
 
     /* 0x14 */ AIContext* mUnidentified014;
 

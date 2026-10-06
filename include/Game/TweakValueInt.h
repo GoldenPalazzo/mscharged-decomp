@@ -7,7 +7,8 @@
 
 typedef TweakValue<int> TweakValueInt;
 
-inline void FormatOwnedTweakValue(char* buffer, unsigned long size, int value)
+template <typename T>
+inline void FormatOwnedTweakValue(char* buffer, unsigned long size, T value)
 {
     nlSNPrintf(buffer, size, "%d", value);
 }

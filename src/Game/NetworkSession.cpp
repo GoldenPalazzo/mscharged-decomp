@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlSingleton.inl"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.inl"
@@ -1660,12 +1661,12 @@ static inline void RecordGameConfig(
 static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
     Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
-    UnidentifiedTypedEvent<UnidentifiedEventNoData>* pauseEvent
+    UnidentifiedTypedEvent0<void>* pauseEvent
         = &g_pGame->mUnidentified49C.mEvent00;
     pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
 
     Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
-    UnidentifiedTypedEvent<UnidentifiedEventNoData>* resumingEvent
+    UnidentifiedTypedEvent0<void>* resumingEvent
         = &g_pGame->mUnidentified49C.mEvent01;
     resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
 

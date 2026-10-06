@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/gx/GXLight.h>
 #include <revolution/gx/GXTev.h>
 #include <revolution/gx/GXTransform.h>

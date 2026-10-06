@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
 #include "Game/Player.h"
 #include "Game/CharacterTriggers.h"
