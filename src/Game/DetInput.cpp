@@ -15,7 +15,7 @@ static u8 PadPressureToByte(float pressure)
     return (u8)(255.0f * pressure);
 }
 
-u16 lbl_806DF740 = 0xFFFF;
+u16 gDetInputDebugType = 0xFFFF;
 int lbl_806E2130;
 
 u8 DetInput::GetConnectionStatus()
