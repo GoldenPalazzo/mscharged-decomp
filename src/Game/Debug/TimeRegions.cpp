@@ -1,4 +1,5 @@
 #include "Game/Debug/TimeRegions.h"
+#include "Game/Debug/FrameCounter.h"
 
 #include "Game/Ball.h"
 #include "Game/Camera/CameraMan.h"

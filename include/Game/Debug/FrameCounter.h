@@ -36,5 +36,7 @@ private:
 };
 
 extern FrameCounter g_FrameCounter;
+extern const float lbl_806E6178;
+extern const float lbl_806E617C;
 
 #endif // GAME_DEBUG_FRAME_COUNTER_H
