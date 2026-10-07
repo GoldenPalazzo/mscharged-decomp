@@ -27,6 +27,8 @@ public:
     void Init(Goalie* pGoalie, const SaveInfo& info, unsigned int uIndex);
     void PostInit(const SaveInfo& info);
 
+    float GetMilestonePercent(int milestone) const { return mfMilestonePercent[milestone]; }
+
     float GetMilestoneTime(int milestone) const
     {
         return mfMilestonePercent[milestone] * mfDuration;
@@ -50,6 +52,8 @@ public:
 
 struct SaveBlendInfo
 {
+    float GetMilestoneTime(int milestone) const { return mfMilestoneTime[milestone]; }
+
     void Reset();
     void SyncLog(void* context, DebugWriteCache* cache);
 
