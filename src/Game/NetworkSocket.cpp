@@ -92,7 +92,7 @@ void NetworkSocket::OnMessageReceived(
 void NetworkSocket::OnVoiceReceived(
     u32 connection, void* buffer, int size)
 {
-    mListener->ListenerVirtual18();
+    mListener->OnVoiceReceived();
 }
 
 void NetworkSocket::OnConnectionRequest(
@@ -320,7 +320,7 @@ void NetworkSocket::Update(float)
                        sizeof(mVersionWord))
                     == 0)
             {
-                mListener->ListenerVirtual00(
+                mListener->OnBroadcastReceived(
                     mPacketBuffer + sizeof(mVersionWord),
                     received - sizeof(mVersionWord));
             }

@@ -134,12 +134,12 @@ void NetworkSession::Initialize(bool first)
         }
         PopAllocator();
 
-        mUnidentified24A5 = 0;
-        mUnidentified24A4 = 0;
+        mDWCInitialized = 0;
+        mLoginRequestStarted = 0;
         mDWCErrorCode = 0;
         mDWCErrorType = DWC_ERROR_NONE;
         mDWCLastError = 0;
-        mUnidentified2494 = 0;
+        mFriendsMatchProcessingSuspended = 0;
         mLoginListener = 0;
         mLoginStartTime = 0.0f;
 
@@ -158,12 +158,12 @@ void NetworkSession::Initialize(bool first)
     mMachineLoadedGame[1] = 0;
     mMachineLoadedGame[2] = 0;
     mMachineLoadedGame[3] = 0;
-    mUnidentified2472 = 0;
+    mGameLoadComplete = 0;
     mPauseRequestMachineMask = 0;
     mPausedMachineMask = 0;
-    mUnidentified247C = 1;
-    mUnidentified2474 = 0;
-    mUnidentified2478 = 0;
+    mGameNumber = 1;
+    mSecondGameRandomSeed = 0;
+    mThirdGameRandomSeed = 0;
     mOverlayRequest = 3;
     mPoppedOverlay = 3;
 }
@@ -247,8 +247,8 @@ void NetworkSession::SendGameStartToEveryone()
     message.mRandomSeed = randomSeed;
     message.mMachineIndex = 0;
     message.mMachineCount = machineCount;
-    message.mUnidentified20 = second;
-    message.mUnidentified24 = third;
+    message.mSecondGameRandomSeed = second;
+    message.mThirdGameRandomSeed = third;
 
     NetworkDraftTeam* home = NetworkDraft::Instance()->GetDraftTeam(0);
     message.mHomeCharacters[0] = home->mCaptain;
@@ -285,23 +285,23 @@ void NetworkSession::SendGameStartToEveryone()
         {
             if (remote)
             {
-                message.mMachineFlags[machine] = 2;
+                message.mMachinePlayerCounts[machine] = 2;
             }
             else
             {
-                message.mMachineFlags[machine] = 1;
+                message.mMachinePlayerCounts[machine] = 1;
             }
         }
         else
         {
-            message.mMachineFlags[machine] = 0;
+            message.mMachinePlayerCounts[machine] = 0;
         }
     }
 
-    message.mUnidentified1B = 0;
-    message.mUnidentified1C[0] = -1;
-    message.mUnidentified1C[1] = -1;
-    message.mUnidentified1C[2] = -1;
+    message.mTournamentGame = 0;
+    message.mTournamentSetup[0] = -1;
+    message.mTournamentSetup[1] = -1;
+    message.mTournamentSetup[2] = -1;
 
     for (int machine = 0; machine < machineCount; ++machine)
     {
@@ -599,7 +599,7 @@ void NetworkSession::Update()
     }
     else if (mSessionMode == 2)
     {
-        if (mSessionState != 0 && mUnidentified2494 == 0
+        if (mSessionState != 0 && mFriendsMatchProcessingSuspended == 0
             && !mLobby->mMatchmakingThreadRunning)
         {
             DWC_ProcessFriendsMatch();
@@ -625,7 +625,7 @@ void NetworkSession::Update()
         }
     }
 
-    if (mOverlayRequest != 3 && mUnidentified2472 != 0)
+    if (mOverlayRequest != 3 && mGameLoadComplete != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Finished pending load, now can popup network error overlay "
@@ -703,7 +703,7 @@ void NetworkSession::InitializeOnline()
         return;
     }
 
-    mUnidentified24A4 = 0;
+    mLoginRequestStarted = 0;
 
     u32 gameCode = gNetworkGameCodeR4QP;
     if (GetRegion() == 2)
@@ -717,7 +717,7 @@ void NetworkSession::InitializeOnline()
 
     DWC_Init(DWC_SVR_RELEASE, "mschargedwii", gameCode, NetworkAlloc, NetworkFree);
     DWC_SetReportLevel(0);
-    mUnidentified24A5 = 1;
+    mDWCInitialized = 1;
     mSessionMode = 2;
 
     gNetworkMessageRegistry->RegisterReceiver(0xD, this);
@@ -744,10 +744,10 @@ void NetworkSession::InitializeOnline()
     mDWCErrorCode = 0;
     mDWCErrorType = DWC_ERROR_NONE;
     mDWCLastError = 0;
-    mUnidentified2494 = 0;
+    mFriendsMatchProcessingSuspended = 0;
     mLobby->RegisterMessageReceiver();
     mRankingReporter->Reset();
-    mUnidentified24A4 = StartLogin();
+    mLoginRequestStarted = StartLogin();
 }
 
 static void* NetworkAlloc(DWCAllocType name, unsigned long size, int align)
@@ -1402,7 +1402,7 @@ void NetworkSession::ShutdownOnline()
         return;
     }
 
-    mUnidentified2494 = 0;
+    mFriendsMatchProcessingSuspended = 0;
     DWC_ShutdownFriendsMatch();
     NetworkDraft::Instance()->Reset(false);
     g_pFriendManager->Reset(false);
@@ -1411,7 +1411,7 @@ void NetworkSession::ShutdownOnline()
     mLobby->UnregisterMessageReceiver();
     mDirectSocket->Shutdown();
     DWC_Shutdown();
-    mUnidentified24A5 = 0;
+    mDWCInitialized = 0;
     SocketNetworkShutdown();
 
     gNetworkMessageRegistry->UnregisterReceiver(0xD);
@@ -1531,7 +1531,7 @@ NetworkRanking* NetworkSession::GetRankingReporter()
     return 0;
 }
 
-void NetworkSession::ListenerVirtual00(void* buffer, int size)
+void NetworkSession::OnBroadcastReceived(void* buffer, int size)
 {
     gNetworkMessageRegistry->Dispatch(-2, static_cast<u8*>(buffer), size);
 }
@@ -1589,7 +1589,7 @@ void NetworkSession::ListenerVirtual14()
 {
 }
 
-void NetworkSession::ListenerVirtual18()
+void NetworkSession::OnVoiceReceived()
 {
 }
 
@@ -1667,7 +1667,7 @@ static inline void PlaybackRecordedGameBody()
         config->mWinBy == 0 ? "Timed" : "Goals",
         config->mGameTime, config->mGameGoals, config->mBestSeries);
     GetInputRouter()->Reset(0);
-    g_pNetworkSessionBase->BaseVirtual3C(info);
+    g_pNetworkSessionBase->InitializeGamePeers(info);
     NetworkSyncState* state = gNetworkSyncState;
     int count = g_pNetworkSessionBase->GetNumMachines();
     state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
@@ -1713,7 +1713,7 @@ int NetworkSession::ProcessMessage(
         }
         else
         {
-            BaseVirtual44((NetMessageGameStart*)message);
+            StartNetworkedGame((NetMessageGameStart*)message);
         }
         mSessionState = 4;
         GameSceneManager::Instance()->PopToScene((SceneList)0x1D);
@@ -1929,12 +1929,12 @@ static inline void RegisterLoadedGameActions(NetworkSession* session)
     Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
     UnidentifiedTypedEvent0<void>* pauseEvent
         = &g_pGame->mUnidentified49C.mPauseGameEvent;
-    pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
+    pauseEvent->Add(first, (unsigned int)&session->mPauseEventOwner, -1);
 
     Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
     UnidentifiedTypedEvent0<void>* resumingEvent
         = &g_pGame->mUnidentified49C.mResumingGameEvent;
-    resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
+    resumingEvent->Add(second, (unsigned int)&session->mResumingEventOwner, -1);
 
     if (NetTournManager::Instance()->mState != 0)
     {
@@ -1942,7 +1942,7 @@ static inline void RegisterLoadedGameActions(NetworkSession* session)
     }
 }
 
-void NetworkSession::BaseVirtual3C(const NetworkGameStartInfo* info)
+void NetworkSession::InitializeGamePeers(const NetworkGameStartInfo* info)
 {
     mMachineCount = info->mMachineCount;
     mLocalMachineId = info->mMyMachineId;
@@ -2026,7 +2026,7 @@ void NetworkSession::BaseVirtual40()
 {
 }
 
-void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
+void NetworkSession::StartNetworkedGame(NetMessageGameStart* message)
 {
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineId = (s8)message->mMachineIndex;
@@ -2038,7 +2038,7 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
         int players;
         if (IsOnlineRankedMatch())
         {
-            players = message->mMachineFlags[machine];
+            players = message->mMachinePlayerCounts[machine];
         }
         else
         {
@@ -2064,15 +2064,15 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
         }
     }
 
-    if (message->mUnidentified1B != 0)
+    if (message->mTournamentGame != 0)
     {
         NetTournManager::Instance()->OnTournamentGameStart(message);
     }
     else
     {
-        mUnidentified2474 = message->mUnidentified20;
-        mUnidentified2478 = message->mUnidentified24;
-        mUnidentified247C = 1;
+        mSecondGameRandomSeed = message->mSecondGameRandomSeed;
+        mThirdGameRandomSeed = message->mThirdGameRandomSeed;
+        mGameNumber = 1;
     }
 
     tDebugPrintManager::Print(DC_NETWORK, "PreStartNetworkedGame NumMachines:%d MyMachineID:%d\n",
@@ -2101,7 +2101,7 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
     if (IsOnlineRankedMatch())
     {
         u32 side = 0;
-        if (message->mUnidentified1B == 0)
+        if (message->mTournamentGame == 0)
         {
             side = NetworkDraft::Instance()->GetDraftTeam(0)
                        ->mPlayers[0]
@@ -2157,15 +2157,15 @@ void NetworkSession::RematchGame()
     GetInputRouter()->Reset(0);
     gInputManager->Reset();
 
-    mUnidentified247C = mUnidentified247C + 1;
+    mGameNumber = mGameNumber + 1;
     u32 seed;
-    if (mUnidentified247C == 2)
+    if (mGameNumber == 2)
     {
-        seed = mUnidentified2474;
+        seed = mSecondGameRandomSeed;
     }
     else
     {
-        seed = mUnidentified2478;
+        seed = mThirdGameRandomSeed;
     }
     SetNetworkRandomSeed(seed);
 
@@ -2225,12 +2225,12 @@ void PlaybackRecordedGame()
     PlaybackRecordedGameBody();
 }
 
-void NetworkSession::BaseVirtual48(int reason)
+void NetworkSession::EndNetworkedGame(int reason)
 {
     mGameEndReason = reason;
     mSessionState = 6;
-    DisconnectEventOwner(&mUnidentified2464);
-    DisconnectEventOwner(&mUnidentified2468);
+    DisconnectEventOwner(&mPauseEventOwner);
+    DisconnectEventOwner(&mResumingEventOwner);
 
     if (mCupMode != 0)
     {

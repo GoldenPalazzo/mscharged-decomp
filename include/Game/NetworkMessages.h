@@ -21,11 +21,12 @@ public:
     /* 0x0E */ u8 mHomeCharacters[4];
     /* 0x12 */ u8 mAwayCharacters[4];
     /* 0x16 */ u8 mStadium;
-    /* 0x17 */ u8 mMachineFlags[4];
-    /* 0x1B */ u8 mUnidentified1B;
-    /* 0x1C */ s8 mUnidentified1C[3];
-    /* 0x20 */ u32 mUnidentified20;
-    /* 0x24 */ u32 mUnidentified24;
+    /* 0x17 */ u8 mMachinePlayerCounts[4];
+    /* 0x1B */ u8 mTournamentGame;
+    // Bracket game index, followed by home and away machine indices.
+    /* 0x1C */ s8 mTournamentSetup[3];
+    /* 0x20 */ u32 mSecondGameRandomSeed;
+    /* 0x24 */ u32 mThirdGameRandomSeed;
 };
 
 struct NetworkDraftSides
