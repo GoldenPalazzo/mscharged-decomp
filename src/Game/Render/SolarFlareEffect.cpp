@@ -8,48 +8,48 @@
 
 extern "C"
 {
-    float lbl_806DEE88 = 0.5f;
-    float lbl_806DEE8C = 0.1f;
+    float gSolarFlareEffectLifetime = 0.5f;
+    float gSolarFlareEffectLifetimeVariation = 0.1f;
     float lbl_806DEE90 = 0.3f;
     float lbl_806DEE94 = 0.2f;
 }
 
-bool lbl_806E19B8;
-StadiumDrawable_8027ADC0* lbl_806E19BC;
+bool gForceDrawSolarFlareDrawable;
+SolarFlareDrawable* g_pSolarFlareDrawable;
 
 
-void StadiumDrawable_8027ADC0::Initialize(WorldObjectLoadContext* context)
+void SolarFlareDrawable::Initialize(WorldObjectLoadContext* context)
 {
     WorldDrawable::Initialize(context);
-    lbl_806E19BC = this;
+    g_pSolarFlareDrawable = this;
 }
 
-void StadiumDrawable_8027ADC0::ReleaseResources()
+void SolarFlareDrawable::ReleaseResources()
 {
 }
 
-void StadiumDrawable_8027ADC0::Draw()
+void SolarFlareDrawable::Draw()
 {
-    if (m_Unknown70 != 0 || lbl_806E19B8)
+    if (m_uDrawEnabled != 0 || gForceDrawSolarFlareDrawable)
         WorldDrawable::Draw();
 }
 
-UnidentifiedObject_8027AE14::UnidentifiedObject_8027AE14(const nlVector3& param1)
-    : TimedObject(lbl_806DEE88
-          + nlRandomf(-lbl_806DEE8C, lbl_806DEE8C, &nlDefaultSeed))
-    , mUnidentified010(param1)
+SolarFlareEffect::SolarFlareEffect(const nlVector3& targetPosition)
+    : TimedObject(gSolarFlareEffectLifetime
+          + nlRandomf(-gSolarFlareEffectLifetimeVariation, gSolarFlareEffectLifetimeVariation, &nlDefaultSeed))
+    , mTargetPosition(targetPosition)
     , mUnidentified020(false)
 {
     mUnidentified01C = lbl_806DEE90
         + nlRandomf(-lbl_806DEE94, lbl_806DEE94, &nlDefaultSeed);
 }
 
-UnidentifiedObject_8027AE14::~UnidentifiedObject_8027AE14()
+SolarFlareEffect::~SolarFlareEffect()
 {
 }
 
 static inline void OrientTowardPosition(
-    StadiumDrawable_8027ADC0* drawable, const nlVector3& position)
+    SolarFlareDrawable* drawable, const nlVector3& position)
 {
     nlVector3 direction;
     nlVec3Sub(direction, position, drawable->mWorldMatrix.GetTranslation());
@@ -66,20 +66,20 @@ static inline void OrientTowardPosition(
     drawable->mWorldMatrix.SetRow_(2, right);
 }
 
-void UnidentifiedObject_8027AE14::Update(float)
+void SolarFlareEffect::Update(float)
 {
-    if (lbl_806E19BC != 0)
+    if (g_pSolarFlareDrawable != 0)
     {
-        OrientTowardPosition(lbl_806E19BC, mUnidentified010);
+        OrientTowardPosition(g_pSolarFlareDrawable, mTargetPosition);
 
-        nlMatrix4 transform = *lbl_806E19BC->GetWorldMatrix();
+        nlMatrix4 transform = *g_pSolarFlareDrawable->GetWorldMatrix();
         glModel* model = glModelDupNoStreams(
-            lbl_806E19BC->GetModel(), false, glGetCurrentResourcePool());
+            g_pSolarFlareDrawable->GetModel(), false, glGetCurrentResourcePool());
         glModelSetMatrix(model, transform);
         BasicStadium::GetCurrentStadium()->m_pAlphaView->AttachModel(model, 0);
     }
 }
 
-StadiumDrawable_8027ADC0::~StadiumDrawable_8027ADC0()
+SolarFlareDrawable::~SolarFlareDrawable()
 {
 }
