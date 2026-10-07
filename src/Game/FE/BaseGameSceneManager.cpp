@@ -560,10 +560,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(InGameTextOverlay), 8, false)) InGameTextOverlay();
         break;
     case (SceneList)91:
-        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(0);
+        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_RESULTS);
         break;
     case (SceneList)92:
-        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(1);
+        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_STATISTICS);
         break;
     case (SceneList)93:
         newHandler = new (nlMalloc(sizeof(OnlineRankingOverlay), 8, false)) OnlineRankingOverlay();
