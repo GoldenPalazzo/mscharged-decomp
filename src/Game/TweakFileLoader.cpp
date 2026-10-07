@@ -6,8 +6,6 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 
-#include "NL/nlstring_tmpl.h"
-
 void OnTweakFileLoaded(
     void* fileData, unsigned long fileSize, void* userData)
 {
