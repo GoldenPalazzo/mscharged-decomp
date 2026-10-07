@@ -10,9 +10,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "Game/SH/SHNavigation.h"
 
-class SHNavigation;
 
 
 static inline TLTextInstance* AsTextInstance(void* instance)
