@@ -10538,8 +10538,8 @@ AllocateEntry__104AVLTreeBase<P8SoundCue,P8SoundCue,49NewAdapter<35AVLTreeEntry<
 ParseChunk__8SoundMapFP7nlChunk = .text:0x802EE458; // type:function size:0x438
 __sinit_\SoundMap_cpp = .text:0x802EE890; // type:function size:0xD4 scope:local
 ParseAudioSliderTable__FP7nlChunk = .text:0x802EE964; // type:function size:0x3D4
-GetAudioSlider = .text:0x802EED38; // type:function size:0x50
-fn_802EED88 = .text:0x802EED88; // type:function size:0x268
+GetAudioSlider__FP16AudioSliderTableUlP12XSoundHandle = .text:0x802EED38; // type:function size:0x50
+AllocateLocalAudioSliders__FP16AudioSliderTableP15XSoundCueHandle = .text:0x802EED88; // type:function size:0x268
 Update__16AudioSliderTableFf = .text:0x802EEFF0; // type:function size:0x140
 __ct__11AudioSliderFv = .text:0x802EF130; // type:function size:0x4C
 __ct__14AudioSliderSetFv = .text:0x802EF17C; // type:function size:0x1C
