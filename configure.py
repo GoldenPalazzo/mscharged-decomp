@@ -603,7 +603,7 @@ config.libs = [
             Object(Matching, "Game/Audio/AuxEffectMap.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/CategoryVolume.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/Delay.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/Audio/GameStreams.cpp"),
+            Object(Matching, "Game/Audio/GameStreams.cpp"),
             Object(Matching, "Game/Audio/LowPassFilter.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/Pitch.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/Plat3dSoundSrc.cpp", extra_cflags=["-ipa file"]),
