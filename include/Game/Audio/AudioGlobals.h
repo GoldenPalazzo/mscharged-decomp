@@ -15,7 +15,6 @@ extern unsigned int gResidentVoiceDropCount;
 extern unsigned int gStreamVoiceDropCount;
 
 void ReleaseAudioSoundOwner(void* value, void* owner);
-void SetControllerSpeakerEnabled(bool enabled);
 void SetAudioEffectContext(unsigned long* hash, int index);
 
 #endif // GAME_AUDIO_AUDIO_GLOBALS_H

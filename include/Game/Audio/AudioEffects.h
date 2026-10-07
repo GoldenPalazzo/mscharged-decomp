@@ -2,7 +2,6 @@
 #define GAME_AUDIO_AUDIO_EFFECTS_H
 
 #include "Game/Audio/AudioEffect.h"
-#include "Game/Audio/AudioGlobals.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlSlotPool.h"
 #include <string.h>
@@ -121,6 +120,7 @@ public:
     static nlArrayAllocator<ControllerSpeaker> s_Allocator;
 };
 
+void SetControllerSpeakerEnabled(bool enabled);
 AudioEffectFactory* GetAudioEffectFactory();
 
 #endif // GAME_AUDIO_AUDIO_EFFECTS_H
