@@ -1,6 +1,7 @@
-#include "Game/OnlinePlayer.h"
 #ifndef GAME_NETWORK_SESSION_H
 #define GAME_NETWORK_SESSION_H
+
+#include "Game/NetworkDebug.h"
 
 #include "Game/LANLobbyListener.h"
 #include "Game/main.h"
@@ -23,7 +24,6 @@ class LANLobby;
 class NetworkLobby;
 class NetMessageGameStart;
 
-extern int g_BuildNumber;
 extern int gNetworkBuildNumberOverride;
 
 class NetworkConnectionListener;
@@ -103,7 +103,6 @@ struct TransportPlayerInfo
     /* 0x12 */ u16 mLosses;
 }; // size: 0x14
 
-
 class NetworkMachineRoster
 {
 public:
@@ -151,6 +150,11 @@ public:
     virtual void DebugDraw();
 };
 
+struct NetworkSocketInitializeInfo
+{
+    u32 mVersionWord;
+    bool mDirectMode;
+};
 
 // Reliable UDP direct/broadcast socket layer owned by the session.
 class NetworkSocket : public NetworkSocketInterface,
@@ -244,7 +248,6 @@ struct NetworkTransportConnectionSlot
     TransportConnection* m_Connection;
     int mStatus;
 };
-
 
 class NetMessageReadyToLaunchConfirm;
 class NetMessageFoundGame;
@@ -386,7 +389,6 @@ public:
     /* 0x1CC */ NetworkSocket* mSocket;
 }; // size: 0x1D0
 
-
 class NetworkSession : public NetworkSessionBase,
                                    public NetworkConnectionListener,
                                    public NetworkMessageReceiver
@@ -446,7 +448,6 @@ public:
     bool IsConnectedPeer(u32 connection);
     void PopupNetworkError(int overlay);
     void DisconnectOnlineMatch();
-
 
     virtual void Initialize(bool);
     virtual void Update();
@@ -515,17 +516,12 @@ public:
     /* 0x27C0 */ u8 mLoginThreadStack[0x4000];
 }; // size: 0x67C0
 
-extern NetworkSessionBase* g_pNetworkSessionBase;
 extern NetworkSession* g_pNetworkSession;
-
 
 unsigned int GetNetworkVersionWord();
 
 void RestartSinglePlayerGame();
 void StartSinglePlayerGame();
 void PlaybackRecordedGame();
-
-extern u8 gOnlineTwoLocalPlayers;
-extern int gOnlineLocalControllerIndices[2];
 
 #endif // GAME_NETWORK_SESSION_H

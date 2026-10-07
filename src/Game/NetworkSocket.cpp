@@ -11,12 +11,6 @@
 #include <string.h>
 #include "Game/TweakValue.inl"
 
-struct NetworkSocketInitializeInfo
-{
-    u32 mVersionWord;
-    bool mDirectMode;
-};
-
 int g_nLocalDirectPort = 1000;
 static int sLocalAddressColumn = 2;
 static int sLocalAddressRow = 5;

@@ -11,9 +11,9 @@
 #include <dwc/dwc_report_fwd.h>
 #include <dwc/dwc_nastime_fwd.h>
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/NetworkLobby.h"
 #include "Game/FE/feDPD.h"
-#include "Game/OnlinePlayer.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/FE/FEAudio.h"
 #include "NL/nlFunctionMemory.h"
@@ -46,7 +46,11 @@
 #include "Game/SH/SHOnlineFriendsChooseSides.h"
 #include "Game/SH/SHOnlineConnectionQuality.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
+#include "Game/TweakValue.h"
+#include <string.h>
+#include "Game/BaseGameSceneManager.h"
+#include "Game/FE/tlComponentInstance.h"
+#include "Game/Game.h"
 
 bool g_bNoPopupNetworkError;
 NetworkSession* g_pNetworkSession;
@@ -59,25 +63,10 @@ u32 gNetworkGameCodeR4QP = 0x52345150;
 u32 gNetworkGameCodeR4QJ = 0x5234514A;
 u32 gNetworkGameCodeR4QE = 0x52345145;
 
-
-#include "Game/TweakValue.h"
-
 static TweakBoolBinding s_NoPopupNetworkErrorTweak(
     "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
 
 static MemoryAllocator s_NetworkAllocator;
-
-#include <string.h>
-
-struct UnidentifiedVersionInfo
-{
-    /* 0x0 */ u32 mVersionWord;
-    /* 0x4 */ u8 mUnidentified04;
-};
-
-#include "Game/BaseGameSceneManager.h"
-#include "Game/FE/tlComponentInstance.h"
-#include "Game/Game.h"
 
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
@@ -662,9 +651,9 @@ void NetworkSession::InitializeLAN()
     gNetworkMessageRegistry->RegisterReceiver(0x1C, this);
     gNetworkMessageRegistry->RegisterReceiver(0x1D, this);
 
-    UnidentifiedVersionInfo info;
+    NetworkSocketInitializeInfo info;
     info.mVersionWord = GetNetworkVersionWord();
-    info.mUnidentified04 = 1;
+    info.mDirectMode = true;
     mDirectSocket->Initialize(&info, this);
     mDirectSocket->SetBroadcastEnabled(true);
 
@@ -736,9 +725,9 @@ void NetworkSession::InitializeOnline()
     gNetworkMessageRegistry->RegisterReceiver(0x1C, this);
     gNetworkMessageRegistry->RegisterReceiver(0x1D, this);
 
-    UnidentifiedVersionInfo info;
+    NetworkSocketInitializeInfo info;
     info.mVersionWord = GetNetworkVersionWord();
-    info.mUnidentified04 = 0;
+    info.mDirectMode = false;
     mDirectSocket->Initialize(&info, this);
 
     mDWCErrorCode = 0;
@@ -2441,7 +2430,7 @@ void NetworkSession::SetTournamentMode(u8 value)
     NetworkLobby* lobby = mSessionMode == 2 ? mLobby : 0;
     if (lobby != 0)
     {
-        ((u8*)lobby)[9] = value;
+        lobby->mTournamentMode = value;
     }
     mCupMode = value;
 }
@@ -2577,8 +2566,3 @@ unsigned int GetNetworkVersionWord()
     }
     return (low | 0x1B030000) | ((unsigned int)(channel & 0xFF) << 20);
 }
-
-
-
-
-#include "Game/NetworkStatsManager.h"
