@@ -96,7 +96,7 @@ public:
     PowerUpTeamType GetPowerUpByIndex(int index) const;
     int SetCurrentPowerUp(
         ePowerUpType eNewPowerUpType, int nnumOfPowerups);
-    void SetDifficulty(int difficulty, int param2, bool param3);
+    void SetDifficulty(int difficulty, bool blend, bool reload);
     void fn_800A607C();
     void fn_800A6248();
     void fn_800A7998();
@@ -118,6 +118,8 @@ public:
     /* 0x0C */ float mUnidentified00C;
 
 private:
+    void WriteTeamStateLog(void* context, DebugWriteCache* cache);
+
     /* 0x10 */ float mUnidentified010;
 
 public:
