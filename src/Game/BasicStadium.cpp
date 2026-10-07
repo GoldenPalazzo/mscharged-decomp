@@ -2,7 +2,7 @@
 #include "Game/BasicStadium.h"
 #include "Game/Render/StadiumWorldObjects.h"
 #include "Game/Render/StadiumPhysicsObject.h"
-#include "Game/Render/tu_8027AE14.h"
+#include "Game/Render/SolarFlareEffect.h"
 #include "Game/World/WorldObjectLoadContext.h"
 #include "Game/World/WorldObject.inl"
 #include "Game/TweakBindingInline.h"

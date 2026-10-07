@@ -1,5 +1,5 @@
-#ifndef GAME_RENDER_TU_8027AE14_H
-#define GAME_RENDER_TU_8027AE14_H
+#ifndef GAME_RENDER_SOLAR_FLARE_EFFECT_H
+#define GAME_RENDER_SOLAR_FLARE_EFFECT_H
 
 #include "NL/nlMath.h"
 #include "Game/World/WorldDrawable.h"
@@ -32,4 +32,4 @@ extern bool lbl_806E19B8;
 extern StadiumDrawable_8027ADC0* lbl_806E19BC;
 
 
-#endif // GAME_RENDER_TU_8027AE14_H
+#endif // GAME_RENDER_SOLAR_FLARE_EFFECT_H

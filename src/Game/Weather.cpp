@@ -16,7 +16,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/WindDebrisConfig.h"
 #include "math.h"
-#include "Game/Render/tu_8027AE14.h"
+#include "Game/Render/SolarFlareEffect.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Player.h"
 #include "Game/AI/ScriptMachine.h"

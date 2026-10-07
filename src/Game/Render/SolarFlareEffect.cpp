@@ -1,4 +1,4 @@
-#include "Game/Render/tu_8027AE14.h"
+#include "Game/Render/SolarFlareEffect.h"
 #include "Game/BasicStadium.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/World/WorldDrawable.h"

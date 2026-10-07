@@ -2379,7 +2379,7 @@ Game/Render/ChargeShadowDrawable.cpp:
 	.sdata      start:0x806DEE80 end:0x806DEE88
 	.sdata2     start:0x806E5CA0 end:0x806E5CB0
 
-Game/Render/tu_8027AE14.cpp:
+Game/Render/SolarFlareEffect.cpp:
 	.text       start:0x8027ADC0 end:0x8027B138
 	.ctors      start:0x804DB7E4 end:0x804DB7E8
 	.data       start:0x805231C0 end:0x80523200
