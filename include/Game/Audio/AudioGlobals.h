@@ -9,7 +9,6 @@ extern AudioSystem* g_pAudioSystem;
 extern AudioBackend* g_pAudioBackend;
 extern void* g_pAudioSilenceBuffer;
 extern unsigned long gAudioMemorySize;
-extern float sSpeedOfSound;
 extern void* gExclusiveAudioContext;
 extern XSoundHandle* g_pLastAudioHandle;
 extern unsigned int gResidentVoiceDropCount;
