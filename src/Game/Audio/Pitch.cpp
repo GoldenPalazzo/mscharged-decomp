@@ -1,4 +1,12 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
+#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/Pitch.h"
+#include "Game/Audio/AudioConfig.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlMath.h"
+#include "NL/nlString.h"
 
 static float sPitchSemitones = 1.0f;
 

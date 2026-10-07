@@ -2,14 +2,14 @@
 #include "NL/nlDLListContainer.inl"
 #include "revolution/wpad/WPAD.h"
 
+#include "Game/Audio/CategoryVolume.h"
+#include "Game/Audio/Pitch.h"
+#include "Game/Audio/LowPassFilter.inl"
+#include "Game/Audio/Delay.h"
+#include "Game/Audio/Reverb.h"
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
-#include "Game/Audio/CategoryVolume.h"
-#include "Game/Audio/Delay.h"
-#include "Game/Audio/LowPassFilter.h"
-#include "Game/Audio/Pitch.h"
-#include "Game/Audio/Reverb.h"
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/SoundInstance.h"
 #include "NL/nlString.h"
@@ -41,6 +41,45 @@ void AudioEffectFactory::Initialize()
 
 void AudioEffectFactory::Update(float)
 {
+}
+
+void AudioEffectFactory::Shutdown()
+{
+    VolumeParameter::s_Pool.FreeBlocks();
+    Volume::s_Pool.FreeBlocks();
+    ReverbParameter::s_Pool.FreeBlocks();
+    Reverb::s_Pool.FreeBlocks();
+    DelayParameter::s_Pool.FreeBlocks();
+    Delay::s_Pool.FreeBlocks();
+    LowPassFilterParameter::s_Pool.FreeBlocks();
+    LowPassFilter::s_Pool.FreeBlocks();
+    PitchParameter::s_Pool.FreeBlocks();
+    Pitch::s_Pool.FreeBlocks();
+    CategoryVolumeParameter::s_Pool.FreeBlocks();
+    CategoryVolume::s_Pool.FreeBlocks();
+}
+
+AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int effect)
+{
+    switch (effect)
+    {
+    case 0xCE5C5677:
+        return new Volume;
+    case 0x7DDB838E:
+        return new ControllerSpeaker;
+    case 0xC457F745:
+        return new Reverb;
+    case 0x04F5A46E:
+        return new Delay;
+    case 0x0BCF338E:
+        return new LowPassFilter;
+    case 0x05D11E37:
+        return new Pitch;
+    case 0xFA8EC255:
+        return new CategoryVolume;
+    default:
+        return 0;
+    }
 }
 
 void AudioEffectFactory::ReleaseEffect(AudioEffectBase* effect)
@@ -177,62 +216,4 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
     parameter->m_Unknown14_00 = node->Get(pauseOnZeroKey).m_Words.m_Value;
     unsigned int stopOnZeroKey = sStopOnZeroKey;
     parameter->m_Unknown14_01 = node->Get(stopOnZeroKey).m_Words.m_Value;
-}
-
-AudioEffectFactory::~AudioEffectFactory()
-{
-}
-
-VolumeParameter::~VolumeParameter()
-{
-}
-
-ControllerSpeakerParameter::~ControllerSpeakerParameter()
-{
-}
-
-Volume::~Volume()
-{
-}
-
-ControllerSpeaker::~ControllerSpeaker()
-{
-}
-
-void AudioEffectFactory::Shutdown()
-{
-    VolumeParameter::s_Pool.FreeBlocks();
-    Volume::s_Pool.FreeBlocks();
-    ReverbParameter::s_Pool.FreeBlocks();
-    Reverb::s_Pool.FreeBlocks();
-    DelayParameter::s_Pool.FreeBlocks();
-    Delay::s_Pool.FreeBlocks();
-    LowPassFilterParameter::s_Pool.FreeBlocks();
-    LowPassFilter::s_Pool.FreeBlocks();
-    PitchParameter::s_Pool.FreeBlocks();
-    Pitch::s_Pool.FreeBlocks();
-    CategoryVolumeParameter::s_Pool.FreeBlocks();
-    CategoryVolume::s_Pool.FreeBlocks();
-}
-
-AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int type)
-{
-    switch ((int)type)
-    {
-    case (int)0xCE5C5677:
-        return new Volume();
-    case (int)0x7DDB838E:
-        return new ControllerSpeaker();
-    case (int)0xC457F745:
-        return new Reverb();
-    case (int)0x04F5A46E:
-        return new Delay();
-    case (int)0x0BCF338E:
-        return new LowPassFilter();
-    case (int)0x05D11E37:
-        return new Pitch();
-    case (int)0xFA8EC255:
-        return new CategoryVolume();
-    }
-    return 0;
 }
