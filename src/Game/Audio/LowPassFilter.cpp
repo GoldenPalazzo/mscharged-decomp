@@ -191,7 +191,7 @@ void LowPassFilter::EndBlend()
 {
     m_Final.m_Frequency /= m_FilterCount;
     if (m_Parameters.m_Head == 0 && m_Initial.m_On == 0)
-        m_Enabled = true;
+        m_Finished = true;
 }
 
 void LowPassFilter::ApplyToSound(void* handle)

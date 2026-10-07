@@ -128,7 +128,7 @@ void Pitch::BlendParameter(AudioEffectParameter* destination,
 void Pitch::EndBlend()
 {
     if (m_Parameters.m_Head == 0 && nlNear(m_Initial.m_Semitones, 0.0f))
-        m_Enabled = true;
+        m_Finished = true;
 }
 
 void Pitch::ApplyToSound(void* handle)
