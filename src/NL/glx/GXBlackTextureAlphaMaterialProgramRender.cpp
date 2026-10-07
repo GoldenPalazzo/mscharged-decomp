@@ -67,7 +67,7 @@ void GXMaterialProgramImpl<GXBlackTextureAlphaMaterialProgram>::Draw(
     {
         const GXBlackTextureAlphaParameters* parameters = static_cast<const GXBlackTextureAlphaParameters*>(packet->materialParameters);
         glx_LoadSkinMatrices(parameters->skinMatrices,
-            parameters->skinMatricesSize / 48,
+            parameters->skinMatrixBytes / 48,
             &modelview,
             0);
     }
