@@ -1,6 +1,10 @@
 #include "Game/Render/tu_8027AE14.h"
+#include "Game/BasicStadium.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/World/WorldDrawable.h"
+#include "NL/gl/glMemory.h"
+#include "NL/gl/glModel.h"
+#include "NL/gl/glView.h"
 
 extern "C"
 {
@@ -42,6 +46,38 @@ UnidentifiedObject_8027AE14::UnidentifiedObject_8027AE14(const nlVector3& param1
 
 UnidentifiedObject_8027AE14::~UnidentifiedObject_8027AE14()
 {
+}
+
+static inline void OrientTowardPosition(
+    StadiumDrawable_8027ADC0* drawable, const nlVector3& position)
+{
+    nlVector3 direction;
+    nlVec3Sub(direction, position, drawable->mWorldMatrix.GetTranslation());
+    nlVec3Normalize(direction, direction);
+
+    nlVector3 up;
+    nlVec3Set(up, 0.0f, 1.0f, 0.0f);
+    nlVector3 right;
+    nlVec3CrossProduct(right, direction, up);
+    nlVec3CrossProduct(up, right, direction);
+
+    drawable->mWorldMatrix.SetRow_(0, direction);
+    drawable->mWorldMatrix.SetRow_(1, up);
+    drawable->mWorldMatrix.SetRow_(2, right);
+}
+
+void UnidentifiedObject_8027AE14::Update(float)
+{
+    if (lbl_806E19BC != 0)
+    {
+        OrientTowardPosition(lbl_806E19BC, mUnidentified010);
+
+        nlMatrix4 transform = *lbl_806E19BC->GetWorldMatrix();
+        glModel* model = glModelDupNoStreams(
+            lbl_806E19BC->GetModel(), false, glGetCurrentResourcePool());
+        glModelSetMatrix(model, transform);
+        BasicStadium::GetCurrentStadium()->m_pAlphaView->AttachModel(model, 0);
+    }
 }
 
 StadiumDrawable_8027ADC0::~StadiumDrawable_8027ADC0()

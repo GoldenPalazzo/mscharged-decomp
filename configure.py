@@ -875,7 +875,7 @@ config.libs = [
             Object(Matching, "Game/Render/StadiumWorldObjects.cpp"),
             Object(Matching, "Game/Render/PlanarShadowDrawable.cpp"),
             Object(Matching, "Game/Render/ChargeShadowDrawable.cpp"),
-            Object(NonMatching, "Game/Render/tu_8027AE14.cpp"),
+            Object(Matching, "Game/Render/tu_8027AE14.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/NisPlayerOverlay.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/Warble.cpp"),
             Object(Matching, "Game/Render/Wiper.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
