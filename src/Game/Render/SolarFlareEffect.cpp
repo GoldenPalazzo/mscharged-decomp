@@ -6,17 +6,13 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glView.h"
 
-extern "C"
-{
-    float gSolarFlareEffectLifetime = 0.5f;
-    float gSolarFlareEffectLifetimeVariation = 0.1f;
-    float lbl_806DEE90 = 0.3f;
-    float lbl_806DEE94 = 0.2f;
-}
+float gSolarFlareEffectLifetime = 0.5f;
+float gSolarFlareEffectLifetimeVariation = 0.1f;
+float lbl_806DEE90 = 0.3f;
+float lbl_806DEE94 = 0.2f;
 
 bool gForceDrawSolarFlareDrawable;
 SolarFlareDrawable* g_pSolarFlareDrawable;
-
 
 void SolarFlareDrawable::Initialize(WorldObjectLoadContext* context)
 {
@@ -36,7 +32,8 @@ void SolarFlareDrawable::Draw()
 
 SolarFlareEffect::SolarFlareEffect(const nlVector3& targetPosition)
     : TimedObject(gSolarFlareEffectLifetime
-          + nlRandomf(-gSolarFlareEffectLifetimeVariation, gSolarFlareEffectLifetimeVariation, &nlDefaultSeed))
+          + nlRandomf(-gSolarFlareEffectLifetimeVariation,
+              gSolarFlareEffectLifetimeVariation, &nlDefaultSeed))
     , mTargetPosition(targetPosition)
     , mUnidentified020(false)
 {

@@ -28,8 +28,11 @@ public:
     /* 0x70 */ unsigned long m_uDrawEnabled;
 };
 
+extern float gSolarFlareEffectLifetime;
+extern float gSolarFlareEffectLifetimeVariation;
+extern float lbl_806DEE90;
+extern float lbl_806DEE94;
 extern bool gForceDrawSolarFlareDrawable;
 extern SolarFlareDrawable* g_pSolarFlareDrawable;
-
 
 #endif // GAME_RENDER_SOLAR_FLARE_EFFECT_H
