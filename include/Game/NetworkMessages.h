@@ -69,7 +69,7 @@ public:
     NetMessageDraft()
         : mMachineIndex(-1)
         , mMachineCount(-1)
-        , mUnidentified0A(0)
+        , mChooseSides(0)
     {
         for (int i = 0; i < 8; ++i)
         {
@@ -82,7 +82,7 @@ public:
 
     /* 0x008 */ s8 mMachineIndex;
     /* 0x009 */ s8 mMachineCount;
-    /* 0x00A */ u8 mUnidentified0A;
+    /* 0x00A */ u8 mChooseSides;
     /* 0x00B */ NetworkDraftSides mPlayerSides;
     /* 0x014 */ NetworkDraftMachineInfo mEntries[8];
 }; // size: 0x414
