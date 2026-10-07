@@ -18,17 +18,12 @@
 #include "NL/nlBasicString.h"
 #include "NL/nlBind.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlFormat_fwd.h"
 #include "NL/nlPrint.h"
 
 #include <string.h>
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
-template <typename StringType, typename T0>
-StringType Format(const StringType& string, const T0& t0);
-
-template <typename StringType, typename T0, typename T1>
-StringType Format(const StringType& string, const T0& t0, const T1& t1);
 
 ChallengePreviewOverlay::ChallengePreviewOverlay(ScreenMovement movement)
     : BaseOverlayHandler(1, POSITION_ALL)
