@@ -1,5 +1,4 @@
-#include "Game/GL/GLSkinMesh.h"
-#include "Game/GL/GLSkinMesh.inl"
+#include "Game/GL/ShaderSkinMesh.h"
 
 #include "Game/PoseAccumulator.h"
 #include "NL/nlMemory.h"
