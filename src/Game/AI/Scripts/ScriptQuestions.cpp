@@ -34,7 +34,6 @@
 #include "Game/Ball.h"
 #include "Game/Team.h"
 extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
 extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
@@ -1436,7 +1435,7 @@ extern "C" float fn_800D9A38(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    nlVector3 vRepulsion = fn_8002E144(pFielder)->GetLastRepulsionVector(AVOID_GOALIES);
+    nlVector3 vRepulsion = pFielder->GetAvoidController()->GetLastRepulsionVector(AVOID_GOALIES);
     float fMagnitude = nlVec3Length(vRepulsion);
     float fScore = NormalizeVal(fMagnitude, g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMin,
         g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMax);
@@ -1452,7 +1451,7 @@ extern "C" float fn_800D9B0C(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_FIELDERS);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_FIELDERS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1463,7 +1462,7 @@ extern "C" float fn_800D9B74(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_POWERUPS);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_POWERUPS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1474,7 +1473,7 @@ extern "C" float fn_800D9BDC(cFielder* pFielder)
         return 0.0f;
     }
 
-    if ((fn_8002E144(pFielder)->m_CurrentlyAvoiding & AVOID_SIDELINES) != 0)
+    if ((pFielder->GetAvoidController()->m_CurrentlyAvoiding & AVOID_SIDELINES) != 0)
     {
         return 1.0f;
     }
@@ -1489,7 +1488,7 @@ extern "C" float fn_800D9C24(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_EVERYTHING);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_EVERYTHING);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 

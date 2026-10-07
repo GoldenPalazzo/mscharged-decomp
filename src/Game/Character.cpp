@@ -102,7 +102,6 @@ struct UnidentifiedCharacterAnimState
 
 inline float ClampMin(float speedRatio, const float min);
 inline float ClampMax(float speedRatio, const float max);
-extern "C" void fn_8002E5F4(cFielder*, int);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 
@@ -2461,7 +2460,7 @@ extern "C" void fn_80022824(cPlayer*)
                 cFielder* pFielder = pTeam->GetFielder(j);
                 if (pFielder->fn_8003EA6C())
                 {
-                    fn_8002E5F4(pFielder, 0);
+                    pFielder->EndSuperPower(0);
                 }
                 else if (pFielder->mUnidentified024.m_eCharacterClass == 13
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
@@ -2570,7 +2569,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         cFielder* pFielder = (cFielder*)pPlayer;
         if (pFielder->IsInvincible())
         {
-            fn_8002E5F4(pEventData->mUnidentified04, 0);
+            pEventData->mUnidentified04->EndSuperPower(0);
         }
         else if (!pFielder->IsFallenDown())
         {

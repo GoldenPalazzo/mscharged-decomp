@@ -164,6 +164,7 @@ struct UnidentifiedFielderAction410
 };
 
 class FuzzyVariant;
+class AvoidController;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
@@ -195,6 +196,21 @@ class cFielder : public cPlayer
     friend float fn_80030750(cFielder*);
 
 public:
+    AvoidController* GetAvoidController();
+    bool EndMushroom();
+    bool EndShrink();
+    bool EndStar();
+    void EndFrozenOrDazed();
+    void EndConfusion();
+    void EndDaze();
+    bool EndSuperPower(int);
+    bool EndDaisySuperPower(bool);
+    bool EndBirdoSuperPower();
+    bool EndKoopaSuperPower();
+    bool EndMarioSuperPower();
+    bool EndPeachSuperPower(bool);
+    bool EndYoshiSuperPower(bool);
+
     void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
     PlayerTweaks* GetTweaks() const;
     void AddDesiredPosition(const nlVector3& position, float urgency, float weight);
@@ -205,7 +221,8 @@ public:
     float GetSpeedPowerupAdjusted(float fSpeed);
 
     unsigned int IsFrozen() const;
-    unsigned int IsShattered();
+    unsigned int IsShattered() const;
+    bool fn_8003881C() const;
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         const int* nModelID, cSHierarchy* pHierarchy,
@@ -673,12 +690,6 @@ public:
 // Shared fielder functions and data.
 extern "C" bool fn_8003C180(cFielder*);
 extern "C" void fn_8003C5D8(cFielder* pFielder, bool bParam, unsigned short aDirection);
-extern "C" void fn_8002E52C(cFielder*);
-extern "C" void fn_8002E580(cFielder* pFielder);
-extern "C" void fn_8002E66C(cFielder*, bool);
-extern "C" void fn_8002E818(cFielder*);
-extern "C" void fn_8002E898(cFielder*, bool);
-extern "C" void fn_8002E934(cFielder*, bool);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" bool fn_8002F1E0(cFielder*);
 extern "C" bool fn_8002F310(cFielder* pFielder);
@@ -694,7 +705,6 @@ extern "C" void fn_800368E4(cFielder*);
 extern "C" bool fn_80036A58(cFielder*, unsigned short*);
 extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
 extern "C" bool fn_80036F88(cFielder* pFielder);
-extern "C" bool fn_8003881C(cFielder* pFielder);
 extern "C" bool fn_800392D8(cFielder*);
 extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
 extern "C" float fn_800394A8(cFielder*, int);

@@ -15,7 +15,6 @@
 #include "Game/Field.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" AvoidController* fn_8002E144(cFielder*);
 
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 
@@ -274,7 +273,7 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
         {
             list.m_pEnd = 0;
             list.m_pStart = 0;
-            AvoidController* controller = fn_8002E144((cFielder*)pCharacter);
+            AvoidController* controller = ((cFielder*)pCharacter)->GetAvoidController();
             UnidentifiedAvoidanceTree& tree = controller->mUnidentified174;
             tree.Walk(
                 &callback, &UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback);
@@ -438,8 +437,7 @@ void UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback(
     const u32&, UnidentifiedAvoidanceValue* value)
 {
     AvoidableObject* pObject = value->mUnidentified008;
-    AvoidController* controller = fn_8002E144(
-        ((AvoidableFielder*)value->mUnidentified004)->m_pFielder);
+    AvoidController* controller = (((AvoidableFielder*)value->mUnidentified004)->m_pFielder)->GetAvoidController();
     float fWeight = 0.0f;
     if (controller->UnidentifiedCanAvoid(pObject->mType))
     {

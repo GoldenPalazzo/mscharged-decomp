@@ -163,7 +163,6 @@ extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
-extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
@@ -172,17 +171,12 @@ extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" void fn_8002E340(cFielder* pFielder);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 extern "C" bool fn_8003E99C(const cFielder* pFielder);
-extern "C" void fn_8002E718(cFielder* pFielder);
-extern "C" void fn_8002E798(cFielder* pFielder);
-extern "C" void fn_8002E39C(cFielder* pFielder);
-extern "C" void fn_8002E2E4(cFielder* pFielder);
 
 
 
@@ -1382,7 +1376,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         return;
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     float fElectrocutionTime;
@@ -1475,7 +1469,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (m_pBall == 0)
@@ -1691,11 +1685,11 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
         }
 
-        fn_8002E718(this);
-        fn_8002E798(this);
-        fn_8002E3F8(this);
-        fn_8002E39C(this);
-        fn_8002E2E4(this);
+        EndBirdoSuperPower();
+        EndKoopaSuperPower();
+        EndFrozenOrDazed();
+        EndStar();
+        EndMushroom();
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -1888,11 +1882,11 @@ void cFielder::fn_80046244()
             SetBallFallState(g_pBall);
         }
 
-        fn_8002E718(this);
-        fn_8002E798(this);
-        fn_8002E3F8(this);
-        fn_8002E39C(this);
-        fn_8002E2E4(this);
+        EndBirdoSuperPower();
+        EndKoopaSuperPower();
+        EndFrozenOrDazed();
+        EndStar();
+        EndMushroom();
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -2306,7 +2300,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         return false;
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
 
     mUnidentified360 = bDoFrameLock;
 
@@ -2937,7 +2931,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
         for (int j = 0; j < 4; j++)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
-            if (pCaptain != pFielder && fn_8003881C(pFielder)
+            if (pCaptain != pFielder && pFielder->fn_8003881C()
                 && g_pGame->m_uMegastrikeGoals == 0)
             {
                 RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
@@ -3746,7 +3740,7 @@ void cFielder::ActionPostWhistle(float fDeltaT)
 void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     float fRadius)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (g_pBall->m_pOwner == this)
@@ -3799,7 +3793,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
 
 void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     mUnidentified360 = false;
@@ -3880,7 +3874,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
         }
     }
 
-    fn_8002E580(this);
+    EndDaze();
     fn_8009750C();
 
     PlayRumbleAction(2, GetGlobalPad());
@@ -4702,7 +4696,7 @@ void cFielder::fn_8004D238()
 
 void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (IsFallenDown() && m_eActionState == (eFielderActionState)0x1C)
@@ -4747,7 +4741,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 {
     if (!IsFallenDown())
     {
-        fn_8002E3F8(this);
+        EndFrozenOrDazed();
 
         bool bHadBall = false;
         if (m_pBall != 0)
@@ -4960,7 +4954,7 @@ void cFielder::fn_8004E228()
 
 void cFielder::fn_8004E438()
 {
-    fn_8002E340(this);
+    EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_UNKNOWN_32);
 
@@ -5165,7 +5159,7 @@ void cFielder::fn_8004EC40()
 
 void cFielder::fn_8004ED64()
 {
-    fn_8002E340(this);
+    EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction((eFielderActionState)0x21);
     InitMovementCoast();

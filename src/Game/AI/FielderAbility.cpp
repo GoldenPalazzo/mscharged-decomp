@@ -52,13 +52,12 @@ float gDKSuperHitTiltScale = 0.4f;
 float gWaluigiTankOffCost;
 bool gPeachPhotoEmitEnabled;
 
-extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 
 
 void cFielder::InitActionDKSuper()
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     SetAction((eFielderActionState)0x1D);
     SetAnimState(0x68, true, 0.2f, false, false);
     muInvincibleStatus |= 1;
@@ -125,7 +124,7 @@ void cFielder::CleanUpPeachSuper()
 
 void cFielder::InitActionPeachSuper()
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction((eFielderActionState)0x1D);
     muInvincibleStatus |= 1;

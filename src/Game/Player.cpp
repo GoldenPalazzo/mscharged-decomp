@@ -62,7 +62,6 @@
 cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
-extern "C" void fn_8002E3F8(cFielder*);
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
@@ -855,7 +854,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
         EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
         pPlayer->fn_8001F1C0(2);
-        fn_8002E3F8((cFielder*)pPlayer);
+        ((cFielder*)pPlayer)->EndFrozenOrDazed();
         pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
         {

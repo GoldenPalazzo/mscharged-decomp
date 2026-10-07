@@ -853,7 +853,6 @@ extern "C" int fn_800B04B4(SandTombWeather*)
     return 4;
 }
 
-extern "C" AvoidController* fn_8002E144(cFielder*);
 extern float lbl_806DC0A8;
 extern int lbl_806DC0B0;
 
@@ -927,7 +926,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
 
     position.z = 0.0f;
     m_pFielder->AddDesiredPosition(position, 2.0f, 1.0f);
-    AvoidController* avoidance = fn_8002E144(m_pFielder);
+    AvoidController* avoidance = m_pFielder->GetAvoidController();
     avoidance->m_fRepulsionMult = 0.5f;
     if (g_pBall->m_pOwner != NULL && g_pBall->m_pOwner->m_eClassType == GOALIE)
     {

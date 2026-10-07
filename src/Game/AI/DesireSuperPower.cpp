@@ -51,8 +51,6 @@
 extern "C" const nlVector3* fn_80040234(cFielder*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" void fn_8002E340(cFielder*);
-extern "C" void fn_8002E3F8(cFielder*);
 int ChooseRunDirection(cFielder*, const unsigned short*, int,
     const nlVector2*, float*);
 // Shared position constants used by the super-power desires.
@@ -194,14 +192,14 @@ void DesireSuperPower::SetContext(
 bool DesireSuperPower::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    fn_8002E340(m_pFielder);
+    m_pFielder->EndShrink();
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
     {
         mpTarget = 0;
-        fn_8002E3F8(m_pFielder);
+        m_pFielder->EndFrozenOrDazed();
         mMaxDuration = gBowserSuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
@@ -267,7 +265,7 @@ bool DesireSuperPower::Initialize(void* context)
     case YOSHI:
     {
         mpTarget = 0;
-        fn_8002E3F8(m_pFielder);
+        m_pFielder->EndFrozenOrDazed();
         mMaxDuration = gPeteySuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
@@ -1627,7 +1625,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
         = self->m_pFielder->mUnidentified328;
-    fn_8002E52C(self->m_pFielder);
+    self->m_pFielder->EndConfusion();
     if (self->m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         self->m_pFielder->fn_8009750C();

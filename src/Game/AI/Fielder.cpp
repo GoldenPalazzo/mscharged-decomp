@@ -15,6 +15,7 @@
 #include "Game/AI/DesireSteering.h"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/DesireUsePowerup.h"
+#include "Game/AI/DesireSuperPower.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/AvoidableObject.h"
 #include "NL/nlMain.h"
@@ -4360,4 +4361,220 @@ bool cFielder::fn_8003499C() const
             mUnidentified428->mScriptMachine->mActiveState)->fn_800C0E54();
     }
     return result;
+}
+
+AvoidController* cFielder::GetAvoidController()
+{
+    return ((DesireSteering*)fn_8002E08C(this, 34))->m_pAvoidance;
+}
+
+float cFielder::GetSpeedPowerupAdjusted(float speed)
+{
+    float multiplier = 1.0f;
+    if (speed >= 0.0f)
+    {
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 25))
+        {
+            multiplier *= GetMushroomSpeedBoost(m_pTweaks);
+        }
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+        {
+            multiplier *= GetStarSpeedBoost(m_pTweaks);
+        }
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 27))
+        {
+            multiplier *= ((DesireGooey*)GetConcurrentState(
+                mUnidentified428->mScriptMachine, 27))->fn_800BD1F0();
+        }
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 28))
+        {
+            multiplier *= ((DesireShrink*)GetConcurrentState(
+                mUnidentified428->mScriptMachine, 28))->fn_800BD75C();
+        }
+    }
+    return multiplier * speed;
+}
+
+bool cFielder::EndMushroom()
+{
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 25))
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 25);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndShrink()
+{
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 28))
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 28);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndStar()
+{
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 24);
+        return true;
+    }
+    return false;
+}
+
+static inline void EndFrozenState(cFielder* fielder, int state)
+{
+    if (((DesireFrozen*)GetConcurrentState(
+            fielder->mUnidentified428->mScriptMachine, 29))->IsUnidentifiedState(state))
+    {
+        RequestStateMachineDeactivation(GetConcurrentState(
+            fielder->mUnidentified428->mScriptMachine, 29));
+    }
+}
+
+void cFielder::EndDaze()
+{
+    EndFrozenState(this, 1);
+}
+
+void cFielder::EndFrozenOrDazed()
+{
+    if (IsFrozen())
+    {
+        EndFrozenState(this, 2);
+    }
+    else if (fn_8003877C(this))
+    {
+        EndDaze();
+    }
+}
+
+void cFielder::EndConfusion()
+{
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 30))
+    {
+        RequestStateMachineDeactivation(GetConcurrentState(
+            mUnidentified428->mScriptMachine, 30));
+    }
+}
+
+bool cFielder::EndSuperPower(int)
+{
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndDaisySuperPower(bool value)
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == DAISY
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        fn_800C9D74((DesireSuperPower*)fn_8002E08C(this, 23), value);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndBirdoSuperPower()
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == BIRDO
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 23);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndKoopaSuperPower()
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == KOOPA
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 23);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndMarioSuperPower()
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == MARIO
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        DeactivateConcurrentState(mUnidentified428->mScriptMachine, 23);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndPeachSuperPower(bool)
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == PEACH
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::EndYoshiSuperPower(bool)
+{
+    bool active = false;
+    if (mUnidentified024.m_eCharacterClass == YOSHI
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+    {
+        active = true;
+    }
+    if (active)
+    {
+        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        return true;
+    }
+    return false;
+}
+
+unsigned int cFielder::IsShattered() const
+{
+    return ((DesireFrozen*)GetConcurrentState(
+        mUnidentified428->mScriptMachine, 29))->IsUnidentifiedState(4);
+}
+
+bool cFielder::fn_8003881C() const
+{
+    return ((DesireFrozen*)GetConcurrentState(
+        mUnidentified428->mScriptMachine, 29))->IsUnidentifiedState(3);
 }
