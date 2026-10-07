@@ -146,7 +146,7 @@ public:
     virtual void BaseVirtual40();
     virtual void StartNetworkedGame(NetMessageGameStart* message);
     virtual void EndNetworkedGame(int reason);
-    virtual int Send(s8 player, void* buffer, int size, bool reliable);
+    virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
     virtual void DebugDraw();
 };
 
@@ -458,7 +458,7 @@ public:
     virtual void BaseVirtual40();
     virtual void StartNetworkedGame(NetMessageGameStart* message);
     virtual void EndNetworkedGame(int reason);
-    virtual int Send(s8 player, void* buffer, int size, bool reliable);
+    virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
 
     virtual void InitializeLAN();
     virtual void InitializeOnline();

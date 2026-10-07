@@ -267,12 +267,12 @@ void NetworkSession::SendGameStartToEveryone()
         message.mStadium = GameInfoManager::GetInstance()->GetStadium();
     }
 
-    u8 remote = gOnlineTwoLocalPlayers;
+    u8 twoLocalPlayers = gOnlineTwoLocalPlayers;
     for (int machine = 0; machine < 4; ++machine)
     {
         if (machine < machineCount)
         {
-            if (remote)
+            if (twoLocalPlayers)
             {
                 message.mMachinePlayerCounts[machine] = 2;
             }
@@ -1582,8 +1582,6 @@ void NetworkSession::OnVoiceReceived()
 {
 }
 
-// Two local pad indices for the machine's one or two local players.
-
 static void CaptureRecordedGameConfig(RecordedGameConfig* config);
 static void ApplyRecordedGameConfig(RecordedGameConfig* config);
 
@@ -2242,10 +2240,10 @@ void NetworkSession::EndNetworkedGame(int reason)
 }
 
 int NetworkSession::Send(
-    s8 player, void* buffer, int size, bool reliable)
+    s8 machineIndex, void* buffer, int size, bool reliable)
 {
     NetworkSocket* socket = GetDirectSocket();
-    if ((int)player == mLocalMachineId)
+    if ((int)machineIndex == mLocalMachineId)
     {
         socket->Receive(buffer, size);
         return 1;
@@ -2257,7 +2255,7 @@ int NetworkSession::Send(
         return 0;
     }
 
-    s8 machine = player;
+    s8 machine = machineIndex;
     if (NetTournManager::Instance()->mTournamentMachineMappingActive)
     {
         machine = (s8)NetTournManager::Instance()->MachineIdxToTournamentIdx(

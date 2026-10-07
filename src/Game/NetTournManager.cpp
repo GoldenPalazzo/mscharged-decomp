@@ -383,12 +383,12 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
     message.mAwayCharacters[3] = info.mSidekickIndex[1][2];
     message.mStadium = info.mStadiumIndex;
 
-    u8 remote = gOnlineTwoLocalPlayers;
+    u8 twoLocalPlayers = gOnlineTwoLocalPlayers;
     for (int machine = 0; machine < 4; ++machine)
     {
         if (machine < 2)
         {
-            if (remote)
+            if (twoLocalPlayers)
             {
                 message.mMachinePlayerCounts[machine] = 2;
             }
