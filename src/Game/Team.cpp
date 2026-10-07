@@ -51,16 +51,15 @@
 
 cTeam* g_pTeams[2] = { NULL, NULL };
 cTeam* g_pCurrentlyUpdatingTeam;
-float lbl_806DBEF0 = 0.5f;
-float lbl_806DBEF4 = 7.5f;
-float lbl_806DBEF8 = 10.0f;
-float lbl_806DBEFC = 1.0f;
-float lbl_806DBF00 = 1.75f;
-u16 lbl_806DBF04 = 0xFFFF;
-u16 lbl_806DBF06 = 0xFFFF;
-bool lbl_806E0E04;
-unsigned long lbl_806E0E08[2];
-
+float gPowerupToggleDelay = 0.5f;
+float gTeamPowerupAwardInterval = 7.5f;
+float gMeterRumbleRandomRange = 10.0f;
+float gMeterRumbleChanceThreshold = 1.0f;
+float gMeterRumbleDifficultyScale = 1.75f;
+u16 gGenDetTeamDebugType = 0xFFFF;
+u16 gDetTeamDebugType = 0xFFFF;
+bool gAlwaysAwardPeriodicPowerups;
+unsigned long gCaptainChantLastPlayTime[2];
 
 struct GenDetTeam
 {
@@ -102,11 +101,11 @@ static inline float WeightedScore2(float fScoreA, float fWeightA,
     return fScoreA * fWeightA + fScoreB * fWeightB;
 }
 
-extern "C" int fn_800A7EA8(const void*, const void*);
-extern "C" void fn_800A6C94(cTeam*, float);
-extern "C" unsigned long fn_800A6EE0(cTeam*);
-extern "C" void fn_800A701C(cTeam*);
-extern "C" void fn_800A83CC(cTeam*, bool);
+int CompareFieldersByTeamRelativeX(const void*, const void*);
+void UpdateTeamTimers(cTeam*, float);
+unsigned long GetTeamCaptainChantCue(cTeam*);
+void UpdateTeamCaptainChant(cTeam*);
+void AssignTeamRoles(cTeam*, bool);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
@@ -121,9 +120,9 @@ static inline cAIPad* GetPlayerController(const cPlayer* player)
 }
 
 /**
- * Offset/Address/Size: 0x32AC | 0x800A8FE0 | size: 0x70
+ * Offset/Address/Size: 0x3294 | 0x800A8FE0 | size: 0x70
  */
-float cTeam::fn_800A8FE0()
+float cTeam::GetAverageDefenseRating()
 {
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
@@ -134,9 +133,9 @@ float cTeam::fn_800A8FE0()
 }
 
 /**
- * Offset/Address/Size: 0x324C | 0x800A8F80 | size: 0x60
+ * Offset/Address/Size: 0x3234 | 0x800A8F80 | size: 0x60
  */
-float cTeam::fn_800A8F80()
+float cTeam::GetAveragePassingRating()
 {
     float fPassRating = 0.0f;
     for (int i = 0; i < 4; i++)
@@ -147,9 +146,9 @@ float cTeam::fn_800A8F80()
 }
 
 /**
- * Offset/Address/Size: 0x31EC | 0x800A8F20 | size: 0x60
+ * Offset/Address/Size: 0x31D4 | 0x800A8F20 | size: 0x60
  */
-float cTeam::fn_800A8F20()
+float cTeam::GetAverageShootingRating()
 {
     float fShootRating = 0.0f;
     for (int i = 0; i < 4; i++)
@@ -160,9 +159,9 @@ float cTeam::fn_800A8F20()
 }
 
 /**
- * Offset/Address/Size: 0x318C | 0x800A8EC0 | size: 0x60
+ * Offset/Address/Size: 0x3174 | 0x800A8EC0 | size: 0x60
  */
-float cTeam::fn_800A8EC0()
+float cTeam::GetAverageMovementRating()
 {
     float fMovementRating = 0.0f;
     for (int i = 0; i < 4; i++)
@@ -174,13 +173,13 @@ float cTeam::fn_800A8EC0()
 }
 
 /**
- * Offset/Address/Size: 0x30B4 | 0x800A8DE8 | size: 0xD8
+ * Offset/Address/Size: 0x309C | 0x800A8DE8 | size: 0xD8
  */
-void cTeam::fn_800A8DE8(RunningChecksum* runningChecksum)
+void cTeam::ChecksumState(RunningChecksum* runningChecksum)
 {
     runningChecksum->ChecksumData(&mfPowerupMeter, sizeof(mfPowerupMeter));
-    runningChecksum->ChecksumData(&mUnidentified00C, sizeof(mUnidentified00C));
-    runningChecksum->ChecksumData(&mUnidentified010, sizeof(mUnidentified010));
+    runningChecksum->ChecksumData(&mfAttackIndicatorProgress, sizeof(mfAttackIndicatorProgress));
+    runningChecksum->ChecksumData(&mfShotScore, sizeof(mfShotScore));
     runningChecksum->ChecksumData(&mfPowerupTimer, sizeof(mfPowerupTimer));
     runningChecksum->ChecksumData(&mpCurrentSituation, sizeof(mpCurrentSituation));
     runningChecksum->ChecksumData(&meCurrentTeamStyle, sizeof(meCurrentTeamStyle));
@@ -193,9 +192,9 @@ void cTeam::fn_800A8DE8(RunningChecksum* runningChecksum)
 }
 
 /**
- * Offset/Address/Size: 0x2BCC | 0x800A8900 | size: 0x4E8
+ * Offset/Address/Size: 0x2BB4 | 0x800A8900 | size: 0x4E8
  */
-void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
+void cTeam::SyncLog(void* context, DebugWriteCache* cache)
 {
     WriteTeamStateLog(context, cache);
 
@@ -211,9 +210,9 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
 
 inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DBF06 == 0xFFFF)
+    if (gDetTeamDebugType == 0xFFFF)
     {
-        lbl_806DBF06 = cache->BeginType("DetTeam");
+        gDetTeamDebugType = cache->BeginType("DetTeam");
         cache->AddField(8, gDebugFieldTypes[8].size, 0, "m_nSide");
         cache->AddField(8, gDebugFieldTypes[8].size,
             (u8*)&m_nScore - (u8*)this, "m_nScore");
@@ -246,13 +245,13 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
     }
 
     cTeam* copy = (cTeam*)cache->WriteData(
-        lbl_806DBF06, this, offsetof(cTeam, m_ePowerupList));
+        gDetTeamDebugType, this, offsetof(cTeam, m_ePowerupList));
     if (copy != NULL)
     {
         *(int*)&copy->mpBestBallInterceptor = mpBestBallInterceptor == NULL
             ? -1
             : mpBestBallInterceptor->mUnidentified120;
-        cache->ChecksumData(lbl_806DBF06, copy, context);
+        cache->ChecksumData(gDetTeamDebugType, copy, context);
     }
 
     GenDetTeam data;
@@ -272,11 +271,11 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
             : m_pBallInterceptOrderedFielders[i]->mUnidentified120;
     }
     data.m_nTeamPlayTransFunc
-        = mUnidentified0F0->mScriptMachine->mTransition.mValue.mFuncHash;
+        = m_pAIContext->mScriptMachine->mTransition.mValue.mFuncHash;
 
-    if (lbl_806DBF04 == 0xFFFF)
+    if (gGenDetTeamDebugType == 0xFFFF)
     {
-        lbl_806DBF04 = cache->BeginType("GenDetTeam");
+        gGenDetTeamDebugType = cache->BeginType("GenDetTeam");
         cache->AddArrayField(8, gDebugFieldTypes[8].size, 2, 0,
             "m_ePowupType[]");
         cache->AddArrayField(8, gDebugFieldTypes[8].size, 2,
@@ -294,14 +293,13 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
         cache->EndType();
     }
 
-    cache->ChecksumData(lbl_806DBF04, &data, context);
-    cache->WriteData(lbl_806DBF04, &data, sizeof(data));
-
+    cache->ChecksumData(gGenDetTeamDebugType, &data, context);
+    cache->WriteData(gGenDetTeamDebugType, &data, sizeof(data));
 
 }
 
 /**
- * Offset/Address/Size: 0x2B50 | 0x800A8884 | size: 0x7C
+ * Offset/Address/Size: 0x2B38 | 0x800A8884 | size: 0x7C
  */
 cFielder* cTeam::GetRearMostFielder()
 {
@@ -322,7 +320,7 @@ cFielder* cTeam::GetRearMostFielder()
 }
 
 /**
- * Offset/Address/Size: 0x2AD4 | 0x800A8808 | size: 0x7C
+ * Offset/Address/Size: 0x2ABC | 0x800A8808 | size: 0x7C
  */
 cFielder* cTeam::GetFrontMostFielder()
 {
@@ -343,7 +341,7 @@ cFielder* cTeam::GetFrontMostFielder()
 }
 
 /**
- * Offset/Address/Size: 0x2ACC | 0x800A8800 | size: 0x8
+ * Offset/Address/Size: 0x2AB4 | 0x800A8800 | size: 0x8
  */
 cFielder* cTeam::GetStriker() const
 {
@@ -351,7 +349,7 @@ cFielder* cTeam::GetStriker() const
 }
 
 /**
- * Offset/Address/Size: 0x2AC4 | 0x800A87F8 | size: 0x8
+ * Offset/Address/Size: 0x2AAC | 0x800A87F8 | size: 0x8
  */
 cFielder* cTeam::GetCaptain()
 {
@@ -359,7 +357,7 @@ cFielder* cTeam::GetCaptain()
 }
 
 /**
- * Offset/Address/Size: 0x2768 | 0x800A849C | size: 0x35C
+ * Offset/Address/Size: 0x2750 | 0x800A849C | size: 0x35C
  */
 void cTeam::AssignMarks(bool bForceReMark)
 {
@@ -461,9 +459,9 @@ void cTeam::AssignMarks(bool bForceReMark)
 }
 
 /**
- * Offset/Address/Size: 0x2698 | 0x800A83CC | size: 0xD0
+ * Offset/Address/Size: 0x2680 | 0x800A83CC | size: 0xD0
  */
-extern "C" void fn_800A83CC(cTeam* pTeam, bool bSituationChanged)
+void AssignTeamRoles(cTeam* pTeam, bool bSituationChanged)
 {
     if (pTeam->mtRoleTimer.m_uPackedTime == 0 || bSituationChanged)
     {
@@ -504,7 +502,7 @@ extern "C" void fn_800A83CC(cTeam* pTeam, bool bSituationChanged)
 }
 
 /**
- * Offset/Address/Size: 0x2550 | 0x800A8284 | size: 0x148
+ * Offset/Address/Size: 0x2538 | 0x800A8284 | size: 0x148
  */
 bool cTeam::AssignSituation()
 {
@@ -555,9 +553,9 @@ bool cTeam::AssignSituation()
 }
 
 /**
- * Offset/Address/Size: 0x2364 | 0x800A8098 | size: 0x1EC
+ * Offset/Address/Size: 0x234C | 0x800A8098 | size: 0x1EC
  */
-void cTeam::fn_800A8098()
+void cTeam::UpdateShotScore()
 {
     if (g_pBall->GetOwnerFielder() != NULL)
     {
@@ -572,8 +570,8 @@ void cTeam::fn_800A8098()
 
             float fScoreValue = CalcShotScoreValue(
                 g_pBall->GetOwnerFielder(), bIsChipShot, false);
-            mUnidentified010 = fScoreValue;
-            mUnidentified00C = nlMinEquals(
+            mfShotScore = fScoreValue;
+            mfAttackIndicatorProgress = nlMinEquals(
                 nlMaxEquals(
                     fn_80034F98(g_pBall->GetOwnerFielder(),
                         fScoreValue)
@@ -603,8 +601,8 @@ void cTeam::fn_800A8098()
                 float fScoreValue = CalcShotScoreValue(
                     g_pBall->GetPassTargetFielder(),
                     g_pBall->GetPassTargetFielder()->bIsModified, false);
-                mUnidentified010 = fScoreValue;
-                mUnidentified00C = nlMinEquals(
+                mfShotScore = fScoreValue;
+                mfAttackIndicatorProgress = nlMinEquals(
                     nlMaxEquals(
                         fn_80034F98(g_pBall->GetPassTargetFielder(),
                             fScoreValue)
@@ -617,7 +615,7 @@ void cTeam::fn_800A8098()
 }
 
 /**
- * Offset/Address/Size: 0x21C4 | 0x800A7EF8 | size: 0x1A0
+ * Offset/Address/Size: 0x21AC | 0x800A7EF8 | size: 0x1A0
  */
 void cTeam::UpdateTeamAI(float fDeltaT)
 {
@@ -627,7 +625,7 @@ void cTeam::UpdateTeamAI(float fDeltaT)
         mtTeamStyleTimer.SetSeconds(1.0f);
     }
 
-    qsort(m_pFieldersByTeamRelativeX, 4, 4, fn_800A7EA8);
+    qsort(m_pFieldersByTeamRelativeX, 4, 4, CompareFieldersByTeamRelativeX);
 
     bool bSituationChanged = AssignSituation();
     if (bSituationChanged)
@@ -636,15 +634,15 @@ void cTeam::UpdateTeamAI(float fDeltaT)
     }
 
     m_pFormationManager->Update(fDeltaT);
-    fn_800A83CC(this, bSituationChanged);
+    AssignTeamRoles(this, bSituationChanged);
     AssignMarks(bSituationChanged);
 
     if (!UserControlledT(this)
         && ShootToScoreMeter::instance.m_bMeterVisible)
     {
-        float fRumbleChance = lbl_806DBF00 * Difficult(this);
-        if (nlRandomf(lbl_806DBEF8, &nlDefaultSeed) < fRumbleChance
-            && fRumbleChance > lbl_806DBEFC)
+        float fRumbleChance = gMeterRumbleDifficultyScale * Difficult(this);
+        if (nlRandomf(gMeterRumbleRandomRange, &nlDefaultSeed) < fRumbleChance
+            && fRumbleChance > gMeterRumbleChanceThreshold)
         {
             cFielder* pBallOwner = g_pBall->GetOwnerFielder();
             if (pBallOwner != NULL && pBallOwner != GetCaptain()
@@ -657,13 +655,13 @@ void cTeam::UpdateTeamAI(float fDeltaT)
         }
     }
 
-    mUnidentified0F0->Update(true, fDeltaT);
+    m_pAIContext->Update(true, fDeltaT);
 }
 
 /**
- * Offset/Address/Size: 0x2174 | 0x800A7EA8 | size: 0x50
+ * Offset/Address/Size: 0x215C | 0x800A7EA8 | size: 0x50
  */
-extern "C" int fn_800A7EA8(const void* a, const void* b)
+int CompareFieldersByTeamRelativeX(const void* a, const void* b)
 {
     cFielder* p1 = *(cFielder**)a;
     cFielder* p2 = *(cFielder**)b;
@@ -688,7 +686,7 @@ extern "C" int fn_800A7EA8(const void* a, const void* b)
 }
 
 /**
- * Offset/Address/Size: 0x1CDC | 0x800A7A10 | size: 0x498
+ * Offset/Address/Size: 0x1CC4 | 0x800A7A10 | size: 0x498
  */
 void cTeam::CalculateNewBallInterceptTimes()
 {
@@ -849,7 +847,7 @@ void cTeam::CalculateNewBallInterceptTimes()
 }
 
 /**
- * Offset/Address/Size: 0x1CD4 | 0x800A7A08 | size: 0x8
+ * Offset/Address/Size: 0x1CBC | 0x800A7A08 | size: 0x8
  */
 bool cTeam::CalculateFormationPosition(nlVector3& v3DestPosition,
     cFielder* pFielder, bool bInPosition,
@@ -860,9 +858,9 @@ bool cTeam::CalculateFormationPosition(nlVector3& v3DestPosition,
 }
 
 /**
- * Offset/Address/Size: 0x1C64 | 0x800A7998 | size: 0x70
+ * Offset/Address/Size: 0x1C4C | 0x800A7998 | size: 0x70
  */
-void cTeam::fn_800A7998()
+void cTeam::StopPlayingAllTrackedSFX()
 {
     s32 side = m_nSide;
     s32 i_player = 0;
@@ -874,7 +872,7 @@ void cTeam::fn_800A7998()
 }
 
 /**
- * Offset/Address/Size: 0x1850 | 0x800A7584 | size: 0x414
+ * Offset/Address/Size: 0x1838 | 0x800A7584 | size: 0x414
  */
 void cTeam::ResetCharacters()
 {
@@ -1037,7 +1035,7 @@ void cTeam::ResetCharacters()
 }
 
 /**
- * Offset/Address/Size: 0x1474 | 0x800A71A8 | size: 0x3DC
+ * Offset/Address/Size: 0x145C | 0x800A71A8 | size: 0x3DC
  */
 void cTeam::UpdateControllers()
 {
@@ -1175,9 +1173,9 @@ void cTeam::UpdateControllers()
 }
 
 /**
- * Offset/Address/Size: 0x12E8 | 0x800A701C | size: 0x18C
+ * Offset/Address/Size: 0x12D0 | 0x800A701C | size: 0x18C
  */
-extern "C" void fn_800A701C(cTeam* pTeam)
+void UpdateTeamCaptainChant(cTeam* pTeam)
 {
     if (!GetStadiumUnknown0x10(
             GameInfoManager::Instance()->GetStadium()))
@@ -1185,7 +1183,7 @@ extern "C" void fn_800A701C(cTeam* pTeam)
         return;
     }
 
-    unsigned long nCueId = fn_800A6EE0(pTeam);
+    unsigned long nCueId = GetTeamCaptainChantCue(pTeam);
     if (nCueId == 0)
     {
         return;
@@ -1215,7 +1213,7 @@ extern "C" void fn_800A701C(cTeam* pTeam)
 
         unsigned long nCurrentTime = (unsigned long)(OSGetTime()
             / ((*(unsigned long*)0x800000F8 >> 2) / 1000));
-        if (nCurrentTime - lbl_806E0E08[0] <= 1200)
+        if (nCurrentTime - gCaptainChantLastPlayTime[0] <= 1200)
         {
             return;
         }
@@ -1224,7 +1222,7 @@ extern "C" void fn_800A701C(cTeam* pTeam)
         {
             PlayCaptainChant(14, nCueId, pTeam);
         }
-        lbl_806E0E08[0] = nCurrentTime;
+        gCaptainChantLastPlayTime[0] = nCurrentTime;
     }
     else
     {
@@ -1233,9 +1231,9 @@ extern "C" void fn_800A701C(cTeam* pTeam)
 }
 
 /**
- * Offset/Address/Size: 0x11AC | 0x800A6EE0 | size: 0x13C
+ * Offset/Address/Size: 0x1194 | 0x800A6EE0 | size: 0x13C
  */
-extern "C" unsigned long fn_800A6EE0(cTeam* pTeam)
+unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
 {
     unsigned long result = 0;
     switch (pTeam->m_pPlayers[0]->mUnidentified11C->unknown_0x14)
@@ -1310,20 +1308,20 @@ extern "C" unsigned long fn_800A6EE0(cTeam* pTeam)
 }
 
 /**
- * Offset/Address/Size: 0x11A8 | 0x800A6EDC | size: 0x4
+ * Offset/Address/Size: 0x1190 | 0x800A6EDC | size: 0x4
  */
 void cTeam::StopGameplayEffectsAndSounds()
 {
-    fn_800A701C(this);
+    UpdateTeamCaptainChant(this);
 }
 
 /**
- * Offset/Address/Size: 0x10E4 | 0x800A6E18 | size: 0xC4
+ * Offset/Address/Size: 0x10CC | 0x800A6E18 | size: 0xC4
  */
 void cTeam::Update(float fDeltaT)
 {
     g_pCurrentlyUpdatingTeam = this;
-    fn_800A6C94(this, fDeltaT);
+    UpdateTeamTimers(this, fDeltaT);
     CalculateNewBallInterceptTimes();
 
     if (mpBestBallInterceptor == NULL)
@@ -1341,15 +1339,14 @@ void cTeam::Update(float fDeltaT)
     }
 
     UpdateTeamAI(fDeltaT);
-    fn_800A8098();
-    fn_800A701C(this);
+    UpdateShotScore();
+    UpdateTeamCaptainChant(this);
 }
 
 /**
- * Offset/Address/Size: 0xF60 | 0x800A6C94 | size: 0x184
+ * Offset/Address/Size: 0xF48 | 0x800A6C94 | size: 0x184
  */
-extern "C" int fn_800A7EA8(const void*, const void*);
-extern "C" void fn_800A6C94(cTeam* pTeam, float fDeltaT)
+void UpdateTeamTimers(cTeam* pTeam, float fDeltaT)
 {
     if ((g_pGame->IsGameplayOrOvertime()
             || g_pGame->GetGameState() == 1)
@@ -1358,9 +1355,9 @@ extern "C" void fn_800A6C94(cTeam* pTeam, float fDeltaT)
         pTeam->mfPowerupTimer -= fDeltaT;
         if (pTeam->mfPowerupTimer < 0.0f)
         {
-            pTeam->mfPowerupTimer = lbl_806DBEF4;
+            pTeam->mfPowerupTimer = gTeamPowerupAwardInterval;
             if (GameInfoManager::Instance()->IsRule0x0Equal10()
-                || lbl_806E0E04)
+                || gAlwaysAwardPeriodicPowerups)
             {
                 PowerupBase::AwardPowerup(pTeam, NULL, false);
             }
@@ -1391,7 +1388,7 @@ extern "C" void fn_800A6C94(cTeam* pTeam, float fDeltaT)
 }
 
 /**
- * Offset/Address/Size: 0xEF8 | 0x800A6C2C | size: 0x68
+ * Offset/Address/Size: 0xEE0 | 0x800A6C2C | size: 0x68
  */
 void cTeam::PreUpdate(float fDeltaT)
 {
@@ -1402,7 +1399,7 @@ void cTeam::PreUpdate(float fDeltaT)
 }
 
 /**
- * Offset/Address/Size: 0xE50 | 0x800A6B84 | size: 0xA8
+ * Offset/Address/Size: 0xE38 | 0x800A6B84 | size: 0xA8
  */
 nlVector3 cTeam::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
 {
@@ -1427,7 +1424,7 @@ nlVector3 cTeam::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
 }
 
 /**
- * Offset/Address/Size: 0xD94 | 0x800A6AC8 | size: 0xBC
+ * Offset/Address/Size: 0xD7C | 0x800A6AC8 | size: 0xBC
  */
 nlVector3 cTeam::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
 {
@@ -1451,7 +1448,7 @@ nlVector3 cTeam::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
 }
 
 /**
- * Offset/Address/Size: 0xD78 | 0x800A6AAC | size: 0x1C
+ * Offset/Address/Size: 0xD60 | 0x800A6AAC | size: 0x1C
  */
 cNet* cTeam::GetOtherNet()
 {
@@ -1459,7 +1456,7 @@ cNet* cTeam::GetOtherNet()
 }
 
 /**
- * Offset/Address/Size: 0xD60 | 0x800A6A94 | size: 0x18
+ * Offset/Address/Size: 0xD48 | 0x800A6A94 | size: 0x18
  */
 cTeam* cTeam::GetOtherTeam()
 {
@@ -1467,7 +1464,7 @@ cTeam* cTeam::GetOtherTeam()
 }
 
 /**
- * Offset/Address/Size: 0xD50 | 0x800A6A84 | size: 0x10
+ * Offset/Address/Size: 0xD38 | 0x800A6A84 | size: 0x10
  */
 cPlayer* cTeam::GetPlayer(int nIndex)
 {
@@ -1475,7 +1472,7 @@ cPlayer* cTeam::GetPlayer(int nIndex)
 }
 
 /**
- * Offset/Address/Size: 0xD40 | 0x800A6A74 | size: 0x10
+ * Offset/Address/Size: 0xD28 | 0x800A6A74 | size: 0x10
  */
 cFielder* cTeam::GetFielder(int nIndex)
 {
@@ -1483,7 +1480,7 @@ cFielder* cTeam::GetFielder(int nIndex)
 }
 
 /**
- * Offset/Address/Size: 0xCC8 | 0x800A69FC | size: 0x78
+ * Offset/Address/Size: 0xCB0 | 0x800A69FC | size: 0x78
  */
 int cTeam::GetNumAssignedControllers()
 {
@@ -1505,7 +1502,7 @@ int cTeam::GetNumAssignedControllers()
 }
 
 /**
- * Offset/Address/Size: 0xC40 | 0x800A6974 | size: 0x88
+ * Offset/Address/Size: 0xC28 | 0x800A6974 | size: 0x88
  */
 cPlayer* cTeam::GetControlledPlayer(cGlobalPad* pController)
 {
@@ -1513,13 +1510,13 @@ cPlayer* cTeam::GetControlledPlayer(cGlobalPad* pController)
     cPlayer* pRetval = NULL;
     for (int i = 0; i < 5; i++)
     {
-        DetInput* pUnidentifiedInput = m_pPlayers[i]->GetGlobalPad();
-        cGlobalPad* pUnidentifiedController = NULL;
-        if (pUnidentifiedInput != NULL)
+        DetInput* pInput = m_pPlayers[i]->GetGlobalPad();
+        cGlobalPad* pLocalPad = NULL;
+        if (pInput != NULL)
         {
-            pUnidentifiedController = ((NetworkPeerChannel*)pUnidentifiedInput->m_pMyUser)->GetLocalChannelPad();
+            pLocalPad = ((NetworkPeerChannel*)pInput->m_pMyUser)->GetLocalChannelPad();
         }
-        if (pUnidentifiedController == pController)
+        if (pLocalPad == pController)
         {
             pRetval = m_pPlayers[i];
             break;
@@ -1530,16 +1527,16 @@ cPlayer* cTeam::GetControlledPlayer(cGlobalPad* pController)
 
 extern "C" ScriptMachine* fn_800A6968(cTeam* pTeam)
 {
-    return pTeam->mUnidentified0F0->mScriptMachine;
+    return pTeam->m_pAIContext->mScriptMachine;
 }
 
-extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam* pTeam)
+FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam* pTeam)
 {
-    return pTeam->mUnidentified0F0->mRuntime;
+    return pTeam->m_pAIContext->mRuntime;
 }
 
 /**
- * Offset/Address/Size: 0xC20 | 0x800A6954 | size: 0x8
+ * Offset/Address/Size: 0xC08 | 0x800A6954 | size: 0x8
  */
 Goalie* cTeam::GetGoalie()
 {
@@ -1547,7 +1544,7 @@ Goalie* cTeam::GetGoalie()
 }
 
 /**
- * Offset/Address/Size: 0xC18 | 0x800A694C | size: 0x8
+ * Offset/Address/Size: 0xC00 | 0x800A694C | size: 0x8
  */
 void cTeam::SetGoalie(Goalie* pGoalie)
 {
@@ -1555,7 +1552,7 @@ void cTeam::SetGoalie(Goalie* pGoalie)
 }
 
 /**
- * Offset/Address/Size: 0xBF4 | 0x800A6928 | size: 0x24
+ * Offset/Address/Size: 0xBDC | 0x800A6928 | size: 0x24
  */
 void cTeam::SetPlayer(cPlayer* pPlayer, int nIndex)
 {
@@ -1569,7 +1566,7 @@ void cTeam::SetPlayer(cPlayer* pPlayer, int nIndex)
 }
 
 /**
- * Offset/Address/Size: 0xB9C | 0x800A68D0 | size: 0x58
+ * Offset/Address/Size: 0xB84 | 0x800A68D0 | size: 0x58
  */
 int cTeam::SetCurrentPowerUp(
     ePowerUpType eNewPowerUpType, int nnumOfPowerups)
@@ -1589,7 +1586,7 @@ int cTeam::SetCurrentPowerUp(
 }
 
 /**
- * Offset/Address/Size: 0xB84 | 0x800A68B8 | size: 0x18
+ * Offset/Address/Size: 0xB6C | 0x800A68B8 | size: 0x18
  */
 void cTeam::SetIsPowerUpNew(int index, bool isNew)
 {
@@ -1600,7 +1597,7 @@ void cTeam::SetIsPowerUpNew(int index, bool isNew)
 }
 
 /**
- * Offset/Address/Size: 0xB2C | 0x800A6860 | size: 0x58
+ * Offset/Address/Size: 0xB14 | 0x800A6860 | size: 0x58
  */
 PowerUpTeamType cTeam::GetPowerUpByIndex(int index) const
 {
@@ -1615,7 +1612,7 @@ PowerUpTeamType cTeam::GetPowerUpByIndex(int index) const
 }
 
 /**
- * Offset/Address/Size: 0xB10 | 0x800A6844 | size: 0x1C
+ * Offset/Address/Size: 0xAF8 | 0x800A6844 | size: 0x1C
  */
 PowerUpTeamType cTeam::GetCurrentPowerUp() const
 {
@@ -1623,7 +1620,7 @@ PowerUpTeamType cTeam::GetCurrentPowerUp() const
 }
 
 /**
- * Offset/Address/Size: 0xA30 | 0x800A6764 | size: 0xE0
+ * Offset/Address/Size: 0xA18 | 0x800A6764 | size: 0xE0
  */
 bool cTeam::fn_800A6764() const
 {
@@ -1653,7 +1650,7 @@ bool cTeam::fn_800A6764() const
 }
 
 /**
- * Offset/Address/Size: 0x9C0 | 0x800A66F4 | size: 0x70
+ * Offset/Address/Size: 0x9A8 | 0x800A66F4 | size: 0x70
  */
 bool cTeam::IncrementPowerupMeter(
     float fAdjustAmount, cFielder* pFielder, bool param3)
@@ -1673,7 +1670,7 @@ bool cTeam::IncrementPowerupMeter(
 }
 
 /**
- * Offset/Address/Size: 0x8B4 | 0x800A65E8 | size: 0x10C
+ * Offset/Address/Size: 0x89C | 0x800A65E8 | size: 0x10C
  */
 bool cTeam::TogglePowerup(bool bIsSilent)
 {
@@ -1695,7 +1692,7 @@ bool cTeam::TogglePowerup(bool bIsSilent)
             PowerUpTeamType eTemp = m_ePowerupList[1];
             m_ePowerupList[1] = m_ePowerupList[0];
             m_ePowerupList[0] = eTemp;
-            mtToggleTimer.SetSeconds(lbl_806DBEF0);
+            mtToggleTimer.SetSeconds(gPowerupToggleDelay);
         }
 
         HUDOverlay* HUD
@@ -1707,7 +1704,7 @@ bool cTeam::TogglePowerup(bool bIsSilent)
 }
 
 /**
- * Offset/Address/Size: 0x82C | 0x800A6560 | size: 0x88
+ * Offset/Address/Size: 0x814 | 0x800A6560 | size: 0x88
  */
 bool cTeam::fn_800A6560()
 {
@@ -1724,7 +1721,7 @@ bool cTeam::fn_800A6560()
 }
 
 /**
- * Offset/Address/Size: 0x71C | 0x800A6450 | size: 0x110
+ * Offset/Address/Size: 0x704 | 0x800A6450 | size: 0x110
  */
 void cTeam::ClearCurrentPowerUp()
 {
@@ -1764,7 +1761,7 @@ void cTeam::ClearCurrentPowerUp()
 }
 
 /**
- * Offset/Address/Size: 0x700 | 0x800A6434 | size: 0x1C
+ * Offset/Address/Size: 0x6E8 | 0x800A6434 | size: 0x1C
  */
 void cTeam::ClearAllPowerUps()
 {
@@ -1785,7 +1782,7 @@ void cTeam::SetDifficulty(int difficulty, bool blend, bool reload)
 }
 
 /**
- * Offset/Address/Size: 0x654 | 0x800A6388 | size: 0x84
+ * Offset/Address/Size: 0x63C | 0x800A6388 | size: 0x84
  */
 float fn_800A6388(cTeam* team)
 {
@@ -1806,20 +1803,20 @@ SkillTweaks* fn_800A636C(cTeam* pTeam)
 }
 
 /**
- * Offset/Address/Size: 0x5B4 | 0x800A62E8 | size: 0x84
+ * Offset/Address/Size: 0x59C | 0x800A62E8 | size: 0x84
  */
 cTeam::~cTeam()
 {
     delete m_pNet;
     delete m_pFormationManager;
-    mUnidentified0F0->Cleanup(true, true);
-    delete mUnidentified0F0;
+    m_pAIContext->Cleanup(true, true);
+    delete m_pAIContext;
 }
 
 /**
- * Offset/Address/Size: 0x514 | 0x800A6248 | size: 0xA0
+ * Offset/Address/Size: 0x4FC | 0x800A6248 | size: 0xA0
  */
-void cTeam::fn_800A6248()
+void cTeam::ResetAI()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -1827,7 +1824,7 @@ void cTeam::fn_800A6248()
     }
 
     m_pFormationManager->ResetToDefaults();
-    mUnidentified0F0->mScriptMachine->Reset(false);
+    m_pAIContext->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
@@ -1838,9 +1835,9 @@ void cTeam::fn_800A6248()
 }
 
 /**
- * Offset/Address/Size: 0x348 | 0x800A607C | size: 0x1CC
+ * Offset/Address/Size: 0x330 | 0x800A607C | size: 0x1CC
  */
-void cTeam::fn_800A607C()
+void cTeam::Reset()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -1848,7 +1845,7 @@ void cTeam::fn_800A607C()
     }
 
     m_pFormationManager->ResetToDefaults();
-    mUnidentified0F0->mScriptMachine->Reset(false);
+    m_pAIContext->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
@@ -1871,8 +1868,8 @@ void cTeam::fn_800A607C()
     mfPowerupTimer = 0.0f;
     mpCurrentSituation = SITUATION_OFFENSE;
     meCurrentTeamStyle = TEAM_STYLE_MODERATE;
-    mUnidentified00C = 0.0f;
-    mUnidentified010 = 0.0f;
+    mfAttackIndicatorProgress = 0.0f;
+    mfShotScore = 0.0f;
 
     mtTeamStyleTimer.UnidentifiedClear();
     mtMarkTimer.UnidentifiedClear();
@@ -1894,7 +1891,7 @@ void cTeam::fn_800A607C()
 }
 
 /**
- * Offset/Address/Size: 0x18 | 0x800A5D4C | size: 0x330
+ * Offset/Address/Size: 0x0 | 0x800A5D4C | size: 0x330
  */
 cTeam::cTeam(int nSide)
 {
@@ -1903,8 +1900,8 @@ cTeam::cTeam(int nSide)
     mfPowerupTimer = 0.0f;
     mpCurrentSituation = SITUATION_OFFENSE;
     meCurrentTeamStyle = TEAM_STYLE_MODERATE;
-    mUnidentified00C = 0.0f;
-    mUnidentified010 = 0.0f;
+    mfAttackIndicatorProgress = 0.0f;
+    mfShotScore = 0.0f;
 
     mtTeamStyleTimer.UnidentifiedClear();
     mtMarkTimer.UnidentifiedClear();
@@ -1934,8 +1931,8 @@ cTeam::cTeam(int nSide)
 
     m_pNet = new (8, false) cNet(nSide);
     m_pFormationManager = new (8, false) FormationManager(this);
-    mUnidentified0F0 = new (8, false) AIContext(this,
+    m_pAIContext = new (8, false) AIContext(this,
         new (8, false) TeamPlayMachine(),
         new (8, false) FuzzyAIRuntime());
-    mUnidentified0F0->mScriptMachine->Initialize();
+    m_pAIContext->mScriptMachine->Initialize();
 }

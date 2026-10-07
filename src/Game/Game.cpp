@@ -208,7 +208,7 @@ inline void cGame::ResetCharacters()
     RandomizePlayerUpdateOrder();
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A6248();
+        g_pTeams[i]->ResetAI();
         g_pTeams[i]->ResetCharacters();
     }
 }
@@ -1042,7 +1042,7 @@ void cGame::ResetCachedPlayerDistances()
 {
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A607C();
+        g_pTeams[i]->Reset();
     }
 
     for (int i = 0; i < 10; i++)
