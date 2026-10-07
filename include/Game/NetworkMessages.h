@@ -78,8 +78,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageDraft() { }
-    virtual int GetType();
+    virtual int GetType() { return 21; }
 
     /* 0x008 */ s8 mMachineIndex;
     /* 0x009 */ s8 mMachineCount;
@@ -87,17 +86,6 @@ public:
     /* 0x00B */ NetworkDraftSides mPlayerSides;
     /* 0x014 */ NetworkDraftMachineInfo mEntries[8];
 }; // size: 0x414
-
-// "Failed to SendCheckConnectionToEveryone to %d because no connection".
-class NetMessageCheckConnection : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageCheckConnection() { }
-    virtual int GetType();
-
-    /* 0x08 */ u32 mProfileIds[2];
-};
 
 // Message IDs 16 and 17 are registered by this translation unit, but no
 // surviving behavior-level name has yet been established for either payload.
@@ -149,8 +137,7 @@ class NetMessageDraftMachineInfo : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageDraftMachineInfo() { }
-    virtual int GetType();
+    virtual int GetType() { return 22; }
 
     /* 0x008 */ NetworkDraftMachineInfo mEntry;
 }; // size: 0x88
@@ -160,8 +147,7 @@ class NetMessageDraftPickedCaptain : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageDraftPickedCaptain();
-    virtual int GetType();
+    virtual int GetType() { return 23; }
 
     /* 0x08 */ s8 mTeamIndex;
     /* 0x09 */ u8 mCaptain;
@@ -172,8 +158,7 @@ class NetMessageDraftPickedSidekicks : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageDraftPickedSidekicks();
-    virtual int GetType();
+    virtual int GetType() { return 24; }
 
     /* 0x08 */ u8 mTeamIndex;
     /* 0x09 */ u8 mSidekick0;
@@ -185,8 +170,7 @@ class NetMessageSidesChanged : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageSidesChanged() { }
-    virtual int GetType();
+    virtual int GetType() { return 25; }
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ s8 mSide;
@@ -194,12 +178,21 @@ public:
     /* 0x0B */ u8 mAccepted;
 };
 
+// "Failed to SendCheckConnectionToEveryone to %d because no connection".
+class NetMessageCheckConnection : public NetworkMessage
+{
+public:
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual int GetType() { return 26; }
+
+    /* 0x08 */ u32 mProfileIds[2];
+};
+
 class NetMessageConnectionDecision : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageConnectionDecision() { }
-    virtual int GetType();
+    virtual int GetType() { return 27; }
 
     /* 0x08 */ u8 mAccepted;
     /* 0x09 */ s8 mMachineIndex;
