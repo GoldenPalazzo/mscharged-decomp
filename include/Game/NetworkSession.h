@@ -422,6 +422,13 @@ public:
     void DWCLoginCallback(int error, int profileID, void* param);
     bool RequestLoginRankings();
     void UpdateLogin();
+    void RequestLoginNearbySeasonRankingsAgain();
+    void RequestLoginNearbyDailyRankings();
+    void RequestLoginNearbyDailyRankingsAgain();
+    void RequestLoginFriendsSeasonRankings();
+    void RequestLoginTopDailyRankings();
+    void RequestLoginTopSeasonRankings();
+
     void ShutdownOnline();
     NetworkLobby* GetOnlineLobby();
     NetworkStatsInterface* GetStatsInterface();

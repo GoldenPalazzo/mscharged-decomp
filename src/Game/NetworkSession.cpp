@@ -53,7 +53,6 @@ NetworkSession* g_pNetworkSession;
 DWCFriendsMatchControl gDWCFriendsMatchControl;
 void* gNetworkMemoryPool;
 int gNetworkBuildNumberOverride;
-int lbl_806E10FC;
 
 float gNetworkLoginTimeout = 180.0f;
 u32 gNetworkGameCodeR4QP = 0x52345150;
@@ -61,11 +60,14 @@ u32 gNetworkGameCodeR4QJ = 0x5234514A;
 u32 gNetworkGameCodeR4QE = 0x52345145;
 
 
+#include "Game/TweakValue.h"
+
+static TweakBoolBinding s_NoPopupNetworkErrorTweak(
+    "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
+
 static MemoryAllocator s_NetworkAllocator;
 
 #include <string.h>
-extern float kInitialNetworkUpdateDelta;
-extern float kNetworkMillisecondsPerSecond;
 
 struct UnidentifiedVersionInfo
 {
@@ -544,11 +546,11 @@ void NetworkSession::Update()
     float dt;
     if (mLastTicker == 0)
     {
-        dt = kInitialNetworkUpdateDelta;
+        dt = 0.001f;
     }
     else
     {
-        dt = nlGetTickerDifference(mLastTicker, nlGetTicker()) / kNetworkMillisecondsPerSecond;
+        dt = nlGetTickerDifference(mLastTicker, nlGetTicker()) / 1000.0f;
     }
 
     u32 ticker = nlGetTicker();
@@ -635,43 +637,8 @@ void NetworkSession::Update()
     }
 }
 
-static void* NetworkAlloc(DWCAllocType name, unsigned long size, int align)
-{
-    return s_NetworkAllocator.Allocate(size, align, false);
-}
-
-static void NetworkFree(DWCAllocType name, void* ptr, unsigned long size)
-{
-    if (ptr == 0)
-    {
-        return;
-    }
-    s_NetworkAllocator.Free(ptr);
-}
-
-unsigned int GetNetworkVersionWord()
-{
-    int channel = 10;
-    switch (GetRegion())
-    {
-    case 0:
-        channel = 10;
-        break;
-    case 1:
-        channel = 14;
-        break;
-    case 2:
-        channel = 15;
-        break;
-    }
-
-    unsigned int low = (u16)g_BuildNumber;
-    if (gNetworkBuildNumberOverride != 0)
-    {
-        low = (u16)gNetworkBuildNumberOverride;
-    }
-    return (low | 0x1B030000) | ((unsigned int)(channel & 0xFF) << 20);
-}
+static void* NetworkAlloc(DWCAllocType name, unsigned long size, int align);
+static void NetworkFree(DWCAllocType name, void* ptr, unsigned long size);
 
 void NetworkSession::InitializeLAN()
 {
@@ -781,6 +748,20 @@ void NetworkSession::InitializeOnline()
     mLobby->RegisterMessageReceiver();
     mRankingReporter->Reset();
     mUnidentified24A4 = StartLogin();
+}
+
+static void* NetworkAlloc(DWCAllocType name, unsigned long size, int align)
+{
+    return s_NetworkAllocator.Allocate(size, align, false);
+}
+
+static void NetworkFree(DWCAllocType name, void* ptr, unsigned long size)
+{
+    if (ptr == 0)
+    {
+        return;
+    }
+    s_NetworkAllocator.Free(ptr);
 }
 
 static void* StaticSetInternetThreadFunc(void*)
@@ -964,6 +945,87 @@ bool NetworkSession::RequestLoginRankings()
     return false;
 }
 
+void NetworkSession::RequestLoginNearbySeasonRankingsAgain()
+{
+    mLoginStage = 7;
+    if (!NetworkStatsManager::Instance()->RequestRankings(2))
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
+void NetworkSession::RequestLoginNearbyDailyRankings()
+{
+    mLoginStage = 8;
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Login: Transition to "
+        "ELoggingInStage_GettingSODNearbyStats\n");
+    if (!NetworkStatsManager::Instance()->RequestRankings(0))
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Initial failure to RequestRankings "
+            "STRIKER_OF_DAY Nearby\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
+void NetworkSession::RequestLoginNearbyDailyRankingsAgain()
+{
+    mLoginStage = 0xA;
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Login: Transition to "
+        "ELoggingInStage_ReGettingSODNearbyStats\n");
+    if (!NetworkStatsManager::Instance()->RequestRankings(0))
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Initial failure to RE-RequestRankings STRIKER_OF_DAY "
+            "Nearby\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
+void NetworkSession::RequestLoginFriendsSeasonRankings()
+{
+    mLoginStage = 0xB;
+    if (!NetworkStatsManager::Instance()->RequestRankings(4))
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Initial failure to RequestRankings SEASON "
+            "FRIENDS\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
+void NetworkSession::RequestLoginTopDailyRankings()
+{
+    mLoginStage = 0xC;
+    if (!NetworkStatsManager::Instance()->RequestRankings(1))
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Initial failure to RequestRankings "
+            "STRIKER_OF_DAY TOP\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
+void NetworkSession::RequestLoginTopSeasonRankings()
+{
+    mLoginStage = 0xD;
+    if (!NetworkStatsManager::Instance()->RequestRankings(3))
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Initial failure to RequestRankings SEASON TOP\n");
+        mLoginListener->OnStatsResult(false);
+        mLoginStage = 0xF;
+    }
+}
+
 void NetworkSession::UpdateLogin()
 {
     if (mLoginStartTime != 0.0f
@@ -1110,18 +1172,7 @@ void NetworkSession::UpdateLogin()
                 }
                 else
                 {
-                    mLoginStage = 8;
-                    tDebugPrintManager::Print(DC_NETWORK,
-                        "Login: Transition to "
-                        "ELoggingInStage_GettingSODNearbyStats\n");
-                    if (!NetworkStatsManager::Instance()->RequestRankings(0))
-                    {
-                        tDebugPrintManager::Print(DC_NETWORK,
-                            "Initial failure to RequestRankings "
-                            "STRIKER_OF_DAY Nearby\n");
-                        mLoginListener->OnStatsResult(false);
-                        mLoginStage = 0xF;
-                    }
+                    RequestLoginNearbyDailyRankings();
                 }
             }
             else
@@ -1149,13 +1200,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
-            mLoginStage = 7;
-            if (!NetworkStatsManager::Instance()->RequestRankings(2))
-            {
-                tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats\n");
-                mLoginListener->OnStatsResult(false);
-                mLoginStage = 0xF;
-            }
+            RequestLoginNearbySeasonRankingsAgain();
         }
         else
         {
@@ -1175,18 +1220,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            mLoginStage = 8;
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Login: Transition to "
-                "ELoggingInStage_GettingSODNearbyStats\n");
-            if (!NetworkStatsManager::Instance()->RequestRankings(0))
-            {
-                tDebugPrintManager::Print(DC_NETWORK,
-                    "Initial failure to RequestRankings STRIKER_OF_DAY "
-                    "Nearby\n");
-                mLoginListener->OnStatsResult(false);
-                mLoginStage = 0xF;
-            }
+            RequestLoginNearbyDailyRankings();
         }
         else
         {
@@ -1223,27 +1257,11 @@ void NetworkSession::UpdateLogin()
                 }
                 else if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
                 {
-                    mLoginStage = 0xB;
-                    if (!NetworkStatsManager::Instance()->RequestRankings(4))
-                    {
-                        tDebugPrintManager::Print(DC_NETWORK,
-                            "Initial failure to RequestRankings SEASON "
-                            "FRIENDS\n");
-                        mLoginListener->OnStatsResult(false);
-                        mLoginStage = 0xF;
-                    }
+                    RequestLoginFriendsSeasonRankings();
                 }
                 else
                 {
-                    mLoginStage = 0xC;
-                    if (!NetworkStatsManager::Instance()->RequestRankings(1))
-                    {
-                        tDebugPrintManager::Print(DC_NETWORK,
-                            "Initial failure to RequestRankings "
-                            "STRIKER_OF_DAY TOP\n");
-                        mLoginListener->OnStatsResult(false);
-                        mLoginStage = 0xF;
-                    }
+                    RequestLoginTopDailyRankings();
                 }
             }
             else
@@ -1271,18 +1289,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
-            mLoginStage = 0xA;
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Login: Transition to "
-                "ELoggingInStage_ReGettingSODNearbyStats\n");
-            if (!NetworkStatsManager::Instance()->RequestRankings(0))
-            {
-                tDebugPrintManager::Print(DC_NETWORK,
-                    "Initial failure to RE-RequestRankings STRIKER_OF_DAY "
-                    "Nearby\n");
-                mLoginListener->OnStatsResult(false);
-                mLoginStage = 0xF;
-            }
+            RequestLoginNearbyDailyRankingsAgain();
         }
         else
         {
@@ -1304,27 +1311,11 @@ void NetworkSession::UpdateLogin()
         {
             if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
             {
-                mLoginStage = 0xB;
-                if (!NetworkStatsManager::Instance()->RequestRankings(4))
-                {
-                    tDebugPrintManager::Print(DC_NETWORK,
-                        "Initial failure to RequestRankings SEASON "
-                        "FRIENDS\n");
-                    mLoginListener->OnStatsResult(false);
-                    mLoginStage = 0xF;
-                }
+                RequestLoginFriendsSeasonRankings();
             }
             else
             {
-                mLoginStage = 0xC;
-                if (!NetworkStatsManager::Instance()->RequestRankings(1))
-                {
-                    tDebugPrintManager::Print(DC_NETWORK,
-                        "Initial failure to RequestRankings STRIKER_OF_DAY "
-                        "TOP\n");
-                    mLoginListener->OnStatsResult(false);
-                    mLoginStage = 0xF;
-                }
+                RequestLoginTopDailyRankings();
             }
         }
         else
@@ -1343,15 +1334,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            mLoginStage = 0xC;
-            if (!NetworkStatsManager::Instance()->RequestRankings(1))
-            {
-                tDebugPrintManager::Print(DC_NETWORK,
-                    "Initial failure to RequestRankings STRIKER_OF_DAY "
-                    "TOP\n");
-                mLoginListener->OnStatsResult(false);
-                mLoginStage = 0xF;
-            }
+            RequestLoginTopDailyRankings();
         }
         else
         {
@@ -1369,14 +1352,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            mLoginStage = 0xD;
-            if (!NetworkStatsManager::Instance()->RequestRankings(3))
-            {
-                tDebugPrintManager::Print(DC_NETWORK,
-                    "Initial failure to RequestRankings SEASON TOP\n");
-                mLoginListener->OnStatsResult(false);
-                mLoginStage = 0xF;
-            }
+            RequestLoginTopSeasonRankings();
         }
         else
         {
@@ -1658,23 +1634,7 @@ static inline void RecordGameConfig(
     }
 }
 
-static inline void RegisterLoadedGameActions(NetworkSession* session)
-{
-    Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
-    UnidentifiedTypedEvent0<void>* pauseEvent
-        = &g_pGame->mUnidentified49C.mPauseGameEvent;
-    pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
-
-    Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
-    UnidentifiedTypedEvent0<void>* resumingEvent
-        = &g_pGame->mUnidentified49C.mResumingGameEvent;
-    resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
-
-    if (NetTournManager::Instance()->mState != 0)
-    {
-        NetTournManager::Instance()->NotifyGameStarted();
-    }
-}
+static inline void RegisterLoadedGameActions(NetworkSession* session);
 
 static inline void PlaybackRecordedGameBody()
 {
@@ -1962,6 +1922,24 @@ int NetworkSession::ProcessMessage(
         break;
     }
     return 1;
+}
+
+static inline void RegisterLoadedGameActions(NetworkSession* session)
+{
+    Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
+    UnidentifiedTypedEvent0<void>* pauseEvent
+        = &g_pGame->mUnidentified49C.mPauseGameEvent;
+    pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
+
+    Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
+    UnidentifiedTypedEvent0<void>* resumingEvent
+        = &g_pGame->mUnidentified49C.mResumingGameEvent;
+    resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
+
+    if (NetTournManager::Instance()->mState != 0)
+    {
+        NetTournManager::Instance()->NotifyGameStarted();
+    }
 }
 
 void NetworkSession::BaseVirtual3C(const NetworkGameStartInfo* info)
@@ -2576,14 +2554,31 @@ void NetworkSession::DisconnectOnlineMatch()
     }
 }
 
-void SHOnlineFriendsChooseSides::SetDraftMessage(NetMessageDraft message)
+unsigned int GetNetworkVersionWord()
 {
-    mDraftMessage = message;
+    int channel = 10;
+    switch (GetRegion())
+    {
+    case 0:
+        channel = 10;
+        break;
+    case 1:
+        channel = 14;
+        break;
+    case 2:
+        channel = 15;
+        break;
+    }
+
+    unsigned int low = (u16)g_BuildNumber;
+    if (gNetworkBuildNumberOverride != 0)
+    {
+        low = (u16)gNetworkBuildNumberOverride;
+    }
+    return (low | 0x1B030000) | ((unsigned int)(channel & 0xFF) << 20);
 }
 
-#include "Game/TweakValue.h"
 
-static TweakBoolBinding s_NoPopupNetworkErrorTweak(
-    "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
+
 
 #include "Game/NetworkStatsManager.h"
