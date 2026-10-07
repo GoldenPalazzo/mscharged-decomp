@@ -36,7 +36,7 @@ private:
 };
 
 extern FrameCounter g_FrameCounter;
-extern const float lbl_806E6178;
-extern const float lbl_806E617C;
+extern const float gTimeRegionHistogramMinValue;
+extern const float gTimeRegionHistogramBinSize;
 
 #endif // GAME_DEBUG_FRAME_COUNTER_H
