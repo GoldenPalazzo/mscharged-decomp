@@ -59,9 +59,9 @@ void AudioEffectFactory::Shutdown()
     CategoryVolume::s_Pool.FreeBlocks();
 }
 
-AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int effect)
+AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int effectId)
 {
-    switch (effect)
+    switch (effectId)
     {
     case 0xCE5C5677:
         return new Volume;
@@ -100,10 +100,10 @@ void ControllerSpeaker::OnSoundStopped(void*)
 {
     if (sControllerSpeakerEnabled)
     {
-        if (--m_Unknown40 < 0)
-            m_Unknown40 = 0;
-        if (m_Unknown40 == 0)
-            WPADControlSpeaker(m_Unknown3C, WPAD_SPEAKER_MUTE, 0);
+        if (--m_ActiveSoundCount < 0)
+            m_ActiveSoundCount = 0;
+        if (m_ActiveSoundCount == 0)
+            WPADControlSpeaker(m_Channel, WPAD_SPEAKER_MUTE, 0);
     }
 }
 
@@ -111,16 +111,16 @@ void ControllerSpeaker::OnSoundStarted(void* handle)
 {
     if (sControllerSpeakerEnabled)
     {
-        if (m_Unknown40 == 0)
-            WPADControlSpeaker(m_Unknown3C, WPAD_SPEAKER_UNMUTE, 0);
-        ++m_Unknown40;
-        bool enabled = OSDisableInterrupts();
+        if (m_ActiveSoundCount == 0)
+            WPADControlSpeaker(m_Channel, WPAD_SPEAKER_UNMUTE, 0);
+        ++m_ActiveSoundCount;
+        bool interruptsEnabled = OSDisableInterrupts();
         AudioSource* voices[8];
         unsigned int count;
         GetSoundSources(handle, voices, &count);
         for (unsigned int i = 0; i < count; ++i)
-            voices[i]->SetControllerSpeaker(true, m_Unknown3C);
-        OSRestoreInterrupts(enabled);
+            voices[i]->SetControllerSpeaker(true, m_Channel);
+        OSRestoreInterrupts(interruptsEnabled);
     }
 }
 
@@ -140,17 +140,17 @@ void ControllerSpeaker::CreateParameter(unsigned int, const void* context, bool,
     AudioEffectParameter** output)
 {
     *output = &m_Parameter;
-    m_Unknown3C = *(const int*)context - 1;
+    m_Channel = *(const int*)context - 1;
 }
 
 void Volume::ApplyToSound(void* handle)
 {
-    ((XSoundCueHandle*)handle)->instance->volumeOffset = m_Final.m_Unknown10;
+    ((XSoundCueHandle*)handle)->instance->volumeOffset = m_Final.m_VolumeOffset;
 }
 
 void Volume::OnParameterFinished(AudioEffectParameter* parameter)
 {
-    m_Initial.m_Unknown10 += ((VolumeParameter*)parameter)->m_Unknown10;
+    m_Initial.m_VolumeOffset += ((VolumeParameter*)parameter)->m_VolumeOffset;
 }
 
 void Volume::BlendParameter(AudioEffectParameter* destination,
@@ -179,9 +179,9 @@ void Volume::BlendParameter(AudioEffectParameter* destination,
             amount = 1.0f;
         }
     }
-    destinationParameter->m_Unknown10 += sourceParameter->m_Unknown10 * amount;
-    destinationParameter->m_Unknown14_00 |= sourceParameter->m_Unknown14_00;
-    destinationParameter->m_Unknown14_01 |= sourceParameter->m_Unknown14_01;
+    destinationParameter->m_VolumeOffset += sourceParameter->m_VolumeOffset * amount;
+    destinationParameter->m_PauseOnZero |= sourceParameter->m_PauseOnZero;
+    destinationParameter->m_StopOnZero |= sourceParameter->m_StopOnZero;
 }
 
 void Volume::BeginBlend()
@@ -200,7 +200,7 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
     if (type == 2)
     {
         unsigned int volumeKey = 0xCE5C5677;
-        parameter->m_Unknown10 = node->Get(volumeKey).m_Float;
+        parameter->m_VolumeOffset = node->Get(volumeKey).m_Float;
     }
     else
     {
@@ -209,11 +209,11 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
             value = *(const float*)&argument->mData;
         else
             value = (float)(int)argument->mData;
-        parameter->m_Unknown10 = value;
+        parameter->m_VolumeOffset = value;
     }
-    parameter->m_Unknown10 = negate ? -parameter->m_Unknown10 : parameter->m_Unknown10;
+    parameter->m_VolumeOffset = negate ? -parameter->m_VolumeOffset : parameter->m_VolumeOffset;
     unsigned int pauseOnZeroKey = sPauseOnZeroKey;
-    parameter->m_Unknown14_00 = node->Get(pauseOnZeroKey).m_Words.m_Value;
+    parameter->m_PauseOnZero = node->Get(pauseOnZeroKey).m_Words.m_Value;
     unsigned int stopOnZeroKey = sStopOnZeroKey;
-    parameter->m_Unknown14_01 = node->Get(stopOnZeroKey).m_Words.m_Value;
+    parameter->m_StopOnZero = node->Get(stopOnZeroKey).m_Words.m_Value;
 }

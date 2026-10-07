@@ -14,8 +14,8 @@ public:
     virtual void Initialize();
     virtual void Update(float);
     virtual void Shutdown();
-    virtual AudioEffectBase* CreateEffect(unsigned int);
-    virtual void ReleaseEffect(AudioEffectBase*);
+    virtual AudioEffectBase* CreateEffect(unsigned int effectId);
+    virtual void ReleaseEffect(AudioEffectBase* effect);
     virtual bool IsInitialized();
 };
 
@@ -36,9 +36,9 @@ public:
         s_Pool.Free((VolumeParameter*)pointer);
     }
 
-    float m_Unknown10;
-    unsigned int m_Unknown14_00 : 1;
-    unsigned int m_Unknown14_01 : 1;
+    float m_VolumeOffset;
+    unsigned int m_PauseOnZero : 1;
+    unsigned int m_StopOnZero : 1;
     unsigned int m_Unknown14_02 : 30;
 
     static SlotPool<VolumeParameter> s_Pool;
@@ -50,8 +50,8 @@ public:
     Volume()
         : AudioEffectBase("Volume")
     {
-        m_Initial.m_Unknown10 = 0.0f;
-        m_Initial.m_Unknown14_01 = m_Initial.m_Unknown14_00 = false;
+        m_Initial.m_VolumeOffset = 0.0f;
+        m_Initial.m_StopOnZero = m_Initial.m_PauseOnZero = false;
         m_CurrentParameter = &m_Initial;
         m_ResultParameter = &m_Final;
     }
@@ -90,8 +90,8 @@ class ControllerSpeaker : public AudioEffectBase
 public:
     ControllerSpeaker()
         : AudioEffectBase("ControllerSpeaker")
-        , m_Unknown3C(-1)
-        , m_Unknown40(0)
+        , m_Channel(-1)
+        , m_ActiveSoundCount(0)
     {
         memset(m_Unknown44, 0, sizeof(m_Unknown44));
     }
@@ -114,8 +114,8 @@ public:
     }
 
     ControllerSpeakerParameter m_Parameter;
-    int m_Unknown3C;
-    int m_Unknown40;
+    int m_Channel;
+    int m_ActiveSoundCount;
     unsigned int m_Unknown44[8];
 
     static nlArrayAllocator<ControllerSpeaker> s_Allocator;
