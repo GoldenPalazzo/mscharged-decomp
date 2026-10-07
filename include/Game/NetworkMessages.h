@@ -355,4 +355,6 @@ public:
     /* 0x09 */ bool mValues[8];
 }; // size: 0x14
 
+void RegisterNetworkMessageFactories();
+
 #endif // GAME_NETWORK_MESSAGES_H
