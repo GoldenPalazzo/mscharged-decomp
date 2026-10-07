@@ -22,7 +22,7 @@ static inline TLTextInstance* AsTextInstance(void* instance)
 
 GameResultsScene::GameResultsScene()
     : mTitleText(0)
-    , mUnidentified5D8(false)
+    , mSuppressMatchSummary(false)
     , mGameData(0)
     , mListener(0)
     , mTournamentGame(0)
@@ -77,7 +77,7 @@ void GameResultsScene::SceneCreated()
 void GameResultsScene::Update(float dt)
 {
     SHStrikerTimesBase::Update(dt);
-    if (!mUnidentified5D8 && mGameData != 0)
+    if (!mSuppressMatchSummary && mGameData != 0)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
         mSummary.DisplayMatchSummary(mGameData->mSides[0], mGameData->mSides[1], presentation);
