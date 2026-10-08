@@ -558,7 +558,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             break;
         case PSS_NEAR_SEEKING:
             fMinSpeed = fMinimumSpeedScale
-                      * fn_8002CE14(desire->m_pFielder->GetTweaks());
+                      * GetJogSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
             fMinSpeed = nlMinEquals(fMinSpeed, fMaxSpeed);
             break;
@@ -593,7 +593,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             break;
         case PSS_NEAR_SEEKING:
             fMinSpeed = fMinimumSpeedScale
-                      * fn_8002CE14(desire->m_pFielder->GetTweaks());
+                      * GetJogSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = desire->m_pFielder->GetTweaks()->GetRunningSpeed();
             fMinSpeed = nlMinEquals(fMinSpeed, fMaxSpeed);
             break;

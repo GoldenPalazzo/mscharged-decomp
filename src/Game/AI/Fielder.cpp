@@ -4500,8 +4500,8 @@ void cFielder::SetStartAnimState(int animState)
         else
         {
             SetRunningAnimState(0.1f);
-            if (mUnidentified024.m_fActualSpeed < fn_8002CE14(m_pTweaks))
-                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = fn_8002CE14(m_pTweaks);
+            if (mUnidentified024.m_fActualSpeed < GetJogSpeed(m_pTweaks))
+                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
         }
     }
 }
@@ -4538,8 +4538,8 @@ void cFielder::SetStartWBAnimState()
         else
         {
             SetRunningWBAnimState(0.1f);
-            if (mUnidentified024.m_fActualSpeed < fn_8002CE14(m_pTweaks))
-                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = fn_8002CE14(m_pTweaks);
+            if (mUnidentified024.m_fActualSpeed < GetJogSpeed(m_pTweaks))
+                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
         }
     }
 }

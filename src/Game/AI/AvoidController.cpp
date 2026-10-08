@@ -760,7 +760,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     float fDesiredSpeed = m_pFielder->GetRunningSpeed();
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
-    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(fn_8002CE14(m_pFielder->GetTweaks()));
+    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(GetJogSpeed(m_pFielder->GetTweaks()));
     if (fDesiredSpeed >= 0.35f * fUnidentifiedSpeed)
     {
         fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;

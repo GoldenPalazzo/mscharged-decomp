@@ -79,7 +79,7 @@ void DesireUserControlled::Update(
         {
             float fMaxSpeed = fn_8002C254(
                 m_pFielder->GetTweaks());
-            float fMinSpeed = fn_8002CE14(
+            float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             m_pFielder->TestLooseBallControls(false);
@@ -149,7 +149,7 @@ void DesireUserControlled::Update(
         if (m_pFielder->m_eActionState == ACTION_RUNNING_WB)
         {
             float fMaxSpeed = m_pFielder->GetTweaks()->GetRunningSpeed();
-            float fMinSpeed = fn_8002CE14(
+            float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             m_pFielder->TestButtonsRunningWB(fDeltaT);

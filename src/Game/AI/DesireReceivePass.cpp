@@ -534,7 +534,7 @@ void DesireReceivePass::ProcessUserInput()
         {
             PlayerTweaks* pTweaks = m_pFielder->GetTweaks();
             float fMaxSpeed = pTweaks->GetRunningSpeed();
-            float fMinSpeed = fn_8002CE14(
+            float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             return;

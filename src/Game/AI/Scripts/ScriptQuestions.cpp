@@ -338,7 +338,7 @@ extern "C" float fn_800D6A90(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fAttribute = fn_8002CE14(pFielder->GetTweaks());
+    float fAttribute = GetJogSpeed(pFielder->GetTweaks());
     return NormalizeVal(fSpeed, 0.7f * fAttribute, 2.0f);
 }
 
@@ -350,7 +350,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fBaseSpeed = fn_8002CE14(pFielder->GetTweaks());
+    float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {
@@ -380,7 +380,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fBaseSpeed = fn_8002CE14(pFielder->GetTweaks());
+    float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {

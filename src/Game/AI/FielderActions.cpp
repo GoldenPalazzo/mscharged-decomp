@@ -179,7 +179,7 @@ extern unsigned short g_IdleTurnCompletionDelta;
 
 void cFielder::asmRunning()
 {
-    fn_8002CE14(this->GetTweaks());
+    GetJogSpeed(this->GetTweaks());
 
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
@@ -208,7 +208,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed <= GetJogSpeed(this->GetTweaks()))
                 {
                     SetIdleAnimState();
                 }
@@ -520,7 +520,7 @@ void cFielder::asmRunning()
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
                 if (mUnidentified024.m_fDesiredSpeed
-                    < fn_8002CE14(this->GetTweaks()) - 0.15f)
+                    < GetJogSpeed(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
@@ -582,7 +582,7 @@ void cFielder::asmRunning()
                 SetStrafeLeftAnimState();
                 break;
             case 4:
-                if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed > GetJogSpeed(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
                     {
@@ -609,7 +609,7 @@ void cFielder::asmRunning()
 
             if (bAnimFinished)
             {
-                if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed > GetJogSpeed(this->GetTweaks()))
                 {
                     SetHardStopTurnAnimState();
                 }
@@ -625,7 +625,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed >= GetJogSpeed(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     SetRunningAnimState(lbl_806E3538[0]);
@@ -652,7 +652,7 @@ void cFielder::asmRunning()
 
 void cFielder::asmRunningWB(float fDeltaT)
 {
-    float fIdleToRunWBDesiredSpeed = lbl_806E3538[0] + fn_8002CE14(this->GetTweaks());
+    float fIdleToRunWBDesiredSpeed = lbl_806E3538[0] + GetJogSpeed(this->GetTweaks());
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
@@ -693,7 +693,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (ShouldStartCrossBlend(0x17))
             {
-                if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed <= GetJogSpeed(this->GetTweaks()))
                 {
                     SetIdleWBAnimState();
                 }
@@ -731,7 +731,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
+            if (mUnidentified024.m_fDesiredSpeed > GetJogSpeed(this->GetTweaks()))
             {
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
@@ -773,7 +773,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (fn_8003E8A0(this) && mUnidentified3DC)
             {
                 if (mUnidentified024.m_fDesiredSpeed
-                    < fn_8002CE14(this->GetTweaks()) - 0.15f)
+                    < GetJogSpeed(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
@@ -810,7 +810,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if (mUnidentified024.m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()) - 0.15f)
+            if (mUnidentified024.m_fDesiredSpeed < GetJogSpeed(this->GetTweaks()) - 0.15f)
             {
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * this->GetTweaks()->GetRunningSpeed())
@@ -838,7 +838,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
             if (bAnimFinished)
             {
-                if (mUnidentified024.m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()))
+                if (mUnidentified024.m_fDesiredSpeed < GetJogSpeed(this->GetTweaks()))
                 {
                     if (mActionRunningWBVars.bCuePitch)
                     {
@@ -866,7 +866,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                     fn_8004B148();
                 }
                 else if (mUnidentified024.m_fDesiredSpeed
-                         >= fn_8002CE14(this->GetTweaks()))
+                         >= GetJogSpeed(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     SetRunningWBAnimState(lbl_806E3538[0]);
@@ -4645,7 +4645,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         float fTargetSpeed = 1.0f;
         if (m_pBall != 0)
         {
-            fTargetSpeed = fn_8002CE14(this->GetTweaks());
+            fTargetSpeed = GetJogSpeed(this->GetTweaks());
         }
 
         InitMovementRunningNoTurn(
