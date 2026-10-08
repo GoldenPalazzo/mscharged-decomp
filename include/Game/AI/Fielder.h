@@ -432,20 +432,20 @@ public:
         m_fSuperPowerTankLevel -= amount;
     }
     bool IsStuck() const;
-    bool UnidentifiedClass17Or2() const
+    bool IsDaisyOrDryBones() const
     {
         return (int)mUnidentified024.m_eCharacterClass == 0x11
             || (int)mUnidentified024.m_eCharacterClass == 2;
     }
-    bool UnidentifiedClass17Or2Or6() const
+    bool HasTeleportDeke() const
     {
-        return UnidentifiedClass17Or2() || (int)mUnidentified024.m_eCharacterClass == 6;
+        return IsDaisyOrDryBones() || (int)mUnidentified024.m_eCharacterClass == 6;
     }
     bool IsInvincible() const
     {
         return !IsStuck() && (muInvincibleStatus & 0x1F) == 0x1F;
     }
-    bool UnidentifiedInvinciblePowerups() const
+    bool IsInvinciblePowerups() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 8);
         return result;
@@ -455,7 +455,7 @@ public:
         bool result = !IsStuck() && (muInvincibleStatus & 0x10);
         return result;
     }
-    bool UnidentifiedInvincibleStatus2() const
+    bool IsInvincibleFront() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 2);
         return result;
@@ -608,7 +608,7 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
-    PlayerTweaks* UnidentifiedGetTweaks() const { return m_pNormalTweaks; }
+    PlayerTweaks* GetNormalTweaks() const { return m_pNormalTweaks; }
 
 public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;

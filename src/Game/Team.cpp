@@ -122,7 +122,7 @@ float cTeam::GetAverageDefenseRating()
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        result += fn_8002BE38(GetFielder(i)->UnidentifiedGetTweaks());
+        result += fn_8002BE38(GetFielder(i)->GetNormalTweaks());
     }
     return result / 4.0f;
 }
@@ -135,7 +135,7 @@ float cTeam::GetAveragePassingRating()
     float fPassRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fPassRating += GetFielder(i)->UnidentifiedGetTweaks()->fPassing;
+        fPassRating += GetFielder(i)->GetNormalTweaks()->fPassing;
     }
     return fPassRating / 4.0f;
 }
@@ -148,7 +148,7 @@ float cTeam::GetAverageShootingRating()
     float fShootRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fShootRating += GetFielder(i)->UnidentifiedGetTweaks()->fShooting;
+        fShootRating += GetFielder(i)->GetNormalTweaks()->fShooting;
     }
     return fShootRating / 4.0f;
 }
@@ -161,7 +161,7 @@ float cTeam::GetAverageMovementRating()
     float fMovementRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fMovementRating += GetFielder(i)->UnidentifiedGetTweaks()
+        fMovementRating += GetFielder(i)->GetNormalTweaks()
                                ->fMovementSpeed;
     }
     return fMovementRating / 4.0f;

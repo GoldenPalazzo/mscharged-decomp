@@ -136,7 +136,7 @@ inline bool AvoidController::UnidentifiedCanAvoid(int things)
     }
     case AVOID_POWERUPS:
         result = false;
-        if (bCanAvoid && !m_pFielder->UnidentifiedInvinciblePowerups())
+        if (bCanAvoid && !m_pFielder->IsInvinciblePowerups())
             result = true;
         break;
     }

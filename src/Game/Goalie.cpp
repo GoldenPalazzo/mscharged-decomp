@@ -2038,7 +2038,7 @@ bool Goalie::CheckForDekeAttack()
         if (nlRandomf(100.0f) < fChance)
         {
             cFielder* pFielder = g_pBall->GetOwnerFielder();
-            bool bUnidentifiedSecond = pFielder->UnidentifiedClass17Or2Or6();
+            bool bUnidentifiedSecond = pFielder->HasTeleportDeke();
             float fDistance = bUnidentifiedSecond ? gfDekeAttackRangeLong : gfDekeAttackRange;
             if (!pFielder->IsFallenDown() && !IsFielderDazed(pFielder)
                 && nlVec3DistanceSquared2D(g_pBall->m_v3Position, mUnidentified024.m_v3Position)

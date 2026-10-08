@@ -1861,7 +1861,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, const nlVector3& position, const nlVector3& velocity)
 {
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-        || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
+        || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !IsInvinciblePowerups()))
     {
         if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !IsSuperGrowActive())
             InitActionKnockdownReact(velocity);
@@ -2009,7 +2009,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
 
 bool cFielder::CollideWithFreezeCallback()
 {
-    if (m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()
+    if (m_eActionState != ACTION_POST_WHISTLE && !IsInvinciblePowerups()
         && mbTangible && !IsFielderDazed(this) && !IsFrozen() && CanReactToGroundEffects())
     {
         SetFielderFrozenState(this, 1, gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
@@ -2021,7 +2021,7 @@ bool cFielder::CollideWithFreezeCallback()
 bool cFielder::CollideWithBananaCallback(const nlVector3& position)
 {
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-        || (!IsStuck() && !IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
+        || (!IsStuck() && !IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !IsInvinciblePowerups()))
     {
         InitActionBananaReact(position);
         return true;
@@ -2031,7 +2031,7 @@ bool cFielder::CollideWithBananaCallback(const nlVector3& position)
 
 bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius)
 {
-    if (!UnidentifiedInvinciblePowerups() && mbTangible && CanReactToGroundEffects())
+    if (!IsInvinciblePowerups() && mbTangible && CanReactToGroundEffects())
     {
         if (g_pGame->IsGameplayOrOvertime())
         {
@@ -2456,7 +2456,7 @@ bool cFielder::IsInFallAction() const
 
 bool IsFielderFrontInvincible(cFielder* pFielder, const nlVector3* position)
 {
-    bool bUnidentified = pFielder->UnidentifiedInvincibleStatus2();
+    bool bUnidentified = pFielder->IsInvincibleFront();
 
     s16 facingDelta = pFielder->GetFacingDeltaToPosition(*position);
     bool result = false;

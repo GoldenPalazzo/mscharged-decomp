@@ -2496,7 +2496,7 @@ extern "C" void fn_80022968(CollisionChainPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pChain != NULL)
     {
-        if (!pEventData->pFielder->UnidentifiedInvinciblePowerups())
+        if (!pEventData->pFielder->IsInvinciblePowerups())
         {
             pEventData->pFielder->CollideWithChainCallback(pEventData->pChain);
         }
@@ -2507,7 +2507,7 @@ extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pDebris != NULL)
     {
-        if (!pEventData->pFielder->UnidentifiedInvinciblePowerups())
+        if (!pEventData->pFielder->IsInvinciblePowerups())
         {
             pEventData->pFielder->CollideWithWindDebrisCallback(pEventData->pDebris);
         }

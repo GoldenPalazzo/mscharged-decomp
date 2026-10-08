@@ -1807,7 +1807,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
             }
 
-            if (((cFielder*)pCharacter)->UnidentifiedInvinciblePowerups())
+            if (((cFielder*)pCharacter)->IsInvinciblePowerups())
             {
                 pObj->m_bShouldDestroy = true;
             }
