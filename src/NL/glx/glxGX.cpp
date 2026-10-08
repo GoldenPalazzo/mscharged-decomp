@@ -3,18 +3,7 @@
 
 #include "NL/gl/glPlat.h"
 
-// R4QE01 links the Revolution SDK GX library as automatic objects. Its entry
-// points are declared here rather than through <revolution/gx.h> because that
-// header's <revolution/types.h> and the game's own "types.h" spell the
-// fixed-width typedefs differently.
-struct GXColor
-{
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-};
-
+// Remaining GX entry points use the game type aliases below.
 extern "C"
 {
     void GXSetTexCoordGen2(s32 dst_coord, s32 func, s32 src_param, u32 mtx, u8 normalize, u32 pt_texmtx);
@@ -49,9 +38,6 @@ extern "C"
 enum
 {
     GX_CULL_BACK = 2,
-
-    GX_LEQUAL = 3,
-    GX_ALWAYS = 7,
 
     GX_AOP_AND = 0,
 

@@ -34,9 +34,7 @@ u32 GXGetNumXfbLines(u16 efbHeight, f32 scaleY);
 f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
 u32 GXSetDispCopyYScale(f32 scaleY);
 
-void GXSetCopyClear(GXColor color, u32 z);
 
-void GXCopyDisp(void*, GXBool);
 void GXCopyTex(void*, GXBool);
 void GXClearBoundingBox(void);
 

@@ -1,6 +1,8 @@
 #include <revolution/gx/GXPixel.h>
 #include <revolution/gx/GXFrameBuf.h>
 #include <revolution/vi/vi_fwd.h>
+#include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/os/OSError_fwd.h>
 #include <revolution/gx/GXTransform.h>
 
 #include "Game/TweakQuery.h"
@@ -26,14 +28,12 @@ extern "C"
 {
     void DCFlushRange(void* address, u32 length);
     void GXSetMisc(s32 token, s32 value);
-    void GXFlush();
     void* GXInit(void* fifo, u32 size);
 
     void SCInit();
     u32 SCCheckStatus();
     u8 SCGetProgressiveMode();
     u8 SCGetEuRgb60Mode();
-    void OSReport(const char* format, ...);
 
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
 }
