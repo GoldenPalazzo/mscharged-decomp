@@ -69,7 +69,7 @@ static unsigned long long glx_LastRetraceTick;
 static int glx_nLoadFrame;
 static int glx_nLoadWaitFrames;
 static void (*glx_pLoadingIndicator)(void*);
-static u8 glx_bAborted;
+static u8 glx_bDrawWaitComplete;
 static u32 glx_nRetraceAtSwap;
 static f32 glx_DrawSyncTimeout;
 static GXColor glx_ClearColour;
@@ -250,7 +250,7 @@ void glxSwapWaitDrawDone()
 
 static void draw_done_cb()
 {
-    glx_bAborted = 1;
+    glx_bDrawWaitComplete = 1;
 }
 
 void glxInitSwap(void* fb0, void* fb1)
@@ -340,17 +340,17 @@ static void WaitDrawDone()
         return;
     }
 
-    if (glx_bAborted != 0)
+    if (glx_bDrawWaitComplete != 0)
     {
         return;
     }
 
     u32 start = nlGetTicker();
-    while (glx_bAborted == 0)
+    while (glx_bDrawWaitComplete == 0)
     {
         if (nlGetTickerDifference(start, nlGetTicker()) > glx_DrawSyncTimeout)
         {
-            glx_bAborted = 1;
+            glx_bDrawWaitComplete = 1;
             OSReport("Warning: Hung in WaitDrawDone, had to abort frame.\n");
             ReportGPStatus();
             if (glx_bAllowAbortFrame != 0)
@@ -431,7 +431,7 @@ static void swap_Pre()
     gxSetAlphaUpdate(true);
     GXCopyDisp(glx_FrameBuffer[glx_nBuffer], 1);
     GXSetDrawDone();
-    glx_bAborted = 0;
+    glx_bDrawWaitComplete = 0;
     GXFlush();
     glx_nRetraceAtSwap = VIGetRetraceCount();
 }
