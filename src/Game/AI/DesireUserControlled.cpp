@@ -85,7 +85,7 @@ void DesireUserControlled::Update(
 
             if (g_pBall->m_pOwner == NULL
                 && (!fn_8003E948(m_pFielder)
-                    || !m_pFielder->mUnidentified3DC))
+                    || !m_pFielder->m_bSuperPowerTankOn))
             {
                 m_pFielder->UpdateFacingToLooseBall();
             }

@@ -371,7 +371,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
     {
         if (player == mOwner)
         {
-            WaluigiWallManager* manager = player->mUnidentified3F8.mUnidentified08;
+            WaluigiWallManager* manager = player->mWaluigiWallState.mUnidentified08;
             float gracePeriod = 0.2f;
             if (manager->mCurrentWall == this)
                 return NO_CONTACT;
@@ -515,7 +515,7 @@ void WaluigiWallManager::Update(float dt)
             {
                 if (wall->mEmitter != 0 && wall->mHealth < 0.2f)
                 {
-                    if (wall->mOwner->mUnidentified3DC)
+                    if (wall->mOwner->m_bSuperPowerTankOn)
                         wall->mOwner->fn_8005001C(true);
                     wall->mEmitter->m_uUserData = 0;
                     wall->mEmitter->m_TimeScale = 5.0f;
@@ -608,20 +608,20 @@ void UpdateWaluigiWallEmitter(EmissionController& controller)
 
 void OnWaluigiWallStart(cPlayer* player)
 {
-    static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08->CreateWall(
+    static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08->CreateWall(
         static_cast<cFielder*>(player), gWaluigiWallWidth, gWaluigiWallHeight);
 }
 
 void OnWaluigiWallEnd(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
     if (manager->mCurrentWall != 0)
         manager->EndWall();
 }
 
 void OnWaluigiWallAbort(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
     if (manager->mCurrentWall != 0)
     {
         manager->EndWall();
@@ -639,8 +639,8 @@ void OnWaluigiWallMegastrikeStart(void*)
         for (int i = 0; i < 4; ++i)
         {
             cFielder* player = team->GetFielder(i);
-            if (player != 0 && player->mUnidentified3F8.mUnidentified08 != 0)
-                player->mUnidentified3F8.mUnidentified08->ClearWalls();
+            if (player != 0 && player->mWaluigiWallState.mUnidentified08 != 0)
+                player->mWaluigiWallState.mUnidentified08->ClearWalls();
         }
     }
 }

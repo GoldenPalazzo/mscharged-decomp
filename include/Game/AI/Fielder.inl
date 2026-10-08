@@ -9,7 +9,7 @@
  */
 extern "C" inline bool fn_800D1C34(const cFielder* fielder)
 {
-    return fielder->mUnidentified3DC;
+    return fielder->m_bSuperPowerTankOn;
 }
 
 static inline float GetNormalizedContactTime(

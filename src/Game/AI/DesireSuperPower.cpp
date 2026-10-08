@@ -239,7 +239,7 @@ bool DesireSuperPower::Initialize(void* context)
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case LUIGI:
-        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
@@ -247,7 +247,7 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     case MARIO:
-        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
@@ -435,13 +435,13 @@ void DesireSuperPower::Cleanup()
         break;
     case LUIGI:
         m_pFielder->m_pTweaks
-            = m_pFielder->mUnidentified32C;
+            = m_pFielder->m_pNormalTweaks;
         m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
         EmitSuperShrink(m_pFielder);
         break;
     case MARIO:
         m_pFielder->m_pTweaks
-            = m_pFielder->mUnidentified32C;
+            = m_pFielder->m_pNormalTweaks;
         m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
         EmitSuperShrink(m_pFielder);
         break;
@@ -480,7 +480,7 @@ void DesireSuperPower::Cleanup()
         break;
     case YOSHI:
         m_pFielder->m_pTweaks
-            = m_pFielder->mUnidentified32C;
+            = m_pFielder->m_pNormalTweaks;
         m_pFielder->RestoreTangibility(false);
         m_pFielder->bYoshiInWindup = false;
         EmitYoshiShellBreak(m_pFielder);
@@ -508,12 +508,12 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!m_pFielder->mUnidentified3DC)
+            if (!m_pFielder->m_bSuperPowerTankOn)
             {
                 m_pFielder->TurnOnSuperPowerTank();
             }
         }
-        else if (m_pFielder->mUnidentified3DC)
+        else if (m_pFielder->m_bSuperPowerTankOn)
         {
             m_pFielder->fn_8005001C(false);
         }
@@ -521,13 +521,13 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
     }
     if (update->mData.i == 0)
     {
-        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
         if (!active)
         {
             *update = 1;
             return;
         }
-        if (m_pFielder->mUnidentified3DC)
+        if (m_pFielder->m_bSuperPowerTankOn)
         {
             if (!fn_8002EDC8(m_pFielder, -1))
             {
@@ -535,12 +535,12 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                 return;
             }
             m_pFielder->fn_800D0534(fDeltaT);
-            bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+            bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
             if (active)
             {
-                m_pFielder->mUnidentified3E8.fireballStageTime += fDeltaT;
-                m_pFielder->mUnidentified3E8.nextFireballTime -= fDeltaT;
-                if (m_pFielder->mUnidentified3E8.nextFireballTime <= 0.0f)
+                m_pFielder->mActionBowserSuper.fireballStageTime += fDeltaT;
+                m_pFielder->mActionBowserSuper.nextFireballTime -= fDeltaT;
+                if (m_pFielder->mActionBowserSuper.nextFireballTime <= 0.0f)
                 {
                     nlVector3 pos;
                     nlVector3 direction;
@@ -557,8 +557,8 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                         direction = flat;
                     }
                     float stage = InterpolateRangeClamped(0.0f, 1.0f, 0.0f, gBowserFireBallRampTime,
-                        m_pFielder->mUnidentified3E8.fireballStageTime);
-                    m_pFielder->mUnidentified3E8.nextFireballTime
+                        m_pFielder->mActionBowserSuper.fireballStageTime);
+                    m_pFielder->mActionBowserSuper.nextFireballTime
                         += Interpolate(gBowserFireBallMinInterval, gBowserFireBallMaxInterval, stage);
                     float speed = Interpolate(gBowserFireBallMinSpeed, gBowserFireBallMaxSpeed, stage);
                     nlVec3ScaleAdd(direction, speed,
@@ -577,7 +577,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
         }
         else
         {
-            m_pFielder->mUnidentified3E8.nextFireballTime = 0.0f;
+            m_pFielder->mActionBowserSuper.nextFireballTime = 0.0f;
         }
     }
 }
@@ -948,12 +948,12 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!m_pFielder->mUnidentified3DC)
+            if (!m_pFielder->m_bSuperPowerTankOn)
             {
                 m_pFielder->TurnOnSuperPowerTank();
             }
         }
-        else if (m_pFielder->mUnidentified3DC)
+        else if (m_pFielder->m_bSuperPowerTankOn)
         {
             m_pFielder->fn_8005001C(false);
         }
@@ -961,7 +961,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
     }
     if (update->mData.i == 0)
     {
-        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
         if (active)
         {
             if (m_pFielder->m_eAnimID == 104
@@ -970,7 +970,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                 m_pFielder->EndDesire();
                 m_pFielder->StartRunning();
             }
-            if (m_pFielder->mUnidentified3DC)
+            if (m_pFielder->m_bSuperPowerTankOn)
             {
                 if (IsMuckBallReady() == true)
                 {
@@ -1022,7 +1022,7 @@ void DesireSuperPower::UpdateWaluigi(DesireUpdate* update, float fDeltaT)
     }
     if (update->mData.i == 0)
     {
-        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
         if (!active)
         {
             *update = 1;
@@ -1091,7 +1091,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     bool result = false;
     for (int i = 0; i < 20; i++)
     {
-        PhysicsWaluigiWall* wall = fielder->mUnidentified3F8.mUnidentified08->GetWall(i);
+        PhysicsWaluigiWall* wall = fielder->mWaluigiWallState.mUnidentified08->GetWall(i);
         if (wall != 0)
         {
             AvoidablePolygon* polygon = wall->GetAvoidablePolygon();
@@ -1108,7 +1108,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
 
 void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
 {
-    if (m_pFielder->fn_8002E060() == 13 && m_pFielder->mUnidentified3DC)
+    if (m_pFielder->fn_8002E060() == 13 && m_pFielder->m_bSuperPowerTankOn)
     {
         nlVector2 direction;
         nlSinCos(&direction.y, &direction.x, m_pFielder->mUnidentified024.m_aActualFacingDirection);
@@ -1116,7 +1116,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             || IsWaluigiWallAhead(&direction, m_pFielder))
             m_pFielder->fn_8005001C(true);
     }
-    else if (!m_pFielder->mUnidentified3DC
+    else if (!m_pFielder->m_bSuperPowerTankOn
         && (m_pFielder->fn_8002E060() == 12 || m_pFielder->fn_8002E060() == 13))
     {
         if (!(bool)UserControlledT(m_pFielder->m_pTeam))
@@ -1152,7 +1152,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 bool start = moving && !IsWaluigiWallAhead((const nlVector2*)&direction, m_pFielder);
                 if (start)
                 {
-                    bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+                    bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
                     if (active && fn_8002EDC8(m_pFielder, -1))
                     {
                         m_pFielder->TurnOnSuperPowerTank();
@@ -1164,7 +1164,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
     }
     else if (m_pFielder->fn_8002E060() != 12
         && m_pFielder->fn_8002E060() != 13
-        && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->mUnidentified3DC)
+        && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->m_bSuperPowerTankOn)
         && (bool)(1.0f - ReceivingPass(m_pFielder))
         && (bool)(1.0f - fn_800DEAB4(m_pFielder))
         && fn_8002EDC8(m_pFielder, -1))
@@ -1188,7 +1188,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(10, FuzzyVariant((void*)FollowPathTransition));
             m_pFielder->ActivateDesire(12, &params);
         }
-        else if (m_pFielder->mUnidentified3DC)
+        else if (m_pFielder->m_bSuperPowerTankOn)
         {
             m_pFielder->fn_8005001C(true);
         }
@@ -1321,7 +1321,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
     bool shoot = true;
     if (!ready)
     {
-        bool active = fielder.mFielder->mUnidentified3E0 > 0.0f;
+        bool active = fielder.mFielder->m_fSuperPowerTankLevel > 0.0f;
         if (active)
             shoot = false;
     }
@@ -1330,10 +1330,10 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
         result = 3;
         result.SetParameter(8, FuzzyVariant(gChooseDirectionWindupShotState));
         result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
-        if (fielder.mFielder->mUnidentified3DC)
+        if (fielder.mFielder->m_bSuperPowerTankOn)
             fielder.mFielder->fn_8005001C(true);
     }
-    else if (fielder.mFielder->mUnidentified3DC && distanceTravelled >= 2.0f)
+    else if (fielder.mFielder->m_bSuperPowerTankOn && distanceTravelled >= 2.0f)
     {
         bool turn = false;
         cPlayer* bestPlayer = fn_800D674C(fielder.mFielder);
@@ -1382,7 +1382,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 result = 3;
                 result.SetParameter(8, FuzzyVariant(gChooseDirectionBlockedWindupShotState));
                 result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
-                if (fielder.mFielder->mUnidentified3DC)
+                if (fielder.mFielder->m_bSuperPowerTankOn)
                     fielder.mFielder->fn_8005001C(true);
             }
             else
@@ -1395,7 +1395,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 result.SetParameter(13, FuzzyVariant(gChooseDirectionNextSpeed));
                 result.SetParameter(10, FuzzyVariant((void*)ChooseDirectionTransition));
             }
-            if (fielder.mFielder->mUnidentified3DC && machine->GetState() == 12)
+            if (fielder.mFielder->m_bSuperPowerTankOn && machine->GetState() == 12)
             {
                 unsigned short absolute = nlAbsAngle(nlAbsAngle(
                     nlAngleDelta(fielder.mFielder->mUnidentified024.m_aActualFacingDirection, angle)));
@@ -1512,16 +1512,16 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!m_pFielder->mUnidentified3DC)
+            if (!m_pFielder->m_bSuperPowerTankOn)
                 m_pFielder->TurnOnSuperPowerTank();
         }
-        else if (m_pFielder->mUnidentified3DC)
+        else if (m_pFielder->m_bSuperPowerTankOn)
             m_pFielder->fn_8005001C(false);
         *update = 0;
     }
     if (update->mData.i == 0)
     {
-        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
         if (active)
         {
             if (m_pFielder->m_eAnimID == 104
@@ -1530,15 +1530,15 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 m_pFielder->EndDesire();
                 m_pFielder->StartRunning();
             }
-            if (m_pFielder->mUnidentified3DC)
+            if (m_pFielder->m_bSuperPowerTankOn)
             {
                 if (!fn_8002EDC8(m_pFielder, -1))
                 {
                     m_pFielder->fn_8005001C(true);
                     return;
                 }
-                m_pFielder->mUnidentified3F4 -= fDeltaT;
-                if (m_pFielder->mUnidentified3F4 <= 0.0f)
+                m_pFielder->m_fNextGasTime -= fDeltaT;
+                if (m_pFielder->m_fNextGasTime <= 0.0f)
                 {
                     unsigned long sound = PowerupBase::GetSoundType(
                         (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
@@ -1546,7 +1546,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     m_pFielder->PlayImpactCameraRumble();
                     m_pFielder->fn_800D0534(gWarioGasInterval);
-                    m_pFielder->mUnidentified3F4 = gWarioGasInterval;
+                    m_pFielder->m_fNextGasTime = gWarioGasInterval;
                     nlVector3 pos;
                     nlVector3 offset;
                     nlPolarToCartesian(offset.x, offset.y,
@@ -1595,7 +1595,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
             }
             else
             {
-                m_pFielder->mUnidentified3F4 = 0.0f;
+                m_pFielder->m_fNextGasTime = 0.0f;
             }
         }
         else if (m_pFielder->m_eAnimID == 104)
@@ -1621,7 +1621,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
     gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
-        = self->m_pFielder->mUnidentified328;
+        = self->m_pFielder->m_pSuperPowerTweaks;
     self->m_pFielder->EndConfusion();
     if (self->m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {

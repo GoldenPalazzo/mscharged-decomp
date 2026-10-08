@@ -429,7 +429,7 @@ public:
     bool IsFallenDown() const;
     void fn_800D0534(float amount)
     {
-        mUnidentified3E0 -= amount;
+        m_fSuperPowerTankLevel -= amount;
     }
     bool IsStuck() const;
     bool UnidentifiedClass17Or2() const
@@ -608,43 +608,43 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
-    PlayerTweaks* UnidentifiedGetTweaks() const { return mUnidentified32C; }
+    PlayerTweaks* UnidentifiedGetTweaks() const { return m_pNormalTweaks; }
 
 public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;
 
 private:
-    /* 0x328 */ PlayerTweaks* mUnidentified328;
-    /* 0x32C */ PlayerTweaks* mUnidentified32C;
-    /* 0x330 */ UnidentifiedFielderPair330 mUnidentified330;
-    /* 0x338 */ u16 mUnidentified338;
+    /* 0x328 */ PlayerTweaks* m_pSuperPowerTweaks;
+    /* 0x32C */ PlayerTweaks* m_pNormalTweaks;
+    /* 0x330 */ UnidentifiedFielderPair330 mActionCrowdVars;
+    /* 0x338 */ u16 m_aDekeDirection;
 
 public:
-    /* 0x33A */ bool mUnidentified33A;
+    /* 0x33A */ bool m_bDekeReset;
 
 private:
     /* 0x33B */ u8 mUnknown33B[0x01];
 
 public:
-    /* 0x33C */ int mUnidentified33C;
+    /* 0x33C */ int m_nDPadDownCounter;
 
 public:
-    /* 0x340 */ float mUnidentified340;
-    /* 0x344 */ float mUnidentified344;
-    /* 0x348 */ bool mUnidentified348;
+    /* 0x340 */ float m_fElectrocutionTime;
+    /* 0x344 */ float m_fElectrocutionLiftTime;
+    /* 0x348 */ bool m_bGroundElectrocution;
 
 private:
     /* 0x349 */ u8 mUnknown349[0x03];
 
 public:
-    /* 0x34C */ float mUnidentified34C;
-    /* 0x350 */ nlVector3 mUnidentified350;
+    /* 0x34C */ float m_fFallingTime;
+    /* 0x350 */ nlVector3 m_v3SuckToSpot;
 
 private:
-    /* 0x35C */ float mUnidentified35C;
+    /* 0x35C */ float m_fHitDistance;
 
 public:
-    /* 0x360 */ bool mUnidentified360;
+    /* 0x360 */ bool m_bHitReactFrameLock;
 
 public:
     /* 0x361 */ bool bYoshiInWindup;
@@ -657,19 +657,19 @@ public:
     /* 0x364 */ UnidentifiedFielderAction364 mActionLooseBallPassVars;
 
 public:
-    /* 0x368 */ float mUnidentified368;
+    /* 0x368 */ float m_fOneTimerAnimTime;
 
 private:
 public:
-    /* 0x36C */ cPlayer* mUnidentified36C;
-    /* 0x370 */ bool mUnidentified370;
-    /* 0x371 */ bool mUnidentified371;
+    /* 0x36C */ cPlayer* m_pPassTarget;
+    /* 0x370 */ bool m_bAllowLeadPass;
+    /* 0x371 */ bool m_bOneTouchPass;
 
 private:
     /* 0x372 */ u8 mUnknown372[0x02];
 
 public:
-    /* 0x374 */ UnidentifiedFielderPair374 mUnidentified374;
+    /* 0x374 */ UnidentifiedFielderPair374 mActionRunPassVars;
     /* 0x37C */ UnidentifiedFielderAction37C mActionRunningVars;
 
 public:
@@ -679,17 +679,17 @@ private:
     /* 0x386 */ u8 mUnknown386[0x02];
 
 public:
-    /* 0x388 */ int mUnidentified388;
+    /* 0x388 */ int m_eSlideAttackState;
     /* 0x38C */ bool bAttackSucceeded;
-    /* 0x38D */ bool mUnidentified38D;
+    /* 0x38D */ bool m_bSlideAttackReset;
 
 private:
     /* 0x38E */ u8 mUnknown38E[0x02];
 
 public:
     /* 0x390 */ float mUnidentified390;
-    /* 0x394 */ float mUnidentified394;
-    /* 0x398 */ float mUnidentified398;
+    /* 0x394 */ float m_fMegaStrikeAccuracy;
+    /* 0x398 */ float m_fMegaStrikeReceivedTimestamp;
     /* 0x39C */ float mUnidentified39C;
     /* 0x3A0 */ float mUnidentified3A0;
     /* 0x3A4 */ float mUnidentified3A4;
@@ -712,24 +712,24 @@ public:
     /* 0x3D4 */ float mUnidentified3D4;
 
 public:
-    /* 0x3D8 */ s16 mUnidentified3D8;
-    /* 0x3DA */ s16 mUnidentified3DA;
+    /* 0x3D8 */ s16 m_nStunnedAngularAcceleration;
+    /* 0x3DA */ s16 m_nStunnedAngularVelocity;
 
 public:
-    /* 0x3DC */ bool mUnidentified3DC;
+    /* 0x3DC */ bool m_bSuperPowerTankOn;
 
 private:
-    /* 0x3DD */ bool mUnidentified3DD;
+    /* 0x3DD */ bool m_bSuperPowerTankShutdownPending;
 
 private:
     /* 0x3DE */ u8 mUnknown3DE[0x02];
 
 public:
-    /* 0x3E0 */ float mUnidentified3E0;
-    /* 0x3E4 */ float mUnidentified3E4;
-    /* 0x3E8 */ ActBowserSuper mUnidentified3E8;
-    /* 0x3F4 */ float mUnidentified3F4;
-    /* 0x3F8 */ WaluigiWallState mUnidentified3F8;
+    /* 0x3E0 */ float m_fSuperPowerTankLevel;
+    /* 0x3E4 */ float m_fSuperPowerTankCapacity;
+    /* 0x3E8 */ ActBowserSuper mActionBowserSuper;
+    /* 0x3F4 */ float m_fNextGasTime;
+    /* 0x3F8 */ WaluigiWallState mWaluigiWallState;
 
 private:
     /* 0x404 */ float mUnidentified404;
@@ -753,7 +753,7 @@ private:
     /* 0x425 */ u8 mUnknown425[0x03];
 
 public:
-    /* 0x428 */ AIContext* mUnidentified428;
+    /* 0x428 */ AIContext* m_pAIContext;
 
 private:
     /* 0x42C */ bool m_bHasBeenUpdated;

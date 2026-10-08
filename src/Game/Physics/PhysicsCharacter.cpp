@@ -192,7 +192,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->m_pBall == 0 || fielder->m_eActionState == 1
-                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
+                || (fn_8003E948(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 actionState = fielder->m_eActionState;
                 bool superWall = fn_8003E948(fielder);
@@ -302,7 +302,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     return NO_CONTACT;
                 }
                 if (fn_8003E948(ball->GetOwnerFielder())
-                    && ball->GetOwnerFielder()->mUnidentified3DC)
+                    && ball->GetOwnerFielder()->m_bSuperPowerTankOn)
                 {
                     DebugPrintf("PhysChar SuperWal\n");
                     return ONE_WAY_CONTACT_THIS;
@@ -408,7 +408,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             if (fielder->IsInvincibleChars()
                 || fn_800344DC(fielder, &otherFielder->mUnidentified024.m_v3Position)
                 || fielder->IsStuck()
-                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
+                || (fn_8003E948(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 contactType = ONE_WAY_CONTACT_OTHER;
             }

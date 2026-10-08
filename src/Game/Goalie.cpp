@@ -2357,7 +2357,7 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
         PhysicsWaluigiWall* pWall = NULL;
         if (muWallID != 0)
         {
-            pWall = pWaluigi->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
+            pWall = pWaluigi->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
             if (pWall == NULL)
                 muWallID = 0;
         }
@@ -2366,7 +2366,7 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
         {
             if (i != 0 || pWall == NULL)
             {
-                pWall = pWaluigi->mUnidentified3F8.mUnidentified08->GetWall(i);
+                pWall = pWaluigi->mWaluigiWallState.mUnidentified08->GetWall(i);
                 ++i;
             }
             if (pWall != NULL)

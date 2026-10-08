@@ -1223,7 +1223,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
                 || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
-            && !pCaptain->mUnidentified3DC)
+            && !pCaptain->m_bSuperPowerTankOn)
         {
             pCaptain->TurnOnSuperPowerTank();
         }
