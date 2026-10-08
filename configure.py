@@ -559,7 +559,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/StatsGatherer.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/AI/TeamDesire.cpp"),
             Object(Matching, "Game/AI/TeamPlayMachine.cpp"),
-            Object(NonMatching, "Game/AI/tu_800BC0C4.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AI/tu_800BC0C4.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/FielderDesireMachine.cpp"),
             Object(Matching, "Game/AI/FielderDesireTransitions.cpp"),
             Object(Matching, "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),

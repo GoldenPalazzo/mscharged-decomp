@@ -5,17 +5,25 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Powerups.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
+#include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Render/BulletBill.h"
+#include "Game/Render/PeachPhoto.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/audio.h"
+#include "Game/Team.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 
-extern float lbl_806E0E40;
-extern const nlVector3 lbl_804DC1A0;
+float lbl_806E0E40;
+extern const nlVector3 lbl_804DC1A0 = { 0.0f, 0.0f, 0.0f };
 
 static unsigned short sDesireStarType = 0xFFFF;
 static unsigned short sDesireMushroomType = 0xFFFF;
@@ -142,6 +150,36 @@ bool DesireMushroom::Reinitialize(void* context)
 }
 
 /**
+ * Offset/Address/Size: 0x78C | 0x800BC850 | size: 0x4DC
+ */
+void DesireMushroom::Update(DesireUpdate* update, float)
+{
+    switch (m_pFielder->m_eActionState)
+    {
+    case (eFielderActionState)0:
+    case ACTION_ELECTROCUTION:
+    case (eFielderActionState)3:
+    case (eFielderActionState)5:
+    case ACTION_HIT_REACT:
+    case ACTION_SHOT:
+    case ACTION_SLIDE_ATTACK_REACT:
+    case (eFielderActionState)24:
+    case ACTION_BOMB_REACT:
+    case ACTION_SHELL_REACT:
+    case ACTION_BANANA_REACT:
+    case ACTION_UNKNOWN_31:
+        *update = 1;
+        break;
+    default:
+        if (!g_pGame->IsGameplayOrOvertime())
+        {
+            *update = 1;
+        }
+        break;
+    }
+}
+
+/**
  * Offset/Address/Size: 0xC68 | 0x800BCD2C | size: 0x64
  */
 void DesireMushroom::Cleanup()
@@ -173,6 +211,17 @@ bool DesireSlippery::Reinitialize(void* context)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
     return Desire::Initialize(context);
+}
+
+/**
+ * Offset/Address/Size: 0xD28 | 0x800BCDEC | size: 0x288
+ */
+void DesireSlippery::Update(DesireUpdate* update, float)
+{
+    if (!g_pGame->IsGameplayOrOvertime())
+    {
+        *update = 1;
+    }
 }
 
 /**
@@ -369,6 +418,117 @@ void DesireShrink::Update(DesireUpdate* update, float)
 }
 
 /**
+ * Offset/Address/Size: 0x194C | 0x800BDA10 | size: 0xA8
+ */
+void DesireShrink::Cleanup()
+{
+    CreateMushroomEffect(m_pFielder);
+    m_pFielder->m_pTweaks = m_pFielder->m_pNormalTweaks;
+    m_pFielder->fn_8001EE74(1.0f, lbl_806DC178, 1.0f);
+    if (g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 4)
+    {
+        cFielder* captain = m_pFielder->m_pTeam->GetOtherTeam()->GetCaptain();
+        PlaySound(captain->m_uSoundSlotId, 0x8011C562, 0, 0);
+    }
+}
+
+static inline void SetAnimationUpdatePaused(cPlayer* player, bool paused)
+{
+    player->mUnidentified1E4.m_bSkipAnimUpdate = paused;
+    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+}
+
+static inline void SetActionUpdatePaused(cPlayer* player, bool paused)
+{
+    player->mUnidentified1E4.m_bSkipActionUpdate = paused;
+    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+}
+
+/**
+ * Offset/Address/Size: 0x19F4 | 0x800BDAB8 | size: 0x24C
+ */
+bool DesireFrozen::Initialize(void* context)
+{
+    bool result = Desire::Initialize(context);
+    switch (m_pFielder->m_eActionState)
+    {
+    case ACTION_SHOT:
+    case ACTION_SHOOT_TO_SCORE:
+    case (eFielderActionState)19:
+    case ACTION_RUNNING_WB:
+        if (!m_pFielder->IsYoshiSuperPowerActive())
+        {
+            m_pFielder->InitActionRunning();
+        }
+        break;
+    case ACTION_UNKNOWN_32:
+        if (m_pFielder->GetCharacterClass() == SHYGUY
+            && m_pFielder->m_eActionState == ACTION_UNKNOWN_32
+            && m_pFielder->m_pBulletBill->active)
+        {
+            m_pFielder->m_pBulletBill->Hide(false);
+        }
+        break;
+    case (eFielderActionState)1:
+    case (eFielderActionState)33:
+        if (m_pFielder->GetCharacterClass() == BOO)
+        {
+            m_pFielder->EndAction();
+            m_pFielder->RestoreTangibility(false);
+        }
+        break;
+    }
+
+    if (m_pFielder->IsSlideAttacking())
+    {
+        m_pFielder->fn_8004D238();
+    }
+
+    mePrevActionState = m_pFielder->m_eActionState;
+    mfPrevFrozenTime = -1.0f;
+    mePrevFrozenState = 0;
+    m_pFielder->SetVelocity(lbl_804DC1A0);
+    m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
+    m_pFielder->mUnidentified024.m_fActualSpeed = 0.0f;
+    if (KillDaze(m_pFielder))
+    {
+        mbWasDazed = true;
+    }
+    else
+    {
+        mbWasDazed = false;
+    }
+    KillConfused(m_pFielder);
+    KillWindups();
+    KillSlideTackleTrail(m_pFielder, 1);
+    KillHitTrail(m_pFielder, 1);
+    EndElectrocution(m_pFielder);
+    KillDeke(m_pFielder);
+    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    {
+        KillSkillshotPlayerOnFire(m_pFielder);
+    }
+    if (IsBowserSuperPowerActive(m_pFielder))
+    {
+        EndBowserSmoke(m_pFielder);
+    }
+    if (m_pFielder->m_bSuperPowerTankOn)
+    {
+        m_pFielder->TurnOffSuperPowerTank(true);
+    }
+    if (m_pFielder->GetDesireState() != (eFielderDesireState)21)
+    {
+        m_pFielder->EndDesire();
+    }
+
+    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    fn_800BE1AC(params->Get(0)->mData.i);
+    SetAnimationUpdatePaused(m_pFielder, true);
+    SetActionUpdatePaused(m_pFielder, true);
+    return result;
+}
+
+/**
  * Offset/Address/Size: 0x1C40 | 0x800BDD04 | size: 0xAC
  */
 bool DesireFrozen::Reinitialize(void* context)
@@ -387,6 +547,179 @@ bool DesireFrozen::Reinitialize(void* context)
     fn_800BE1AC(params->Get(0)->mData.i);
     KillFreeze(m_pFielder);
     return Desire::Initialize(context);
+}
+
+static inline float GetCharacterOpacity(const cCharacter* character)
+{
+    return character->mUnidentified178;
+}
+
+/**
+ * Offset/Address/Size: 0x1CEC | 0x800BDDB0 | size: 0xB4
+ */
+void DesireFrozen::Update(DesireUpdate*, float)
+{
+    if (meFrozenState == 2 && gPeachPhotoState.textureReady)
+    {
+        if (GetCharacterOpacity(m_pFielder) != 0.0f)
+        {
+            m_pFielder->mUnidentified178 = 0.0f;
+        }
+    }
+    if (!g_pGame->IsGameplayOrOvertime())
+    {
+        if (m_pFielder->IsMarioSuperPowerActive() || m_pFielder->IsLuigiSuperPowerActive())
+        {
+            m_pFielder->EndSuperPower(0);
+        }
+    }
+}
+
+/**
+ * Offset/Address/Size: 0x1DA0 | 0x800BDE64 | size: 0x258
+ */
+void DesireFrozen::Cleanup()
+{
+    switch (meFrozenState)
+    {
+    case 0:
+        break;
+    case 1:
+        EmitUnFreeze(m_pFielder);
+        PowerupBase::PlayPowerupSound(POWER_UP_FREEZE_SHELL,
+            PowerupBase::PWRUP_SOUND_END, m_pFielder->m_pPhysicsCharacter, 0.0f, 0);
+        break;
+    case 2:
+        m_pFielder->mUnidentified17D = false;
+        m_pFielder->SetTangible(true, false);
+        m_pFielder->mUnidentified178 = 1.0f;
+        m_pFielder->SetModelType(0);
+        break;
+    case 3:
+        SetAnimationUpdatePaused(m_pFielder, false);
+        SetActionUpdatePaused(m_pFielder, false);
+        switch (mePrevFrozenState)
+        {
+        case 0:
+            break;
+        case 1:
+            EmitUnFreeze(m_pFielder);
+            break;
+        case 2:
+            m_pFielder->mUnidentified17D = false;
+            m_pFielder->SetTangible(true, false);
+            m_pFielder->mUnidentified178 = 1.0f;
+            m_pFielder->SetModelType(0);
+            break;
+        case 3:
+        case 4:
+        default:
+            break;
+        }
+        m_pFielder->EndConfusion();
+        if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+        {
+            m_pFielder->fn_8009750C();
+            m_pFielder->EndAction();
+        }
+        m_pFielder->EndMarioSuperPower();
+        m_pFielder->EndLuigiSuperPower();
+        m_pFielder->EndStar();
+        m_pFielder->EndMushroom();
+        break;
+    case 4:
+        m_pFielder->SetTangible(true, false);
+        m_pFielder->mUnidentified178 = 1.0f;
+        break;
+    }
+
+    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    {
+        EmitSkillshotPlayerOnFire(m_pFielder);
+    }
+    if (IsBowserSuperPowerActive(m_pFielder))
+    {
+        EmitBowserSmoke(m_pFielder);
+    }
+    if (m_pFielder->IsConfused())
+    {
+        EmitConfused(m_pFielder);
+    }
+    if (mbWasDazed)
+    {
+        EmitDaze(m_pFielder);
+    }
+    if (m_pFielder->m_eActionState == ACTION_ELECTROCUTION)
+    {
+        EmitElectrocution(m_pFielder);
+    }
+    if (m_pFielder->m_eActionState == (eFielderActionState)1)
+    {
+        EmitDeke(m_pFielder);
+    }
+    SetAnimationUpdatePaused(m_pFielder, false);
+    SetActionUpdatePaused(m_pFielder, false);
+    if (m_pFielder->m_eActionState == ACTION_NEED_ACTION)
+    {
+        m_pFielder->EndDesire();
+        m_pFielder->StartRunning();
+    }
+}
+
+/**
+ * Offset/Address/Size: 0x1FF8 | 0x800BE0BC | size: 0xF0
+ */
+void DesireFrozen::fn_800BE0BC(float duration, int state)
+{
+    UnidentifiedVariantCollection params;
+    params.Set(7, FuzzyVariant(duration));
+    params.Set(0, FuzzyVariant(state));
+    ActivateConcurrentState(mScriptMachine, 29, &params, mActive);
+}
+
+/**
+ * Offset/Address/Size: 0x20E8 | 0x800BE1AC | size: 0x14C
+ */
+void DesireFrozen::fn_800BE1AC(int state)
+{
+    switch (state)
+    {
+    case 0:
+        break;
+    case 1:
+        m_pFielder->fn_8009750C();
+        EmitFreeze(m_pFielder);
+        m_pFielder->fn_8001F1D8();
+        if (mePrevFrozenState != 1)
+        {
+            PlaySound(16, 0x1DFB6861, 0, 0);
+        }
+        break;
+    case 2:
+        m_pFielder->mUnidentified17D = true;
+        m_pFielder->SetTangible(false, false);
+        break;
+    case 3:
+        m_pFielder->EndStar();
+        if (mePrevFrozenState == 1)
+        {
+            EmitUnFreeze(m_pFielder);
+        }
+        break;
+    case 4:
+        m_pFielder->SetTangible(false, false);
+        m_pFielder->mUnidentified178 = 0.0f;
+        m_pFielder->ResetEffects();
+        m_pFielder->ClearInvincibility(false);
+        PowerupBase::StopPowerupInEffectSound(POWER_UP_STAR,
+            PowerupBase::PWRUP_SOUND_IN_EFFECT, m_pFielder);
+        if (m_pFielder->GetCharacterClass() == SHYGUY)
+        {
+            m_pFielder->m_pBulletBill->Hide(true);
+        }
+        break;
+    }
+    meFrozenState = state;
 }
 
 static inline int GetFacingDirection(cFielder* fielder)
@@ -418,7 +751,7 @@ bool DesireConfused::Initialize(void* context)
             m_pFielder->InitActionRunning();
         }
         else if (m_pFielder->mUnidentified024.m_eCharacterClass
-                     == (eCharacterClass)0x13
+                     == SHYGUY
                  && m_pFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
         {
@@ -460,7 +793,7 @@ bool DesireConfused::Reinitialize(void* context)
 
     if (m_pFielder->m_pBall != 0
         && (m_pFielder->mUnidentified024.m_eCharacterClass
-                != (eCharacterClass)0x13
+                != SHYGUY
             || m_pFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
@@ -541,215 +874,20 @@ void DesireConfused::Cleanup()
 }
 
 /**
- * Offset/Address/Size: 0x2CD8 | 0x800BED9C | size: 0x110
- */
-void DesireConfused::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireConfused");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
-    cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x2DE8 | 0x800BEEAC | size: 0x9C
- */
-void DesireConfused::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireConfusedType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireConfusedType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireConfusedType, data, context);
-    cache->WriteData(sDesireConfusedType, data, sizeof(DesireConfused) - offset);
-}
-
-/**
- * Offset/Address/Size: 0x2E84 | 0x800BEF48 | size: 0x17C
- */
-void DesireFrozen::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireFrozen");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meFrozenState - (u8*)&mvDesiredPosition, "meFrozenState");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevFrozenState - (u8*)&mvDesiredPosition, "mePrevFrozenState");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
-    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x3000 | 0x800BF0C4 | size: 0x9C
- */
-void DesireFrozen::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireFrozenType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireFrozenType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireFrozenType, data, context);
-    cache->WriteData(sDesireFrozenType, data, sizeof(DesireFrozen) - offset);
-}
-
-/**
- * Offset/Address/Size: 0x309C | 0x800BF160 | size: 0xEC
- */
-void DesireShrink::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireShrink");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x3188 | 0x800BF24C | size: 0x9C
- */
-void DesireShrink::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireShrinkType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireShrinkType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireShrinkType, data, context);
-    cache->WriteData(sDesireShrinkType, data, sizeof(DesireShrink) - offset);
-}
-
-/**
- * Offset/Address/Size: 0x3224 | 0x800BF2E8 | size: 0x17C
- */
-void DesireGooey::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireGooey");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooPercentage - (u8*)&mvDesiredPosition, "mfGooPercentage");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfMaxGooEffect - (u8*)&mvDesiredPosition, "mfMaxGooEffect");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x33A0 | 0x800BF464 | size: 0x9C
- */
-void DesireGooey::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireGooeyType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireGooeyType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireGooeyType, data, context);
-    cache->WriteData(sDesireGooeyType, data, sizeof(DesireGooey) - offset);
-}
-
-/**
- * Offset/Address/Size: 0x343C | 0x800BF500 | size: 0xC8
- */
-void DesireSlippery::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireSlippery");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x3504 | 0x800BF5C8 | size: 0x9C
- */
-void DesireSlippery::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireSlipperyType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireSlipperyType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireSlipperyType, data, context);
-    cache->WriteData(sDesireSlipperyType, data, sizeof(DesireSlippery) - offset);
-}
-
-/**
- * Offset/Address/Size: 0x35A0 | 0x800BF664 | size: 0xC8
- */
-void DesireMushroom::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireMushroom");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x3668 | 0x800BF72C | size: 0x9C
- */
-void DesireMushroom::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireMushroomType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireMushroomType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireMushroomType, data, context);
-    cache->WriteData(sDesireMushroomType, data, sizeof(DesireMushroom) - offset);
-}
-
-/**
  * Offset/Address/Size: 0x3704 | 0x800BF7C8 | size: 0xC8
  */
-void DesireStar::UnidentifiedVirtual8(
+inline void DesireStar::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireStar");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x37CC | 0x800BF890 | size: 0x9C
  */
-void DesireStar::UnidentifiedVirtual7(
+inline void DesireStar::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireStarType == 0xFFFF)
@@ -764,50 +902,182 @@ void DesireStar::UnidentifiedVirtual7(
 }
 
 /**
- * Offset/Address/Size: 0x3868 | 0x800BF92C | size: 0x5C
+ * Offset/Address/Size: 0x35A0 | 0x800BF664 | size: 0xC8
  */
-DesireStar::~DesireStar()
+inline void DesireMushroom::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireMushroom");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x38C4 | 0x800BF988 | size: 0x5C
+ * Offset/Address/Size: 0x3668 | 0x800BF72C | size: 0x9C
  */
-DesireMushroom::~DesireMushroom()
+inline void DesireMushroom::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesireMushroomType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireMushroomType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireMushroomType, data, context);
+    cache->WriteData(sDesireMushroomType, data, sizeof(DesireMushroom) - offset);
 }
 
 /**
- * Offset/Address/Size: 0x3920 | 0x800BF9E4 | size: 0x5C
+ * Offset/Address/Size: 0x343C | 0x800BF500 | size: 0xC8
  */
-DesireSlippery::~DesireSlippery()
+inline void DesireSlippery::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireSlippery");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x397C | 0x800BFA40 | size: 0x5C
+ * Offset/Address/Size: 0x3504 | 0x800BF5C8 | size: 0x9C
  */
-DesireGooey::~DesireGooey()
+inline void DesireSlippery::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesireSlipperyType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireSlipperyType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireSlipperyType, data, context);
+    cache->WriteData(sDesireSlipperyType, data, sizeof(DesireSlippery) - offset);
 }
 
 /**
- * Offset/Address/Size: 0x39D8 | 0x800BFA9C | size: 0x5C
+ * Offset/Address/Size: 0x3224 | 0x800BF2E8 | size: 0x17C
  */
-DesireShrink::~DesireShrink()
+inline void DesireGooey::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireGooey");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooPercentage - (u8*)&mvDesiredPosition, "mfGooPercentage");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfMaxGooEffect - (u8*)&mvDesiredPosition, "mfMaxGooEffect");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x3A34 | 0x800BFAF8 | size: 0x5C
+ * Offset/Address/Size: 0x33A0 | 0x800BF464 | size: 0x9C
  */
-DesireFrozen::~DesireFrozen()
+inline void DesireGooey::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesireGooeyType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireGooeyType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireGooeyType, data, context);
+    cache->WriteData(sDesireGooeyType, data, sizeof(DesireGooey) - offset);
 }
 
 /**
- * Offset/Address/Size: 0x3A90 | 0x800BFB54 | size: 0x5C
+ * Offset/Address/Size: 0x309C | 0x800BF160 | size: 0xEC
  */
-DesireConfused::~DesireConfused()
+inline void DesireShrink::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireShrink");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
+}
+
+/**
+ * Offset/Address/Size: 0x3188 | 0x800BF24C | size: 0x9C
+ */
+inline void DesireShrink::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
+{
+    if (sDesireShrinkType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireShrinkType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireShrinkType, data, context);
+    cache->WriteData(sDesireShrinkType, data, sizeof(DesireShrink) - offset);
+}
+
+/**
+ * Offset/Address/Size: 0x2E84 | 0x800BEF48 | size: 0x17C
+ */
+inline void DesireFrozen::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
+{
+    *(unsigned short*)field = cache->BeginType("DesireFrozen");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meFrozenState - (u8*)&mvDesiredPosition, "meFrozenState");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevFrozenState - (u8*)&mvDesiredPosition, "mePrevFrozenState");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
+    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
+}
+
+/**
+ * Offset/Address/Size: 0x3000 | 0x800BF0C4 | size: 0x9C
+ */
+inline void DesireFrozen::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
+{
+    if (sDesireFrozenType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireFrozenType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireFrozenType, data, context);
+    cache->WriteData(sDesireFrozenType, data, sizeof(DesireFrozen) - offset);
+}
+
+/**
+ * Offset/Address/Size: 0x2CD8 | 0x800BED9C | size: 0x110
+ */
+inline void DesireConfused::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
+{
+    *(unsigned short*)field = cache->BeginType("DesireConfused");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
+    cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
+}
+
+/**
+ * Offset/Address/Size: 0x2DE8 | 0x800BEEAC | size: 0x9C
+ */
+inline void DesireConfused::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
+{
+    if (sDesireConfusedType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireConfusedType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireConfusedType, data, context);
+    cache->WriteData(sDesireConfusedType, data, sizeof(DesireConfused) - offset);
 }

@@ -343,7 +343,6 @@ public:
     {
     }
 
-    virtual ~DesireStar();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -361,7 +360,6 @@ public:
     {
     }
 
-    virtual ~DesireMushroom();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -379,7 +377,6 @@ public:
     {
     }
 
-    virtual ~DesireSlippery();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -393,7 +390,6 @@ class DesireGooey : public Desire
 {
 public:
     DesireGooey();
-    virtual ~DesireGooey();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -421,7 +417,6 @@ public:
     {
     }
 
-    virtual ~DesireShrink();
 
     virtual bool Initialize(void*);
     virtual void Cleanup();
@@ -445,7 +440,6 @@ public:
     {
     }
 
-    virtual ~DesireFrozen();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -479,7 +473,6 @@ public:
     {
     }
 
-    virtual ~DesireConfused();
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
