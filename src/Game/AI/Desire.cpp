@@ -241,7 +241,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case MARIO:
     case LUIGI:
         avoidSideline = true;
-        if (m_pFielder->fn_8003E6EC() && mUnidentifiedA4 != 0)
+        if (m_pFielder->IsSuperPowerActive() && mUnidentifiedA4 != 0)
         {
             cFielder* target = (cFielder*)mUnidentifiedA4;
             nlVector3 delta;

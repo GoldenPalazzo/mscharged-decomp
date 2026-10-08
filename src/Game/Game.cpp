@@ -592,7 +592,7 @@ void cGame::InitMegaStrikeGameplay()
     g_pBall->m_uGoalType = 6;
 
     float accuracy = mpMegaStrikeShooter->m_fMegaStrikeAccuracy;
-    float numBalls = mpMegaStrikeShooter->mUnidentified390;
+    float numBalls = mpMegaStrikeShooter->m_fMegaStrikeNumBalls;
     Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->InitActionMegaStrike(numBalls, accuracy);
     mpMegaStrikeShooter->EndAction();

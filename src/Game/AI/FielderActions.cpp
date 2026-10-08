@@ -2957,7 +2957,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 {
     tDebugPrintManager::Print(DC_NETWORK, "InitActionMegaStrikeMeter at frame %d\n", GetFixedUpdateTask()->GetFrame());
 
-    mUnidentified390 = 0.0f;
+    m_fMegaStrikeNumBalls = 0.0f;
     m_fMegaStrikeAccuracy = 0.0f;
     m_fMegaStrikeReceivedTimestamp = -1.0f;
     m_fMegaStrikeFirstPressPosition = -1.0f;

@@ -529,7 +529,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
         }
         if (m_pFielder->m_bSuperPowerTankOn)
         {
-            if (!fn_8002EDC8(m_pFielder, -1))
+            if (!CanUsePowerup(m_pFielder, -1))
             {
                 m_pFielder->TurnOffSuperPowerTank(true);
                 return;
@@ -1153,7 +1153,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 if (start)
                 {
                     bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
-                    if (active && fn_8002EDC8(m_pFielder, -1))
+                    if (active && CanUsePowerup(m_pFielder, -1))
                     {
                         m_pFielder->TurnOnSuperPowerTank();
                         m_pFielder->SetThingsToAvoid(0);
@@ -1167,7 +1167,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->m_bSuperPowerTankOn)
         && (bool)(1.0f - ReceivingPass(m_pFielder))
         && (bool)(1.0f - fn_800DEAB4(m_pFielder))
-        && fn_8002EDC8(m_pFielder, -1))
+        && CanUsePowerup(m_pFielder, -1))
     {
         if ((bool)UserControlledT(m_pFielder->m_pTeam))
         {
@@ -1312,7 +1312,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
     GetFielderDesire(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
-    float danger = fn_80041B0C(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),
+    float danger = CallFielderFuzzyFunction(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),
         fielder.mFielder, "InDangerForMegastrike").mData.f;
     float question = fn_800DBB0C(fielder.mFielder);
     bool good = ((1.0f - danger) / 2.0f + question / 2.0f) > 0.75f;
@@ -1532,7 +1532,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
             }
             if (m_pFielder->m_bSuperPowerTankOn)
             {
-                if (!fn_8002EDC8(m_pFielder, -1))
+                if (!CanUsePowerup(m_pFielder, -1))
                 {
                     m_pFielder->TurnOffSuperPowerTank(true);
                     return;

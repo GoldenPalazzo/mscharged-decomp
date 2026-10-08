@@ -941,15 +941,15 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     if (pFielder == NULL)
         return 0.0f;
     float fScore = 0.0f;
-    if (pFielder->IsCaptain() && !pFielder->fn_8003E6EC())
+    if (pFielder->IsCaptain() && !pFielder->IsSuperPowerActive())
     {
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
-        if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
+        if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
             fScore = 1.0f;
         else if (pFielder->m_pTeam->fn_800A6560())
         {
             powerup = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-            if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
+            if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
                 fScore = 1.0f;
         }
     }
@@ -965,12 +965,12 @@ extern "C" float fn_800D85F8(cFielder* pFielder)
     if (pFielder->IsCaptain())
     {
         if (first != -1 || (pFielder->m_pTeam->fn_800A6560() && second != -1))
-            return (fn_8002EDC8(pFielder, first) || fn_8002EDC8(pFielder, second)) ? 1.0f : 0.0f;
+            return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
         return 0.0f;
     }
     if ((first >= 0 && first < 9)
         || (pFielder->m_pTeam->fn_800A6560() && second >= 0 && second < 9))
-        return (fn_8002EDC8(pFielder, first) || fn_8002EDC8(pFielder, second)) ? 1.0f : 0.0f;
+        return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
     return 0.0f;
 }
 
@@ -982,7 +982,7 @@ extern "C" float fn_800D8764(cFielder* pFielder, int powerup)
     int first = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
     int second = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
     if (first == powerup || (pFielder->m_pTeam->fn_800A6560() && second == powerup))
-        fScore = fn_8002EDC8(pFielder, powerup);
+        fScore = CanUsePowerup(pFielder, powerup);
     return fScore;
 }
 
@@ -2719,7 +2719,7 @@ extern "C" float fn_800DD944(cPlayer* pPlayer)
 
     if (pPlayer->m_eClassType == FIELDER)
     {
-        if (((cFielder*)pPlayer)->fn_8003E6EC())
+        if (((cFielder*)pPlayer)->IsSuperPowerActive())
         {
             return 1.0f;
         }

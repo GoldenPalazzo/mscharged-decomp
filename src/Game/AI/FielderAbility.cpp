@@ -378,7 +378,7 @@ void cFielder::InitSuperPowerTank(bool bTurnOn)
 
 bool cFielder::TurnOnSuperPowerTank()
 {
-    if (!fn_8002EDC8(this, -1))
+    if (!CanUsePowerup(this, -1))
     {
         return false;
     }

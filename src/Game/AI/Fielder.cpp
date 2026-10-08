@@ -236,7 +236,7 @@ static inline void GetCharacterSpecialActive(
     {
         return;
     }
-    if (!fielder->fn_8003E6EC())
+    if (!fielder->IsSuperPowerActive())
     {
         return;
     }
@@ -542,7 +542,7 @@ static inline bool HasHitWindowStarted(const cFielder* fielder, float fAnimTime)
 static void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
 {
     {
-        UnidentifiedVariant_80054AB8 bestTarget = fn_80041AFC(
+        UnidentifiedVariant_80054AB8 bestTarget = CallFielderFuzzyFunction(
             FuzzyAIGetFielderRuntime(fielder), "BestHitTarget", fielder);
         if (bestTarget.IsPointerType())
         {
@@ -588,7 +588,7 @@ static inline void SetStoppingAnimState(cFielder* fielder, int animation)
 
 static inline bool IsCharacterSuperPowerActive(const cFielder* fielder, eCharacterClass character)
 {
-    return fielder->GetCharacterClass() == character && fielder->fn_8003E6EC();
+    return fielder->GetCharacterClass() == character && fielder->IsSuperPowerActive();
 }
 
 inline void cFielder::SetRunLeanSAB(const int* anims, int count, int primary)
@@ -753,7 +753,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     , m_eSlideAttackState(0)
     , bAttackSucceeded(false)
     , m_bSlideAttackReset(true)
-    , mUnidentified390(0.0f)
+    , m_fMegaStrikeNumBalls(0.0f)
     , m_fMegaStrikeAccuracy(0.0f)
     , m_fMegaStrikeReceivedTimestamp(-1.0f)
     , m_fMegaStrikeFirstPressPosition(-1.0f)
@@ -1135,7 +1135,7 @@ int GetFielderHitReaction(cFielder* pReceiver,
     return nReaction;
 }
 
-extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
+bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
 {
     if (nPowerupType == -1)
     {
@@ -1896,7 +1896,7 @@ void TryFielderQueuedPass(cFielder* pFielder)
         cPlayer* pPassTarget;
         if (pFielder->GetGlobalPad() == 0)
         {
-            UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+            UnidentifiedVariant_80054AB8 vBestTarget = CallFielderFuzzyFunction(
                 FuzzyAIGetFielderRuntime(pFielder), "BestPassTarget", pFielder);
             pPassTarget = vBestTarget.GetPlayer();
         }
@@ -3348,7 +3348,7 @@ bool cFielder::IsDekePadPressed()
 
 cFielder* cFielder::DoFindBestHitTarget()
 {
-    UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+    UnidentifiedVariant_80054AB8 vBestTarget = CallFielderFuzzyFunction(
         FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
     if (vBestTarget.IsPointerType())
     {
@@ -5222,7 +5222,7 @@ PlayerTweaks* cFielder::GetTweaks() const
     return m_pTweaks;
 }
 
-bool cFielder::fn_8003E6EC() const
+bool cFielder::IsSuperPowerActive() const
 {
     return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17);
 }
@@ -5259,12 +5259,12 @@ bool cFielder::IsSuperGrowActive() const
 
 bool cFielder::IsMarioSuperPowerActive() const
 {
-    return GetCharacterClass() == (eCharacterClass)0 && fn_8003E6EC();
+    return GetCharacterClass() == (eCharacterClass)0 && IsSuperPowerActive();
 }
 
 bool cFielder::IsLuigiSuperPowerActive() const
 {
-    return GetCharacterClass() == (eCharacterClass)4 && fn_8003E6EC();
+    return GetCharacterClass() == (eCharacterClass)4 && IsSuperPowerActive();
 }
 
 bool IsBowserSuperPowerActive(const cFielder* pFielder)
@@ -6038,7 +6038,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_fHitDistance = 0.0f;
     m_bHitReactFrameLock = false;
     bYoshiInWindup = false;
-    mUnidentified390 = 0.0f;
+    m_fMegaStrikeNumBalls = 0.0f;
     m_fMegaStrikeAccuracy = 0.0f;
     m_fMegaStrikeReceivedTimestamp = -1.0f;
     bIsModified = false;
@@ -6105,7 +6105,7 @@ void cFielder::ResetEffects()
 
 void cFielder::SetMegaStrikeResult(float numBalls, float accuracy)
 {
-    mUnidentified390 = numBalls;
+    m_fMegaStrikeNumBalls = numBalls;
     m_nMegaStrikeResultState = 2;
     m_fMegaStrikeAccuracy = accuracy;
     m_fMegaStrikeReceivedTimestamp = GetFixedUpdateTask()->mSimulationTime;
@@ -6204,11 +6204,11 @@ inline void cFielder::RegisterActStunnedFields(unsigned short* type, DebugWriteC
 inline void cFielder::RegisterActMegaStrikeMeterFields(unsigned short* type, DebugWriteCache* cache)
 {
     *type = cache->BeginType("ActMegaStrikeMeter");
-    REGISTER_FIELDER_FIELD(17, mUnidentified390,
-        mUnidentified390, "fNumBalls");
-    REGISTER_FIELDER_FIELD(17, mUnidentified390,
+    REGISTER_FIELDER_FIELD(17, m_fMegaStrikeNumBalls,
+        m_fMegaStrikeNumBalls, "fNumBalls");
+    REGISTER_FIELDER_FIELD(17, m_fMegaStrikeNumBalls,
         m_fMegaStrikeAccuracy, "fAccuracy");
-    REGISTER_FIELDER_FIELD(17, mUnidentified390,
+    REGISTER_FIELDER_FIELD(17, m_fMegaStrikeNumBalls,
         m_fMegaStrikeReceivedTimestamp, "fReceivedTimestamp");
     cache->EndType();
 }
@@ -6526,15 +6526,15 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     }
     cache->ChecksumData(sActSlideAttackType, &m_eSlideAttackState, context);
     cache->WriteData(sActSlideAttackType, &m_eSlideAttackState,
-        offsetof(cFielder, mUnidentified390) - offsetof(cFielder, m_eSlideAttackState));
+        offsetof(cFielder, m_fMegaStrikeNumBalls) - offsetof(cFielder, m_eSlideAttackState));
 
     if (sActMegaStrikeMeterType == 0xFFFF)
     {
         RegisterActMegaStrikeMeterFields(&sActMegaStrikeMeterType, cache);
     }
-    cache->ChecksumData(sActMegaStrikeMeterType, &mUnidentified390, context);
-    cache->WriteData(sActMegaStrikeMeterType, &mUnidentified390,
-        offsetof(cFielder, m_fMegaStrikeFirstPressPosition) - offsetof(cFielder, mUnidentified390));
+    cache->ChecksumData(sActMegaStrikeMeterType, &m_fMegaStrikeNumBalls, context);
+    cache->WriteData(sActMegaStrikeMeterType, &m_fMegaStrikeNumBalls,
+        offsetof(cFielder, m_fMegaStrikeFirstPressPosition) - offsetof(cFielder, m_fMegaStrikeNumBalls));
 
     if (sActStunnedType == 0xFFFF)
     {

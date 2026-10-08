@@ -832,7 +832,7 @@ void UnidentifiedDesire35::Update(
     {
         return;
     }
-    if (!fn_8002EDC8(m_pFielder, -1))
+    if (!CanUsePowerup(m_pFielder, -1))
     {
         m_pFielder->TurnOffSuperPowerTank(true);
         fn_80060804(g_pGame, m_pFielder);

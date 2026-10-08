@@ -1193,7 +1193,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 
     if (bCaptainPowerupActive
         && GameInfoManager::Instance()->GetRule0x0() != 9
-        && !pCaptain->fn_8003E6EC())
+        && !pCaptain->IsSuperPowerActive())
     {
         bPlayCaptainChant = true;
     }

@@ -47,7 +47,7 @@ DesireUpdate TransDesireUsePowerup(
     {
         input->SetTimer(key, 0.4f);
         unsigned int hash = nlStringHash("TransDesireUsePowerup");
-        result = fn_80041B6C(input->mRuntime, hash, pFielder);
+        result = CallFielderFuzzyFunction(input->mRuntime, hash, pFielder);
     }
 
     return DesireUpdate(result, -1.0f, -1.0f);
@@ -140,7 +140,7 @@ void DesireUsePowerup::Cleanup()
  */
 extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 {
-    if (!fn_8002EDC8(pDesire->m_pFielder, -1))
+    if (!CanUsePowerup(pDesire->m_pFielder, -1))
     {
         return;
     }
@@ -161,7 +161,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 void DesireUsePowerup::fn_800D3968(
     cFielder* pTarget, ePowerUpType ePowerup, bool bActivate)
 {
-    if (!fn_8002EDC8(m_pFielder, -1))
+    if (!CanUsePowerup(m_pFielder, -1))
     {
         return;
     }
@@ -343,7 +343,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     case (ePowerUpType)19:
     case (ePowerUpType)20:
     {
-        if (!pDesire->m_pFielder->fn_8003E6EC())
+        if (!pDesire->m_pFielder->IsSuperPowerActive())
         {
             UnidentifiedVariantCollection params;
             TransitionFunc* pTransition

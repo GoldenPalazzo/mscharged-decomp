@@ -478,7 +478,7 @@ public:
     void EndAllDesires();
     int GetPreviousDesireState() const;
     bool IsReceivingVolleyPass() const;
-    bool fn_8003E6EC() const;
+    bool IsSuperPowerActive() const;
     bool IsStarActive() const;
     bool IsConfused() const;
     bool IsMushroomActive() const;
@@ -679,7 +679,7 @@ private:
     /* 0x38E */ u8 mUnknown38E[0x02];
 
 public:
-    /* 0x390 */ float mUnidentified390;
+    /* 0x390 */ float m_fMegaStrikeNumBalls;
     /* 0x394 */ float m_fMegaStrikeAccuracy;
     /* 0x398 */ float m_fMegaStrikeReceivedTimestamp;
     /* 0x39C */ float m_fMegaStrikeFirstPressPosition;
@@ -798,7 +798,7 @@ private:
 // Shared fielder functions and data.
 class Desire;
 Desire* GetFielderDesire(cFielder*, int);
-extern "C" bool fn_8002EDC8(cFielder*, int);
+bool CanUsePowerup(cFielder*, int);
 bool IsBowserSuperPowerActive(const cFielder*);
 bool IsWaluigiSuperPowerActive(const cFielder*);
 int GetFielderHitReaction(cFielder*, cFielder*, float);

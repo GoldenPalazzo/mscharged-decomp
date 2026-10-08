@@ -1015,7 +1015,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
     }
 
     NisPlayer::Instance()->mMaxNumBallsVisible
-        = (int)((cFielder*)player)->mUnidentified390;
+        = (int)((cFielder*)player)->m_fMegaStrikeNumBalls;
 }
 
 /**

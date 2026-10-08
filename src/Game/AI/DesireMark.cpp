@@ -184,7 +184,7 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
     {
         input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");
-        result = fn_80041B6C(input->mRuntime, hash, pFielder);
+        result = CallFielderFuzzyFunction(input->mRuntime, hash, pFielder);
     }
     return DesireUpdate(result, -1.0f, -1.0f);
 }
@@ -351,7 +351,7 @@ void DesireDefendPos::Cleanup()
 extern "C" DesireUpdate fn_800B9020(
     void* runtime, cFielder* fielder, const char* name)
 {
-    return fn_80041B0C(runtime, fielder, name);
+    return CallFielderFuzzyFunction(runtime, fielder, name);
 }
 
 /**
