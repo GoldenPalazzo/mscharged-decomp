@@ -280,7 +280,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
 {
     ++lbl_806E2130;
 
-    cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
+    cGame* game = new (nlMalloc(sizeof(cGame), 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
     g_pGame = game;
 
     cTeam* team = new (8, false) cTeam(0);
@@ -313,7 +313,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
     {
         NumberDisplay* numberDisplay
             = static_cast<NumberDisplay*>(
-                nlMalloc(0x28, 8, false));
+                nlMalloc(sizeof(NumberDisplay), 8, false));
         numberDisplay
             = new (numberDisplay) NumberDisplay();
         gpNumberDisplay = numberDisplay;
