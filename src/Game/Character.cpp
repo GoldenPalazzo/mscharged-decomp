@@ -21,6 +21,7 @@
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Desire.h"
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FielderActions.h"
 #include "Game/Audio/GameStreams.h"
@@ -105,7 +106,6 @@ inline float ClampMax(float speedRatio, const float max);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 
-extern float gSlipperySlideFactor;
 
 float lbl_806DB5D8 = 12.5f;
 float lbl_806DB5DC = 0.4f;

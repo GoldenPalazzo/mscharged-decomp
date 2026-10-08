@@ -367,6 +367,8 @@ public:
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
+extern float gSlipperySlideFactor;
+
 class DesireSlippery : public Desire
 {
 public:
