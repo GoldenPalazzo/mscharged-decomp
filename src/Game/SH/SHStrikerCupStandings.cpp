@@ -76,7 +76,7 @@ void StrikerCupStandingsScene::SceneCreated()
     FEPresentation* presentation;
 
     presentation = mFEScene->m_pFEPackage->GetPresentation();
-    cupManager = g_pCupManager;
+    cupManager = CupManager::s_pInstance;
     numTeams = cupManager->GetNumPlayingTeams();
 
     TLComponentInstance* title =
@@ -167,7 +167,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
     if (!mScrollBar.mInitialized)
         mScrollBar.Initialize();
 
-    g_pCupManager->GetNumPlayingTeams();
+    CupManager::s_pInstance->GetNumPlayingTeams();
     if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -293,7 +293,7 @@ void StrikerCupStandingsScene::UpdateStandings()
             userVisible = true;
     }
 
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int numTeams = cupManager->GetNumPlayingTeams();
     for (int i = 0; i < numTeams; ++i)
     {
@@ -312,7 +312,7 @@ void StrikerCupStandingsScene::UpdateStandings()
     mMovingHighlight->SetActiveSlide(slideName, true, false);
     mHighlight->m_bVisible = userVisible;
 
-    int linePosition = g_pCupManager->GetNumPlayoffTeams() - mScrollOffset;
+    int linePosition = CupManager::s_pInstance->GetNumPlayoffTeams() - mScrollOffset;
     if (linePosition <= 5)
     {
         char lineName[2];
@@ -329,7 +329,7 @@ void StrikerCupStandingsScene::UpdateStandings()
 bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
 {
     bool isUserTeam = false;
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     if (row >= cupManager->GetNumPlayingTeams())
     {
         mTeamRows[row]->m_bVisible = false;

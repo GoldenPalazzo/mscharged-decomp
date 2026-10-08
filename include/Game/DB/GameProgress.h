@@ -4,6 +4,7 @@
 #include "Game/DB/Cup.h"
 #include "Game/DB/CupInterface.h"
 #include "Game/GameInfo.h"
+#include "NL/nlSingleton.h"
 #include "types.h"
 
 struct OSCalendarTime;
@@ -100,7 +101,7 @@ struct CupProgressRecord
 void AppendCupHistoryRecord(CupHistory* history, int index, OSCalendarTime* date,
     int captain, CupSidekicks* sidekicks, TeamStats* stats, CupProgressRecord records);
 
-class CupManager : public CupInterface
+class CupManager : public CupInterface, public nlSingleton<CupManager>
 {
 public:
     CupManager();
@@ -119,7 +120,6 @@ public:
     virtual u16 GetNumPlayoffRounds() const;
     virtual ~CupManager();
 
-    static CupManager* Instance();
     int GetGoalsAgainstLeader(int* statistic);
     int GetGoalsForLeader(int* statistic);
     s16 GetNextRoundNumber(int* roundType);
@@ -201,8 +201,6 @@ public:
     /* 0x8A38 */ u32 mPreGameUnlockedState;
 };
 
-extern CupManager* g_pCupManager;
-inline CupManager* CupManager::Instance() { return g_pCupManager; }
 
 struct ChallengeCompletionDate
 {

@@ -421,7 +421,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     }
     case 2:
         GameInfoManager::Instance()->SetMode(3, 0);
-        if (g_pCupManager->GetCurrentMode() == -1)
+        if (CupManager::s_pInstance->GetCurrentMode() == -1)
         {
             StartNewCup();
         }

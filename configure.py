@@ -648,7 +648,7 @@ config.libs = [
             Object(Matching, "Game/DB/SaveLoad.cpp", extra_cflags=["-ipa file", "-inline noauto", "-sym on"]),
             Object(Matching, "Game/DB/Simmer.cpp"),
             Object(Matching, "Game/DB/StadiumInfo.cpp"),
-            Object(NonMatching, "Game/DB/StatsTracker.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/DB/StatsTracker.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/DB/UserOptions.cpp"),
 
             # Game/Debug

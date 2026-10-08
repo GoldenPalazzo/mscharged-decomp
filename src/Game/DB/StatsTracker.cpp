@@ -65,9 +65,6 @@ public:
     virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
 };
 
-extern "C" int fn_80380C34(FILE* file, long offset, int origin);
-extern "C" int fn_8037FA00(FILE* file);
-
 template <>
 StatsTracker* nlSingleton<StatsTracker>::s_pInstance = 0;
 
@@ -100,9 +97,6 @@ static inline void InitializePlayerStats(
     stats.mRecordType.mControllerID = record;
     stats.mType = type;
 }
-
-static int GetStatValue(const PlayerStats& stats, ePlayerStats stat);
-
 
 static inline void AddStatValue(
     PlayerStats& stats, ePlayerStats stat, int amount)
@@ -314,8 +308,8 @@ void StatsTracker::ResetCurrentStats()
         mCurrentTeamStats[1].mTeamIndex);
 
     mNumConsecutiveGamesPlayed++;
-    mBasicGameInfo->mFinalScore[0] = 0;
-    mBasicGameInfo->mFinalScore[1] = 0;
+    mBasicGameInfo->fn_801037B0(0, 0);
+    mBasicGameInfo->fn_801037B0(1, 0);
 
     for (int i = 0; i < 4; i++)
     {
@@ -324,6 +318,8 @@ void StatsTracker::ResetCurrentStats()
 
     static_cast<OverlayManager*>(g_pOverlayManager)->ResetStrikerTimesVariants();
 }
+
+#include "Game/DB/StatsTracker.inl"
 
 void StatsTracker::CreateEventHandler()
 {
@@ -1281,7 +1277,7 @@ void StatsTracker::TrackWinner(int forfeitSide)
                     homeScore, awayScore, 0, 0);
                 if (GameInfoManager::Instance()->IsInMode3())
                 {
-                    g_pCupManager->SetRoundResult(true, winningSide);
+                    CupManager::s_pInstance->SetRoundResult(true, winningSide);
                 }
             }
             else
@@ -1290,7 +1286,7 @@ void StatsTracker::TrackWinner(int forfeitSide)
                     homeScore, awayScore, 0, 0);
                 if (GameInfoManager::Instance()->IsInMode3())
                 {
-                    g_pCupManager->SetRoundResult(false, winningSide);
+                    CupManager::s_pInstance->SetRoundResult(false, winningSide);
                 }
             }
 
@@ -1311,10 +1307,10 @@ void StatsTracker::TrackWinner(int forfeitSide)
 
 static int CountNewlines(FILE* file)
 {
-    fn_80380C34(file, 0, 0);
+    fseek(file, 0, 0);
     int count = 0;
     char character;
-    while ((character = fn_8037FA00(file)) != -1)
+    while ((character = fgetc(file)) != -1)
     {
         if (character == '\n')
         {
@@ -1467,57 +1463,6 @@ bool StatsTracker::MoveTeamBUp(TeamStats b, TeamStats a)
         return false;
 
     return (int)a.mTeamIndex < (int)b.mTeamIndex;
-}
-
-void StatsTracker::Track(ePlayerStats stat, int homeaway, int playerindex,
-    int param0, int param1, int param2, int param3)
-{
-    s_pInstance->TrackStat(
-        stat, homeaway, playerindex, param0, param1, param2, param3);
-}
-
-static int GetStatValue(const PlayerStats& stats, ePlayerStats stat)
-{
-    int value = -1;
-    switch (stat)
-    {
-    case STATS_00: value = stats.unknown_0x00; break;
-    case STATS_01: value = stats.unknown_0x02; break;
-    case STATS_02: value = stats.unknown_0x04; break;
-    case STATS_SHOTS_ON_GOAL: value = stats.mNumShotsOnGoal; break;
-    case STATS_05: value = stats.unknown_0x08; break;
-    case STATS_06: value = stats.unknown_0x0A; break;
-    case STATS_07: value = stats.unknown_0x0C; break;
-    case STATS_08: value = stats.unknown_0x0E; break;
-    case STATS_GOALS_FOR: value = stats.mNumGoalsFor; break;
-    case STATS_GOALS_AGAINST: value = stats.mNumGoalsAgainst; break;
-    case STATS_04: value = stats.unknown_0x14; break;
-    case STATS_09: value = stats.unknown_0x16; break;
-    case STATS_0A: value = stats.unknown_0x18; break;
-    case STATS_FOULS: value = stats.mNumFouls; break;
-    case STATS_18: value = stats.unknown_0x1C; break;
-    case STATS_19: value = stats.mNumPowerupsUsed; break;
-    case STATS_1A: value = stats.unknown_0x20; break;
-    case STATS_1B: value = stats.unknown_0x22; break;
-    case STATS_1C: value = stats.unknown_0x24; break;
-    case STATS_1D: value = stats.unknown_0x26; break;
-    case STATS_PASSES_MADE: value = stats.mNumPassesMade; break;
-    case STATS_0E: value = stats.unknown_0x2C; break;
-    case STATS_0F: value = stats.unknown_0x2E; break;
-    case STATS_PASSES_RECEIVED: value = stats.mNumPassesReceived; break;
-    case STATS_12: value = stats.mNumHitsMade; break;
-    case STATS_ATTACK_ATTEMPTS: value = stats.unknown_0x34; break;
-    case STATS_ATTACK_SUCCESSES: value = stats.mNumSteals; break;
-    case STATS_15: value = stats.unknown_0x38; break;
-    case STATS_16: value = stats.unknown_0x3C; break;
-    case STATS_17: value = stats.mNumButtonPresses; break;
-    case STATS_PERFECT_PASSES: value = stats.mNumPerfectPasses; break;
-    case STATS_25: value = stats.unknown_0x46; break;
-    case STATS_26: value = stats.unknown_0x48; break;
-    case STATS_POWERUPS_USED: value = stats.unknown_0x28; break;
-    case STATS_PASSES_INTERCEPTED: value = stats.mNumPassesIntercepted; break;
-    }
-    return value;
 }
 
 void StatsTracker::WriteCurrentlyPlaying() const
