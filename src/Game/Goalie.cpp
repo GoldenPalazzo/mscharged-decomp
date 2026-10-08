@@ -4309,7 +4309,7 @@ void Goalie::StealBall(cPlayer* pPlayer)
     pPlayer->ReleaseBall(false);
 
     cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-    if (pFielder->fn_8002E060() == FIELDERDESIRE_FINISH_ACTION)
+    if (pFielder->GetDesireState() == FIELDERDESIRE_FINISH_ACTION)
     {
         return;
     }
@@ -4537,7 +4537,7 @@ extern "C" void GoalieOnGameOver()
         else if (pPlayer->m_eClassType == FIELDER)
         {
             cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-            pFielder->fn_8002E0FC();
+            pFielder->EndAllDesires();
             pFielder->EndAction();
         }
     }

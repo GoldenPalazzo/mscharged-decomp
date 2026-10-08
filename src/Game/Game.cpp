@@ -2073,7 +2073,7 @@ void cGame::InitGameState(int state)
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = team->GetFielder(j);
-                if (fielder->fn_8002E060() == 31)
+                if (fielder->GetDesireState() == 31)
                 {
                     fielder->EndDesire();
                 }

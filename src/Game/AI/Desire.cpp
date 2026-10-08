@@ -138,7 +138,7 @@ bool DesireWait::Initialize(void*)
 
 void DesireWait::Update(DesireUpdate*, float)
 {
-    m_pFielder->fn_8003057C(0);
+    m_pFielder->SetThingsToAvoid(0);
     m_pFielder->AddDesiredPosition(m_pFielder->mUnidentified024.m_v3Position, 1.0f, 1.0f);
 }
 

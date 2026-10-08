@@ -676,7 +676,7 @@ inline bool cFielder::ShouldSkipHardStopAnim()
             || (IsCharacterSuperPowerActive(this, (eCharacterClass)11) && m_bSuperPowerTankOn))
         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 27);
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
-    if (!skip && fn_8002E060() == (eFielderDesireState)20)
+    if (!skip && GetDesireState() == (eFielderDesireState)20)
     {
         Desire* desire = fn_8002E08C(this, 20);
         if (desire->mAgeTimer.GetSeconds() < 0.05f)
@@ -762,7 +762,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     , mUnidentified39C(-1.0f)
     , mUnidentified3A0(-1.0f)
     , mUnidentified3A4(-1.0f)
-    , mUnidentified3A8(-1.0f)
+    , m_fMegaStrikeMeterPosition(-1.0f)
     , mUnidentified3AC(0.0f)
     , mUnidentified3B0(0.0f)
     , mUnidentified3B4(0.0f)
@@ -858,12 +858,12 @@ cFielder::~cFielder()
     delete m_pAIContext;
 }
 
-float cFielder::fn_8002E058()
+float cFielder::GetMegaStrikeMeterPosition()
 {
-    return mUnidentified3A8;
+    return m_fMegaStrikeMeterPosition;
 }
 
-eFielderDesireState cFielder::fn_8002E060()
+eFielderDesireState cFielder::GetDesireState()
 {
     ScriptMachine* machine = m_pAIContext->mScriptMachine;
     if (machine != 0 && machine->mActiveState != 0)
@@ -894,7 +894,7 @@ void cFielder::EndDesire()
     }
 }
 
-void cFielder::fn_8002E0FC()
+void cFielder::EndAllDesires()
 {
     ScriptMachine* machine = m_pAIContext->mScriptMachine;
     if (machine != 0)
@@ -914,7 +914,7 @@ FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
     return m_pAIContext->mRuntime;
 }
 
-ScriptMachine* fn_8002E1A4(cFielder* pFielder)
+ScriptMachine* GetFielderScriptMachine(cFielder* pFielder)
 {
     return pFielder->m_pAIContext->mScriptMachine;
 }
@@ -1095,7 +1095,7 @@ bool cFielder::EndPeteySuperPower(bool)
     return false;
 }
 
-int cFielder::fn_8002E9D0() const
+int cFielder::GetPreviousDesireState() const
 {
     ScriptMachine* machine = m_pAIContext->mScriptMachine;
     if (machine != 0 && machine->mPreviousState != 0)
@@ -1167,7 +1167,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->fn_8002E060() == (eFielderDesireState)0x20)
+    if (pFielder->GetDesireState() == (eFielderDesireState)0x20)
     {
         if (pFielder->m_eActionState == ACTION_SHOT)
         {
@@ -1479,7 +1479,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
         if (!(bPassInFlight && requireBestInterceptor) && !fn_80014E20(g_pBall))
         {
             bool bHasGlobalPad = GetGlobalPad() != 0;
-            if (bHasGlobalPad && fn_8002E060() >= 0x14)
+            if (bHasGlobalPad && GetDesireState() >= 0x14)
             {
                 return true;
             }
@@ -1562,7 +1562,7 @@ void cFielder::SetSuperPowerTweaks()
         SetRunningWBAnimState(0.1f);
 }
 
-void cFielder::fn_8003057C(int nParam)
+void cFielder::SetThingsToAvoid(int nParam)
 {
     DesireSteering* pAction = (DesireSteering*)
         GetScriptMachineState(m_pAIContext->mScriptMachine, 0x22);
@@ -1574,7 +1574,7 @@ void cFielder::fn_8003057C(int nParam)
     pAction->m_ThingsToAvoid = nParam;
 }
 
-void cFielder::fn_800305DC(float fParam)
+void cFielder::SetAvoidanceMultiplier(float fParam)
 {
     DesireSteering* pAction = (DesireSteering*)
         GetScriptMachineState(m_pAIContext->mScriptMachine, 0x22);
@@ -1586,7 +1586,7 @@ void cFielder::fn_800305DC(float fParam)
     pAction->m_fAvoidanceMult = fParam;
 }
 
-void cFielder::fn_8003063C(PlayerTweaks* pParam)
+void cFielder::SetTweaks(PlayerTweaks* pParam)
 {
     if (pParam != 0)
     {
@@ -1602,7 +1602,7 @@ void cFielder::fn_8003063C(PlayerTweaks* pParam)
     }
 }
 
-void cFielder::fn_800306A0(cFielder* pParam)
+void cFielder::AddMark(cFielder* pParam)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -1614,7 +1614,7 @@ void cFielder::fn_800306A0(cFielder* pParam)
     }
 }
 
-void cFielder::fn_800306DC()
+void cFielder::ClearMarks()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -1622,7 +1622,7 @@ void cFielder::fn_800306DC()
     }
 }
 
-bool cFielder::fn_800306F4(cFielder* pParam)
+bool cFielder::IsMarking(cFielder* pParam)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -6076,7 +6076,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mUnidentified39C = -1.0f;
     mUnidentified3A0 = -1.0f;
     mUnidentified3A4 = -1.0f;
-    mUnidentified3A8 = -1.0f;
+    m_fMegaStrikeMeterPosition = -1.0f;
     mUnidentified3AC = 0.0f;
     mUnidentified3B0 = 0.0f;
     mUnidentified3B4 = 0.0f;

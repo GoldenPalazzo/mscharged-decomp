@@ -688,7 +688,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
             return;
         }
     }
-    if (m_pController != NULL && pFielder->fn_8002E060() < 20)
+    if (m_pController != NULL && pFielder->GetDesireState() < 20)
     {
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
@@ -700,7 +700,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController == NULL && pFielder->fn_8002E060() == 20)
+    if (m_pController == NULL && pFielder->GetDesireState() == 20)
     {
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->fn_80038660()
@@ -713,7 +713,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController != NULL && pFielder->fn_8002E060() == 31 && g_pGame->m_eGameState == 1)
+    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == 1)
     {
         pFielder->EndDesire();
     }

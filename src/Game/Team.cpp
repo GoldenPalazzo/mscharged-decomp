@@ -379,7 +379,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        pMyFielder->fn_800306DC();
+        pMyFielder->ClearMarks();
         bool bUnidentified = pMyFielder->fn_800344B0()
                           || pMyFielder->IsShattered()
                           || Incapacitated(pMyFielder);
@@ -402,7 +402,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     if (pUnidentifiedBestFielder != NULL
         && pUnidentifiedFielder != NULL)
     {
-        pUnidentifiedBestFielder->fn_800306A0(pUnidentifiedFielder);
+        pUnidentifiedBestFielder->AddMark(pUnidentifiedFielder);
     }
 
     float fFielderMarkScores[4][4];
@@ -446,7 +446,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     {
         pMarkIDs[i_fielder]
             = nlMin(nlMax((int)pMarkIDs[i_fielder], 0), 3);
-        GetFielder(i_fielder)->fn_800306A0(
+        GetFielder(i_fielder)->AddMark(
             GetOtherTeam()->GetFielder(pMarkIDs[i_fielder]));
     }
 

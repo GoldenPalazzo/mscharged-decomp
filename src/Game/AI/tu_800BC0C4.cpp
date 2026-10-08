@@ -310,7 +310,7 @@ bool DesireShrink::Initialize(void* context)
     UnidentifiedVariantCollection* params
         = (UnidentifiedVariantCollection*)context;
     source = (cFielder*)params->Get(14)->mData.pointer;
-    m_pFielder->fn_8003063C(source->m_pSuperPowerTweaks);
+    m_pFielder->SetTweaks(source->m_pSuperPowerTweaks);
     m_pFielder->m_pTweaks->mUnidentified004
         = m_pFielder->m_pNormalTweaks->mUnidentified004.GetValue();
     m_pFielder->m_pTweaks->fWidth
@@ -319,7 +319,7 @@ bool DesireShrink::Initialize(void* context)
 
     if (m_pFielder->m_pBall != 0)
     {
-        if (m_pFielder->fn_8002E060()
+        if (m_pFielder->GetDesireState()
             == (eFielderDesireState)ACTION_UNKNOWN_32)
         {
             m_pFielder->ReleaseBall(0);
@@ -410,7 +410,7 @@ bool DesireConfused::Initialize(void* context)
 
     if (m_pFielder->m_pBall != 0)
     {
-        if (m_pFielder->fn_8002E060()
+        if (m_pFielder->GetDesireState()
             == (eFielderDesireState)ACTION_UNKNOWN_32)
         {
             m_pFielder->ReleaseBall(0);

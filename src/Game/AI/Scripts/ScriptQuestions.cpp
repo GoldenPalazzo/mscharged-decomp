@@ -321,7 +321,7 @@ float Marking(cFielder* pMarking, cPlayer* pMarked)
         return 0.0f;
     }
 
-    if (pMarking->fn_800306F4((cFielder*)pMarked))
+    if (pMarking->IsMarking((cFielder*)pMarked))
     {
         return 1.0f;
     }
@@ -801,7 +801,7 @@ extern "C" float fn_800D7A70(cFielder* pFielder)
         return 0.0f;
     }
 
-    shdStateMachine* pState = fn_8002E1A4(pFielder)->mActiveState;
+    shdStateMachine* pState = GetFielderScriptMachine(pFielder)->mActiveState;
     if (pState != NULL)
     {
         pState->mAgeTimer.GetSeconds();
@@ -3271,13 +3271,13 @@ extern "C" float fn_800DED80(cPlayer* pPlayer)
     else if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        DesireRunToTarget* pDesire = pFielder->fn_8002E060() == 13
+        DesireRunToTarget* pDesire = pFielder->GetDesireState() == 13
             ? (DesireRunToTarget*)fn_8002E08C(pFielder, 13) : NULL;
         if ((pDesire != NULL && pDesire->GetTargetBall() != NULL)
-            || pFielder->fn_8002E060() == 7 || pFielder->fn_8002E060() == 16
+            || pFielder->GetDesireState() == 7 || pFielder->GetDesireState() == 16
             || pFielder->m_eActionState == ACTION_SLIDE_ATTACK)
             fScore = AbleToInterceptBall(pFielder);
-        else if (pFielder->fn_8002E060() == 20)
+        else if (pFielder->GetDesireState() == 20)
             fScore = FMIN(FMAX(1.5f * AbleToInterceptBall(pFielder), 0.0f), 1.0f);
     }
     return fScore;
@@ -3306,7 +3306,7 @@ float ReceivingPass(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (pFielder->fn_8002E060() == 22)
+    if (pFielder->GetDesireState() == 22)
     {
         fScore = 1.0f;
     }

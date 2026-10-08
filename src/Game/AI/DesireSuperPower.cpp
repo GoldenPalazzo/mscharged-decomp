@@ -203,9 +203,9 @@ bool DesireSuperPower::Initialize(void* context)
         EmitBowserSmoke(m_pFielder);
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (m_pFielder->fn_8002E060() == 21
-                || m_pFielder->fn_8002E060() == 18
-                || m_pFielder->fn_8002E060() == 9))
+            && (m_pFielder->GetDesireState() == 21
+                || m_pFielder->GetDesireState() == 18
+                || m_pFielder->GetDesireState() == 9))
         {
             m_pFielder->EndDesire();
         }
@@ -270,9 +270,9 @@ bool DesireSuperPower::Initialize(void* context)
         m_pFielder->mUnidentified40C = 0.0f;
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (m_pFielder->fn_8002E060() == 21
-                || m_pFielder->fn_8002E060() == 18
-                || m_pFielder->fn_8002E060() == 9))
+            && (m_pFielder->GetDesireState() == 21
+                || m_pFielder->GetDesireState() == 18
+                || m_pFielder->GetDesireState() == 9))
         {
             m_pFielder->EndDesire();
         }
@@ -294,9 +294,9 @@ bool DesireSuperPower::Initialize(void* context)
             (bool)UserControlledT(m_pFielder->m_pTeam));
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (m_pFielder->fn_8002E060() == 21
-                || m_pFielder->fn_8002E060() == 18
-                || m_pFielder->fn_8002E060() == 9))
+            && (m_pFielder->GetDesireState() == 21
+                || m_pFielder->GetDesireState() == 18
+                || m_pFielder->GetDesireState() == 9))
         {
             m_pFielder->EndDesire();
         }
@@ -462,7 +462,7 @@ void DesireSuperPower::Cleanup()
         }
         break;
     case WALUIGI:
-        if (m_pFielder->fn_8002E060() == 12)
+        if (m_pFielder->GetDesireState() == 12)
         {
             m_pFielder->EndDesire();
         }
@@ -824,7 +824,7 @@ void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
 
 void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_800305DC(lbl_806DC268);
+    m_pFielder->SetAvoidanceMultiplier(lbl_806DC268);
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
@@ -868,7 +868,7 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
 
 void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_800305DC(lbl_806DC268);
+    m_pFielder->SetAvoidanceMultiplier(lbl_806DC268);
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
@@ -1108,7 +1108,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
 
 void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
 {
-    if (m_pFielder->fn_8002E060() == 13 && m_pFielder->m_bSuperPowerTankOn)
+    if (m_pFielder->GetDesireState() == 13 && m_pFielder->m_bSuperPowerTankOn)
     {
         nlVector2 direction;
         nlSinCos(&direction.y, &direction.x, m_pFielder->mUnidentified024.m_aActualFacingDirection);
@@ -1117,11 +1117,11 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             m_pFielder->fn_8005001C(true);
     }
     else if (!m_pFielder->m_bSuperPowerTankOn
-        && (m_pFielder->fn_8002E060() == 12 || m_pFielder->fn_8002E060() == 13))
+        && (m_pFielder->GetDesireState() == 12 || m_pFielder->GetDesireState() == 13))
     {
         if (!(bool)UserControlledT(m_pFielder->m_pTeam))
         {
-            m_pFielder->fn_800305DC(0.0f);
+            m_pFielder->SetAvoidanceMultiplier(0.0f);
             nlVector3 direction;
             const nlVector3& target = m_pFielder->GetDesiredPosition();
             nlVec3Sub(direction, target, m_pFielder->mUnidentified024.m_v3Position);
@@ -1156,14 +1156,14 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                     if (active && fn_8002EDC8(m_pFielder, -1))
                     {
                         m_pFielder->TurnOnSuperPowerTank();
-                        m_pFielder->fn_8003057C(0);
+                        m_pFielder->SetThingsToAvoid(0);
                     }
                 }
             }
         }
     }
-    else if (m_pFielder->fn_8002E060() != 12
-        && m_pFielder->fn_8002E060() != 13
+    else if (m_pFielder->GetDesireState() != 12
+        && m_pFielder->GetDesireState() != 13
         && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->m_bSuperPowerTankOn)
         && (bool)(1.0f - ReceivingPass(m_pFielder))
         && (bool)(1.0f - fn_800DEAB4(m_pFielder))
@@ -1571,7 +1571,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 if ((bool)UserControlledT(m_pFielder->m_pTeam))
                 {
                     bool userControlled = (bool)m_pFielder->GetGlobalPad();
-                    if (!userControlled && m_pFielder->fn_8002E060() != 12)
+                    if (!userControlled && m_pFielder->GetDesireState() != 12)
                     {
                         nlVector3 pos;
                         pos.z = 0.0f;
@@ -1631,10 +1631,10 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     self->m_pFielder->bYoshiInWindup
         = (self->m_pFielder->m_eActionState
             == ACTION_UNKNOWN_30);
-    if ((self->m_pFielder->fn_8002E060() == 21)
-        || (self->m_pFielder->fn_8002E060() == 19)
-        || (self->m_pFielder->fn_8002E060() == 18)
-        || (self->m_pFielder->fn_8002E060() == 9))
+    if ((self->m_pFielder->GetDesireState() == 21)
+        || (self->m_pFielder->GetDesireState() == 19)
+        || (self->m_pFielder->GetDesireState() == 18)
+        || (self->m_pFielder->GetDesireState() == 9))
     {
         self->m_pFielder->EndDesire();
         self->m_pFielder->StartRunning();

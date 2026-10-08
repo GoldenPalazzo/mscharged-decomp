@@ -315,9 +315,9 @@ void cFielder::fn_8005001C(bool bForce)
                     }
                 }
                 SetNormalTweaks();
-                if (IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
+                if (IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
                 {
-                    DeactivateConcurrentState(fn_8002E1A4(this), 0x23);
+                    DeactivateConcurrentState(GetFielderScriptMachine(this), 0x23);
                 }
                 StopSound(0x8A9FCF66, this);
             }
@@ -410,7 +410,7 @@ bool cFielder::TurnOnSuperPowerTank()
     else if (mUnidentified024.m_eCharacterClass == WALUIGI)
     {
         m_pTweaks = m_pSuperPowerTweaks;
-        if (fn_8002E060() != (eFielderDesireState)0xC)
+        if (GetDesireState() != (eFielderDesireState)0xC)
         {
             EndDesire();
         }
@@ -424,15 +424,15 @@ bool cFielder::TurnOnSuperPowerTank()
         }
         InitMovementCoast();
         mUnidentified024.m_fLeanAmount = 0.0f;
-        if (!IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
+        if (!IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
         {
-            ActivateConcurrentState(fn_8002E1A4(this), 0x23, 0, 0);
+            ActivateConcurrentState(GetFielderScriptMachine(this), 0x23, 0, 0);
         }
     }
     else if (mUnidentified024.m_eCharacterClass == WARIO)
     {
         if (m_eAnimID != 0x68 && IsRunning()
-            && fn_8002E060() != (eFielderDesireState)0x16)
+            && GetDesireState() != (eFielderDesireState)0x16)
         {
             SetAction((eFielderActionState)0x1D);
             SetAnimState(0x68, true, 0.2f, false, false);

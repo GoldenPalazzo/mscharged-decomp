@@ -418,12 +418,12 @@ public:
     bool IsYoshiSuperPowerActive() const;
     cFielder* GetMark() const { return m_pMark[0]; }
     cFielder* GetMark(int index) const { return m_pMark[index]; }
-    void fn_8003057C(int nParam);
-    void fn_800305DC(float fParam);
-    void fn_8003063C(PlayerTweaks* pParam);
-    void fn_800306A0(cFielder* pParam);
-    void fn_800306DC();
-    bool fn_800306F4(cFielder* pParam);
+    void SetThingsToAvoid(int nParam);
+    void SetAvoidanceMultiplier(float fParam);
+    void SetTweaks(PlayerTweaks* pParam);
+    void AddMark(cFielder* pParam);
+    void ClearMarks();
+    bool IsMarking(cFielder* pParam);
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
@@ -474,10 +474,10 @@ public:
     bool IsHitting() const;
     bool fn_80038660() const;
     bool fn_80038918() const;
-    float fn_8002E058();
-    eFielderDesireState fn_8002E060();
-    void fn_8002E0FC();
-    int fn_8002E9D0() const;
+    float GetMegaStrikeMeterPosition();
+    eFielderDesireState GetDesireState();
+    void EndAllDesires();
+    int GetPreviousDesireState() const;
     bool fn_8003499C() const;
     bool fn_8003E6EC() const;
     bool IsStarActive() const;
@@ -693,7 +693,7 @@ public:
     /* 0x39C */ float mUnidentified39C;
     /* 0x3A0 */ float mUnidentified3A0;
     /* 0x3A4 */ float mUnidentified3A4;
-    /* 0x3A8 */ float mUnidentified3A8;
+    /* 0x3A8 */ float m_fMegaStrikeMeterPosition;
     /* 0x3AC */ float mUnidentified3AC;
     /* 0x3B0 */ float mUnidentified3B0;
     /* 0x3B4 */ float mUnidentified3B4;
@@ -835,6 +835,6 @@ extern "C" bool fn_8003877C(const cFielder* pFielder);
 
 
 
-ScriptMachine* fn_8002E1A4(cFielder* pFielder);
+ScriptMachine* GetFielderScriptMachine(cFielder* pFielder);
 
 #endif // GAME_AI_FIELDER_H

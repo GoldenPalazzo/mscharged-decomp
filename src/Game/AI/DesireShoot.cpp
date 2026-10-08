@@ -148,8 +148,8 @@ bool DesireShoot::Initialize(void* context)
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
-    if (m_pFielder->fn_8002E9D0() != 20
-        && m_pFielder->fn_8002E9D0() != 19)
+    if (m_pFielder->GetPreviousDesireState() != 20
+        && m_pFielder->GetPreviousDesireState() != 19)
     {
         m_pFielder->DoResetShotMeter(0.0f);
     }

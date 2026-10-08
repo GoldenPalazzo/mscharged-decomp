@@ -291,7 +291,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         }
         else
         {
-            if (m_pFielder->fn_800306F4(pOther))
+            if (m_pFielder->IsMarking(pOther))
             {
                 fStrength *= 0.4f;
             }
