@@ -33,7 +33,6 @@
 #include "NL/platvmath.h"
 #include "NL/nlFunction.inl"
 
-extern "C" void fn_80060608(cGame*, cFielder*);
 
 void OnWaluigiWallEffectFinished(EmissionController&, int);
 void UpdateWaluigiWallEmitter(EmissionController&);

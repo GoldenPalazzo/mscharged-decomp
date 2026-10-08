@@ -73,9 +73,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
-extern "C" void fn_8005ED64(void*, void*);
-extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
