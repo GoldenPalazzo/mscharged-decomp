@@ -698,11 +698,11 @@ void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
     {
         return;
     }
-    if (eventData->source == 0)
+    if (eventData->thwomp == 0)
     {
         return;
     }
-    if ((int)eventData->sourceValue != 3)
+    if (eventData->state != THWOMP_STATE_FALLING)
     {
         return;
     }

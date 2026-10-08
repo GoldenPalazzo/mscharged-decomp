@@ -49,6 +49,8 @@
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/ChainChomp.h"
+#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/ThwompObject.h"
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
@@ -4807,7 +4809,9 @@ bool cFielder::fn_800392D8() const
         return false;
     case 3:
     case 24:
-        return !(mUnidentified34C > 0.0f);
+        if (mUnidentified34C > 0.0f)
+            return false;
+        return true;
     default:
         return true;
     }
@@ -5499,4 +5503,187 @@ float CalcPenaltyWorth(ePenaltyType type)
     }
     }
     return InterpolateRangeClamped(minAmount, maxAmount, 0.0f, 1.0f, nlRandomf(1.0f));
+}
+
+float gWindDebrisKnockbackScale = 2.5f;
+float gWindDebrisKnockbackZ = 20.0f;
+float gWindDebrisKnockbackZRange;
+float gThwompBallReleaseSpeed = 10.0f;
+
+static inline bool IsCharacterSuperPowerActive(const cFielder* fielder, eCharacterClass character)
+{
+    return fielder->GetCharacterClass() == character && fielder->fn_8003E6EC();
+}
+
+bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, const nlVector3& position, const nlVector3& velocity)
+{
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
+        || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
+    {
+        if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !fn_8003E74C())
+            fn_8004D480(velocity);
+        else
+        {
+            InitActionShellReact(position, velocity);
+            ePowerupSize soundSize = size;
+            if (largeSound)
+                soundSize = POWERUPSIZE_LARGE;
+            switch (soundSize)
+            {
+            case POWERUPSIZE_SMALL:
+                PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fSmallShellHitReactionVolume);
+                break;
+            case POWERUPSIZE_MEDIUM:
+                PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fMediumShellHitReactionVolume);
+                break;
+            case POWERUPSIZE_LARGE:
+                PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fBombHitReactionVolume);
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::CollideWithFreezeCallback()
+{
+    if (m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()
+        && mbTangible && !fn_8003877C(this) && !IsFrozen() && fn_800392D8())
+    {
+        fn_80031A30(this, 1, gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::CollideWithBananaCallback(const nlVector3& position)
+{
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
+        || (!IsStuck() && !IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
+    {
+        InitActionBananaReact(position);
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius)
+{
+    if (!UnidentifiedInvinciblePowerups() && mbTangible && fn_800392D8())
+    {
+        if (g_pGame->IsGameplayOrOvertime())
+        {
+            AddRandomDirt();
+            fn_8001F1C0(2);
+        }
+        InitActionBombReact(position, radius);
+        return true;
+    }
+    return false;
+}
+
+void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
+{
+    if (m_eActionState != ACTION_POST_WHISTLE && !IsInvincible() && !IsInvincibleHammers()
+        && mbTangible && fn_800392D8())
+    {
+        AddRandomDirt();
+        if (g_pBall->m_pOwner == this)
+        {
+            ReleaseBall(0);
+            nlVector3 velocity;
+            nlPolarToCartesian(velocity.x, velocity.y, mUnidentified024.m_aActualFacingDirection, 2.0f + GetActualSpeed());
+            velocity.z = 0.5f;
+            g_pBall->ShootRelease(velocity, SPINTYPE_NONE);
+        }
+        InitActionBombHitReact(position);
+        PlayRumbleAction(3, GetGlobalPad());
+    }
+}
+
+void cFielder::CollideWithChainCallback(ChainChomp* chain)
+{
+    if (!IsFallenDown() || mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    {
+        unsigned short direction = nlATan2Angle(mUnidentified024.m_v3Position.y - chain->mv3Position.y,
+            mUnidentified024.m_v3Position.x - chain->mv3Position.x);
+        if (m_pBall != 0)
+        {
+            ReleaseBall(0);
+            nlVector3 velocity;
+            nlPolarToCartesian(velocity.x, velocity.y, direction, 2.0f + GetActualSpeed());
+            velocity.z = 0.5f;
+            g_pBall->ShootRelease(velocity, SPINTYPE_NONE);
+        }
+        if (chain->IsFrozen())
+            InitActionShellReact(chain->mv3Position, chain->mv3Velocity);
+        else if (chain->meChainChompState != CHAIN_STATE_RECOVER)
+            fn_80047240(chain->mpThrower, direction, 2, false, false);
+        else
+            fn_8004D480(chain->mv3Velocity);
+        if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
+            StatsTracker::Instance()->TrackStat((ePlayerStats)0x1E, m_pTeam->m_nSide,
+                mUnidentified1E4.m_ID, chain->mnThrowerPadID, 0, 0, 0);
+    }
+}
+
+void cFielder::fn_8003295C(UnidentifiedNPC_801B43F8* debris)
+{
+    if (!IsInvincible() && !IsShattered() && mbTangible && m_eActionState != 0 && m_eActionState != 35)
+    {
+        EndFrozenOrDazed();
+        nlVector3 debrisVelocity = debris->mv3Velocity;
+        nlVector3 velocity;
+        velocity.x = debrisVelocity.x * gWindDebrisKnockbackScale;
+        velocity.y = debrisVelocity.y * gWindDebrisKnockbackScale;
+        velocity.z = gWindDebrisKnockbackZ + nlRandomf(gWindDebrisKnockbackZRange);
+        float goalLine = cField::GetGoalLineX(1U);
+        if (mUnidentified024.m_v3Position.x > goalLine || mUnidentified024.m_v3Position.x < -1.0f * goalLine)
+        {
+            velocity.z = 0.0f;
+            velocity.x = 2.0f * nlSqrt(nlVec3LengthSquared(velocity), true);
+            if (mUnidentified024.m_v3Position.x > goalLine)
+                velocity.x *= -1.0f;
+            velocity.y = 0.0f;
+            velocity.z = 8.0f;
+        }
+        fn_80044148(velocity);
+        PlaySound(11, debris->mUnidentified08C, 0, 0);
+        PlayRumbleAction(3, GetGlobalPad());
+        EmitTackleImpact(this);
+    }
+}
+
+void cFielder::fn_80032CB8(CollisionThwompPlayerData* event)
+{
+    if (event == 0 || event->thwomp == 0)
+        return;
+    if (!IsInvincible() && mbTangible)
+    {
+        if (event->state == THWOMP_STATE_FALLING || (IsCharacterSuperPowerActive(this, MARIO) && mUnidentified3DC))
+        {
+            if (g_pBall->m_pOwner == this)
+            {
+                ReleaseBall(0);
+                nlVector3 velocity;
+                nlPolarToCartesian(velocity.x, velocity.y, mUnidentified024.m_aActualFacingDirection, gThwompBallReleaseSpeed);
+                velocity.z = gThwompBallReleaseSpeed;
+                g_pBall->SetVelocity(velocity, SPINTYPE_NONE, 0);
+            }
+            const nlVector3* thwompPosition = event->thwomp->GetPosition();
+            nlVector3 direction;
+            nlVec3Set(direction, thwompPosition->x - mUnidentified024.m_v3Position.x,
+                thwompPosition->y - mUnidentified024.m_v3Position.y, 0.0f);
+            nlVec3Scale(direction, direction, nlRecipSqrt(nlVec3LengthSquared(direction), false));
+            if (IsCharacterSuperPowerActive(this, MARIO) && mUnidentified3DC)
+            {
+                if (!IsFallenDown())
+                    InitActionShellReact(*event->thwomp->GetPosition(), v3Zero);
+            }
+            else
+                fn_8004D480(direction);
+            PlayRumbleAction(3, GetGlobalPad());
+        }
+    }
 }

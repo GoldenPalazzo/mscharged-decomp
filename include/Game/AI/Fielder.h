@@ -250,6 +250,8 @@ public:
     void PlayImpactCameraRumble();
     void ShouldIWave();
 
+    void CollideWithShockwaveCallback(const nlVector3& position);
+
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -404,9 +406,7 @@ public:
     }
     bool IsInvincibleHammers() const
     {
-        bool result = false;
-        if (!IsStuck() && (muInvincibleStatus & 0x10))
-            result = true;
+        bool result = !IsStuck() && (muInvincibleStatus & 0x10);
         return result;
     }
     bool UnidentifiedInvincibleStatus2() const
@@ -768,7 +768,6 @@ extern "C" void fn_8002FE54(cFielder* pFielder);
 extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_80031C3C(cFielder*, float);
-extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" float fn_80034F98(cFielder*, float);
 extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_80039F24(cFielder*);

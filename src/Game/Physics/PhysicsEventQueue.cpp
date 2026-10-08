@@ -407,7 +407,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                 {
                     break;
                 }
-                fn_80032534(pFielder, pShockwave->mPosition);
+                pFielder->CollideWithShockwaveCallback(pShockwave->mPosition);
                 break;
             case SHOCKWAVE_FREEZE:
                 pFielder->CollideWithFreezeCallback();
@@ -932,12 +932,12 @@ void QueueCollisionHammerChain(UnidentifiedEventData28* data)
     gPhysicsEventQueue->mCollisionHammerChainEvent.Queue(data, Function<UnidentifiedEventData28*>());
 }
 
-void QueueCollisionThwompPlayer(void* source, cCharacter* target)
+void QueueCollisionThwompPlayer(ThwompObject* thwomp, cCharacter* target)
 {
     CollisionThwompPlayerData* data = 0;
     g_CollisionThwompPlayerDataPool.Allocate(data);
-    data->source = source;
-    data->sourceValue = *(void**)source;
+    data->thwomp = thwomp;
+    data->state = thwomp->mState;
     data->target = target;
     gPhysicsEventQueue->mCollisionThwompPlayerEvent.Queue(
         data,
