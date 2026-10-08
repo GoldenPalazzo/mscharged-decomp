@@ -2,7 +2,7 @@
 #define GAME_PAD_ACTIONS_H
 
 extern bool g_bEnableGamecubePadMonkey;
-extern int g_pPadRemapArray[51];
+extern int gGameCubeButtonRemap[51];
 
 void UseDefaultFreestyleButtonRemap(bool useDefaultRemap);
 void CreatePadBackends();
