@@ -14,14 +14,13 @@
 #include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/RLView.h"
+#include "Game/Render/ThwompObject.h"
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 #include "NL/nlFunction.inl"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" const nlVector3 gWindDebrisZeroVelocity;
-extern "C" const nlVector3 gWindDebrisHiddenPosition;
 static RLView* sUnshadowedView;
 
 static inline void FreeCollisionWindDebrisPlayerData(CollisionWindDebrisPlayerData* pData);
