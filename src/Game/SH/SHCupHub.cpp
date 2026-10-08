@@ -30,7 +30,7 @@ class SHNavigation;
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-static const char* lbl_8051B3E0[] = {
+static const char* sMatchupRowComponentNames[] = {
     "matchups", "matchups2", "matchups3", "matchups4"
 };
 
@@ -90,7 +90,7 @@ void CupHubScene::SceneCreated()
 
     for (int i = 0; i < 4; ++i)
     {
-        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "schedule screen", lbl_8051B3E0[i]);
+        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "schedule screen", sMatchupRowComponentNames[i]);
         TLComponentInstance* highlight = FEFinder<TLComponentInstance, 4>::FindOrDefault(mRowInstances[i]->GetActiveSlide(), "highlite");
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(highlight, "on", "RTSC_highlightbar");
         nlColour colour;
