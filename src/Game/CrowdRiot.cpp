@@ -1,5 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 #include "Game/CrowdRiot.h"
 #include "Game/Goalie.h"
 
@@ -31,6 +33,8 @@
 
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
+float lbl_806E0C40;
+float lbl_806E0C44;
 
 extern "C" void fn_80029C80(
     PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
@@ -87,19 +91,33 @@ CrowdRiot::~CrowdRiot()
     }
 }
 
+inline void Generators::RegisterDebugFields(u16* type, DebugWriteCache* cache)
+{
+    *type = cache->BeginType("Generators");
+    cache->AddField(21, gDebugFieldTypes[21].size, 0, "v2Location");
+    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&bIsOn - (u8*)this, "bIsOn");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&fTimeToExplode - (u8*)this, "fTimeToExplode");
+    cache->EndType();
+}
+
+inline void CrowdRiot::RegisterDebugFields(u16* type, DebugWriteCache* cache)
+{
+    *type = cache->BeginType("CrowdRiot");
+    cache->AddField(17, gDebugFieldTypes[17].size, 0, "mfStateTime");
+    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfRiotTime - (u8*)this, "mfRiotTime");
+    cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Target - (u8*)this, "mv3Target");
+    cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Position - (u8*)this, "mv3Position");
+    cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Velocity - (u8*)this, "mv3Velocity");
+    cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&maDesiredFacingDirection - (u8*)this, "maDesiredFacingDirection");
+    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meState - (u8*)this, "meState");
+    cache->EndType();
+}
+
 void CrowdRiot::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sCrowdRiotType == 0xFFFF)
     {
-        sCrowdRiotType = cache->BeginType("CrowdRiot");
-        cache->AddField(17, gDebugFieldTypes[17].size, 0, "mfStateTime");
-        cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfRiotTime - (u8*)this, "mfRiotTime");
-        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Target - (u8*)this, "mv3Target");
-        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Position - (u8*)this, "mv3Position");
-        cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&mv3Velocity - (u8*)this, "mv3Velocity");
-        cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&maDesiredFacingDirection - (u8*)this, "maDesiredFacingDirection");
-        cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meState - (u8*)this, "meState");
-        cache->EndType();
+        RegisterDebugFields(&sCrowdRiotType, cache);
     }
 
     cache->ChecksumData(sCrowdRiotType, this, context);
@@ -110,11 +128,7 @@ void CrowdRiot::SyncLog(void* context, DebugWriteCache* cache)
         Generators* generator = &lbl_8056B890[i];
         if (sGeneratorsType == 0xFFFF)
         {
-            sGeneratorsType = cache->BeginType("Generators");
-            cache->AddField(21, gDebugFieldTypes[21].size, 0, "v2Location");
-            cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&generator->bIsOn - (u8*)generator, "bIsOn");
-            cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&generator->fTimeToExplode - (u8*)generator, "fTimeToExplode");
-            cache->EndType();
+            generator->RegisterDebugFields(&sGeneratorsType, cache);
         }
 
         cache->ChecksumData(sGeneratorsType, generator, context);
@@ -157,6 +171,12 @@ void CrowdRiot::fn_8002921C()
     }
 }
 
+void InterpolateRiotBallPosition(nlVector3& result, const nlVector3& riotPosition,
+    const nlVector3& ballPosition, float time)
+{
+    nlVecLerp(result, riotPosition, ballPosition, time);
+}
+
 void CrowdRiot::fn_80029320()
 {
     for (int i = 0; i < 6; i++)
@@ -182,6 +202,35 @@ void CrowdRiot::fn_80029320()
             maDesiredFacingDirection = nlVector3ToAngle(velocity);
         }
     }
+}
+
+enum CrowdRiotEffect
+{
+    GENERATOR_BROKEN,
+    GENERATOR_EXPLOSION,
+    CROWD_RIOT,
+    CROWD_RIOT_WITH_FADE
+};
+
+EffectsGroup* GetCrowdRiotEffectGroup(CrowdRiotEffect effect)
+{
+    switch (effect)
+    {
+    case CROWD_RIOT_WITH_FADE:
+        return EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");
+    case CROWD_RIOT:
+        return EmissionManager::Instance()->GetEffectsGroup("crowd_riot");
+    case GENERATOR_EXPLOSION:
+        return EmissionManager::Instance()->GetEffectsGroup("generator_explode");
+    case GENERATOR_BROKEN:
+        return EmissionManager::Instance()->GetEffectsGroup("generator_broken");
+    }
+    return 0;
+}
+
+void PlayCrowdRiotSound(CrowdRiot* crowdRiot)
+{
+    PlaySound(13, 0x198B7ED3, "CrowdRiot", crowdRiot);
 }
 
 void CrowdRiot::fn_80029460(bool param1)
@@ -223,13 +272,13 @@ void CrowdRiot::fn_80029460(bool param1)
     mv3Target.y = 0.0f;
     mv3Target.z = 0.0f;
 
-    group = EmissionManager::Instance()->GetEffectsGroup("generator_broken");
+    group = GetCrowdRiotEffectGroup(GENERATOR_BROKEN);
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = EmissionManager::Instance()->GetEffectsGroup("generator_explode");
+    group = GetCrowdRiotEffectGroup(GENERATOR_EXPLOSION);
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot");
+    group = GetCrowdRiotEffectGroup(CROWD_RIOT);
     EmissionManager::Instance()->Kill((unsigned long)this, group);
-    group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");
+    group = GetCrowdRiotEffectGroup(CROWD_RIOT_WITH_FADE);
     EmissionManager::Instance()->Kill((unsigned long)this, group);
     StopSound(0x198B7ED3, this);
 
@@ -253,7 +302,7 @@ void CrowdRiot::fn_80029460(bool param1)
             mTriggerVolume->EnableCollisions();
         }
 
-        group = EmissionManager::Instance()->GetEffectsGroup("crowd_riot_with_fade");
+        group = GetCrowdRiotEffectGroup(CROWD_RIOT_WITH_FADE);
         controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->SetPosition(mv3Position);
         controller->SetVelocity(mv3Velocity);
@@ -272,7 +321,7 @@ void CrowdRiot::fn_80029460(bool param1)
             controller->SetUpdateCallback(callback);
         }
         controller->m_uUserData = (u32)this;
-        PlaySound(13, 0x198B7ED3, "CrowdRiot", this);
+        PlayCrowdRiotSound(this);
     }
 }
 
@@ -330,10 +379,7 @@ void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
     {
         float time = ball->mtStuckInRiotTimer.GetSeconds();
         nlVector3 position;
-        position.x = (1.0f - time) * crowdRiot->mv3Position.x
-                   + time * ball->m_v3Position.x;
-        position.y = (1.0f - time) * crowdRiot->mv3Position.y
-                   + time * ball->m_v3Position.y;
+        InterpolateRiotBallPosition(position, crowdRiot->mv3Position, ball->m_v3Position, time);
         position.z = 0.18f;
         ball->SetPosition(position);
     }

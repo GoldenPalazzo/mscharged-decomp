@@ -427,7 +427,7 @@ config.libs = [
             Object(Matching, "Game/CharacterTemplate.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/CharacterTriggers.cpp", cflags=cflags_game + ["-ipa file"]),
             Object(Matching, "Game/CharacterTweaks.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/CrowdRiot.cpp"),
+            Object(Matching, "Game/CrowdRiot.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/DebugWriteCache.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/DetermDataEvent.cpp"),
             Object(Matching, "Game/DetInput.cpp"),

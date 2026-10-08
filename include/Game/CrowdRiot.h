@@ -12,6 +12,7 @@ class cBall;
 
 struct Generators
 {
+    void RegisterDebugFields(u16* type, DebugWriteCache* cache);
     /* 0x00 */ nlVector2 v2Location;
     /* 0x08 */ bool bIsOn;
     /* 0x0C */ float fTimeToExplode;
@@ -23,6 +24,7 @@ public:
     CrowdRiot(bool param1);
     ~CrowdRiot();
 
+    void RegisterDebugFields(u16* type, DebugWriteCache* cache);
     void SyncLog(void* context, DebugWriteCache* cache);
     void fn_8002921C();
     void fn_80029320();
