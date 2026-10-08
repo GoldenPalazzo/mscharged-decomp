@@ -966,7 +966,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
         if (pFielder->m_eActionState == (eFielderActionState)0x21
-            && pFielder->mUnidentified410.mUnidentified0C)
+            && pFielder->mActionBooSkillshot.bFollowingBall)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);

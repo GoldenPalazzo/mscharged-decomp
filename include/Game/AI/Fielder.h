@@ -104,31 +104,31 @@ int GetNumOneTimerIdleVolleyContactAnims();
 const LooseBallContactAnimInfo* GetOneTimerLeadGroundContactAnims();
 int GetNumOneTimerLeadGroundContactAnims();
 
-struct UnidentifiedFielderPair330
+struct ActCrowdVars
 {
-    UnidentifiedFielderPair330(bool bParam, float fParam)
-        : mUnidentified00(bParam)
-        , mUnidentified04(fParam)
+    ActCrowdVars(bool bParam, float fParam)
+        : bHasBeenSuckedToMiddle(bParam)
+        , fStuckInRiotTime(fParam)
     {
     }
-    /* 0x0 */ bool mUnidentified00;
-    /* 0x4 */ float mUnidentified04;
+    /* 0x0 */ bool bHasBeenSuckedToMiddle;
+    /* 0x4 */ float fStuckInRiotTime;
 }; // total size: 0x8
 
-struct UnidentifiedFielderPair374
+struct ActRunPassVars
 {
-    UnidentifiedFielderPair374()
-        : mUnidentified00(0)
-        , mUnidentified04(0.0f)
+    ActRunPassVars()
+        : nHeldTicks(0)
+        , fSpeed(0.0f)
     {
     }
-    /* 0x0 */ int mUnidentified00;
-    /* 0x4 */ float mUnidentified04;
+    /* 0x0 */ int nHeldTicks;
+    /* 0x4 */ float fSpeed;
 }; // total size: 0x8
 
-struct UnidentifiedFielderAction364
+struct ActLooseBallPass
 {
-    UnidentifiedFielderAction364()
+    ActLooseBallPass()
         : passTarget(0)
     {
     }
@@ -136,9 +136,9 @@ struct UnidentifiedFielderAction364
     cFielder* passTarget;
 };
 
-struct UnidentifiedFielderAction37C
+struct ActRunningVars
 {
-    UnidentifiedFielderAction37C()
+    ActRunningVars()
         : eLastStrafeDirection(STRAFE_IDLE)
         , bFirstCycleOfTurbo(false)
     {
@@ -148,9 +148,9 @@ struct UnidentifiedFielderAction37C
     bool bFirstCycleOfTurbo;
 };
 
-struct UnidentifiedFielderAction384
+struct ActRunningWBVars
 {
-    UnidentifiedFielderAction384()
+    ActRunningWBVars()
     {
         bWaitForAnimToFinish = false;
         bCuePitch = false;
@@ -160,16 +160,16 @@ struct UnidentifiedFielderAction384
     bool bWaitForAnimToFinish;
 };
 
-struct UnidentifiedFielderAction410
+struct ActBooSkillshot
 {
-    UnidentifiedFielderAction410()
+    ActBooSkillshot()
     {
-        nlVec3Set(mUnidentified00, 0.0f, 0.0f, 0.0f);
-        mUnidentified0C = false;
+        nlVec3Set(v3StartPosition, 0.0f, 0.0f, 0.0f);
+        bFollowingBall = false;
     }
 
-    nlVector3 mUnidentified00;
-    bool mUnidentified0C;
+    nlVector3 v3StartPosition;
+    bool bFollowingBall;
 };
 
 class FuzzyVariant;
@@ -616,7 +616,7 @@ public:
 private:
     /* 0x328 */ PlayerTweaks* m_pSuperPowerTweaks;
     /* 0x32C */ PlayerTweaks* m_pNormalTweaks;
-    /* 0x330 */ UnidentifiedFielderPair330 mActionCrowdVars;
+    /* 0x330 */ ActCrowdVars mActionCrowdVars;
     /* 0x338 */ u16 m_aDekeDirection;
 
 public:
@@ -654,7 +654,7 @@ private:
     /* 0x363 */ u8 mUnknown363[0x01];
 
 public:
-    /* 0x364 */ UnidentifiedFielderAction364 mActionLooseBallPassVars;
+    /* 0x364 */ ActLooseBallPass mActionLooseBallPassVars;
 
 public:
     /* 0x368 */ float m_fOneTimerAnimTime;
@@ -669,11 +669,11 @@ private:
     /* 0x372 */ u8 mUnknown372[0x02];
 
 public:
-    /* 0x374 */ UnidentifiedFielderPair374 mActionRunPassVars;
-    /* 0x37C */ UnidentifiedFielderAction37C mActionRunningVars;
+    /* 0x374 */ ActRunPassVars mActionRunPassVars;
+    /* 0x37C */ ActRunningVars mActionRunningVars;
 
 public:
-    /* 0x384 */ UnidentifiedFielderAction384 mActionRunningWBVars;
+    /* 0x384 */ ActRunningWBVars mActionRunningWBVars;
 
 private:
     /* 0x386 */ u8 mUnknown386[0x02];
@@ -741,7 +741,7 @@ private:
     /* 0x40C */ float mUnidentified40C;
 
 public:
-    /* 0x410 */ UnidentifiedFielderAction410 mUnidentified410;
+    /* 0x410 */ ActBooSkillshot mActionBooSkillshot;
 
 public:
     /* 0x420 */ BulletBillObject* m_pBulletBill;

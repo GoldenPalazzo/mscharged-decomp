@@ -918,8 +918,8 @@ void cFielder::fn_80043ADC()
         ShootBallDueToContact(v3Velocity);
     }
 
-    mActionCrowdVars = UnidentifiedFielderPair330(false, -1.0f);
-    mActionCrowdVars.mUnidentified04 = 0.75f + nlRandomf(0.25f);
+    mActionCrowdVars = ActCrowdVars(false, -1.0f);
+    mActionCrowdVars.fStuckInRiotTime = 0.75f + nlRandomf(0.25f);
 
     nlVector3 v3Position = GetJointPosition(m_nBip01JointIndex_0xA4);
     SetPosition(v3Position);
@@ -952,10 +952,10 @@ void cFielder::fn_80043C18(float fDeltaT)
                 fDeltaT),
             true);
 
-        if (!mActionCrowdVars.mUnidentified00)
+        if (!mActionCrowdVars.bHasBeenSuckedToMiddle)
         {
-            float fTime = mActionCrowdVars.mUnidentified04 - fDeltaT;
-            mActionCrowdVars.mUnidentified04 = fTime;
+            float fTime = mActionCrowdVars.fStuckInRiotTime - fDeltaT;
+            mActionCrowdVars.fStuckInRiotTime = fTime;
             if (fTime < 0.0f)
             {
                 float fRadius = (float)(s32)(6.0f * (0.33f * fSpin + 1.0f));
@@ -965,7 +965,7 @@ void cFielder::fn_80043C18(float fDeltaT)
                 MakeRandomDirection2D(v3Velocity, fRadius);
                 v3Velocity.z = fUpVelocity;
                 SetVelocity(v3Velocity);
-                mActionCrowdVars.mUnidentified00 = true;
+                mActionCrowdVars.bHasBeenSuckedToMiddle = true;
                 mUnidentified024.m_v3Position.z += fDeltaT * mUnidentified024.m_v3Velocity.z;
             }
             else
@@ -3906,7 +3906,7 @@ void cFielder::ActionRunning(float dt)
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
         bIsModified = false;
-        mActionRunPassVars = UnidentifiedFielderPair374();
+        mActionRunPassVars = ActRunPassVars();
     }
     else
     {
@@ -3931,7 +3931,7 @@ void cFielder::ActionRunning(float dt)
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
             bIsModified = false;
-            mActionRunPassVars = UnidentifiedFielderPair374();
+            mActionRunPassVars = ActRunPassVars();
         }
     }
 }
@@ -3944,7 +3944,7 @@ void cFielder::InitActionRunningWB(bool bWaitForAnimToFinish)
     mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
     mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
     bIsModified = false;
-    mActionRunPassVars = UnidentifiedFielderPair374();
+    mActionRunPassVars = ActRunPassVars();
 }
 
 void cFielder::ActionRunningWB(float dt)
@@ -3993,13 +3993,13 @@ void cFielder::fn_8004B148()
 
     if (GetGlobalPad() != 0)
     {
-        mActionRunPassVars.mUnidentified04
-            = InterpolateRangeClamped(lbl_806DB8D8, lbl_806DB8DC, 0.2f, lbl_806DB8E0, (float)mActionRunPassVars.mUnidentified00 * FixedUpdateTask::GetPhysicsUpdateTick());
+        mActionRunPassVars.fSpeed
+            = InterpolateRangeClamped(lbl_806DB8D8, lbl_806DB8DC, 0.2f, lbl_806DB8E0, (float)mActionRunPassVars.nHeldTicks * FixedUpdateTask::GetPhysicsUpdateTick());
         GetGlobalPad()->ResetButtonStateTicks(0x17, 1);
     }
     else
     {
-        mActionRunPassVars.mUnidentified04 = lbl_806DB8D8;
+        mActionRunPassVars.fSpeed = lbl_806DB8D8;
     }
 
     SetAnimState(0x25, true, 0.2f, false, false);
@@ -4010,7 +4010,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 {
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
-        float fSpeed = mUnidentified024.m_fActualSpeed + mActionRunPassVars.mUnidentified04;
+        float fSpeed = mUnidentified024.m_fActualSpeed + mActionRunPassVars.fSpeed;
         if (fSpeed < lbl_806DB8E8)
         {
             fSpeed = lbl_806DB8E8;
@@ -4022,7 +4022,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
             lbl_806DB8D4,
             lbl_806DB8D8,
             lbl_806DB8DC,
-            mActionRunPassVars.mUnidentified04);
+            mActionRunPassVars.fSpeed);
 
         nlVector3 v3Spin;
         nlVector3 v3UpCopy = { 0.0f, 0.0f, 1.0f };
@@ -5153,8 +5153,8 @@ void cFielder::fn_8004ED64()
     SetAction((eFielderActionState)0x21);
     InitMovementCoast();
 
-    mUnidentified410.mUnidentified00 = mUnidentified024.m_v3Position;
-    mUnidentified410.mUnidentified0C = true;
+    mActionBooSkillshot.v3StartPosition = mUnidentified024.m_v3Position;
+    mActionBooSkillshot.bFollowingBall = true;
 
     g_pBall->m_tNoPickupTimer.SetSeconds(0.5f);
     SetNoPickUpTime(0.5f);
@@ -5169,7 +5169,7 @@ void cFielder::fn_8004ED64()
 
 void cFielder::fn_8004EE48(float fDeltaT)
 {
-    if (mUnidentified410.mUnidentified0C)
+    if (mActionBooSkillshot.bFollowingBall)
     {
         float fAbsX;
         float fDistSq;
@@ -5181,7 +5181,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
         fAbsX = fabsf(v3BallPos.x);
 
         fDistSq = nlVec3DistanceSquared2D(
-            mUnidentified410.mUnidentified00, v3BallPos);
+            mActionBooSkillshot.v3StartPosition, v3BallPos);
 
         if (fn_800167A8(g_pBall)
             && !(fDistSq > lbl_806DB8A8 * lbl_806DB8A8)
@@ -5190,7 +5190,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
             return;
         }
 
-        mUnidentified410.mUnidentified0C = false;
+        mActionBooSkillshot.bFollowingBall = false;
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
         EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);

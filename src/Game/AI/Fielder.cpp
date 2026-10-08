@@ -556,7 +556,7 @@ static void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
 
 extern u16 lbl_806DC048;
 
-struct UnidentifiedFielderDesireState
+struct FielderDesireShdState
 {
     void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
     u32 m_nTransitionFuncHash;
@@ -786,7 +786,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     , mUnidentified404(0.0f)
     , mUnidentified408(0.0f)
     , mUnidentified40C(0.0f)
-    , mUnidentified410()
+    , mActionBooSkillshot()
     , mUnidentified424(false)
     , m_tMoveToTurboTimer(0.0f)
     , mtPostDekeTimer(0.0f)
@@ -2701,9 +2701,9 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
             fn_8002CF10(pTweaks), fn_8002C180(pTweaks),
             fn_8002CF24(pTweaks));
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-        mActionRunPassVars.mUnidentified04 = 0.0f;
+        mActionRunPassVars.fSpeed = 0.0f;
         m_tMoveToTurboTimer.UnidentifiedClear();
-        mActionRunPassVars = UnidentifiedFielderPair374();
+        mActionRunPassVars = ActRunPassVars();
         break;
     }
 
@@ -2766,7 +2766,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
-        mUnidentified410.mUnidentified0C = false;
+        mActionBooSkillshot.bFollowingBall = false;
         nlVector3 v3Position = mUnidentified024.m_v3Position;
         if (v3Position.z != 0.0f)
         {
@@ -5134,7 +5134,7 @@ void cFielder::TestButtonsRunningWB(float deltaTime)
     if (GetGlobalPad()->JustPressed(23, true))
         GetGlobalPad()->ResetButtonStateTicks(23, true);
     else if (GetGlobalPad()->IsPressed(23, true))
-        mActionRunPassVars.mUnidentified00 = GetGlobalPad()->GetButtonStateTicks(23, true);
+        mActionRunPassVars.nHeldTicks = GetGlobalPad()->GetButtonStateTicks(23, true);
     else if (GetGlobalPad()->JustReleased(23, true))
     {
         if (GetCurrentAnimID() == 24 || GetCurrentAnimID() == 25)
@@ -6028,8 +6028,8 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     muInvincibleStatus = 0;
     mUnidentified478 = 0;
     mUnidentified178 = 1.0f;
-    mActionCrowdVars.mUnidentified00 = false;
-    mActionCrowdVars.mUnidentified04 = -1.0f;
+    mActionCrowdVars.bHasBeenSuckedToMiddle = false;
+    mActionCrowdVars.fStuckInRiotTime = -1.0f;
     m_aDekeDirection = 0;
     m_bDekeReset = false;
     m_nDPadDownCounter = 2;
@@ -6070,8 +6070,8 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mWaluigiWallState.mUnidentified00 = 0.0f;
     mWaluigiWallState.mUnidentified04 = 0.0f;
     mWaluigiWallState.fn_800504A8();
-    nlVec3Set(mUnidentified410.mUnidentified00, 0.0f, 0.0f, 0.0f);
-    mUnidentified410.mUnidentified0C = false;
+    nlVec3Set(mActionBooSkillshot.v3StartPosition, 0.0f, 0.0f, 0.0f);
+    mActionBooSkillshot.bFollowingBall = false;
     mUnidentified424 = false;
     mUnidentified39C = -1.0f;
     mUnidentified3A0 = -1.0f;
@@ -6252,9 +6252,9 @@ inline void cFielder::RegisterActRunPassVarsFields(unsigned short* type, DebugWr
 {
     *type = cache->BeginType("ActRunPassVars");
     REGISTER_FIELDER_FIELD(8, mActionRunPassVars,
-        mActionRunPassVars.mUnidentified00, "nHeldTicks");
+        mActionRunPassVars.nHeldTicks, "nHeldTicks");
     REGISTER_FIELDER_FIELD(17, mActionRunPassVars,
-        mActionRunPassVars.mUnidentified04, "fSpeed");
+        mActionRunPassVars.fSpeed, "fSpeed");
     cache->EndType();
 }
 
@@ -6356,13 +6356,13 @@ inline void cFielder::RegisterActCrowdVarsFields(unsigned short* type, DebugWrit
 {
     *type = cache->BeginType("ActCrowdVars");
     REGISTER_FIELDER_FIELD(16, mActionCrowdVars,
-        mActionCrowdVars.mUnidentified00, "bHasBeenSuckedToMiddle");
+        mActionCrowdVars.bHasBeenSuckedToMiddle, "bHasBeenSuckedToMiddle");
     REGISTER_FIELDER_FIELD(17, mActionCrowdVars,
-        mActionCrowdVars.mUnidentified04, "fStuckInRiotTime");
+        mActionCrowdVars.fStuckInRiotTime, "fStuckInRiotTime");
     cache->EndType();
 }
 
-inline void UnidentifiedFielderDesireState::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
+inline void FielderDesireShdState::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
 {
     *type = cache->BeginType("FielderDesireShdState");
     REGISTER_FIELDER_FIELD(2, *this,
@@ -6473,7 +6473,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         &mActionLooseBallPassVars, sizeof(mActionLooseBallPassVars));
     if (data != 0)
     {
-        UnidentifiedFielderAction364* copy = (UnidentifiedFielderAction364*)data;
+        ActLooseBallPass* copy = (ActLooseBallPass*)data;
         copy->passTarget = (cFielder*)(mActionLooseBallPassVars.passTarget == 0
             ? -1
             : mActionLooseBallPassVars.passTarget->mUnidentified120);
@@ -6569,7 +6569,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         Desire* desire = GetFielderDesire(this, i);
         if (desire != 0 && desire->IsActive())
         {
-            UnidentifiedFielderDesireState state;
+            FielderDesireShdState state;
             const TransitionFunc& transition
                 = !desire->mOverrideTransition.IsUnset()
                 ? desire->mOverrideTransition
