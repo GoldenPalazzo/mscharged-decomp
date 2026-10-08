@@ -1,6 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
+#include "NL/nlFunction.inl"
 #include "Game/AI/Fielder.inl"
 #include "Game/PoseAccumulator.h"
 #include "Game/AI/ScriptMachine.h"
@@ -66,8 +67,10 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/CharacterTriggers.h"
+#include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
@@ -111,6 +114,7 @@ float lbl_806DB7E8 = 12.5f;
 float lbl_806DB7EC = 23.5f;
 float lbl_806DB7F0 = 0.2f;
 float lbl_806DB7F4 = 0.33f;
+float gPenaltyPossessionGraceTime = 0.66f;
 float lbl_806DB7FC = 0.2f;
 float lbl_806DB800 = -0.425f;
 float lbl_806DB804 = 0.425f;
@@ -121,7 +125,7 @@ float lbl_806DB81C = 8.3f;
 float lbl_806DB820 = 12.075f;
 float lbl_806DB824 = 8.875f;
 float lbl_806DB828 = 20.0f;
-bool lbl_806DB830 = true;
+bool gbUseDumpCharging = true;
 float lbl_806DB834 = 1.5f;
 float lbl_806DB838 = 1.5f;
 bool lbl_806E0C53;
@@ -1130,11 +1134,11 @@ static inline void ResolveSlideAttack(cFielder* pWinner, cFielder* pLoser)
     if (bHadBall && !bBallTooHigh)
     {
         pWinner->PickupBall(g_pBall);
-        fn_80036594(pWinner, pLoser, 2);
+        pWinner->DoPenaltyCardBooking(pLoser, PEN_TYPE_SLIDE_WITH_BALL);
     }
     else
     {
-        fn_80036594(pWinner, pLoser, 3);
+        pWinner->DoPenaltyCardBooking(pLoser, PEN_TYPE_SLIDE_NO_BALL);
     }
 }
 
@@ -2341,7 +2345,7 @@ void cFielder::DoClearBall()
     {
         ReleaseBall(1);
     }
-    if (lbl_806DB830 && m_eClassType == FIELDER)
+    if (gbUseDumpCharging && m_eClassType == FIELDER)
     {
         float fCharge = Interpolate(lbl_806DB834, lbl_806DB838,
             InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(m_pTweaks)));
@@ -4320,7 +4324,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(
     return fn_80041B6C(runtime, functionHash, fielder);
 }
 
-extern "C" void fn_8004257C(PenaltyData* data)
+void FreePenaltyData(PenaltyData* data)
 {
     g_PenaltyDataPool.Free(data);
 }
@@ -5938,3 +5942,28 @@ bool cFielder::DoLooseBallContactFromRun(nlVector3& animStart, float& animStartT
     ballContactTime = bestTime;
     return true;
 }
+
+void cFielder::DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type)
+{
+    if (foulee->mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() < gPenaltyPossessionGraceTime)
+    {
+        if (type == PEN_TYPE_HIT_NO_BALL)
+            type = PEN_TYPE_HIT_WITH_BALL;
+        else if (type == PEN_TYPE_SLIDE_NO_BALL)
+            type = PEN_TYPE_SLIDE_WITH_BALL;
+    }
+    float worth = CalcPenaltyWorth(type);
+    if (worth > 0.0f && foulee->m_pTeam->IncrementPowerupMeter(worth, foulee, true))
+    {
+        PenaltyData* data = g_PenaltyDataPool.Allocate();
+        data->fPenaltyWorth = worth;
+        data->pFouler = this;
+        data->pFoulee = foulee;
+        g_pGame->mUnidentified49C.mPenaltyEvent.Queue(data, Function<PenaltyData*>(FreePenaltyData));
+    }
+}
+
+#include "NL/nlBind_impl.h"
+
+static TweakBoolBinding sUseDumpChargingTweak(
+    "gbUseDumpCharging", "Game/Gameplay/Charging/Dump", &gbUseDumpCharging, true);

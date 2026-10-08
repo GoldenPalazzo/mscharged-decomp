@@ -165,7 +165,6 @@ static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
 extern "C" bool fn_8003E948(const cFielder* pFielder);
 
-extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
@@ -2307,12 +2306,12 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
         if (bBookPenalty)
         {
-            fn_80036594(pAttacker, this, 0);
+            static_cast<cFielder*>(pAttacker)->DoPenaltyCardBooking(this, PEN_TYPE_HIT_WITH_BALL);
         }
     }
     else if (bBookPenalty)
     {
-        fn_80036594(pAttacker, this, 1);
+        static_cast<cFielder*>(pAttacker)->DoPenaltyCardBooking(this, PEN_TYPE_HIT_NO_BALL);
     }
 
     if (!mUnidentified360)
