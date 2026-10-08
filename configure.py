@@ -843,7 +843,7 @@ config.libs = [
             Object(NonMatching, "Game/Render/ImpostorCluster.cpp"),
             Object(Matching, "Game/Render/ImpostorLightingColour.cpp"),
             Object(Matching, "Game/Render/ImpostorLighting.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Render/ImpostorManager.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Render/ImpostorManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/ImpostorModel.cpp"),
             Object(Matching, "Game/Render/ImpostorSprite.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/Indicators.cpp", cflags=cflags_game),

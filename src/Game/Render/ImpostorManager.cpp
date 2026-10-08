@@ -19,7 +19,6 @@ u8 gImpostorSpritesInvalid;
 static int sImpostorAlphaTestReference = 0x80;
 static int sImpostorUpdatePeriod = 1;
 static float sDefaultImpostorSizeScale = 1.0f;
-extern int sInitialRenderedImpostorCount;
 
 static GLMemoryRequirement sImpostorResourceRequirements[2] = {
     { GLM_Header, 0xC000 },
@@ -250,7 +249,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         }
     }
 
-    sNumImpostorsRendered.mValue = sInitialRenderedImpostorCount;
+    sNumImpostorsRendered = 0;
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthWrite, 1);
     glSetRasterState(GLS_Culling, 0);
@@ -490,4 +489,3 @@ void ImpostorManager::SetUpdatePeriod(int period)
 {
     sImpostorUpdatePeriod = period;
 }
-
