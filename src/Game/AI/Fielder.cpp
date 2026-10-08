@@ -4928,7 +4928,7 @@ bool cFielder::GetDekePadDirection(unsigned short* direction)
     {
         angle = 0x8000;
         if (m_pController->m_pGlobalPad->IsPressed(13, true))
-            angle -= 0x2000;
+            angle -= DegreesToAngle(45.0f);
         else if (m_pController->m_pGlobalPad->IsPressed(14, true))
             angle += 0x2000;
         pressed = true;
