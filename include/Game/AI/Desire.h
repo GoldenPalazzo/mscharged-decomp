@@ -343,7 +343,6 @@ public:
     {
     }
 
-
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
@@ -360,7 +359,6 @@ public:
     {
     }
 
-
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
@@ -376,7 +374,6 @@ public:
         : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
-
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -398,12 +395,12 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    float fn_800BD1F0();
+    float GetSpeedScale();
 
 private:
     float mfGooPercentage;
     float mfMaxGooEffect;
-    float mUnidentifiedAC;
+    float mfAdditionalGooEffect;
     float mfGooTime;
     float mf_NotRunning_SpeedScale;
     float mf_NotRunning_MovementScale;
@@ -417,14 +414,13 @@ public:
     {
     }
 
-
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    float fn_800BD75C();
+    float GetSpeedScale();
 
 private:
     float mfSlowPercentage;
@@ -435,11 +431,19 @@ class DesireFrozen : public Desire
     friend class cFielder;
 
 public:
+    enum FrozenState
+    {
+        FROZEN_NONE = 0,
+        FROZEN_ICE = 1,
+        FROZEN_PHOTO = 2,
+        FROZEN_MEGA_STRIKE = 3,
+        FROZEN_SHATTERED = 4,
+    };
+
     DesireFrozen(int state)
         : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
-
 
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
@@ -448,15 +452,15 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    void fn_800BE0BC(float, int);
+    void Activate(float duration, int state);
 
-    bool IsUnidentifiedState(int nState) const
+    bool IsActiveFrozenState(int nState) const
     {
         return mActive && meFrozenState == nState;
     }
 
 private:
-    void fn_800BE1AC(int);
+    void SetFrozenState(int state);
 
     int meFrozenState;
     float mfPrevFrozenTime;
@@ -473,7 +477,6 @@ public:
     {
     }
 
-
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
@@ -481,7 +484,7 @@ public:
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    void fn_800BED24(unsigned short*);
+    void AdjustInputDirection(unsigned short*);
 
 private:
     float mfConfusedPercentage;

@@ -105,7 +105,7 @@ inline float ClampMax(float speedRatio, const float max);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 
-extern float lbl_806E0E40;
+extern float gSlipperySlideFactor;
 
 float lbl_806DB5D8 = 12.5f;
 float lbl_806DB5DC = 0.4f;
@@ -1342,7 +1342,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
-        unidentifiedSlide += pFielder->IsSlippery() ? lbl_806E0E40 : 0.0f;
+        unidentifiedSlide += pFielder->IsSlippery() ? gSlipperySlideFactor : 0.0f;
         if (unidentifiedSlide > 1.0f)
         {
             unidentifiedSlide = 1.0f;

@@ -332,7 +332,7 @@ inline bool cFielder::CheckReceivePassState()
             GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
         bool bFrozenStateActive = false;
         if (pAction != 0 && pAction->mActive
-            && pAction->meFrozenState != 0)
+            && pAction->meFrozenState != DesireFrozen::FROZEN_NONE)
         {
             bFrozenStateActive = true;
         }
@@ -572,7 +572,7 @@ struct FielderDesireShdState
 static inline void EndFrozenState(cFielder* fielder, int state)
 {
     if (((DesireFrozen*)GetConcurrentState(
-            fielder->m_pAIContext->mScriptMachine, 29))->IsUnidentifiedState(state))
+            fielder->m_pAIContext->mScriptMachine, 29))->IsActiveFrozenState(state))
     {
         RequestStateMachineDeactivation(GetConcurrentState(
             fielder->m_pAIContext->mScriptMachine, 29));
@@ -1535,7 +1535,7 @@ void cFielder::SetDesiredFacingDirection(unsigned short aParam, bool bParam)
             pAction = (DesireConfused*)GetConcurrentState(
                 m_pAIContext->mScriptMachine, 0x1E);
         }
-        pAction->fn_800BED24(&aParam);
+        pAction->AdjustInputDirection(&aParam);
     }
 
     cCharacter::SetDesiredFacingDirection(aParam, bParam);
@@ -1972,7 +1972,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
     }
 
     ((DesireFrozen*)GetConcurrentState(pFielder->m_pAIContext->mScriptMachine, 0x1D))
-        ->fn_800BE0BC(fFrozenTime, nFrozenState);
+        ->Activate(fFrozenTime, nFrozenState);
 }
 
 bool cFielder::FreezeWithPeachPhoto(float duration)
@@ -2155,7 +2155,7 @@ void cFielder::CollideWithWallCallback(
         GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
-        && pAction->meFrozenState != 0)
+        && pAction->meFrozenState != DesireFrozen::FROZEN_NONE)
     {
         bActionActive = true;
     }
@@ -3992,39 +3992,39 @@ bool cFielder::IsDefense() const
 
 unsigned int cFielder::IsFrozen() const
 {
-    return ((DesireFrozen*)GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
+    return ((DesireFrozen*)GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D))->IsActiveFrozenState(DesireFrozen::FROZEN_PHOTO);
 }
 
 bool IsFielderDazed(const cFielder* pFielder)
 {
-    return ((DesireFrozen*)GetConcurrentState(pFielder->m_pAIContext->mScriptMachine, 0x1D))->IsUnidentifiedState(1);
+    return ((DesireFrozen*)GetConcurrentState(pFielder->m_pAIContext->mScriptMachine, 0x1D))->IsActiveFrozenState(DesireFrozen::FROZEN_ICE);
 }
 
 unsigned int cFielder::IsShattered() const
 {
     return ((DesireFrozen*)GetConcurrentState(
-        m_pAIContext->mScriptMachine, 29))->IsUnidentifiedState(4);
+        m_pAIContext->mScriptMachine, 29))->IsActiveFrozenState(DesireFrozen::FROZEN_SHATTERED);
 }
 
 bool cFielder::IsMegaStrikeFrozen() const
 {
     return ((DesireFrozen*)GetConcurrentState(
-        m_pAIContext->mScriptMachine, 29))->IsUnidentifiedState(3);
+        m_pAIContext->mScriptMachine, 29))->IsActiveFrozenState(DesireFrozen::FROZEN_MEGA_STRIKE);
 }
 
 bool cFielder::IsStuck() const
 {
     return ((DesireFrozen*)GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D))
-               ->IsUnidentifiedState(1)
+               ->IsActiveFrozenState(DesireFrozen::FROZEN_ICE)
         || ((DesireFrozen*)GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D))
-               ->IsUnidentifiedState(2);
+               ->IsActiveFrozenState(DesireFrozen::FROZEN_PHOTO);
 }
 
 bool cFielder::IsFrozenStateActive() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
         GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
-    return pAction != 0 && pAction->mActive && pAction->meFrozenState != 0;
+    return pAction != 0 && pAction->mActive && pAction->meFrozenState != DesireFrozen::FROZEN_NONE;
 }
 
 float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
@@ -4798,12 +4798,12 @@ float cFielder::GetSpeedPowerupAdjusted(float speed)
         if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 27))
         {
             multiplier *= ((DesireGooey*)GetConcurrentState(
-                m_pAIContext->mScriptMachine, 27))->fn_800BD1F0();
+                m_pAIContext->mScriptMachine, 27))->GetSpeedScale();
         }
         if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 28))
         {
             multiplier *= ((DesireShrink*)GetConcurrentState(
-                m_pAIContext->mScriptMachine, 28))->fn_800BD75C();
+                m_pAIContext->mScriptMachine, 28))->GetSpeedScale();
         }
     }
     return multiplier * speed;
@@ -5381,7 +5381,7 @@ void cFielder::PrePhysicsUpdate()
         GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
-        && pAction->meFrozenState != 0)
+        && pAction->meFrozenState != DesireFrozen::FROZEN_NONE)
     {
         bActionActive = true;
     }

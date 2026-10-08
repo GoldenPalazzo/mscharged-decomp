@@ -22,8 +22,8 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-float lbl_806E0E40;
-extern const nlVector3 lbl_804DC1A0 = { 0.0f, 0.0f, 0.0f };
+float gSlipperySlideFactor;
+extern const nlVector3 gStatusEffectZeroVector = { 0.0f, 0.0f, 0.0f };
 
 static unsigned short sDesireStarType = 0xFFFF;
 static unsigned short sDesireMushroomType = 0xFFFF;
@@ -33,17 +33,17 @@ static unsigned short sDesireShrinkType = 0xFFFF;
 static unsigned short sDesireFrozenType = 0xFFFF;
 static unsigned short sDesireConfusedType = 0xFFFF;
 
-static float lbl_806DC160 = 2.0f;
-static float lbl_806DC164 = 1.0f;
-static float lbl_806DC168 = 20.0f;
-static float lbl_806DC16C = 0.9f;
-static float lbl_806DC170 = 0.75f;
-static float lbl_806DC174 = 0.6f;
-static float lbl_806DC178 = 0.15f;
-static float lbl_806DC17C = 1.25f;
-static float lbl_806DC180 = 2.5f;
-static float lbl_806DC184 = 0.33f;
-static nlVector2 lbl_806DC188 = { 0.1f, 0.0f };
+static float sSlipperyDuration = 2.0f;
+static float sSlipperySlideFactor = 1.0f;
+static float sShrinkDuration = 20.0f;
+static float sShrinkSpeedScale = 0.9f;
+static float sShrinkMovementScale = 0.75f;
+static float sShrinkPlayerScale = 0.6f;
+static float sShrinkScaleDuration = 0.15f;
+static float sMushroomPlayerScale = 1.25f;
+static float sStarShotAgeScale = 2.5f;
+static float sConfusionRampDuration = 0.33f;
+static nlVector2 sConfusionReapplyIncrement = { 0.1f, 0.0f };
 
 /**
  * Offset/Address/Size: 0x0 | 0x800BC0C4 | size: 0x68
@@ -87,7 +87,7 @@ void DesireStar::Update(DesireUpdate* update, float fDeltaT)
                 == SHOT_METER_STS_ACTIVE
             && IsSidekick(m_pFielder)))
     {
-        float scaledDeltaT = fDeltaT * lbl_806DC180;
+        float scaledDeltaT = fDeltaT * sStarShotAgeScale;
         mAgeTimer.Countup(scaledDeltaT - fDeltaT, 10.0f);
     }
 
@@ -131,7 +131,7 @@ bool DesireMushroom::Initialize(void* context)
     m_pFielder->EndShrink();
     if (!m_pFielder->IsSuperGrowActive())
     {
-        m_pFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
+        m_pFielder->fn_8001EE74(sMushroomPlayerScale, 0.2f, -1.0f);
     }
     EmitMushroom(m_pFielder, false);
     return result;
@@ -198,8 +198,8 @@ void DesireMushroom::Cleanup()
 bool DesireSlippery::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    mMaxDuration = lbl_806DC160;
-    lbl_806E0E40 = lbl_806DC164;
+    mMaxDuration = sSlipperyDuration;
+    gSlipperySlideFactor = sSlipperySlideFactor;
     return result;
 }
 
@@ -238,7 +238,7 @@ DesireGooey::DesireGooey()
     : Desire(27, UnsetTransitionFunc(g_UnsetTransitionFunc))
     , mfGooPercentage(1.0f)
     , mfMaxGooEffect(1.0f)
-    , mUnidentifiedAC(-1.0f)
+    , mfAdditionalGooEffect(-1.0f)
     , mfGooTime(0.0f)
     , mf_NotRunning_SpeedScale(1.0f)
     , mf_NotRunning_MovementScale(1.0f)
@@ -255,7 +255,7 @@ bool DesireGooey::Initialize(void* context)
     float fGooEffect = params->Get(0)->mData.f;
     if (fGooEffect < mfMaxGooEffect)
     {
-        mUnidentifiedAC = -1.0f;
+        mfAdditionalGooEffect = -1.0f;
         mfMaxGooEffect = params->Get(0)->mData.f;
         mfGooTime = params->Get(1)->mData.f;
         mf_NotRunning_SpeedScale = params->Get(2)->mData.f;
@@ -264,7 +264,7 @@ bool DesireGooey::Initialize(void* context)
     }
     else
     {
-        mUnidentifiedAC = fGooEffect;
+        mfAdditionalGooEffect = fGooEffect;
     }
     mfGooPercentage = 1.0f;
     return result;
@@ -283,7 +283,7 @@ bool DesireGooey::Reinitialize(void* context)
 /**
  * Offset/Address/Size: 0x112C | 0x800BD1F0 | size: 0x18
  */
-float DesireGooey::fn_800BD1F0()
+float DesireGooey::GetSpeedScale()
 {
     return InterpolateRangeClamped(
         1.0f, mfMaxGooEffect, 0.0f, 1.0f, mfGooPercentage);
@@ -295,9 +295,9 @@ float DesireGooey::fn_800BD1F0()
 void DesireGooey::Update(
     DesireUpdate* update, float fDeltaT)
 {
-    if (mUnidentifiedAC != -1.0f)
+    if (mfAdditionalGooEffect != -1.0f)
     {
-        mfMaxGooEffect += mUnidentifiedAC * (mfGooTime * fDeltaT);
+        mfMaxGooEffect += mfAdditionalGooEffect * (mfGooTime * fDeltaT);
     }
 
     mfGooPercentage = 1.0f
@@ -341,7 +341,7 @@ bool DesireShrink::Initialize(void* context)
 {
     cFielder* source;
     bool result = Desire::Initialize(context);
-    mMaxDuration = lbl_806DC168;
+    mMaxDuration = sShrinkDuration;
     mfSlowPercentage = 1.0f;
 
     m_pFielder->EndMushroom();
@@ -354,7 +354,7 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->EndFrozenOrDazed();
     m_pFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
     m_pFielder->fn_8001EE74(
-        lbl_806DC174, lbl_806DC178, lbl_806DC170);
+        sShrinkPlayerScale, sShrinkScaleDuration, sShrinkMovementScale);
 
     UnidentifiedVariantCollection* params
         = (UnidentifiedVariantCollection*)context;
@@ -369,7 +369,7 @@ bool DesireShrink::Initialize(void* context)
     if (m_pFielder->m_pBall != 0)
     {
         if (m_pFielder->GetDesireState()
-            == (eFielderDesireState)ACTION_UNKNOWN_32)
+            == (eFielderDesireState)32)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->EndDesire();
@@ -395,9 +395,9 @@ bool DesireShrink::Initialize(void* context)
 /**
  * Offset/Address/Size: 0x1698 | 0x800BD75C | size: 0x8
  */
-float DesireShrink::fn_800BD75C()
+float DesireShrink::GetSpeedScale()
 {
-    return lbl_806DC16C;
+    return sShrinkSpeedScale;
 }
 
 /**
@@ -408,7 +408,7 @@ void DesireShrink::Update(DesireUpdate* update, float)
     if (!(m_pFielder->mUnidentified024.m_fPlayerScale < 0.99f))
     {
         m_pFielder->fn_8001EE74(
-            lbl_806DC174, 0.0f, lbl_806DC170);
+            sShrinkPlayerScale, 0.0f, sShrinkMovementScale);
     }
 
     if (!g_pGame->IsGameplayOrOvertime())
@@ -424,7 +424,7 @@ void DesireShrink::Cleanup()
 {
     CreateMushroomEffect(m_pFielder);
     m_pFielder->m_pTweaks = m_pFielder->m_pNormalTweaks;
-    m_pFielder->fn_8001EE74(1.0f, lbl_806DC178, 1.0f);
+    m_pFielder->fn_8001EE74(1.0f, sShrinkScaleDuration, 1.0f);
     if (g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 4)
     {
         cFielder* captain = m_pFielder->m_pTeam->GetOtherTeam()->GetCaptain();
@@ -486,8 +486,8 @@ bool DesireFrozen::Initialize(void* context)
 
     mePrevActionState = m_pFielder->m_eActionState;
     mfPrevFrozenTime = -1.0f;
-    mePrevFrozenState = 0;
-    m_pFielder->SetVelocity(lbl_804DC1A0);
+    mePrevFrozenState = FROZEN_NONE;
+    m_pFielder->SetVelocity(gStatusEffectZeroVector);
     m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
     m_pFielder->mUnidentified024.m_fActualSpeed = 0.0f;
     if (KillDaze(m_pFielder))
@@ -516,13 +516,13 @@ bool DesireFrozen::Initialize(void* context)
     {
         m_pFielder->TurnOffSuperPowerTank(true);
     }
-    if (m_pFielder->GetDesireState() != (eFielderDesireState)21)
+    if (m_pFielder->GetDesireState() != FIELDERDESIRE_FINISH_ACTION)
     {
         m_pFielder->EndDesire();
     }
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
-    fn_800BE1AC(params->Get(0)->mData.i);
+    SetFrozenState(params->Get(0)->mData.i);
     SetAnimationUpdatePaused(m_pFielder, true);
     SetActionUpdatePaused(m_pFielder, true);
     return result;
@@ -533,7 +533,7 @@ bool DesireFrozen::Initialize(void* context)
  */
 bool DesireFrozen::Reinitialize(void* context)
 {
-    if (meFrozenState == 3)
+    if (meFrozenState == FROZEN_MEGA_STRIKE)
     {
         return false;
     }
@@ -544,7 +544,7 @@ bool DesireFrozen::Reinitialize(void* context)
     mAgeTimer.m_uPackedTime = 0;
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
-    fn_800BE1AC(params->Get(0)->mData.i);
+    SetFrozenState(params->Get(0)->mData.i);
     KillFreeze(m_pFielder);
     return Desire::Initialize(context);
 }
@@ -559,7 +559,7 @@ static inline float GetCharacterOpacity(const cCharacter* character)
  */
 void DesireFrozen::Update(DesireUpdate*, float)
 {
-    if (meFrozenState == 2 && gPeachPhotoState.textureReady)
+    if (meFrozenState == FROZEN_PHOTO && gPeachPhotoState.textureReady)
     {
         if (GetCharacterOpacity(m_pFielder) != 0.0f)
         {
@@ -582,37 +582,37 @@ void DesireFrozen::Cleanup()
 {
     switch (meFrozenState)
     {
-    case 0:
+    case FROZEN_NONE:
         break;
-    case 1:
+    case FROZEN_ICE:
         EmitUnFreeze(m_pFielder);
         PowerupBase::PlayPowerupSound(POWER_UP_FREEZE_SHELL,
             PowerupBase::PWRUP_SOUND_END, m_pFielder->m_pPhysicsCharacter, 0.0f, 0);
         break;
-    case 2:
+    case FROZEN_PHOTO:
         m_pFielder->mUnidentified17D = false;
         m_pFielder->SetTangible(true, false);
         m_pFielder->mUnidentified178 = 1.0f;
         m_pFielder->SetModelType(0);
         break;
-    case 3:
+    case FROZEN_MEGA_STRIKE:
         SetAnimationUpdatePaused(m_pFielder, false);
         SetActionUpdatePaused(m_pFielder, false);
         switch (mePrevFrozenState)
         {
-        case 0:
+        case FROZEN_NONE:
             break;
-        case 1:
+        case FROZEN_ICE:
             EmitUnFreeze(m_pFielder);
             break;
-        case 2:
+        case FROZEN_PHOTO:
             m_pFielder->mUnidentified17D = false;
             m_pFielder->SetTangible(true, false);
             m_pFielder->mUnidentified178 = 1.0f;
             m_pFielder->SetModelType(0);
             break;
-        case 3:
-        case 4:
+        case FROZEN_MEGA_STRIKE:
+        case FROZEN_SHATTERED:
         default:
             break;
         }
@@ -627,7 +627,7 @@ void DesireFrozen::Cleanup()
         m_pFielder->EndStar();
         m_pFielder->EndMushroom();
         break;
-    case 4:
+    case FROZEN_SHATTERED:
         m_pFielder->SetTangible(true, false);
         m_pFielder->mUnidentified178 = 1.0f;
         break;
@@ -669,7 +669,7 @@ void DesireFrozen::Cleanup()
 /**
  * Offset/Address/Size: 0x1FF8 | 0x800BE0BC | size: 0xF0
  */
-void DesireFrozen::fn_800BE0BC(float duration, int state)
+void DesireFrozen::Activate(float duration, int state)
 {
     UnidentifiedVariantCollection params;
     params.Set(7, FuzzyVariant(duration));
@@ -680,33 +680,33 @@ void DesireFrozen::fn_800BE0BC(float duration, int state)
 /**
  * Offset/Address/Size: 0x20E8 | 0x800BE1AC | size: 0x14C
  */
-void DesireFrozen::fn_800BE1AC(int state)
+void DesireFrozen::SetFrozenState(int state)
 {
     switch (state)
     {
-    case 0:
+    case FROZEN_NONE:
         break;
-    case 1:
+    case FROZEN_ICE:
         m_pFielder->fn_8009750C();
         EmitFreeze(m_pFielder);
         m_pFielder->fn_8001F1D8();
-        if (mePrevFrozenState != 1)
+        if (mePrevFrozenState != FROZEN_ICE)
         {
             PlaySound(16, 0x1DFB6861, 0, 0);
         }
         break;
-    case 2:
+    case FROZEN_PHOTO:
         m_pFielder->mUnidentified17D = true;
         m_pFielder->SetTangible(false, false);
         break;
-    case 3:
+    case FROZEN_MEGA_STRIKE:
         m_pFielder->EndStar();
-        if (mePrevFrozenState == 1)
+        if (mePrevFrozenState == FROZEN_ICE)
         {
             EmitUnFreeze(m_pFielder);
         }
         break;
-    case 4:
+    case FROZEN_SHATTERED:
         m_pFielder->SetTangible(false, false);
         m_pFielder->mUnidentified178 = 0.0f;
         m_pFielder->ResetEffects();
@@ -744,7 +744,7 @@ bool DesireConfused::Initialize(void* context)
     if (m_pFielder->m_pBall != 0)
     {
         if (m_pFielder->GetDesireState()
-            == (eFielderDesireState)ACTION_UNKNOWN_32)
+            == (eFielderDesireState)32)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->EndDesire();
@@ -771,7 +771,7 @@ bool DesireConfused::Initialize(void* context)
         }
     }
 
-    mvDesiredPosition = lbl_804DC1A0;
+    mvDesiredPosition = gStatusEffectZeroVector;
     mvDesiredPosition.x = 1.0f;
     GetStateMachineAIContext(this)->SetTimer(0xFF, 0.0f);
     return result;
@@ -785,7 +785,7 @@ bool DesireConfused::Reinitialize(void* context)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
     bool result = Desire::Initialize(context);
-    mfConfusedPercentage += lbl_806DC188.x;
+    mfConfusedPercentage += sConfusionReapplyIncrement.x;
     if (mfConfusedPercentage >= 1.0f)
     {
         mfConfusedPercentage = 1.0f;
@@ -811,7 +811,7 @@ void DesireConfused::Update(
     DesireUpdate* update, float)
 {
     mfConfusedPercentage
-        += mAgeTimer.GetSeconds() / lbl_806DC184;
+        += mAgeTimer.GetSeconds() / sConfusionRampDuration;
     if (mfConfusedPercentage >= 1.0f)
     {
         mfConfusedPercentage = 1.0f;
@@ -856,7 +856,7 @@ void DesireConfused::Update(
 /**
  * Offset/Address/Size: 0x2C60 | 0x800BED24 | size: 0x70
  */
-void DesireConfused::fn_800BED24(unsigned short* direction)
+void DesireConfused::AdjustInputDirection(unsigned short* direction)
 {
     bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
     if (hasGlobalPad)
@@ -964,11 +964,11 @@ inline void DesireGooey::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireGooey");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooPercentage - (u8*)&mvDesiredPosition, "mfGooPercentage");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfMaxGooEffect - (u8*)&mvDesiredPosition, "mfMaxGooEffect");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfGooPercentage - (u8*)&mvDesiredPosition, "mfGooPercentage");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfMaxGooEffect - (u8*)&mvDesiredPosition, "mfMaxGooEffect");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
     Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
@@ -997,7 +997,7 @@ inline void DesireShrink::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireShrink");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
     Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
@@ -1026,11 +1026,11 @@ inline void DesireFrozen::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireFrozen");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meFrozenState - (u8*)&mvDesiredPosition, "meFrozenState");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevFrozenState - (u8*)&mvDesiredPosition, "mePrevFrozenState");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
-    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
+    cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&meFrozenState - (u8*)&mvDesiredPosition, "meFrozenState");
+    cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&mePrevFrozenState - (u8*)&mvDesiredPosition, "mePrevFrozenState");
+    cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
+    cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
     Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
@@ -1059,8 +1059,8 @@ inline void DesireConfused::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireConfused");
-    cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
-    cache->AddField(8, gDebugFieldTypes[8].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
+    cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
+    cache->AddField(DEBUG_FIELD_INT, gDebugFieldTypes[DEBUG_FIELD_INT].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
     Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }

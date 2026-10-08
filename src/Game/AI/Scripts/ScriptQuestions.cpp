@@ -1632,7 +1632,7 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
     DesireGooey* pDesire = (DesireGooey*)GetFielderDesire(pFielder, 27);
     if (pDesire != NULL && pDesire->IsActive())
     {
-        fScore = pDesire->fn_800BD1F0();
+        fScore = pDesire->GetSpeedScale();
     }
     return fScore;
 }
