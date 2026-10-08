@@ -553,7 +553,7 @@ static void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
     target = 0;
 }
 
-extern u16 lbl_806DC048;
+extern u16 gFielderDesireStateDebugType;
 
 struct FielderDesireShdState
 {
@@ -6576,12 +6576,12 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
             state.m_fMaxDuration = desire->mMaxDuration;
             state.m_fMinDuration = desire->mMinDuration;
             state.m_fAge = desire->mAgeTimer.GetSeconds();
-            if (lbl_806DC048 == 0xFFFF)
+            if (gFielderDesireStateDebugType == 0xFFFF)
             {
-                state.RegisterDebugFields(&lbl_806DC048, cache);
+                state.RegisterDebugFields(&gFielderDesireStateDebugType, cache);
             }
-            cache->ChecksumData(lbl_806DC048, &state, context);
-            cache->WriteData(lbl_806DC048, &state, sizeof(state));
+            cache->ChecksumData(gFielderDesireStateDebugType, &state, context);
+            cache->WriteData(gFielderDesireStateDebugType, &state, sizeof(state));
             desire->UnidentifiedVirtual7(context, cache);
         }
     }
