@@ -25,9 +25,6 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 
-class SHNavigation;
-
-
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 static const char* sMatchupRowComponentNames[] = {
