@@ -840,7 +840,7 @@ config.libs = [
             Object(Matching, "Game/Render/HomeButtonFade.cpp"),
             Object(Matching, "Game/Render/Impostor.cpp"),
             Object(Matching, "Game/Render/ImpostorCharacter.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Render/ImpostorCluster.cpp"),
+            Object(Matching, "Game/Render/ImpostorCluster.cpp"),
             Object(Matching, "Game/Render/ImpostorLightingColour.cpp"),
             Object(Matching, "Game/Render/ImpostorLighting.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/ImpostorManager.cpp", extra_cflags=["-ipa file"]),

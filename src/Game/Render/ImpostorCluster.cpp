@@ -9,6 +9,7 @@
 #include "Game/TweakValue.h"
 #include "Game/TweakValueInt.h"
 #include "Game/TweakValueFloat.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 
 static TweakValueInt siBackgroundRed(
