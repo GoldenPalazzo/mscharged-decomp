@@ -43,6 +43,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/Physics/PhysicsColumn.h"
 #include "Game/Physics/PhysicsAIBall.h"
+#include "Game/Physics/PhysicsFakeBall.h"
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Sys/audio.h"
 #include "Game/Render/NPCManager.h"
@@ -5859,4 +5860,81 @@ void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballS
         goalie->mbShouldMiss = true;
     else
         goalie->mbShouldMiss = false;
+}
+
+bool cFielder::DoLooseBallContactFromIdle(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, unsigned short facing, const LooseBallContactAnimInfo* info)
+{
+    const cSAnim* anim = m_pAnimInventory->GetAnim(info->nAnimID);
+    nlVector3 localOffset;
+    GetJointPositionFuture(&localOffset, info->nAnimID, m_nBallJointIndex,
+        anim->GetNormalizedTime(info->fAnimContactFrame), true, true, false, true);
+    nlVector3 worldOffset;
+    nlVec2Rotate(*(nlVector2*)&worldOffset, *(const nlVector2*)&localOffset, facing);
+    worldOffset.z = localOffset.z;
+    nlVector3 contactTarget;
+    nlVec3Add(contactTarget, mUnidentified024.m_v3Position, worldOffset);
+    FakeBallWorld::ResetBallIterator();
+    float bestDistanceSquared = 0.0f;
+    bool done = false;
+    float simulatedTime = 0.0f;
+    while (!done || simulatedTime > 5.0f)
+    {
+        nlVector3 ballPosition;
+        FakeBallWorld::GetNextBallPosition(ballPosition);
+        nlVector3 delta;
+        nlVec3Sub(delta, contactTarget, ballPosition);
+        float distanceSquared = nlVec3LengthSquared(delta);
+        if (simulatedTime > 0.0f && distanceSquared > bestDistanceSquared)
+            done = true;
+        if (!done)
+        {
+            ballContact = ballPosition;
+            bestDistanceSquared = distanceSquared;
+            simulatedTime += FixedUpdateTask::GetPhysicsUpdateTick();
+            if (simulatedTime > 5.0f)
+                return false;
+        }
+    }
+    nlVec3Sub(animStart, ballContact, worldOffset);
+    animStartTime = simulatedTime - anim->GetNormalizedTime(info->fAnimContactFrame) * anim->GetDuration();
+    ballContactTime = simulatedTime;
+    return true;
+}
+
+bool cFielder::DoLooseBallContactFromRun(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, const LooseBallContactAnimInfo* info, const nlVector3& passIntercept, unsigned int facing)
+{
+    FakeBallWorld::ResetBallIterator();
+    float simulatedTime = 0.0f;
+    float bestDistanceSquared = 0.0f;
+    float bestTime;
+    nlVector3 bestIntercept;
+    while (simulatedTime < 5.0f)
+    {
+        nlVector3 ballPosition;
+        FakeBallWorld::GetNextBallPosition(ballPosition);
+        simulatedTime += FixedUpdateTask::GetPhysicsUpdateTick();
+        nlVector2 delta = { ballPosition.x - passIntercept.x, ballPosition.y - passIntercept.y };
+        float distanceSquared = nlVec2LengthSquared(delta);
+        if (!(distanceSquared < bestDistanceSquared) && simulatedTime != FixedUpdateTask::GetPhysicsUpdateTick())
+            break;
+        bestDistanceSquared = distanceSquared;
+        bestTime = simulatedTime;
+        bestIntercept = ballPosition;
+    }
+    if (simulatedTime >= 5.0f)
+        return false;
+    const cSAnim* anim = m_pAnimInventory->GetAnim(info->nAnimID);
+    float timeToContact = GetNormalizedContactTime(anim, info->fAnimContactFrame) * anim->GetDuration();
+    nlVector3 worldOffset;
+    nlVector3 localOffset;
+    GetJointPositionFuture(&localOffset, info->nAnimID, m_nBallJointIndex,
+        GetNormalizedContactTime(anim, info->fAnimContactFrame), true, true, false, true);
+    nlVec2Rotate(*(nlVector2*)&worldOffset, *(const nlVector2*)&localOffset, facing);
+    worldOffset.z = localOffset.z;
+    nlVec3Sub(animStart, bestIntercept, worldOffset);
+    animStart.z = 0.0f;
+    animStartTime = bestTime - timeToContact;
+    ballContact = bestIntercept;
+    ballContactTime = bestTime;
+    return true;
 }

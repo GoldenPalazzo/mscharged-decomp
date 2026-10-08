@@ -258,6 +258,8 @@ public:
     void SetRunningWBAnimState(float blendTime);
     float GetShotProbability(float fValue);
     void CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballState);
+    bool DoLooseBallContactFromIdle(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, unsigned short facing, const LooseBallContactAnimInfo* info);
+    bool DoLooseBallContactFromRun(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, const LooseBallContactAnimInfo* info, const nlVector3& passIntercept, unsigned int facing);
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();

@@ -91,10 +91,6 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
-    float*, unsigned short, const LooseBallContactAnimInfo*);
-extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
-    float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
 extern "C" void fn_80015B38(cBall*, bool);
 void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
@@ -991,18 +987,18 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     bool result;
     if (fn_800C0E74())
     {
-        result = fn_80036234(m_pFielder,
-            &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
-            &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
+        result = m_pFielder->DoLooseBallContactFromRun(
+            mEstimated.v3AnimStartPos, mEstimated.fAnimStartTime,
+            mEstimated.v3BallContactPos, mEstimated.fBallContactTime,
             mEstimated.pAnimInfo,
-            &mEstimated.v3BallContactPos,
+            mEstimated.v3BallContactPos,
             mEstimated.aFacingTargetDirection);
     }
     else
     {
-        result = fn_80035F84(m_pFielder,
-            &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
-            &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
+        result = m_pFielder->DoLooseBallContactFromIdle(
+            mEstimated.v3AnimStartPos, mEstimated.fAnimStartTime,
+            mEstimated.v3BallContactPos, mEstimated.fBallContactTime,
             mEstimated.aFacingTargetDirection,
             mEstimated.pAnimInfo);
     }
