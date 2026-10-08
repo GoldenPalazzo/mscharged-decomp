@@ -195,6 +195,28 @@ struct BulletBillObject;
 
 class cFielder : public cPlayer
 {
+    static float GetHeadTrackingFinalPhaseTime();
+    static float GetModifiedShotTargetDistance(float shotDistance);
+    void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActCrowdVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActDekeVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActElectVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActFallVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActHitVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActHitReactVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActSuperVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActShootPassCommonFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActLooseBallPassFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActOneTimerVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActPassingVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunPassVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunningVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunningWBVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActSlideAttackFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActMegaStrikeMeterFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActStunnedFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActBowserSuperFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActWarioSuperFields(unsigned short* type, DebugWriteCache* cache);
     friend void fn_800C5DBC(DesireSteering*, float);
     friend void fn_800C6FDC(DesireSteering*, float);
     friend class UnidentifiedDesire35;
