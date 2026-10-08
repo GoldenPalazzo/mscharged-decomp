@@ -165,6 +165,7 @@ struct UnidentifiedFielderAction410
 
 class FuzzyVariant;
 class AvoidController;
+class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
@@ -210,6 +211,23 @@ public:
     bool EndMarioSuperPower();
     bool EndPeachSuperPower(bool);
     bool EndYoshiSuperPower(bool);
+
+    void SetHardStopRecoverAnimState();
+    void SetHardStopTurnAnimState();
+    void SetRunBackwardsAnimState();
+    void SetStrafeLeftAnimState();
+    void SetStrafeRightAnimState();
+    void SetRunToBackRunningAnimState();
+    void SetBackRunningToRunAnimState();
+    void SetBackRunningStopAnimState();
+    void SetBackRunningStopStartAnimState();
+    void SetBackRunningStopRecoverAnimState();
+    void SetStopAnimState();
+    void fn_8003B5FC();
+    void fn_8003B664();
+    void SetIdleAnimState();
+    void SetIdleWBAnimState();
+    static void RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender* blender);
 
     void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
     PlayerTweaks* GetTweaks() const;
@@ -717,21 +735,6 @@ extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" void fn_8003A544(cFielder* pFielder);
 extern "C" void fn_8003A5C8(cFielder* pFielder);
 extern "C" void fn_8003ADAC(cFielder* pFielder);
-extern "C" void fn_8003B020(cFielder* pFielder);
-extern "C" void fn_8003B0D8(cFielder* pFielder);
-extern "C" void fn_8003B190(cFielder* pFielder);
-extern "C" void fn_8003B254(cFielder* pFielder);
-extern "C" void fn_8003B2EC(cFielder* pFielder);
-extern "C" void fn_8003B384(cFielder* pFielder);
-extern "C" void fn_8003B41C(cFielder* pFielder);
-extern "C" void fn_8003B4B4(cFielder* pFielder);
-extern "C" void fn_8003B54C(cFielder* pFielder);
-extern "C" void fn_8003B5FC(cFielder* pFielder);
-extern "C" void fn_8003B664(cFielder* pFielder);
-extern "C" void fn_8003B6CC(cFielder* pFielder);
-extern "C" void fn_8003B790(cFielder* pFielder);
-extern "C" void fn_8003B854(cFielder* pFielder);
-extern "C" void fn_8003B920(cFielder* pFielder);
 extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
 extern "C" void fn_8003C268(cFielder*, float, float);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);

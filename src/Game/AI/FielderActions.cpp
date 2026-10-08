@@ -206,7 +206,7 @@ void cFielder::asmRunning()
         {
         default:
         {
-            fn_8003B854(this);
+            SetIdleAnimState();
             bFirstTime = false;
             break;
         }
@@ -219,7 +219,7 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 else
                 {
@@ -235,10 +235,10 @@ void cFielder::asmRunning()
             switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 0:
             case 3:
@@ -247,16 +247,16 @@ void cFielder::asmRunning()
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
                     {
-                        fn_8003B2EC(this);
+                        SetBackRunningToRunAnimState();
                     }
                     else
                     {
-                        fn_8003B384(this);
+                        SetBackRunningStopAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 4:
@@ -279,7 +279,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0x1B))
             {
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
             }
             break;
         }
@@ -297,7 +297,7 @@ void cFielder::asmRunning()
                 case 1:
                 case 2:
                 case 4:
-                    fn_8003B4B4(this);
+                    SetBackRunningStopRecoverAnimState();
                     break;
                 case 3:
                 {
@@ -310,7 +310,7 @@ void cFielder::asmRunning()
                     }
                     else
                     {
-                        fn_8003B41C(this);
+                        SetBackRunningStopStartAnimState();
                     }
                     break;
                 }
@@ -328,10 +328,10 @@ void cFielder::asmRunning()
                 case 1:
                 case 2:
                 case 4:
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                     break;
                 case 0:
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                     break;
                 case 3:
                     fn_8003BA94(this, lbl_806E3538[0]);
@@ -348,16 +348,16 @@ void cFielder::asmRunning()
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
                 case 4:
-                    fn_8003B190(this);
+                    SetRunBackwardsAnimState();
                     break;
                 case 1:
-                    fn_8003B790(this);
+                    SetStrafeRightAnimState();
                     break;
                 case 2:
-                    fn_8003B6CC(this);
+                    SetStrafeLeftAnimState();
                     break;
                 case 0:
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                     break;
                 case 3:
                     fn_8003A2D0(this, -1);
@@ -376,11 +376,11 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B664(this);
+                    fn_8003B664();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 2:
@@ -390,7 +390,7 @@ void cFielder::asmRunning()
                 fn_8003BA94(this, lbl_806E3538[0]);
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -405,11 +405,11 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B5FC(this);
+                    fn_8003B5FC();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 1:
@@ -419,7 +419,7 @@ void cFielder::asmRunning()
                 fn_8003BA94(this, lbl_806E3538[0]);
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -434,19 +434,19 @@ void cFielder::asmRunning()
             case 0:
                 if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 1:
                 if (ShouldStartCrossBlend(0x1D))
                 {
-                    fn_8003B790(this);
+                    SetStrafeRightAnimState();
                 }
                 break;
             case 2:
                 if (ShouldStartCrossBlend(0x1C))
                 {
-                    fn_8003B6CC(this);
+                    SetStrafeLeftAnimState();
                 }
                 break;
             case 3:
@@ -470,7 +470,7 @@ void cFielder::asmRunning()
             case 4:
                 if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003B190(this);
+                    SetRunBackwardsAnimState();
                     mUnidentified024.m_fActualSpeed = 0.0f;
                 }
                 break;
@@ -483,7 +483,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                fn_8003B854(this);
+                SetIdleAnimState();
             }
             break;
         }
@@ -497,14 +497,14 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 break;
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 3:
                 if (mUnidentified024.m_fActualSpeed
@@ -518,7 +518,7 @@ void cFielder::asmRunning()
                 }
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -534,11 +534,11 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                     else
                     {
-                        fn_8003B854(this);
+                        SetIdleAnimState();
                     }
                 }
                 return;
@@ -558,11 +558,11 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 3:
@@ -585,26 +585,26 @@ void cFielder::asmRunning()
                 }
                 break;
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 4:
                 if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
                     {
-                        fn_8003B254(this);
+                        SetRunToBackRunningAnimState();
                     }
                     else
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 break;
             }
@@ -620,11 +620,11 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B0D8(this);
+                    SetHardStopTurnAnimState();
                 }
                 else
                 {
-                    fn_8003B020(this);
+                    SetHardStopRecoverAnimState();
                 }
             }
             break;
@@ -641,7 +641,7 @@ void cFielder::asmRunning()
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
             }
             break;
@@ -651,7 +651,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003B854(this);
+                SetIdleAnimState();
             }
             break;
         }
@@ -691,7 +691,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            fn_8003B920(this);
+            SetIdleWBAnimState();
             bFirstTime = false;
             break;
         }
@@ -704,7 +704,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             {
                 if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B920(this);
+                    SetIdleWBAnimState();
                 }
                 else
                 {
@@ -721,7 +721,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
             if (ShouldStartCrossBlend(0xF))
             {
-                fn_8003B920(this);
+                SetIdleWBAnimState();
                 mUnidentified024.m_fActualSpeed = 0.0f;
                 break;
             }
@@ -768,7 +768,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             else if (mUnidentified024.m_fActualSpeed
                      > 0.6f * this->GetTweaks()->GetRunningSpeed())
             {
-                fn_8003B54C(this);
+                SetStopAnimState();
             }
             else
             {
@@ -787,11 +787,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                     else
                     {
-                        fn_8003B920(this);
+                        SetIdleWBAnimState();
                     }
                 }
                 return;
@@ -824,11 +824,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 else
                 {
-                    fn_8003B920(this);
+                    SetIdleWBAnimState();
                 }
                 break;
             }
@@ -855,12 +855,12 @@ void cFielder::asmRunningWB(float fDeltaT)
                     }
                     else
                     {
-                        fn_8003B020(this);
+                        SetHardStopRecoverAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B0D8(this);
+                    SetHardStopTurnAnimState();
                 }
             }
             break;
@@ -882,7 +882,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
             }
             break;
@@ -892,7 +892,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (ShouldStartCrossBlend(0x14))
             {
-                fn_8003B920(this);
+                SetIdleWBAnimState();
                 mUnidentified024.m_fActualSpeed = 0.0f;
             }
             break;

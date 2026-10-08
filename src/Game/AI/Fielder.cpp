@@ -50,6 +50,8 @@
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
+#include "Game/Terrain.h"
+#include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "math.h"
 #include <stddef.h>
@@ -4577,4 +4579,196 @@ bool cFielder::fn_8003881C() const
 {
     return ((DesireFrozen*)GetConcurrentState(
         mUnidentified428->mScriptMachine, 29))->IsUnidentifiedState(3);
+}
+
+float gStopAnimPlaybackSpeed = 1.33f;
+float gBackRunningAnimPlaybackSpeed = 1.33f;
+float gBackRunningTerrainSpeedBoost = 0.33f;
+float gHardStopAnimPlaybackSpeed = 2.0f;
+float gHardStopTerrainSpeedBoost = 0.58f;
+
+void cFielder::SetHardStopRecoverAnimState()
+{
+    if (m_pBall != 0)
+    {
+        SetAnimState(26, false, 0.03f, false, false);
+    }
+    else
+    {
+        SetAnimState(14, false, 0.03f, false, false);
+    }
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gHardStopAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gHardStopTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetHardStopTurnAnimState()
+{
+    if (m_pBall != 0)
+    {
+        SetAnimState(25, false, 0.03f, false, false);
+    }
+    else
+    {
+        SetAnimState(13, false, 0.03f, false, false);
+    }
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gHardStopAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gHardStopTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetRunBackwardsAnimState()
+{
+    SetAnimState(27, true, 0.067f, true, false);
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
+        GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+}
+
+void cFielder::SetStrafeLeftAnimState()
+{
+    SetAnimState(28, true, 0.067f, true, false);
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
+        GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+}
+
+void cFielder::SetStrafeRightAnimState()
+{
+    SetAnimState(29, true, 0.067f, true, false);
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
+        GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+}
+
+void cFielder::SetRunToBackRunningAnimState()
+{
+    SetAnimState(33, true, 0.067f, true, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetBackRunningToRunAnimState()
+{
+    SetAnimState(34, true, 0.067f, true, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetBackRunningStopAnimState()
+{
+    SetAnimState(30, true, 0.067f, true, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetBackRunningStopStartAnimState()
+{
+    SetAnimState(31, true, 0.067f, true, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+void cFielder::SetBackRunningStopRecoverAnimState()
+{
+    SetAnimState(32, true, 0.067f, true, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
+        + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
+            0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+}
+
+static inline void SetStoppingAnimState(cFielder* fielder, int animation)
+{
+    fielder->SetAnimState(animation, true, 0.2f, false, false);
+    fielder->InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    fielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
+}
+
+void cFielder::SetStopAnimState()
+{
+    if (m_pBall != 0)
+    {
+        SetStoppingAnimState(this, 0x17);
+    }
+    else
+    {
+        SetStoppingAnimState(this, 5);
+    }
+}
+
+void cFielder::fn_8003B5FC()
+{
+    SetAnimState(36, true, 0.2f, false, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gStopAnimPlaybackSpeed;
+}
+
+void cFielder::fn_8003B664()
+{
+    SetAnimState(35, true, 0.2f, false, false);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = gStopAnimPlaybackSpeed;
+}
+
+void cFielder::SetIdleAnimState()
+{
+    SetAnimState(0, true, 0.2f, false, false);
+    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aActualFacingDirection;
+    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementRunning(GetJogTurnSpeed(tweaks), fn_8002CF10(tweaks),
+        fn_8002C180(tweaks), fn_8002CF24(tweaks));
+}
+
+void cFielder::SetIdleWBAnimState()
+{
+    SetAnimState(15, true, 0.2f, false, false);
+    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aActualFacingDirection;
+    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementRunning(GetJogTurnSpeed(tweaks), GetRunWBTurnFalloff(tweaks),
+        GetRunWBAccel(tweaks), GetRunWBDecel(tweaks));
+}
+
+void cFielder::RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender* blender)
+{
+    cFielder* fielder = (cFielder*)parameter;
+    if (fielder->m_eAnimID == 4 || fielder->m_eAnimID == 9 || fielder->m_eAnimID == 0x14)
+    {
+        float weight = 0.5f * fielder->mUnidentified024.m_fLeanAmount + 0.5f;
+        if (fielder->m_pCurrentAnimController->m_bMirror)
+        {
+            weight = 1.0f - weight;
+        }
+        if (IsConcurrentStateActive(fielder->mUnidentified428->mScriptMachine, 30))
+        {
+            weight = 1.0f - weight;
+        }
+        blender->m_fDesiredWeight = weight;
+    }
+    else
+    {
+        blender->m_fDesiredWeight = blender->m_fSmoothedWeight;
+    }
 }
