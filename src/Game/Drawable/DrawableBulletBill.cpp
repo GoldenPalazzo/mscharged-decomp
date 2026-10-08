@@ -18,7 +18,7 @@
 // object. The live object and the material/texture services it calls are not
 // reconstructed yet and stay address-named.
 
-static float gShadowAlphaScale = 0.4f;
+static float gShadowSizeScale = 0.4f;
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 130;
 static int gShadowAlphaHigh = 10;
@@ -176,7 +176,7 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
     drawable->SetWorldMatrix(matrix);
     drawable->DrawToView((GLView*)GetLayerView(eCLV_MoreCharacters));
 
-    DrawShadow(matrix, gShadowAlphaScale);
+    DrawShadow(matrix, gShadowSizeScale);
 }
 
 void DrawableBulletBill::Blend(const float* factors, const DrawableBulletBill& lhs, const DrawableBulletBill& rhs)
