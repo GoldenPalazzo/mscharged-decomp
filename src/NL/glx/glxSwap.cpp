@@ -1,5 +1,6 @@
 #include "NL/glx/glxSwap.h"
 #include "NL/nlDebug.h"
+#include "NL/nlConfig.h"
 #include <stdio.h>
 #include <revolution/vi/vi_fwd.h>
 
@@ -48,9 +49,6 @@ struct GXColor
 
 extern "C" void GXSetCopyClear(GXColor clear_clr, u32 clear_z);
 
-// R4QE01 keeps one copy of the aligned nlMalloc forwarding thunk, emitted by
-// the nlConfig translation unit and called from here as well.
-void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
 
 enum
 {
