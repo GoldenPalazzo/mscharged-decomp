@@ -482,7 +482,7 @@ void DesireSuperPower::Cleanup()
     case TOAD:
         m_pFielder->m_pTweaks
             = m_pFielder->mUnidentified32C;
-        fn_80039CF0(m_pFielder, 0);
+        m_pFielder->RestoreTangibility(false);
         m_pFielder->bYoshiInWindup = false;
         EmitYoshiShellBreak(m_pFielder);
         gNPCManager->mpYoshiEgg->Break();

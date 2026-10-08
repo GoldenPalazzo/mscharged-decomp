@@ -229,7 +229,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x09FC95CF:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_80039CF0((cFielder*)g_pCurrentlyUpdatingCharacter, 0);
+                static_cast<cFielder*>(g_pCurrentlyUpdatingCharacter)->RestoreTangibility(false);
             }
             break;
 

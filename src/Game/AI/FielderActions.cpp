@@ -301,7 +301,7 @@ void cFielder::asmRunning()
                               >> 14;
                     if (nIndex != 0)
                     {
-                        fn_8003A2D0(this, nIndex);
+                        SetStartAnimState(nIndex);
                     }
                     else
                     {
@@ -355,7 +355,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                     break;
                 case 3:
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                     break;
                 }
             }
@@ -450,16 +450,16 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003A2D0(this, -1);
+                        SetStartAnimState(-1);
                     }
                     else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
-                        fn_8003ADAC(this);
+                        SetHardStopAnimState();
                     }
                 }
                 else if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                 }
                 break;
             case 4:
@@ -505,7 +505,7 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                 }
                 else
                 {
@@ -566,11 +566,11 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003A2D0(this, -1);
+                        SetStartAnimState(-1);
                     }
                     else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
-                        fn_8003ADAC(this);
+                        SetHardStopAnimState();
                     }
                 }
                 else if ((m_eAnimID != 9 && fn_8003E74C())
@@ -726,11 +726,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 else
                 {
-                    fn_8003ADAC(this);
+                    SetHardStopAnimState();
                 }
                 break;
             }
@@ -740,7 +740,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
             }
             break;
@@ -753,7 +753,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 else
                 {
@@ -805,11 +805,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003ADAC(this);
+                    SetHardStopAnimState();
                 }
                 else
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 break;
             }
@@ -5124,7 +5124,7 @@ void cFielder::fn_8004EC40()
 {
     if (!mbTangible)
     {
-        fn_80039CF0(this, 0);
+        RestoreTangibility(false);
     }
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
@@ -5222,7 +5222,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
 
         if (m_pCurrentAnimController->TestTrigger(0.05f))
         {
-            fn_80039CF0(this, 0);
+            RestoreTangibility(false);
         }
 
         if (ShouldStartCrossBlend(0))
@@ -5244,7 +5244,7 @@ void cFielder::fn_8004F180()
     SetPosition(v3Position);
 
     mUnidentified17C = true;
-    fn_80039CF0(this, 0);
+    RestoreTangibility(false);
     ClearInvincibility(0);
     mUnidentified424 = false;
 }

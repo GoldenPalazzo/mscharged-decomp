@@ -1901,7 +1901,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case 1:
-        fn_80039F24(this);
+        CleanActionDeke();
         break;
 
     case ACTION_ELECTROCUTION:
@@ -2040,7 +2040,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
             v3Position.z = 0.0f;
             SetPosition(v3Position);
         }
-        fn_80039CF0(this, 0);
+        RestoreTangibility(false);
         break;
     }
 
@@ -5967,3 +5967,181 @@ void cFielder::DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type)
 
 static TweakBoolBinding sUseDumpChargingTweak(
     "gbUseDumpCharging", "Game/Gameplay/Charging/Dump", &gbUseDumpCharging, true);
+
+extern "C" float fn_8002CE14(PlayerTweaks* tweaks);
+float gStartAnimPlaybackSpeed = 1.2f;
+float gStartTerrainSpeedBoost = 0.33f;
+float gMontyReappearRadius = 2.25f;
+
+void cFielder::RestoreTangibility(bool fadeIn)
+{
+    if (!mbTangible)
+    {
+        SetTangible(true, false);
+        if (GetCharacterClass() == (eCharacterClass)16)
+        {
+            if (mUnidentified178 < 1.0f)
+            {
+                if (fadeIn && g_pGame->IsGameplayOrOvertime())
+                    mtPostDekeTimer.SetSeconds(gBooDekeFadeTime);
+                else
+                    mUnidentified178 = 1.0f;
+            }
+            EmitBooDekePuffEnd(this);
+        }
+        else if (GetCharacterClass() == (eCharacterClass)8)
+        {
+            mUnidentified178 = 1.0f;
+        }
+        else if (GetCharacterClass() == (eCharacterClass)18)
+        {
+            mUnidentified178 = 1.0f;
+            if (!IsFallenDown())
+            {
+                CharacterImpactEvent event;
+                event.v3Position = mUnidentified024.m_v3Position;
+                event.fRadius = gMontyReappearRadius;
+                event.pCharacter = this;
+                DeliverMontyReappearEvent(g_pGame, &event);
+                EmitMontyDekeExit(this);
+            }
+            else
+                EmitMontySquishExit(this);
+            if (m_eActionState == (eFielderActionState)32 && m_pBall != 0)
+                g_pBall->m_pPhysicsBall->mbCanCollideGoalie = false;
+            g_pBall->m_pPhysicsBall->mbCanGoThroughGround = false;
+        }
+        else
+        {
+            mUnidentified178 = 1.0f;
+            PlaySound(m_uSoundSlotId, 0x5bf8e132, 0, 0);
+            if (GetCharacterClass() == (eCharacterClass)6)
+                EmitDekeExit(this, "waluigi_deke_enter");
+            else if (GetCharacterClass() == (eCharacterClass)2)
+                EmitDekeExit(this, "daisy_deke_enter");
+            else if (GetCharacterClass() == (eCharacterClass)17)
+                EmitDekeExit(this, "drybones_deke_enter");
+        }
+    }
+}
+
+void cFielder::CleanActionDeke()
+{
+    mUnidentified1E4.m_eLastPadAction = 50;
+    m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
+    bIsModified = false;
+    if (IsInvincibleChars())
+        EndDeke(this);
+    if (m_pController != 0)
+        m_pController->ResetAccelerationHistory();
+    if (GetCharacterClass() == (eCharacterClass)16)
+        RestoreTangibility(true);
+    else if (GetCharacterClass() == (eCharacterClass)18
+        || GetCharacterClass() == (eCharacterClass)6
+        || GetCharacterClass() == (eCharacterClass)2
+        || GetCharacterClass() == (eCharacterClass)17)
+        RestoreTangibility(false);
+    if (IsCharacterSuperPowerActive(this, (eCharacterClass)1) && g_pGame->GetGameState() != 4)
+        EmitBowserSmoke(this);
+    if (m_pBall != 0 && !m_pBall->m_bVisible)
+        m_pBall->m_bVisible = true;
+}
+
+void cFielder::SetStartAnimState(int animState)
+{
+    static int runStartAnims[4] = { 2, 2, 3, 1 };
+    if ((IsCharacterSuperPowerActive(this, (eCharacterClass)1)
+            || IsCharacterSuperPowerActive(this, (eCharacterClass)6)
+            || IsCharacterSuperPowerActive(this, (eCharacterClass)11)) && mUnidentified3DC)
+    {
+        SetRunningAnimState(0.1f);
+    }
+    else if (animState != -1)
+    {
+        SetAnimState(runStartAnims[animState], true, 0.2f, false, false);
+        s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
+            mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+        InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
+        m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
+            + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+    }
+    else
+    {
+        int direction = ((mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection + 0x2000) >> 14) & 3;
+        if (direction != 0)
+        {
+            SetAnimState(runStartAnims[direction], true, 0.2f, false, false);
+            s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+            InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
+            m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
+                + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+        }
+        else
+        {
+            SetRunningAnimState(0.1f);
+            if (mUnidentified024.m_fActualSpeed < fn_8002CE14(m_pTweaks))
+                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = fn_8002CE14(m_pTweaks);
+        }
+    }
+}
+
+void cFielder::SetStartWBAnimState()
+{
+    static int runStartAnims[4] = { 17, 17, 18, 16 };
+    if ((IsCharacterSuperPowerActive(this, (eCharacterClass)1)
+            || IsCharacterSuperPowerActive(this, (eCharacterClass)6)
+            || IsCharacterSuperPowerActive(this, (eCharacterClass)11)) && mUnidentified3DC)
+    {
+        SetRunningWBAnimState(0.1f);
+    }
+    else
+    {
+        int direction = ((mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection + 0x2000) >> 14) & 3;
+        if (direction != 0)
+        {
+            SetAnimState(runStartAnims[direction], true, 0.2f, false, false);
+            s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
+                mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+            InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
+            m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
+                + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+        }
+        else
+        {
+            SetRunningWBAnimState(0.1f);
+            if (mUnidentified024.m_fActualSpeed < fn_8002CE14(m_pTweaks))
+                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = fn_8002CE14(m_pTweaks);
+        }
+    }
+}
+
+inline bool cFielder::ShouldSkipHardStopAnim()
+{
+    bool specialMovement = ((IsCharacterSuperPowerActive(this, (eCharacterClass)6)
+            || IsCharacterSuperPowerActive(this, (eCharacterClass)1))
+            || (IsCharacterSuperPowerActive(this, (eCharacterClass)11) && mUnidentified3DC))
+        || IsConcurrentStateActive(mUnidentified428->mScriptMachine, 27);
+    bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
+    if (!skip && fn_8002E060() == (eFielderDesireState)20)
+    {
+        Desire* desire = fn_8002E08C(this, 20);
+        if (desire->mAgeTimer.GetSeconds() < 0.05f)
+            skip = true;
+    }
+    return skip;
+}
+
+void cFielder::SetHardStopAnimState()
+{
+    if (!ShouldSkipHardStopAnim())
+    {
+        if (m_pBall != 0)
+            SetAnimState(24, true, 0.2f, false, false);
+        else
+            SetAnimState(12, true, 0.2f, false, false);
+        InitMovementFromAnim(0, v3Zero, 1.0f, false);
+        m_pCurrentAnimController->m_fPlaybackSpeedScale = gHardStopAnimPlaybackSpeed
+            + InterpolateRangeClamped(0.0f, gHardStopTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+    }
+}
