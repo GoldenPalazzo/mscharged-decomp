@@ -5,9 +5,9 @@
 #include "NL/nlColour.h"
 
 /**
- * The eight-byte pair at CharacterInfo+0x30. R4QE01 copies it as two raw words
- * rather than element-wise, which is what shows it is a struct and not a float
- * array: the twelve goalie rows share one runtime-initialised value.
+ * The eight-byte pair at CharacterInfo+0x30. R4QE01 copies its two raw words;
+ * the twelve goalie rows share one runtime-initialised value. These copies
+ * establish the storage layout, without identifying the original grouping.
  */
 struct CharacterValuePair
 {
