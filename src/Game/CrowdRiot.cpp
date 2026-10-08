@@ -30,7 +30,7 @@
 #include <math.h>
 #include "NL/nlFunction.inl"
 
-struct Generators
+struct CrowdRiotGenerator
 {
     void RegisterDebugFields(u16* type, DebugWriteCache* cache);
     /* 0x00 */ nlVector2 v2Location;
@@ -38,38 +38,38 @@ struct Generators
     /* 0x0C */ float fTimeToExplode;
 }; // total size: 0x10
 
-float lbl_806E0C40;
-float lbl_806E0C44;
+float gCrowdRiotGeneratorGoalLineOffset;
+float gCrowdRiotGeneratorSidelineOffset;
 
-void fn_80029C80(PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
-void fn_800298D8(void*);
-void fn_800299C4(void*);
-void fn_80029AB0(void*);
-void fn_80029B9C(void*);
+void QueueCrowdRiotCollision(PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
+void OnCrowdRiotGoalScored(void*);
+void OnCrowdRiotMegastrikeEnd(void*);
+void OnCrowdRiotGameOver(void*);
+void OnCrowdRiotCollision(void*);
 
-static float sUnidentifiedFloat0 = 2.45f;
-static float sUnidentifiedFloat1 = 4.0f;
-static float sUnidentifiedFloat2 = 2.0f;
-static float sUnidentifiedFloat3 = 1.0f;
-static float sUnidentifiedFloat4 = 10.4f;
-static float sUnidentifiedFloat5 = 3.0f;
+static float sRiotCollisionRadius = 2.45f;
+static float sRiotExitSpeedMultiplier = 4.0f;
+static float sRiotSpeed = 2.0f;
+static float sRiotResumeStateTime = 1.0f;
+static float sRiotPathX = 10.4f;
+static float sRiotSidelineOffset = 3.0f;
 static unsigned short sCrowdRiotType = 0xFFFF;
 static unsigned short sGeneratorsType = 0xFFFF;
 
-Generators lbl_8056B890[6];
+CrowdRiotGenerator gCrowdRiotGenerators[6];
 
-CrowdRiot::CrowdRiot(bool param1)
-    : mTriggerVolume(0)
+CrowdRiot::CrowdRiot(bool enableRiot)
+    : mpTriggerVolume(0)
 {
-    fn_8002921C();
-    if (param1)
+    ResetGenerators();
+    if (enableRiot)
     {
-        fn_80029460(false);
+        Reset(false);
     }
     else
     {
         mfRiotTime = -1.0f;
-        meState = 0;
+        meState = STATE_DISABLED;
         mfStateTime = -1.0f;
         maDesiredFacingDirection = 0;
         mv3Position.x = 0.0f;
@@ -83,22 +83,22 @@ CrowdRiot::CrowdRiot(bool param1)
         mv3Target.z = 0.0f;
     }
 
-    UnidentifiedFindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(fn_80029B9C), 0, -1);
-    UnidentifiedFindEvent<void>("GoalScored", -1)->Add(Function<void*>(fn_800298D8), 0, -1);
-    UnidentifiedFindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(fn_800299C4), 0, -1);
-    UnidentifiedFindEvent<void>("GameOver", -1)->Add(Function<void*>(fn_80029AB0), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(OnCrowdRiotCollision), 0, -1);
+    UnidentifiedFindEvent<void>("GoalScored", -1)->Add(Function<void*>(OnCrowdRiotGoalScored), 0, -1);
+    UnidentifiedFindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(OnCrowdRiotMegastrikeEnd), 0, -1);
+    UnidentifiedFindEvent<void>("GameOver", -1)->Add(Function<void*>(OnCrowdRiotGameOver), 0, -1);
 }
 
 CrowdRiot::~CrowdRiot()
 {
-    if (mTriggerVolume != 0)
+    if (mpTriggerVolume != 0)
     {
-        delete mTriggerVolume;
-        mTriggerVolume = 0;
+        delete mpTriggerVolume;
+        mpTriggerVolume = 0;
     }
 }
 
-inline void Generators::RegisterDebugFields(u16* type, DebugWriteCache* cache)
+inline void CrowdRiotGenerator::RegisterDebugFields(u16* type, DebugWriteCache* cache)
 {
     *type = cache->BeginType("Generators");
     cache->AddField(21, gDebugFieldTypes[21].size, 0, "v2Location");
@@ -132,27 +132,27 @@ void CrowdRiot::SyncLog(void* context, DebugWriteCache* cache)
 
     for (int i = 0; i < 6; i++)
     {
-        Generators* generator = &lbl_8056B890[i];
+        CrowdRiotGenerator* generator = &gCrowdRiotGenerators[i];
         if (sGeneratorsType == 0xFFFF)
         {
             generator->RegisterDebugFields(&sGeneratorsType, cache);
         }
 
         cache->ChecksumData(sGeneratorsType, generator, context);
-        cache->WriteData(sGeneratorsType, generator, sizeof(Generators));
+        cache->WriteData(sGeneratorsType, generator, sizeof(CrowdRiotGenerator));
     }
 }
 
-void CrowdRiot::fn_8002921C()
+void CrowdRiot::ResetGenerators()
 {
     for (int i = 0; i < 6; i++)
     {
-        Generators* generator = &lbl_8056B890[i];
+        CrowdRiotGenerator* generator = &gCrowdRiotGenerators[i];
         generator->bIsOn = true;
         generator->fTimeToExplode = -1.0f;
 
-        float goalLineX = lbl_806E0C40 + cField::GetGoalLineX(1U);
-        float sidelineY = lbl_806E0C44 + cField::GetSidelineY(1U);
+        float goalLineX = gCrowdRiotGeneratorGoalLineOffset + cField::GetGoalLineX(1U);
+        float sidelineY = gCrowdRiotGeneratorSidelineOffset + cField::GetSidelineY(1U);
 
         if (i == 0 || i == 3)
         {
@@ -184,17 +184,17 @@ void InterpolateRiotBallPosition(nlVector3& result, const nlVector3& riotPositio
     nlVecLerp(result, riotPosition, ballPosition, time);
 }
 
-void CrowdRiot::fn_80029320()
+void CrowdRiot::InitializeRiotMotion()
 {
     for (int i = 0; i < 6; i++)
     {
-        Generators* generator = &lbl_8056B890[i];
+        CrowdRiotGenerator* generator = &gCrowdRiotGenerators[i];
         if (!generator->bIsOn)
         {
             nlVector3 position;
-            position.x = sUnidentifiedFloat4
+            position.x = sRiotPathX
                        * AIsgn(generator->v2Location.x);
-            position.y = sUnidentifiedFloat5
+            position.y = sRiotSidelineOffset
                        + fabsf(generator->v2Location.y);
             position.y *= AIsgn(generator->v2Location.y);
             position.z = 0.0f;
@@ -202,7 +202,7 @@ void CrowdRiot::fn_80029320()
 
             nlVector3 velocity;
             velocity.x = 0.0f;
-            velocity.y = -sUnidentifiedFloat2;
+            velocity.y = -sRiotSpeed;
             velocity.y *= AIsgn(generator->v2Location.y);
             velocity.z = 0.0f;
             mv3Velocity = velocity;
@@ -240,9 +240,9 @@ void PlayCrowdRiotSound(CrowdRiot* crowdRiot)
     PlaySound(13, 0x198B7ED3, "CrowdRiot", crowdRiot);
 }
 
-void CrowdRiot::fn_80029460(bool param1)
+void CrowdRiot::Reset(bool preserveActiveRiot)
 {
-    if (meState == 0)
+    if (meState == STATE_DISABLED)
     {
         return;
     }
@@ -250,23 +250,23 @@ void CrowdRiot::fn_80029460(bool param1)
     EffectsGroup* group;
     EmissionController* controller;
     bool resumeRiot = false;
-    if (mfRiotTime > 0.0f && param1)
+    if (mfRiotTime > 0.0f && preserveActiveRiot)
     {
         resumeRiot = true;
     }
     else
     {
         mfRiotTime = -1.0f;
-        fn_8002921C();
+        ResetGenerators();
     }
 
-    if (mTriggerVolume != 0)
+    if (mpTriggerVolume != 0)
     {
-        delete mTriggerVolume;
-        mTriggerVolume = 0;
+        delete mpTriggerVolume;
+        mpTriggerVolume = 0;
     }
 
-    meState = 1;
+    meState = STATE_READY;
     mfStateTime = -1.0f;
     maDesiredFacingDirection = 0;
     mv3Position.x = 0.0f;
@@ -289,24 +289,24 @@ void CrowdRiot::fn_80029460(bool param1)
     EmissionManager::Instance()->Kill((unsigned long)this, group);
     StopSound(0x198B7ED3, this);
 
-    if (resumeRiot && meState != 0 && meState == 1)
+    if (resumeRiot && meState != STATE_DISABLED && meState == STATE_READY)
     {
-        fn_80029320();
-        meState = 2;
-        mfStateTime = sUnidentifiedFloat3;
+        InitializeRiotMotion();
+        meState = STATE_ACTIVE;
+        mfStateTime = sRiotResumeStateTime;
 
-        if (mTriggerVolume == 0)
+        if (mpTriggerVolume == 0)
         {
             PhysicsTriggerVolume* physicsObject
                 = new (8, false) PhysicsTriggerVolume(
-                    sUnidentifiedFloat0);
-            mTriggerVolume = physicsObject;
+                    sRiotCollisionRadius);
+            mpTriggerVolume = physicsObject;
             physicsObject->m_pTriggerCallbackFunc
-                = fn_80029C80;
+                = QueueCrowdRiotCollision;
             physicsObject->m_pCallbackParam = this;
-            mTriggerVolume->SetPosition(
+            mpTriggerVolume->SetPosition(
                 mv3Position, PhysicsObject::WORLD_COORDINATES);
-            mTriggerVolume->EnableCollisions();
+            mpTriggerVolume->EnableCollisions();
         }
 
         group = GetCrowdRiotEffectGroup(CROWD_RIOT_WITH_FADE);
@@ -322,7 +322,7 @@ void CrowdRiot::fn_80029460(bool param1)
                     Placeholder<0> >(
                     Detail::MemFunImpl<void,
                         void (CrowdRiot::*)(EmissionController&)>(
-                        &CrowdRiot::fn_80029D78),
+                        &CrowdRiot::UpdateEmissionPosition),
                     this,
                     placeholder0));
             controller->SetUpdateCallback(callback);
@@ -332,34 +332,34 @@ void CrowdRiot::fn_80029460(bool param1)
     }
 }
 
-static inline void UnidentifiedInline_800298D8()
+static inline void StartCrowdRiotExit()
 {
     CrowdRiot* crowdRiot
         = (CrowdRiot*)g_pGame->mpCrowdRiot;
-    if (crowdRiot->meState == 2)
+    if (crowdRiot->meState == CrowdRiot::STATE_ACTIVE)
     {
         nlVector3 velocity;
-        velocity.x = sUnidentifiedFloat1 * crowdRiot->mv3Velocity.x;
-        velocity.y = sUnidentifiedFloat1 * crowdRiot->mv3Velocity.y;
+        velocity.x = sRiotExitSpeedMultiplier * crowdRiot->mv3Velocity.x;
+        velocity.y = sRiotExitSpeedMultiplier * crowdRiot->mv3Velocity.y;
         velocity.z = 0.0f;
         crowdRiot->mv3Velocity = velocity;
 
         nlVector3 target;
-        target.x = sUnidentifiedFloat4
+        target.x = sRiotPathX
                  * AIsgn(crowdRiot->mv3Position.x);
-        float sideline = sUnidentifiedFloat5
+        float sideline = sRiotSidelineOffset
                        + cField::GetSidelineY(1U);
         float sign = AIsgn(crowdRiot->mv3Position.y);
         target.y = sign * sideline;
         target.y = -target.y;
         target.z = 0.0f;
         crowdRiot->mv3Target = target;
-        crowdRiot->meState = 4;
+        crowdRiot->meState = CrowdRiot::STATE_EXITING;
         crowdRiot->mfStateTime = -1.0f;
     }
 }
 
-void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
+void HandleCrowdRiotBallCollision(cBall* ball, CrowdRiot* crowdRiot)
 {
     if (ball->mbStuckInRiotDone)
     {
@@ -389,22 +389,22 @@ void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
     }
 }
 
-void fn_800298D8(void*)
+void OnCrowdRiotGoalScored(void*)
 {
-    UnidentifiedInline_800298D8();
+    StartCrowdRiotExit();
 }
 
-void fn_800299C4(void*)
+void OnCrowdRiotMegastrikeEnd(void*)
 {
-    UnidentifiedInline_800298D8();
+    StartCrowdRiotExit();
 }
 
-void fn_80029AB0(void*)
+void OnCrowdRiotGameOver(void*)
 {
-    UnidentifiedInline_800298D8();
+    StartCrowdRiotExit();
 }
 
-void fn_80029B9C(void* param)
+void OnCrowdRiotCollision(void* param)
 {
     CollisionCrowdData* event
         = (CollisionCrowdData*)param;
@@ -443,7 +443,7 @@ void fn_80029B9C(void* param)
         }
         else
         {
-            fn_800297B8(ball, crowdRiot);
+            HandleCrowdRiotBallCollision(ball, crowdRiot);
         }
         break;
     }
@@ -458,7 +458,7 @@ void fn_80029B9C(void* param)
     }
 }
 
-void fn_80029C80(PhysicsObject*, PhysicsObject* other,
+void QueueCrowdRiotCollision(PhysicsObject*, PhysicsObject* other,
     const nlVector3& position, void* context)
 {
     switch (other->GetObjectType())
@@ -471,7 +471,7 @@ void fn_80029C80(PhysicsObject*, PhysicsObject* other,
     case 28:
     {
         CrowdRiot* crowdRiot = (CrowdRiot*)context;
-        if (crowdRiot->meState != 1)
+        if (crowdRiot->meState != CrowdRiot::STATE_READY)
         {
             CollisionCrowdData* event = 0;
             g_CollisionCrowdDataPool.Allocate(event);
@@ -485,7 +485,7 @@ void fn_80029C80(PhysicsObject*, PhysicsObject* other,
     }
 }
 
-void CrowdRiot::fn_80029D78(EmissionController& controller)
+void CrowdRiot::UpdateEmissionPosition(EmissionController& controller)
 {
     controller.SetPosition(mv3Position);
 }
