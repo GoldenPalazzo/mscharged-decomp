@@ -15,7 +15,7 @@
 #include "Game/Render/NetMesh.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"

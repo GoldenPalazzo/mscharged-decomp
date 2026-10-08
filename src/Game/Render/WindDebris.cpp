@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -180,5 +180,5 @@ void UnidentifiedNPC_801B43F8::DrawShadow(
     }
 }
 
-#include "Game/Render/tu_801B43F8.inl"
+#include "Game/Render/WindDebris.inl"
 #include "NL/nlBind_impl.h"

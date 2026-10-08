@@ -54,7 +54,7 @@
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/ChainChomp.h"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "Game/Render/ThwompObject.h"
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"

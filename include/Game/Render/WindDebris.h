@@ -1,5 +1,5 @@
-#ifndef GAME_RENDER_TU_801B43F8_H
-#define GAME_RENDER_TU_801B43F8_H
+#ifndef GAME_RENDER_WINDDEBRIS_H
+#define GAME_RENDER_WINDDEBRIS_H
 
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 
@@ -36,4 +36,4 @@ public:
     /* 0x94 */ float mfCollisionDelay;
 }; // total size: 0x98
 
-#endif // GAME_RENDER_TU_801B43F8_H
+#endif // GAME_RENDER_WINDDEBRIS_H
