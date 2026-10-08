@@ -572,7 +572,7 @@ config.libs = [
             Object(Matching, "Game/AI/shdStateMachine.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/ScriptMachine.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/TutorialMegastrikeDesire.cpp"),
-            Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/Scripts/FuzzyAIRuntime.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/Scripts/ScriptDefines.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/AI/Scripts/ScriptQuestions.cpp", extra_cflags=["-ipa file"]),

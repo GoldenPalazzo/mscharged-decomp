@@ -1,11 +1,9 @@
-#include "Game/AI/Variant.h"
+#include "Game/AI/Variant.inl"
 
 #include "NL/nlFormat.h"
 #include "runtime.h"
 
 Variant gvNotSet;
-
-#pragma dont_inline on
 
 NLString Variant::ToString() const
 {
@@ -98,16 +96,4 @@ unsigned long Variant::GetHash() const
     }
 
     return hash;
-}
-
-#pragma dont_inline reset
-
-inline bool Variant::IsSet() const
-{
-    return mType != FT_UNSPECIFIED;
-}
-
-inline bool Variant::IsPointerType() const
-{
-    return mType == FT_POINTER || mType == FT_STRING;
 }
