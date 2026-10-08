@@ -7,7 +7,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "NL/gl/glMemory.h"
-#include "Game/TweakValue.h"
 #include "NL/gl/glState.h"
 #include "NL/nlDebug.h"
 #include "Game/TweakValueFloat.h"
@@ -40,10 +39,10 @@ ImpostorManager::ImpostorManager()
     mParentView = 0;
     mInitialized = false;
     mUnidentified035 = false;
-    mUnidentified036 = false;
-    mUnidentified037 = false;
+    mHasClusters = false;
+    mUpdateClusters = false;
     mCurrentResource = 0;
-    mUnidentified04C = false;
+    mUseRenderCache = false;
     mLastRenderChecksum = 0;
     mFrameCount = 0;
     mCaptured = false;
@@ -51,10 +50,11 @@ ImpostorManager::ImpostorManager()
     SetEnabled(false);
 }
 
-void ImpostorManager::Initialize(GLView* registry, int capacity,
-    const GLMemoryRequirement* config, int numRequirements, bool flag)
+void ImpostorManager::Initialize(GLView* parentView, int capacity,
+    const GLMemoryRequirement* requirements, int numRequirements,
+    bool invalidateCaptureOnRender)
 {
-    mParentView = registry;
+    mParentView = parentView;
     mImpostors = new (8, false) Impostor[capacity];
     mCapacity = capacity;
     mNumUsed = 0;
@@ -64,7 +64,7 @@ void ImpostorManager::Initialize(GLView* registry, int capacity,
 
     for (int i = 0; i < 2; ++i)
     {
-        if (config == 0)
+        if (requirements == 0)
         {
             mResources[i] = glCreateResourcePool(
                 sImpostorResourceRequirements, 2, "Impostors");
@@ -72,17 +72,17 @@ void ImpostorManager::Initialize(GLView* registry, int capacity,
         else
         {
             mResources[i] = glCreateResourcePool(
-                config, numRequirements, "Impostors");
+                requirements, numRequirements, "Impostors");
         }
         mResourceMarkers[i] = mResources[i]->MarkResource();
     }
 
-    mUnidentified04C = false;
+    mUseRenderCache = false;
     mCaptured = false;
-    mUnidentified037 = false;
-    mUnidentified036 = false;
+    mUpdateClusters = false;
+    mHasClusters = false;
     mUnidentified035 = false;
-    mUnidentified059 = flag;
+    mInvalidateCaptureOnRender = invalidateCaptureOnRender;
     LoadTweakConfigFile("ini/ImpostorCharacterTweaks.ini",
         "/Render/Impostor/CharacterTweaks", false);
 }
@@ -204,7 +204,7 @@ static inline u32 AccumulateRenderChecksums(
     return total;
 }
 
-void ImpostorManager::Render(void* target, bool skipCapture)
+void ImpostorManager::Render(GLView* target, bool skipCapture)
 {
     u32 total;
     if (mEnabled == 0)
@@ -212,13 +212,13 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         return;
     }
 
-    if (mUnidentified059 != 0)
+    if (mInvalidateCaptureOnRender != 0)
     {
         mCaptured = false;
     }
 
     bool cached = false;
-    if (mUnidentified04C != 0 && !skipCapture)
+    if (mUseRenderCache != 0 && !skipCapture)
     {
         cached = true;
     }
@@ -293,7 +293,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         {
             rendered = sNumImpostorsRendered.mValue;
             sNumImpostorsRendered.mValue = rendered
-                + spriteEntry->entry->Render((GLView*)target, mImpostors, cached, skipCapture);
+                + spriteEntry->entry->Render(target, mImpostors, cached, skipCapture);
             if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
             {
                 spriteEntry = 0;
@@ -327,9 +327,9 @@ void ImpostorManager::AddCharacter(ImpostorCharacter* character)
 {
     mCharacters.AddEnd(character);
     character->RegisterSprites(mParentView);
-    if (character->mUnidentified00C != 0)
+    if (character->mIsCluster != 0)
     {
-        mUnidentified036 = true;
+        mHasClusters = true;
     }
 }
 
@@ -384,7 +384,7 @@ void ImpostorManager::UpdateSprites()
     while (entry != 0)
     {
         ImpostorCharacter* character = entry->entry;
-        if (mUnidentified037 == 0 && character->mUnidentified00C != 0)
+        if (mUpdateClusters == 0 && character->mIsCluster != 0)
         {
             break;
         }
