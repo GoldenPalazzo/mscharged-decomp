@@ -3620,7 +3620,7 @@ void Goalie::ReleaseMonty()
     if (mpMonty != 0)
     {
         if (mpMonty->m_eActionState == ACTION_UNKNOWN_34
-            && !mpMonty->mUnidentified424)
+            && !mpMonty->m_bMontyDekeFinished)
         {
             if (mbGrabMonty
                 && mpMonty->mUnidentified024.m_v3Position.z > -0.25f)

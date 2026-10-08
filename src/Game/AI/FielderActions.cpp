@@ -2960,25 +2960,25 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     mUnidentified390 = 0.0f;
     m_fMegaStrikeAccuracy = 0.0f;
     m_fMegaStrikeReceivedTimestamp = -1.0f;
-    mUnidentified39C = -1.0f;
-    mUnidentified3A0 = -1.0f;
-    mUnidentified3A4 = -1.0f;
+    m_fMegaStrikeFirstPressPosition = -1.0f;
+    m_fMegaStrikeSecondPressPosition = -1.0f;
+    m_fMegaStrikeGreenRegionWidth = -1.0f;
     m_fMegaStrikeMeterPosition = -1.0f;
-    mUnidentified3AC = 0.0f;
-    mUnidentified3B0 = 0.0f;
-    mUnidentified3B4 = 0.0f;
-    mUnidentified3B8 = false;
-    mUnidentified3BC = 0.0f;
-    mUnidentified3C0 = 0.0f;
-    mUnidentified3C4 = 0.0f;
-    mUnidentified3C8 = 0.0f;
-    mUnidentified3CC = 0.0f;
-    mUnidentified3D0 = 0.0f;
+    m_fMegaStrikePhaseTimeRemaining = 0.0f;
+    m_fMegaStrikeSecondPhaseDuration = 0.0f;
+    m_fMegaStrikeFirstPhaseDuration = 0.0f;
+    m_bMegaStrikeSecondPhase = false;
+    m_fLocalMegaStrikeNumBalls = 0.0f;
+    m_fLocalMegaStrikeAccuracy = 0.0f;
+    m_fMegaStrikeSegment1Position = 0.0f;
+    m_fMegaStrikeSegment2Position = 0.0f;
+    m_fMegaStrikeSegment3Position = 0.0f;
+    m_fMegaStrikeSegment4Position = 0.0f;
     mUnidentified3D4 = 0.0f;
 
     g_pGame->ResetMegaStrikeMeterQueues();
 
-    mUnidentified478 = 0;
+    m_nMegaStrikeResultState = 0;
 
     if (m_pBall == 0)
     {
@@ -3057,7 +3057,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         MegaStrikeMeterData event;
         event.pFielder = this;
-        event.fMeterValue = mUnidentified3BC;
+        event.fMeterValue = m_fLocalMegaStrikeNumBalls;
         nlVector3 v3Column;
         glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
         event.v3Position = v3Column;
@@ -3068,9 +3068,9 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         ClearPowerupAnimState(false);
 
         float fMeterTime = lbl_806DB924;
-        mUnidentified3B4 = fMeterTime;
-        mUnidentified3AC = fMeterTime;
-        mUnidentified3B8 = false;
+        m_fMegaStrikeFirstPhaseDuration = fMeterTime;
+        m_fMegaStrikePhaseTimeRemaining = fMeterTime;
+        m_bMegaStrikeSecondPhase = false;
 
         float fShooting = this->GetTweaks()->fShooting;
         if (fShooting > 1.0f)
@@ -3096,23 +3096,23 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         float fHalfC = fSegmentC / 2.0f;
         float fHalfD = fSegmentD / 2.0f;
 
-        mUnidentified3C4 = lbl_806DB970 + fHalfA;
-        ShootToScoreMeter::instance.SetSegment1Position(mUnidentified3C4);
+        m_fMegaStrikeSegment1Position = lbl_806DB970 + fHalfA;
+        ShootToScoreMeter::instance.SetSegment1Position(m_fMegaStrikeSegment1Position);
         ShootToScoreMeter::instance.SetSegment1Width(fSegmentA);
 
-        mUnidentified3C8 = fHalfB + (mUnidentified3C4 + fHalfA);
-        ShootToScoreMeter::instance.SetSegment2Position(mUnidentified3C8);
+        m_fMegaStrikeSegment2Position = fHalfB + (m_fMegaStrikeSegment1Position + fHalfA);
+        ShootToScoreMeter::instance.SetSegment2Position(m_fMegaStrikeSegment2Position);
         ShootToScoreMeter::instance.SetSegment2Width(fSegmentB);
 
-        mUnidentified3CC = fHalfC + (mUnidentified3C8 + fHalfB);
-        ShootToScoreMeter::instance.SetSegment3Position(mUnidentified3CC);
+        m_fMegaStrikeSegment3Position = fHalfC + (m_fMegaStrikeSegment2Position + fHalfB);
+        ShootToScoreMeter::instance.SetSegment3Position(m_fMegaStrikeSegment3Position);
         ShootToScoreMeter::instance.SetSegment3Width(fSegmentC);
 
-        mUnidentified3D0 = fHalfD + (mUnidentified3CC + fHalfC);
-        ShootToScoreMeter::instance.SetSegment4Position(mUnidentified3D0);
+        m_fMegaStrikeSegment4Position = fHalfD + (m_fMegaStrikeSegment3Position + fHalfC);
+        ShootToScoreMeter::instance.SetSegment4Position(m_fMegaStrikeSegment4Position);
         ShootToScoreMeter::instance.SetSegment4Width(fSegmentD);
 
-        mUnidentified3D4 = mUnidentified3D0;
+        mUnidentified3D4 = m_fMegaStrikeSegment4Position;
 
         StopSound(0x5C8E379, this);
         PlaySound(0, 0x5C8E379, "Needle Left", this);
@@ -3128,41 +3128,41 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 {
     if (bButtonPressed)
     {
-        tDebugPrintManager::Print(DC_NETWORK, "Button pushed phase %d time %f\n", mUnidentified3B8, mUnidentified3AC);
+        tDebugPrintManager::Print(DC_NETWORK, "Button pushed phase %d time %f\n", m_bMegaStrikeSecondPhase, m_fMegaStrikePhaseTimeRemaining);
     }
 
     if (bButtonPressed)
     {
-        if (!mUnidentified3B8)
+        if (!m_bMegaStrikeSecondPhase)
         {
-            if (mUnidentified39C < 0.0f)
+            if (m_fMegaStrikeFirstPressPosition < 0.0f)
             {
-                mUnidentified39C = m_fMegaStrikeMeterPosition;
+                m_fMegaStrikeFirstPressPosition = m_fMegaStrikeMeterPosition;
                 DoMegaMeterFirstButtonPressEvent(nParam);
             }
         }
-        else if (mUnidentified3A0 < 0.0f)
+        else if (m_fMegaStrikeSecondPressPosition < 0.0f)
         {
-            mUnidentified3A0 = m_fMegaStrikeMeterPosition;
+            m_fMegaStrikeSecondPressPosition = m_fMegaStrikeMeterPosition;
             DoMegaMeterSecondButtonPressEvent(nParam);
         }
     }
 
-    mUnidentified3AC -= fDeltaT;
-    if (mUnidentified3AC < 0.0f)
+    m_fMegaStrikePhaseTimeRemaining -= fDeltaT;
+    if (m_fMegaStrikePhaseTimeRemaining < 0.0f)
     {
-        if (!mUnidentified3B8)
+        if (!m_bMegaStrikeSecondPhase)
         {
-            if (mUnidentified39C < 0.0f)
+            if (m_fMegaStrikeFirstPressPosition < 0.0f)
             {
-                mUnidentified39C = 1.0f;
+                m_fMegaStrikeFirstPressPosition = 1.0f;
                 DoMegaMeterFirstButtonPressEvent(nParam);
             }
 
             float fMidTime = GetShotMeterMidpointRatio() * lbl_806DB934 + lbl_806DB93C;
             if (m_fMegaStrikeMeterPosition <= fMidTime)
             {
-                mUnidentified3B0 = InterpolateRangeClamped(lbl_806DB928,
+                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(lbl_806DB928,
                     0.0f,
                     fMidTime,
                     0.0f,
@@ -3170,60 +3170,60 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
             }
             else
             {
-                mUnidentified3B0 = InterpolateRangeClamped(lbl_806DB930,
+                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(lbl_806DB930,
                     lbl_806DB92C,
                     1.0f,
                     fMidTime,
                     m_fMegaStrikeMeterPosition);
             }
 
-            mUnidentified3A4 = InterpolateClamped(lbl_806DB934,
+            m_fMegaStrikeGreenRegionWidth = InterpolateClamped(lbl_806DB934,
                 lbl_806DB938,
                 this->GetTweaks()->fShooting);
             float fSecondPhaseTime = InterpolateClamped(lbl_806DB940,
                 lbl_806DB944,
                 this->GetTweaks()->fShooting);
 
-            mUnidentified3B8 = true;
-            mUnidentified3AC = mUnidentified3B0;
+            m_bMegaStrikeSecondPhase = true;
+            m_fMegaStrikePhaseTimeRemaining = m_fMegaStrikeSecondPhaseDuration;
             ShootToScoreMeter::instance.SetGreenRegionWidth(
-                mUnidentified3A4);
+                m_fMegaStrikeGreenRegionWidth);
             ShootToScoreMeter::instance.SetYellowRegionWidth(fSecondPhaseTime);
             ShootToScoreMeter::instance.SetGreenBarPosition(lbl_806DB93C);
             ShootToScoreMeter::instance.mbShowGreenRegion = true;
         }
-        else if (mUnidentified3A0 < 0.0f)
+        else if (m_fMegaStrikeSecondPressPosition < 0.0f)
         {
-            mUnidentified3A0 = 0.0f;
+            m_fMegaStrikeSecondPressPosition = 0.0f;
             DoMegaMeterSecondButtonPressEvent(nParam);
         }
     }
 
-    if (mUnidentified3B8)
+    if (m_bMegaStrikeSecondPhase)
     {
         m_fMegaStrikeMeterPosition
-            = (mUnidentified39C * mUnidentified3AC) / mUnidentified3B0;
+            = (m_fMegaStrikeFirstPressPosition * m_fMegaStrikePhaseTimeRemaining) / m_fMegaStrikeSecondPhaseDuration;
     }
     else
     {
-        m_fMegaStrikeMeterPosition = 1.0f - mUnidentified3AC / mUnidentified3B4;
+        m_fMegaStrikeMeterPosition = 1.0f - m_fMegaStrikePhaseTimeRemaining / m_fMegaStrikeFirstPhaseDuration;
     }
 
-    if (mUnidentified3A0 < 0.0f)
+    if (m_fMegaStrikeSecondPressPosition < 0.0f)
     {
         ShootToScoreMeter::instance.SetWhiteBarPosition(m_fMegaStrikeMeterPosition);
     }
     else
     {
-        ShootToScoreMeter::instance.SetWhiteBarPosition(mUnidentified3A0);
+        ShootToScoreMeter::instance.SetWhiteBarPosition(m_fMegaStrikeSecondPressPosition);
     }
 
-    ShootToScoreMeter::instance.SetSavedWhiteBarPosition(mUnidentified39C);
+    ShootToScoreMeter::instance.SetSavedWhiteBarPosition(m_fMegaStrikeFirstPressPosition);
 }
 
 void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 {
-    if (mUnidentified478 == 0)
+    if (m_nMegaStrikeResultState == 0)
     {
         if (nParam != 0)
         {
@@ -3249,7 +3249,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
             g_pGame->mReceivedMegaStrikeMeter.mCount,
-            mUnidentified478);
+            m_nMegaStrikeResultState);
 
         while (g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
         {
@@ -3259,22 +3259,22 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         }
     }
 
-    if (mUnidentified478 == 2)
+    if (m_nMegaStrikeResultState == 2)
     {
         if (!IsNetworkOrRecordedGame())
         {
-            mUnidentified478 = 3;
+            m_nMegaStrikeResultState = 3;
         }
         else
         {
             float fEndTime = m_fMegaStrikeReceivedTimestamp + lbl_806DB974;
             if (GetFixedUpdateTask()->mSimulationTime >= fEndTime)
             {
-                mUnidentified478 = 3;
+                m_nMegaStrikeResultState = 3;
             }
         }
     }
-    else if (mUnidentified478 == 3)
+    else if (m_nMegaStrikeResultState == 3)
     {
         MegaStrikeMeterOverlay* pScene
             = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
@@ -3300,25 +3300,25 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
 void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 {
-    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterFirstButtonPressEvent at time %f\n", mUnidentified3AC);
+    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterFirstButtonPressEvent at time %f\n", m_fMegaStrikePhaseTimeRemaining);
 
     ShootToScoreMeter::instance.mbShowSavedWhiteBar = true;
 
-    mUnidentified3BC = (float)(s32)GetMegaStrikeShotCount(this, 0);
+    m_fLocalMegaStrikeNumBalls = (float)(s32)GetMegaStrikeShotCount(this, 0);
 
     PlayRumbleAction(1, GetGlobalPad());
 
     MegaStrikeMeterData event;
     event.pFielder = this;
-    event.fMeterValue = mUnidentified3BC;
+    event.fMeterValue = m_fLocalMegaStrikeNumBalls;
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
     DeliverMegaStrikeMeterFirstEvent(g_pGame, &event);
 
-    if (mUnidentified3AC >= 0.0f)
+    if (m_fMegaStrikePhaseTimeRemaining >= 0.0f)
     {
-        mUnidentified3AC = -1.0f;
+        m_fMegaStrikePhaseTimeRemaining = -1.0f;
     }
 
     StopSound(0x5C8E379, this);
@@ -3343,13 +3343,13 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
 void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 {
-    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterSecondButtonPressEvent at time %f\n", mUnidentified3AC);
+    tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterSecondButtonPressEvent at time %f\n", m_fMegaStrikePhaseTimeRemaining);
 
     ShootToScoreMeter::instance.mbSecondButtonPressed = true;
     ShootToScoreMeter::instance.m_v3MeterPosition
         = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 
-    mUnidentified3C0 = GetMegaStrikeAccuracy(this, 0);
+    m_fLocalMegaStrikeAccuracy = GetMegaStrikeAccuracy(this, 0);
 
     for (int i = 0; i < 2; i++)
     {
@@ -3359,13 +3359,13 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             cPlayer* pPlayer = pTeam->GetPlayer(j);
             if (pPlayer->GetGlobalPad() != 0)
             {
-                if (mUnidentified3C0 >= 1.0f)
+                if (m_fLocalMegaStrikeAccuracy >= 1.0f)
                 {
                     PlayRumbleAction(3, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xD17A65BA, 0, 0);
                 }
-                else if (mUnidentified3C0 >= 0.0f)
+                else if (m_fLocalMegaStrikeAccuracy >= 0.0f)
                 {
                     PlayRumbleAction(2, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
@@ -3383,7 +3383,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
     MegaStrikeMeterData event;
     event.pFielder = this;
-    event.fMeterValue = mUnidentified3C0;
+    event.fMeterValue = m_fLocalMegaStrikeAccuracy;
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
@@ -3399,10 +3399,10 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
         if (!gNetworkInputRecording->mPlaybackReady)
         {
-            g_pGame->SendMegaStrike(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
+            g_pGame->SendMegaStrike(m_pTeam->m_nSide, mUnidentified1E4.m_ID, m_fLocalMegaStrikeNumBalls, m_fLocalMegaStrikeAccuracy);
         }
 
-        mUnidentified478 = 1;
+        m_nMegaStrikeResultState = 1;
     }
 
     StopSound(0xBF541A4C, this);
@@ -3443,27 +3443,27 @@ float GetMegaStrikeShotCount(cFielder* pFielder, int nParam)
     float fHalfC = fSegmentC / 2.0f;
     float fHalfD = fSegmentD / 2.0f;
 
-    float fTime = pFielder->mUnidentified39C;
+    float fTime = pFielder->m_fMegaStrikeFirstPressPosition;
     if (nParam != 0)
     {
         fTime = pFielder->m_fMegaStrikeMeterPosition;
     }
 
-    if (fTime >= pFielder->mUnidentified3C4 - fHalfA)
+    if (fTime >= pFielder->m_fMegaStrikeSegment1Position - fHalfA)
     {
-        if (fTime < pFielder->mUnidentified3C4 + fHalfA)
+        if (fTime < pFielder->m_fMegaStrikeSegment1Position + fHalfA)
         {
             fResult = 0.33f * fMeterRange + fResult;
         }
-        else if (fTime < pFielder->mUnidentified3C8 + fHalfB)
+        else if (fTime < pFielder->m_fMegaStrikeSegment2Position + fHalfB)
         {
             fResult = 0.66f * fMeterRange + fResult;
         }
-        else if (fTime < pFielder->mUnidentified3CC + fHalfC)
+        else if (fTime < pFielder->m_fMegaStrikeSegment3Position + fHalfC)
         {
             fResult = pFielder->fn_80048A08();
         }
-        else if (fTime < pFielder->mUnidentified3D0 + fHalfD)
+        else if (fTime < pFielder->m_fMegaStrikeSegment4Position + fHalfD)
         {
             fResult = pFielder->fn_80048A08();
         }
@@ -3484,15 +3484,15 @@ float GetMegaStrikeShotCount(cFielder* pFielder, int nParam)
 float GetMegaStrikeAccuracy(cFielder* pFielder, int nParam)
 {
     float fNeedle = -9999.0f;
-    if (pFielder->mUnidentified3B8)
+    if (pFielder->m_bMegaStrikeSecondPhase)
     {
-        float fTime = pFielder->mUnidentified3A0;
+        float fTime = pFielder->m_fMegaStrikeSecondPressPosition;
         if (nParam != 0)
         {
             fTime = pFielder->m_fMegaStrikeMeterPosition;
         }
         float fDelta = fabsf(lbl_806DB93C - fTime);
-        float fHalfWidth = fabsf(pFielder->mUnidentified3A4 / 2.0f);
+        float fHalfWidth = fabsf(pFielder->m_fMegaStrikeGreenRegionWidth / 2.0f);
         if (fDelta
             < InterpolateClamped(lbl_806DB940, lbl_806DB944, pFielder->GetTweaks()->fShooting)
                   / 2.0f)
@@ -5240,7 +5240,7 @@ void cFielder::fn_8004F180()
     mUnidentified17C = true;
     RestoreTangibility(false);
     ClearInvincibility(0);
-    mUnidentified424 = false;
+    m_bMontyDekeFinished = false;
 }
 
 void cFielder::fn_8004F204()
@@ -5260,12 +5260,12 @@ void cFielder::fn_8004F204()
     mUnidentified17C = false;
     mUnidentified178 = 1.0f;
     SetNoPickUpTime(1.0f);
-    mUnidentified424 = false;
+    m_bMontyDekeFinished = false;
 }
 
 void cFielder::fn_8004F2FC(float fDeltaT)
 {
-    if (mUnidentified424)
+    if (m_bMontyDekeFinished)
     {
         switch (m_eAnimID)
         {

@@ -956,7 +956,7 @@ void Goalie::fn_80083960(float)
         }
 
         if (m_pCurrentAnimController->m_fTime >= fGrabTime
-            && !mpMonty->mUnidentified424
+            && !mpMonty->m_bMontyDekeFinished
             && mpMonty->m_eActionState == ACTION_UNKNOWN_34)
         {
             nlVector3 v3Position

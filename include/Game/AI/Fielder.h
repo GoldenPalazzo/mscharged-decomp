@@ -465,7 +465,7 @@ public:
         bool result = !IsStuck() && (muInvincibleStatus & 1);
         return result;
     }
-    void TestCollisionForInvicibility(cFielder* pOpponent);
+    void TestCollisionForInvincibility(cFielder* pOpponent);
     const LooseBallContactAnimInfo* FindLooseBallContactAnim(
         const LooseBallContactAnimInfo* pBallContactAnimInfo,
         int nNumContactAnims, unsigned short aFutureFacingDirection,
@@ -690,25 +690,25 @@ public:
     /* 0x390 */ float mUnidentified390;
     /* 0x394 */ float m_fMegaStrikeAccuracy;
     /* 0x398 */ float m_fMegaStrikeReceivedTimestamp;
-    /* 0x39C */ float mUnidentified39C;
-    /* 0x3A0 */ float mUnidentified3A0;
-    /* 0x3A4 */ float mUnidentified3A4;
+    /* 0x39C */ float m_fMegaStrikeFirstPressPosition;
+    /* 0x3A0 */ float m_fMegaStrikeSecondPressPosition;
+    /* 0x3A4 */ float m_fMegaStrikeGreenRegionWidth;
     /* 0x3A8 */ float m_fMegaStrikeMeterPosition;
-    /* 0x3AC */ float mUnidentified3AC;
-    /* 0x3B0 */ float mUnidentified3B0;
-    /* 0x3B4 */ float mUnidentified3B4;
-    /* 0x3B8 */ bool mUnidentified3B8;
+    /* 0x3AC */ float m_fMegaStrikePhaseTimeRemaining;
+    /* 0x3B0 */ float m_fMegaStrikeSecondPhaseDuration;
+    /* 0x3B4 */ float m_fMegaStrikeFirstPhaseDuration;
+    /* 0x3B8 */ bool m_bMegaStrikeSecondPhase;
 
 private:
     /* 0x3B9 */ u8 mUnknown3B9[0x03];
 
 public:
-    /* 0x3BC */ float mUnidentified3BC;
-    /* 0x3C0 */ float mUnidentified3C0;
-    /* 0x3C4 */ float mUnidentified3C4;
-    /* 0x3C8 */ float mUnidentified3C8;
-    /* 0x3CC */ float mUnidentified3CC;
-    /* 0x3D0 */ float mUnidentified3D0;
+    /* 0x3BC */ float m_fLocalMegaStrikeNumBalls;
+    /* 0x3C0 */ float m_fLocalMegaStrikeAccuracy;
+    /* 0x3C4 */ float m_fMegaStrikeSegment1Position;
+    /* 0x3C8 */ float m_fMegaStrikeSegment2Position;
+    /* 0x3CC */ float m_fMegaStrikeSegment3Position;
+    /* 0x3D0 */ float m_fMegaStrikeSegment4Position;
     /* 0x3D4 */ float mUnidentified3D4;
 
 public:
@@ -732,13 +732,13 @@ public:
     /* 0x3F8 */ WaluigiWallState mWaluigiWallState;
 
 private:
-    /* 0x404 */ float mUnidentified404;
+    /* 0x404 */ float m_fPeteyLastMuckBallTime;
 
 public:
-    /* 0x408 */ float mUnidentified408;
+    /* 0x408 */ float m_fPeteyMuckBallSpeed;
 
 private:
-    /* 0x40C */ float mUnidentified40C;
+    /* 0x40C */ float m_fPeteySuperPowerTime;
 
 public:
     /* 0x410 */ ActBooSkillshot mActionBooSkillshot;
@@ -747,7 +747,7 @@ public:
     /* 0x420 */ BulletBillObject* m_pBulletBill;
 
 public:
-    /* 0x424 */ bool mUnidentified424;
+    /* 0x424 */ bool m_bMontyDekeFinished;
 
 private:
     /* 0x425 */ u8 mUnknown425[0x03];
@@ -797,7 +797,7 @@ private:
     /* 0x477 */ u8 mUnknown477;
 
 public:
-    /* 0x478 */ int mUnidentified478;
+    /* 0x478 */ int m_nMegaStrikeResultState;
 
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;

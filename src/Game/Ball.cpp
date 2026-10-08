@@ -570,7 +570,7 @@ void cBall::CollideWithCharacterCallback(
         && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pCharacterFielder = (cFielder*)pCharacter;
-        pOwnerFielder->TestCollisionForInvicibility(pCharacterFielder);
+        pOwnerFielder->TestCollisionForInvincibility(pCharacterFielder);
 
         if (!pCharacterFielder->IsOnSameTeam(pOwnerFielder))
         {

@@ -340,7 +340,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
         if (m_bSuperPowerTankOn || bForce)
         {
             m_bSuperPowerTankOn = false;
-            mUnidentified408 = 0.0f;
+            m_fPeteyMuckBallSpeed = 0.0f;
             SetNormalTweaks();
         }
     }
@@ -443,7 +443,7 @@ bool cFielder::TurnOnSuperPowerTank()
     }
     else if (mUnidentified024.m_eCharacterClass == PETEY)
     {
-        mUnidentified408 = 0.0f;
+        m_fPeteyMuckBallSpeed = 0.0f;
         SetSuperPowerTweaks();
     }
 

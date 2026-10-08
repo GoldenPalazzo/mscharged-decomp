@@ -266,8 +266,8 @@ bool DesireSuperPower::Initialize(void* context)
         mMaxDuration = gPeteySuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
-        m_pFielder->mUnidentified408 = 0.0f;
-        m_pFielder->mUnidentified40C = 0.0f;
+        m_pFielder->m_fPeteyMuckBallSpeed = 0.0f;
+        m_pFielder->m_fPeteySuperPowerTime = 0.0f;
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
             && (m_pFielder->GetDesireState() == 21
@@ -451,8 +451,8 @@ void DesireSuperPower::Cleanup()
         break;
     case PETEY:
         m_pFielder->ClearInvincibility(0);
-        m_pFielder->mUnidentified404 = 0.0f;
-        m_pFielder->mUnidentified408 = 0.0f;
+        m_pFielder->m_fPeteyLastMuckBallTime = 0.0f;
+        m_pFielder->m_fPeteyMuckBallSpeed = 0.0f;
         m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         if (m_pFielder->m_eAnimID == 104)
@@ -931,7 +931,7 @@ void DesireSuperPower::UpdatePeach(DesireUpdate* update, float fDeltaT)
 inline bool DesireSuperPower::IsMuckBallReady() const
 {
     bool fire = false;
-    if (m_pFielder->mUnidentified40C - m_pFielder->mUnidentified404 > gPeteyMuckBallInterval
+    if (m_pFielder->m_fPeteySuperPowerTime - m_pFielder->m_fPeteyLastMuckBallTime > gPeteyMuckBallInterval
         && m_pFielder->IsFallenDown() != true)
         fire = true;
     return fire;
@@ -939,10 +939,10 @@ inline bool DesireSuperPower::IsMuckBallReady() const
 
 void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->mUnidentified40C += fDeltaT;
-    m_pFielder->mUnidentified408 += gPeteyMuckBallSpeedRate * fDeltaT;
-    m_pFielder->mUnidentified408 = nlMinEquals(
-        nlMaxEquals(m_pFielder->mUnidentified408, gPeteyMuckBallMinSpeed), gPeteyMuckBallMaxSpeed);
+    m_pFielder->m_fPeteySuperPowerTime += fDeltaT;
+    m_pFielder->m_fPeteyMuckBallSpeed += gPeteyMuckBallSpeedRate * fDeltaT;
+    m_pFielder->m_fPeteyMuckBallSpeed = nlMinEquals(
+        nlMaxEquals(m_pFielder->m_fPeteyMuckBallSpeed, gPeteyMuckBallMinSpeed), gPeteyMuckBallMaxSpeed);
     if (update->mData.i == 3)
     {
         if (update->ExtraData.Get(11)->mData.b)
@@ -974,7 +974,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
             {
                 if (IsMuckBallReady() == true)
                 {
-                    m_pFielder->mUnidentified404 = m_pFielder->mUnidentified40C;
+                    m_pFielder->m_fPeteyLastMuckBallTime = m_pFielder->m_fPeteySuperPowerTime;
                     m_pFielder->DrainSuperPowerTank(1.0f / (float)gPeteyMuckBallCount);
                     nlVector3 pos;
                     nlVector3 direction;
@@ -987,8 +987,8 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                     unsigned short angle = polar.a;
                     unsigned short range = DegreesToAngle(gPeteyMuckBallSpreadAngle);
                     angle += nlRandom(range) - 0.5f * range;
-                    direction.x = m_pFielder->mUnidentified408 * nlSin(angle + 0x4000);
-                    direction.y = m_pFielder->mUnidentified408 * nlSin(angle);
+                    direction.x = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle + 0x4000);
+                    direction.y = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle);
                     direction.z = gPeteyMuckBallUpSpeed;
                     nlVec3Add(direction, direction, m_pFielder->mUnidentified024.m_v3Velocity);
                     PhysicsPatch* patch = lbl_806E12C8->CreatePatch(3, m_pFielder,
