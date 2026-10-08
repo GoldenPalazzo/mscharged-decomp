@@ -4143,7 +4143,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
             g_pBall->m_uGoalType = 2;
             if (GetCharacterClass() == (eCharacterClass)0x10)
             {
-                fn_800395C0(this);
+                BeginDekeIntangibility();
             }
             else
             {

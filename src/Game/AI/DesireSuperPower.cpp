@@ -1645,7 +1645,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     {
         self->m_pFielder->StartRunning();
     }
-    fn_800395C0(self->m_pFielder);
+    self->m_pFielder->BeginDekeIntangibility();
     self->mMaxDuration = gYoshiSuperPowerTimeLimit;
     return true;
 }

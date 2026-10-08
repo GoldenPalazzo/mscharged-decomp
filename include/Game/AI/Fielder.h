@@ -262,6 +262,7 @@ public:
     bool DoLooseBallContactFromRun(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, const LooseBallContactAnimInfo* info, const nlVector3& passIntercept, unsigned int facing);
     void DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type);
     void RestoreTangibility(bool fadeIn);
+    void BeginDekeIntangibility();
     void CleanActionDeke();
     void SetStartAnimState(int animState);
     void SetStartWBAnimState();
@@ -801,7 +802,6 @@ extern float lbl_806E342C;
 
 extern "C" bool fn_8003877C(const cFielder* pFielder);
 
-extern "C" void fn_800395C0(cFielder* pFielder);
 
 
 ScriptMachine* fn_8002E1A4(cFielder* pFielder);

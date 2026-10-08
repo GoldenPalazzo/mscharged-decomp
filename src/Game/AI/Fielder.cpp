@@ -6145,3 +6145,98 @@ void cFielder::SetHardStopAnimState()
             + InterpolateRangeClamped(0.0f, gHardStopTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
     }
 }
+
+float gDekeDirectionSpread = 1000.0f;
+float gIntangibleAlpha;
+
+void cFielder::BeginDekeIntangibility()
+{
+    if (mbTangible)
+    {
+        if (GetCharacterClass() == (eCharacterClass)16)
+        {
+            SetTangible(false, false);
+            mtPostDekeTimer.UnidentifiedClear();
+            mUnidentified178 = gIntangibleAlpha;
+            EmitBooDekePuffStart(this);
+        }
+        else if (GetCharacterClass() == (eCharacterClass)8)
+        {
+            SetTangible(false, false);
+            mUnidentified178 = gIntangibleAlpha;
+        }
+        else if (GetCharacterClass() == (eCharacterClass)18)
+        {
+            SetTangible(false, false);
+            mUnidentified178 = gIntangibleAlpha;
+            if (m_eActionState == (eFielderActionState)1 || m_eActionState == (eFielderActionState)32)
+            {
+                EmitMontyDekeEnter(this);
+                if (m_pBall != 0)
+                    m_pBall->m_pPhysicsBall->mbCanGoThroughGround = true;
+            }
+            else if (m_eActionState == (eFielderActionState)28)
+                EmitMontySquishEnter(this);
+        }
+        else if (m_pBall != 0 && m_eActionState == (eFielderActionState)1)
+        {
+            SetTangible(false, false);
+            mUnidentified178 = gIntangibleAlpha;
+            int spread = gDekeDirectionSpread;
+            float distance = GetDekeDistance();
+            ResetBallCharge(g_pBall, false);
+            if (GetCharacterClass() == (eCharacterClass)6)
+                EmitDekeEnter(this, "waluigi_deke_enter");
+            else if (GetCharacterClass() == (eCharacterClass)2)
+                EmitDekeEnter(this, "daisy_deke_enter");
+            else if (GetCharacterClass() == (eCharacterClass)17)
+                EmitDekeEnter(this, "drybones_deke_enter");
+            unsigned short direction = GetActualFacing() + (nlRandomf(2 * spread) - spread);
+            float safeY = cField::GetSidelineY(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 0.25f;
+            bool nearSideline = fabsf(mUnidentified024.m_v3Position.y) >= safeY;
+            nlVector3 destination;
+            nlPolarToCartesian(destination.x, destination.y, direction, 1.0f);
+            destination.z = 0.0f;
+            nlVec3Scale(destination, destination, distance);
+            nlVec3Add(destination, destination, mUnidentified024.m_v3Position);
+            bool beyondSideline = fabsf(destination.y) > cField::GetSidelineY(1U);
+            bool fixed = false;
+            if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
+                fixed = cField::FixOutOfBoundsPosition(destination, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()), false);
+            else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine)
+                fixed = cField::FixOutOfBoundsX(destination, false, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()));
+            bool overGoal = false;
+            if (fixed)
+            {
+                if (fabsf(destination.y) < 0.5f * cNet::GetNetWidth())
+                {
+                    destination.x = AIsgn(destination.x) * cField::GetGoalLineX(1U);
+                    if (lbl_806E0C60 || GameInfoManager::Instance()->IsRule0x4Equal2()
+                        || IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+                    {
+                        if (destination.y < 0.0f)
+                            destination.y = -(1.0f + (0.5f * cNet::GetNetWidth() + fn_8002BFA8(m_pTweaks, GetPlayerScale())));
+                        else
+                            destination.y = 1.0f + (0.5f * cNet::GetNetWidth() + fn_8002BFA8(m_pTweaks, GetPlayerScale()));
+                        destination.z = 0.0f;
+                    }
+                    else
+                    {
+                        destination.z = 3.5f;
+                        overGoal = true;
+                    }
+                }
+                if (nearSideline && fabsf(destination.x) <= cField::GetGoalLineX(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 2.0f && !beyondSideline)
+                    destination.y = safeY * AIsgn(destination.y);
+            }
+            SetPosition(destination);
+            if (fixed && overGoal && m_pBall != 0)
+            {
+                ReleaseBall(0);
+                destination.x = AIsgn(destination.x) * (cField::GetGoalLineX(1U) - 0.5f);
+                g_pBall->SetPosition(destination);
+                fn_800156F8(g_pBall, 0);
+            }
+        }
+    }
+}

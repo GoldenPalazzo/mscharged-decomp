@@ -222,7 +222,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xE26970B8:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800395C0((cFielder*)g_pCurrentlyUpdatingCharacter);
+                static_cast<cFielder*>(g_pCurrentlyUpdatingCharacter)->BeginDekeIntangibility();
             }
             break;
 
