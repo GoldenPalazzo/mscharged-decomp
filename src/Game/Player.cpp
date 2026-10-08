@@ -1234,9 +1234,9 @@ extern "C" void fn_80098098(cPlayer* pSelf)
         if (bCaptainPowerup)
         {
             if (pSelf->m_eClassType == FIELDER)
-                fn_8003F1E8((cFielder*)pSelf);
+                ((cFielder*)pSelf)->UseCaptainPowerup();
             else
-                fn_8003F1E8(pSelf->m_pTeam->GetCaptain());
+                pSelf->m_pTeam->GetCaptain()->UseCaptainPowerup();
         }
         else if (pSelf->m_eClassType == FIELDER)
         {

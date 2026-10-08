@@ -220,6 +220,13 @@ public:
     void CleanActionShot(eFielderActionState newAction);
     void SetWindupWBAnimState();
 
+    void TestButtonsWindup();
+    void TestButtonsRunningWB(float deltaTime);
+    void UpdateTimers(float deltaTime);
+    void UseCaptainPowerup();
+    bool IsReceivePassHitRequested(unsigned short* direction);
+    void UpdateFacingToLooseBall();
+
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -742,8 +749,6 @@ extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" float fn_80034F98(cFielder*, float);
 extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_800367B4(cFielder*);
-extern "C" void fn_800368E4(cFielder*);
-extern "C" bool fn_80036A58(cFielder*, unsigned short*);
 extern "C" float fn_800394A8(cFielder*, int);
 extern "C" void fn_80039F24(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
@@ -754,11 +759,7 @@ extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_8003C6E0(cFielder* pFielder);
 extern "C" void fn_8003C7B0(cFielder*);
 extern "C" void fn_8003DA94(cFielder*, bool);
-extern "C" void fn_8003E0A8(cFielder*);
-extern "C" void fn_8003E168(cFielder*, float);
 extern "C" void fn_8003E354(cFielder* pFielder);
-extern "C" void fn_8003EAC0(cFielder*, float);
-extern "C" void fn_8003F1E8(cFielder*);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;

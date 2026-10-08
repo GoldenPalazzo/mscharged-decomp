@@ -89,14 +89,14 @@ void DesireUserControlled::Update(
                 && (!fn_8003E948(m_pFielder)
                     || !m_pFielder->mUnidentified3DC))
             {
-                fn_800368E4(m_pFielder);
+                m_pFielder->UpdateFacingToLooseBall();
             }
             return;
         }
 
         if (m_pFielder->m_eActionState == ACTION_UNKNOWN_30)
         {
-            fn_8003E0A8(m_pFielder);
+            m_pFielder->TestButtonsWindup();
             if (m_pFielder->m_eActionState != ACTION_UNKNOWN_30)
             {
                 return;
@@ -153,7 +153,7 @@ void DesireUserControlled::Update(
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
-            fn_8003E168(m_pFielder, fDeltaT);
+            m_pFielder->TestButtonsRunningWB(fDeltaT);
         }
     }
 }

@@ -550,7 +550,7 @@ void DesireReceivePass::ProcessUserInput()
         if (meDesireSubState != 4)
         {
             unsigned short aDirection = 0;
-            if (fn_80036A58(m_pFielder, &aDirection))
+            if (m_pFielder->IsReceivePassHitRequested(&aDirection))
             {
                 unsigned short aHitDirection =
                     m_pFielder->mUnidentified024.m_aActualFacingDirection;
