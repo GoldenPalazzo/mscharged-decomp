@@ -82,7 +82,7 @@ void DesireUserControlled::Update(
                 m_pFielder->GetTweaks());
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             fn_8003DA94(m_pFielder, false);
 
             if (g_pBall->m_pOwner == NULL
@@ -152,7 +152,7 @@ void DesireUserControlled::Update(
             float fMaxSpeed = m_pFielder->GetTweaks()->GetRunningSpeed();
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             fn_8003E168(m_pFielder, fDeltaT);
         }
     }

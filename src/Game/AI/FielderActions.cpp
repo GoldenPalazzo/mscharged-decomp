@@ -173,7 +173,6 @@ extern bool lbl_806DB5A8;
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
-extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 extern "C" bool fn_8003E99C(const cFielder* pFielder);
@@ -1045,7 +1044,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     SetAnimState(0x7C, false, 0.0333333f, false, false);
     SetVelocity(v3Velocity);
     InitMovementCoast();
-    fn_8003C560(this, 1, 0);
+    SetTangible(1, 0);
     mUnidentified178 = 1.0f;
 
     if (GameInfoManager::Instance()->GetStadium() == 0x0B)
@@ -1316,7 +1315,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
     {
         if (m_pCurrentAnimController->m_fTime > lbl_806DB8F0)
         {
-            mUnidentified33A = !fn_80036F88(this);
+            mUnidentified33A = !IsDekePadPressed();
         }
         else
         {
@@ -1325,7 +1324,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            fn_8003D8A4(this, fDeltaT);
+            TestButtonsToQueueActions(fDeltaT);
         }
     }
     else
@@ -1360,7 +1359,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
 
         if (GetGlobalPad() != 0)
         {
-            if (fn_8003D9BC(this))
+            if (TestQueuedActions())
             {
                 mUnidentified1E4.m_eLastPadAction = 0x32;
             }
@@ -4426,7 +4425,7 @@ void cFielder::InitActionSlideAttack(
             v3Target.z = 0.0f;
         }
 
-        float fSpeed = fn_8003C40C(this, nParam);
+        float fSpeed = GetSlideAttackSpeed(nParam);
         if (fn_8003E70C())
         {
             nlPolarToCartesian(
@@ -4607,12 +4606,12 @@ void cFielder::fn_8004C88C(float fDeltaT)
     {
         if (GetGlobalPad() != 0 && !mUnidentified38D)
         {
-            mUnidentified38D = fn_80036F88(this) == 0;
+            mUnidentified38D = IsDekePadPressed() == 0;
         }
 
         if (m_pBall != 0)
         {
-            fn_8003D8A4(this, fDeltaT);
+            TestButtonsToQueueActions(fDeltaT);
         }
     }
 
@@ -4629,7 +4628,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         bool bUnidentified = false;
         if (GetGlobalPad() != 0 && mUnidentified38D && m_pBall != 0)
         {
-            if (!fn_80036F88(this))
+            if (!IsDekePadPressed())
             {
                 bUnidentified = true;
             }
@@ -4679,7 +4678,7 @@ void cFielder::fn_8004D238()
 {
     if (m_pBall != 0)
     {
-        if (!fn_8003D9BC(this))
+        if (!TestQueuedActions())
         {
             EndDesire();
             EndAction();
@@ -5172,7 +5171,7 @@ void cFielder::fn_8004ED64()
 
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = 0;
-    fn_8003C560(this, 0, 1);
+    SetTangible(0, 1);
 
     g_pBall->m_pPhysicsBall->mbCanCollidePlayer = false;
     g_pBall->m_pPhysicsBall->mbCanCollideGoalie = false;
@@ -5266,7 +5265,7 @@ void cFielder::fn_8004F204()
     SetPosition(v3Position);
     SetVelocity(v3Zero);
 
-    fn_8003C560(this, 1, 0);
+    SetTangible(1, 0);
 
     mUnidentified17C = false;
     mUnidentified178 = 1.0f;
@@ -5307,7 +5306,7 @@ void cFielder::fn_8004F2FC(float fDeltaT)
         case 0x7D:
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003C560(this, 1, 0);
+                SetTangible(1, 0);
                 EndAction();
             }
             break;

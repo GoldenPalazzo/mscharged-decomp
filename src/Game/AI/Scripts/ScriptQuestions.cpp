@@ -49,7 +49,6 @@ static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCat
 static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
 static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" float fn_8003C40C(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 
@@ -853,7 +852,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     if (pFielder->m_eActionState != ACTION_SLIDE_ATTACK && vTarget.z <= 0.35f)
     {
         float fDuration = GetSlideTime(pFielder->GetTweaks());
-        float fSpeed = fn_8003C40C(pFielder, pFielder->mUnidentified024.m_aActualFacingDirection);
+        float fSpeed = pFielder->GetSlideAttackSpeed(pFielder->mUnidentified024.m_aActualFacingDirection);
         float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, vTarget), true);
         float fRadius = pFielder->mUnidentified320->GetRadius();
         fDistance -= fRadius + fOwnerRadius;

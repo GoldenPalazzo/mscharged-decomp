@@ -4841,3 +4841,213 @@ const nlVector3& cFielder::GetDesiredVelocity()
     }
     return v3Zero;
 }
+
+bool gUseMovementStickForDeke = true;
+
+void cFielder::SetDesiredSpeed(float minSpeed, float maxSpeed)
+{
+    if (m_pController != 0)
+    {
+        float speed = 0.0f;
+        if (m_pController->GetMovementStickMagnitude() > 0.0f)
+        {
+            speed = (maxSpeed - minSpeed) * m_pController->GetMovementStickMagnitude() + minSpeed;
+        }
+        mUnidentified024.m_fDesiredSpeed = speed;
+    }
+}
+
+float cFielder::GetSlideAttackSpeed(int direction)
+{
+    float speed = GetSpeedPowerupAdjusted(GetSlideSpeed(m_pTweaks));
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 25)
+        || IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+    {
+        speed *= GetSuperSlideSpeedBonus(m_pTweaks);
+    }
+    return speed;
+}
+
+void cFielder::SetTangible(bool tangible, bool affectGoalLine)
+{
+    m_pPhysicsCharacter->m_CanCollideWithBall = tangible;
+    m_pPhysicsCharacter->m_CanCollideWithCharacters = tangible;
+    if (affectGoalLine)
+    {
+        m_pPhysicsCharacter->m_CanCollideWithGoalLine = tangible;
+    }
+    if (m_pBall != 0)
+    {
+        g_pBall->m_pPhysicsBall->mbCanCollideGoalie = tangible;
+        g_pBall->m_pPhysicsBall->mbCanCollidePlayer = tangible;
+    }
+    mbTangible = tangible;
+    if (m_pBall != 0)
+    {
+        m_pBall->m_bVisible = tangible;
+    }
+    mUnidentified17C = tangible;
+}
+
+bool cFielder::GetDekePadDirection(unsigned short* direction)
+{
+    bool pressed = false;
+    unsigned short angle = 0;
+    if (m_pController->m_pGlobalPad->IsPressed(11, true))
+    {
+        angle = 0x8000;
+        if (m_pController->m_pGlobalPad->IsPressed(13, true))
+            angle -= 0x2000;
+        else if (m_pController->m_pGlobalPad->IsPressed(14, true))
+            angle += 0x2000;
+        pressed = true;
+    }
+    if (m_pController->m_pGlobalPad->IsPressed(12, true))
+    {
+        angle = 0;
+        if (m_pController->m_pGlobalPad->IsPressed(13, true))
+            angle += 0x2000;
+        else if (m_pController->m_pGlobalPad->IsPressed(14, true))
+            angle -= 0x2000;
+        pressed = true;
+    }
+    if (m_pController->m_pGlobalPad->IsPressed(13, true))
+    {
+        angle = 0x4000;
+        if (m_pController->m_pGlobalPad->IsPressed(11, true))
+            angle += 0x2000;
+        else if (m_pController->m_pGlobalPad->IsPressed(12, true))
+            angle -= 0x2000;
+        pressed = true;
+    }
+    if (m_pController->m_pGlobalPad->IsPressed(14, true))
+    {
+        angle = 0xc000;
+        if (m_pController->m_pGlobalPad->IsPressed(11, true))
+            angle -= 0x2000;
+        else if (m_pController->m_pGlobalPad->IsPressed(12, true))
+            angle += 0x2000;
+        pressed = true;
+    }
+    if (pressed)
+        *direction = angle;
+    return pressed;
+}
+
+bool cFielder::IsDekeRequested(unsigned short* direction)
+{
+    if (mtPostDekeTimer.m_uPackedTime != 0)
+        return false;
+    if (fn_8003E948(this) && mUnidentified3DC)
+        return false;
+    unsigned short padDirection = 0;
+    if (GetDekePadDirection(&padDirection))
+    {
+        if (!mUnidentified38D)
+            return false;
+        if (!mUnidentified33A)
+            return false;
+        if (--mUnidentified33C == 0)
+        {
+            if (gUseMovementStickForDeke && GetGlobalPad() != 0
+                && m_pController->GetMovementStickMagnitude() > 0.01f)
+                *direction = m_pController->GetMovementStickDirection();
+            else
+                *direction = padDirection;
+        }
+        else if (mUnidentified33C < 0)
+            mUnidentified33C = 0;
+    }
+    else
+    {
+        mUnidentified38D = true;
+        mUnidentified33A = true;
+    }
+    if (mUnidentified33C == 0)
+    {
+        mUnidentified33C = 2;
+        return true;
+    }
+    return false;
+}
+
+bool cFielder::IsReceivePassDekeRequested(unsigned short* direction)
+{
+    unsigned short padDirection = 0;
+    if (GetDekePadDirection(&padDirection))
+    {
+        if (!mUnidentified38D)
+            return false;
+        if (!mUnidentified33A)
+            return false;
+        if (mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() < 0.0f)
+            return false;
+        if (--mUnidentified33C == 0)
+            *direction = padDirection;
+        else if (mUnidentified33C < 0)
+            mUnidentified33C = 0;
+        if (mUnidentified33C == 0)
+        {
+            mUnidentified33C = 2;
+            return true;
+        }
+    }
+    else
+    {
+        mUnidentified38D = true;
+        mUnidentified33A = true;
+    }
+    return false;
+}
+
+bool cFielder::IsDekePadPressed()
+{
+    bool pressed = false;
+    if (GetGlobalPad()->IsPressed(11, true))
+        pressed = true;
+    if (GetGlobalPad()->IsPressed(12, true))
+        pressed = true;
+    if (GetGlobalPad()->IsPressed(14, true))
+        pressed = true;
+    if (GetGlobalPad()->IsPressed(13, true))
+        pressed = true;
+    return pressed;
+}
+
+void cFielder::TestButtonsToQueueActions(float deltaTime)
+{
+    unsigned short direction = 0;
+    if (GetGlobalPad() != 0 && m_pBall != 0)
+    {
+        if (GetGlobalPad()->JustPressed(27, true))
+        {
+            bIsModified = bIsModified || IsActionModifierPressed();
+            mUnidentified1E4.m_eLastPadAction = 27;
+        }
+        else if (GetGlobalPad()->JustPressed(28, true))
+            mUnidentified1E4.m_eLastPadAction = 28;
+        else if (IsDekeRequested(&direction) && mUnidentified33A && mUnidentified38D)
+        {
+            mUnidentified338 = direction;
+            mUnidentified1E4.m_eLastPadAction = 29;
+        }
+    }
+}
+
+bool cFielder::TestQueuedActions()
+{
+    bool result = false;
+    if (mUnidentified1E4.m_eLastPadAction == 28 && GetGlobalPad() != 0
+        && !GetGlobalPad()->IsPressed(28, true))
+    {
+        result = InitActionShot(bIsModified, false);
+    }
+    else if (mUnidentified1E4.m_eLastPadAction == 27)
+    {
+        bool volley = bIsModified;
+        result = InitActionPass(fn_80096F54(this, volley), volley, 0, false);
+    }
+    else if (mUnidentified1E4.m_eLastPadAction == 29)
+        result = fn_800447C0(mUnidentified338);
+    return result;
+}

@@ -543,7 +543,7 @@ void DesireReceivePass::ProcessUserInput()
             float fMaxSpeed = pTweaks->GetRunningSpeed();
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             return;
         }
 
@@ -564,7 +564,7 @@ void DesireReceivePass::ProcessUserInput()
                 return;
             }
 
-            if (fn_80036C8C(m_pFielder, &aDirection))
+            if (m_pFielder->IsReceivePassDekeRequested(&aDirection))
             {
                 m_pFielder->InitActionSlideAttack(
                     0, -1.0f, aDirection);
