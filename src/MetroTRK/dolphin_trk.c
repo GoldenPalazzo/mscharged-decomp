@@ -71,7 +71,8 @@ void __TRK_copy_vectors(void)
     int vectorIndex;
     u32 exceptionMask;
 
-    if (exceptionMaskAddress <= 0x44 && exceptionMaskAddress + 0x4000 > 0x44 && gTRKCPUState.Extended1.DBAT3U & 3)
+    if (exceptionMaskAddress <= 0x44 && exceptionMaskAddress + 0x4000 > 0x44
+        && gTRKCPUState.Extended1.DBAT3U & 3)
     {
         exceptionMaskAddress = 0x44;
     }
