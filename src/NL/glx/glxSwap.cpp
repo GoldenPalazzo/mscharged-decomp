@@ -19,10 +19,6 @@
 #include "NL/nlTicker.h"
 #include "NL/nlAllocatorStack.h"
 
-#define OS_BUS_CLOCK                 (*(u32*)0x800000F8)
-#define OS_TIMER_CLOCK               (OS_BUS_CLOCK / 4)
-#define OSTicksToMicroseconds(ticks) (((ticks) * 8) / (OS_TIMER_CLOCK / 125000))
-
 #pragma push
 #pragma pack(1)
 struct TargaHeader
