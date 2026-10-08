@@ -1,4 +1,5 @@
 #include <MetroTRK/dolphin_trk.h>
+#include <MetroTRK/__exception.h>
 #include <MetroTRK/dolphin_trk_glue.h>
 #include <MetroTRK/main_TRK.h>
 #include <MetroTRK/mem_TRK.h>
@@ -7,7 +8,6 @@
 #include <revolution/os/OSReset.h>
 #include <revolution/os/__ppc_eabi_init.h>
 
-extern u8 gTRKInterruptVectorTable[];
 extern void TRK_flush_cache(u32 address, u32 length);
 
 #define EXCEPTIONMASK_ADDR 0x80000044
