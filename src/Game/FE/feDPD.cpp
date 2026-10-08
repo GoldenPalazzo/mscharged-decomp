@@ -89,7 +89,7 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
     int width = IsWidescreen() ? 854 : screenInfo->ScreenWidth;
     int height = screenInfo->ScreenHeight;
 
-    if (g_bEnableGamecubePadMonkey)
+    if (gEnablePadMonkeys)
     {
         char path[32];
         nlSNPrintf(path, sizeof(path), "user/monkey_%d_offset", pad);
