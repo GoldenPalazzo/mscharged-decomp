@@ -859,7 +859,7 @@ bool cFielder::fn_8003E9F0() const
 bool cFielder::fn_8003EA44() const
 {
     bool result = false;
-    if (mUnidentified024.m_eCharacterClass == HAMMERBROS
+    if (GetCharacterClass() == HAMMERBROS
         && m_eActionState == (eFielderActionState)0x1D)
     {
         result = true;
@@ -6497,7 +6497,7 @@ UnidentifiedFuzzyVariantData::UnidentifiedFuzzyVariantData(int index, FuzzyVaria
 
 inline bool cFielder::IsDaisySuperPowerActive() const
 {
-    return mUnidentified024.m_eCharacterClass == (eCharacterClass)2 && fn_8003E6EC();
+    return IsCharacterSuperPowerActive(this, (eCharacterClass)2);
 }
 
 inline bool cFielder::CanBeCaughtInPhoto() const
@@ -6520,10 +6520,7 @@ inline bool cFielder::CanBeAffectedByPhoto() const
     bool susceptible = false;
     if (canFreeze && GetCharacterClass() != (eCharacterClass)5)
         susceptible = true;
-    bool tangible = false;
-    if (susceptible && CanBeCaughtInPhoto())
-        tangible = true;
-    return tangible;
+    return susceptible && CanBeCaughtInPhoto();
 }
 
 bool cFielder::FreezeWithPeachPhoto(float duration)
@@ -6534,7 +6531,9 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
         if (GetJointPosition(m_nHeadJointIndex).z < 0.0f || m_eActionState == 34)
             return false;
     }
-    if (fn_8003EA6C())
+    bool yoshiActive;
+    GetCharacterSpecialActive(this, (eCharacterClass)8, yoshiActive);
+    if (yoshiActive)
     {
         if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
             RequestStateMachineDeactivation(fn_8002E08C(this, 23));
