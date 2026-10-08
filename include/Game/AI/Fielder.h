@@ -267,6 +267,8 @@ public:
     void SetStartAnimState(int animState);
     void SetStartWBAnimState();
     void SetHardStopAnimState();
+    bool ShouldIClearBall();
+    void TestAnimBallContact();
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -781,13 +783,11 @@ private:
 
 
 // Shared fielder functions and data.
-extern "C" bool fn_8003C180(cFielder*);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_8003DA94(cFielder*, bool);
-extern "C" void fn_8003E354(cFielder* pFielder);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;

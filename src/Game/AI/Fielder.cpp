@@ -3088,7 +3088,7 @@ void cFielder::PrePhysicsUpdate()
             || m_eActionState == ACTION_LOOSE_BALL_SHOT
             || m_eActionState == ACTION_LOOSE_BALL_PASS))
     {
-        fn_8003E354(this);
+        TestAnimBallContact();
     }
 
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
@@ -6236,6 +6236,92 @@ void cFielder::BeginDekeIntangibility()
                 destination.x = AIsgn(destination.x) * (cField::GetGoalLineX(1U) - 0.5f);
                 g_pBall->SetPosition(destination);
                 fn_800156F8(g_pBall, 0);
+            }
+        }
+    }
+}
+
+static inline bool CanShootWithoutPossession(cFielder* fielder)
+{
+    return CanShootFromPosition(fielder, false);
+}
+
+bool cFielder::ShouldIClearBall()
+{
+    return !CanShootWithoutPossession(this);
+}
+
+void cFielder::TestAnimBallContact()
+{
+    if (m_pCurrentAnimController->TestTrigger(mUnidentified368)
+        && g_pBall->m_pOwner == 0 && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0
+        && g_pBall->meBallState != 10)
+    {
+        nlVector3 newBallPosition;
+        g_pBall->m_pPhysicsBall->GetPosition(&newBallPosition);
+        nlVector3 oldBallPosition = g_pBall->GetPosition();
+        float contactRadius = g_pBall->fn_80014F38(GetPlayerScale());
+        float ballRadius = g_pBall->fn_80014F38(1.0f);
+        int jointIndex = m_nBallJointIndex;
+        if (TestCollision(contactRadius, GetPrevJointPosition(jointIndex), GetJointPosition(jointIndex),
+                ballRadius, oldBallPosition, newBallPosition))
+        {
+            g_pBall->SetPosition(GetJointPosition(m_nBallJointIndex));
+            switch (m_eActionState)
+            {
+            case ACTION_RECEIVE_PASS:
+                PickupBall(g_pBall);
+                break;
+            case ACTION_LOOSE_BALL_PASS:
+            {
+                g_pBall->SetOwner(this);
+                mUnidentified1E4.m_tBallPossessionTimer.UnidentifiedClear();
+                mUnidentified1E4.m_tBallUnPossessionTimer.UnidentifiedClear();
+                float slow = GetSlowestVolleyPassSpeed(m_pTweaks);
+                float fast = GetFastestVolleyPassSpeed(m_pTweaks);
+                if (!bIsModified)
+                {
+                    slow = GetSlowestGroundPassSpeed(m_pTweaks);
+                    fast = GetFastestGroundPassSpeed(m_pTweaks);
+                }
+                DoRegularPassing(mActionLooseBallPassVars.passTarget, bIsModified, true, false, false, slow, fast);
+                m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
+                break;
+            }
+            case ACTION_LOOSE_BALL_SHOT:
+            case ACTION_ONETIMER:
+            {
+                m_pShotMeter->Reset(this);
+                m_pShotMeter->m_fTime = 0.0f;
+                bool perfectPass;
+                switch (m_eAnimID)
+                {
+                case 60: case 61: case 62: case 63: case 64: case 65: case 66:
+                case 67: case 68: case 69: case 70: case 71: case 72: case 73:
+                    perfectPass = true;
+                    break;
+                default:
+                    perfectPass = false;
+                    break;
+                }
+                m_pShotMeter->CalcOneTimerValue(this, perfectPass);
+                g_pBall->SetOwner(this);
+                mUnidentified1E4.m_tBallPossessionTimer.UnidentifiedClear();
+                mUnidentified1E4.m_tBallUnPossessionTimer.UnidentifiedClear();
+                if (!ShouldIClearBall())
+                {
+                    DoRegularShooting(false);
+                    DeliverShotPresentationEndEvent(g_pGame);
+                    EmitBallShot(this, (eBallShotEffectType)2, 0, false, true);
+                }
+                else
+                {
+                    DoClearBall();
+                    EmitBallShot(this, (eBallShotEffectType)1, 0, false, false);
+                }
+                FixedUpdateTask::GetTargetTimeScale();
+                break;
+            }
             }
         }
     }

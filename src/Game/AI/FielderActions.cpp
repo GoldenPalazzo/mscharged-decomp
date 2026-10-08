@@ -2472,7 +2472,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
         (s16)(nTurnAdjust + facingDelta2), v3Zero, 0.6f, false);
 
     bool bShotNormally = true;
-    if (fn_8003C180(this))
+    if (ShouldIClearBall())
     {
         DoClearBall();
         bShotNormally = false;
@@ -3622,7 +3622,7 @@ void cFielder::ActionOneTouchPassFromVolley(float fDeltaT)
 
 bool cFielder::DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& position)
 {
-    if (!fn_8003C180(pOther))
+    if (!pOther->ShouldIClearBall())
     {
         float fOtherScore = fn_800DBAB0(pOther);
 
@@ -4331,7 +4331,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
     if (m_pBall != 0
         && m_pCurrentAnimController->TestFrameTrigger(1.825f))
     {
-        if (!fn_8003C180(this))
+        if (!ShouldIClearBall())
         {
             DoRegularShooting(false);
 
