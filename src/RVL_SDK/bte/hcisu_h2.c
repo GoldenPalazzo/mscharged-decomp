@@ -37,7 +37,7 @@
 #include "btu.h"
 #include "gki.h"
 #include "l2c_int.h"
-#include "misc.h"
+#include "bte.h"
 #include "uusb.h"
 
 #define HCI_CMD_PREAMBLE_SIZE	3
