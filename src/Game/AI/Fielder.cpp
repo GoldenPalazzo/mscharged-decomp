@@ -1,6 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/FuzzyAIRuntime.h"
 #include "NL/nlFunction.inl"
 #include "Game/AI/Fielder.inl"
 #include "Game/PoseAccumulator.h"
@@ -6473,4 +6474,18 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
     }
     target.z = 0.0f;
     return time;
+}
+
+extern "C" UnidentifiedVariant_80054AB8 fn_80041B6C(
+    void* runtime, const unsigned int& hash, cFielder* fielder)
+{
+    unsigned int functionHash = hash;
+    FunctionEntryPoint* entry = ((InterpreterCore*)runtime)->FindFunctionEntryPoint(functionHash);
+    return ExecuteFuzzyFunction((FuzzyRuntimeBase*)runtime, entry, 1, FuzzyArgumentBits(fielder), 0);
+}
+
+UnidentifiedFuzzyVariantData::UnidentifiedFuzzyVariantData(int index, FuzzyVariant value)
+    : FuzzyVariant(value)
+    , mIndex(index)
+{
 }
