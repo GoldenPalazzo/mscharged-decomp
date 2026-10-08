@@ -48,8 +48,6 @@
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 
-extern "C" const nlVector3* fn_80040234(cFielder*);
-extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 int ChooseRunDirection(cFielder*, const unsigned short*, int,
     const nlVector2*, float*);
@@ -1126,7 +1124,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         {
             m_pFielder->fn_800305DC(0.0f);
             nlVector3 direction;
-            const nlVector3& target = *fn_80040234(m_pFielder);
+            const nlVector3& target = m_pFielder->GetDesiredPosition();
             nlVec3Sub(direction, target, m_pFielder->mUnidentified024.m_v3Position);
             bool valid;
             float lengthSq = direction.GetLengthSq3D();
@@ -1189,7 +1187,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(1, FuzzyVariant(count));
             params.Set(13, FuzzyVariant(gFollowPathSpeed));
             params.Set(10, FuzzyVariant((void*)FollowPathTransition));
-            fn_8003EBD0(m_pFielder, 12, &params);
+            m_pFielder->ActivateDesire(12, &params);
         }
         else if (m_pFielder->mUnidentified3DC)
         {
@@ -1216,7 +1214,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 params.Set(18, FuzzyVariant(gChooseDirectionMaxDistance));
                 params.Set(13, FuzzyVariant(gChooseDirectionSpeed));
                 params.Set(10, FuzzyVariant((void*)ChooseDirectionTransition));
-                fn_8003EBD0(m_pFielder, 12, &params);
+                m_pFielder->ActivateDesire(12, &params);
             }
         }
         else if (!(bool)Offensive(m_pFielder->m_pTeam)
@@ -1229,7 +1227,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(gInterceptBallSpeed));
             params.Set(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireInterceptBall")));
-            fn_8003EBD0(m_pFielder, 13, &params);
+            m_pFielder->ActivateDesire(13, &params);
         }
     }
 }
@@ -1592,7 +1590,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         params.Set(18, FuzzyVariant(distance));
                         params.Set(13, FuzzyVariant(gWarioRunSpeed));
                         params.Set(10, FuzzyVariant(gWarioRunTransitionHash));
-                        fn_8003EBD0(m_pFielder, 12, &params);
+                        m_pFielder->ActivateDesire(12, &params);
                     }
                 }
             }

@@ -4772,3 +4772,72 @@ void cFielder::RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender*
         blender->m_fDesiredWeight = blender->m_fSmoothedWeight;
     }
 }
+
+bool cFielder::IsActionModifierPressed()
+{
+    if (GetGlobalPad() != 0)
+    {
+        return GetGlobalPad()->IsPressed(0x17, true);
+    }
+    return false;
+}
+
+bool cFielder::fn_800392D8() const
+{
+    switch (m_eActionState)
+    {
+    case ACTION_ELECTROCUTION:
+        if (mUnidentified348 || m_eAnimID == 0x78)
+        {
+            return true;
+        }
+        return false;
+    case 3:
+    case 24:
+        return !(mUnidentified34C > 0.0f);
+    default:
+        return true;
+    }
+}
+
+bool cFielder::ActivateDesire(int state, UnidentifiedVariantCollection* parameters)
+{
+    return mUnidentified428->mScriptMachine->ActivateState(state, parameters, true) != 0;
+}
+
+void cFielder::AddDesiredPosition(const nlVector3& position, float urgency, float weight)
+{
+    DesireSteering* steering = (DesireSteering*)GetConcurrentState(mUnidentified428->mScriptMachine, 34);
+    if (steering != 0 && steering->mActive)
+    {
+        AddSteeringTarget(steering, position, urgency, weight);
+    }
+}
+
+const nlVector3& cFielder::GetDesiredPosition()
+{
+    DesireSteering* steering = (DesireSteering*)GetConcurrentState(mUnidentified428->mScriptMachine, 34);
+    if (steering != 0 && steering->mActive)
+    {
+        return *GetSteeringTargetPosition(steering);
+    }
+    return mUnidentified024.m_v3Position;
+}
+
+float cFielder::GetDistanceToDesiredPos()
+{
+    const nlVector3& desiredPosition = GetDesiredPosition();
+    nlVector2 delta = { mUnidentified024.m_v3Position.x - desiredPosition.x,
+        mUnidentified024.m_v3Position.y - desiredPosition.y };
+    return nlVec2Length(delta);
+}
+
+const nlVector3& cFielder::GetDesiredVelocity()
+{
+    DesireSteering* steering = (DesireSteering*)GetConcurrentState(mUnidentified428->mScriptMachine, 34);
+    if (steering != 0 && steering->mActive)
+    {
+        return steering->m_v3DesiredVel;
+    }
+    return v3Zero;
+}

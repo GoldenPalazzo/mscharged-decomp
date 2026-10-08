@@ -42,7 +42,6 @@ float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
 static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
-extern "C" const nlVector3& fn_80040234(cFielder*);
 nlVector2 gConfidenceDistanceRange = { 10.0f, 10.0f };
 nlVector2 gConfidenceAngleRange = { 21845.0f, 0.0f };
 static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/Player", &gConfidenceDistanceRange.x);
@@ -2648,7 +2647,7 @@ extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
@@ -2666,7 +2665,7 @@ extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
@@ -2684,7 +2683,7 @@ extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;

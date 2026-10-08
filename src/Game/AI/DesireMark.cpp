@@ -17,7 +17,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" const nlVector3* fn_80040234(cFielder* pFielder);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
 extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
@@ -337,7 +336,7 @@ void DesireDefendPos::Update(
         m_pFielder->AddDesiredPosition(v3FormationPosition, gMarkUrgency, fFormationWeight);
     }
 
-    mvDesiredPosition = *fn_80040234(m_pFielder);
+    mvDesiredPosition = m_pFielder->GetDesiredPosition();
 }
 
 /**

@@ -77,7 +77,6 @@ extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_8002CE14(const PlayerTweaks*);
 bool lbl_806E0BB8;
 
-extern "C" const nlVector3& fn_80040234(cFielder*);
 
 bool lbl_806E0BB9;
 
@@ -653,7 +652,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         return false;
     bTurboAllowed = true;
     nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->mUnidentified024.m_aActualMovementDirection);
-    vCurrentDesiredVelDir = *(const nlVector2*)&fn_80040318(m_pFielder);
+    vCurrentDesiredVelDir = *(const nlVector2*)&m_pFielder->GetDesiredVelocity();
     float fLengthSquared = vCurrentDesiredVelDir.x * vCurrentDesiredVelDir.x + vCurrentDesiredVelDir.y * vCurrentDesiredVelDir.y;
     if (fLengthSquared > 0.0f)
     {
@@ -759,7 +758,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         g_ShapeRenderer.DrawLine3D(m_pFielder->mUnidentified024.m_v3Position, vUnidentified00C, colour, true);
     }
 
-    nlVec3Add(v3Repulsion, v3Repulsion, fn_80040318(m_pFielder));
+    nlVec3Add(v3Repulsion, v3Repulsion, m_pFielder->GetDesiredVelocity());
     float fDesiredSpeed = fn_8002E1B0(m_pFielder);
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
@@ -869,13 +868,13 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     context.mUnidentified010 = NormalizeVal(context.mUnidentified018,
         mUnidentified008->mTweaks[2], mUnidentified008->mTweaks[1]);
     context.mUnidentified01C = GetClosingSpeed2D(
-        context.mUnidentified020, fn_80040318(pFielder),
+        context.mUnidentified020, pFielder->GetDesiredVelocity(),
         context.mUnidentified02C, mUnidentified008->GetVelocity());
     float fClosingSpeed = context.mUnidentified01C;
     context.mUnidentified01C = nlMaxEquals(0.0f, fClosingSpeed);
-    context.mUnidentified050 = nlVec2Length(*(const nlVector2*)&fn_80040318(pFielder));
+    context.mUnidentified050 = nlVec2Length(*(const nlVector2*)&pFielder->GetDesiredVelocity());
     if (context.mUnidentified050 > 0.1f)
-        nlVec3Scale(context.mUnidentified054, fn_80040318(pFielder), 1.0f / context.mUnidentified050);
+        nlVec3Scale(context.mUnidentified054, pFielder->GetDesiredVelocity(), 1.0f / context.mUnidentified050);
     else
         context.mUnidentified054 = v3Zero;
 
@@ -893,7 +892,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
 {
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        fn_80040234(pFielder), mUnidentified008->GetPosition())
+        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
         - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
@@ -936,7 +935,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800121D0(
 {
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        fn_80040234(pFielder), mUnidentified008->GetPosition())
+        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
         - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
@@ -963,7 +962,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
 {
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        fn_80040234(pFielder), mUnidentified008->GetPosition())
+        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
         - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;

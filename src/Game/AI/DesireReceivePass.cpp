@@ -100,8 +100,6 @@ extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
 extern "C" void fn_80015B38(cBall*, bool);
 void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
-extern "C" void fn_8003EBD0(
-    cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 static float sfReceivePassMaxDuration = 5.0f;
 unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
@@ -1489,7 +1487,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         UnidentifiedVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));
         params.Set(11, FuzzyVariant(FT_INT, eReceiveAnimType));
-        fn_8003EBD0(pPassTarget, 22, &params);
+        pPassTarget->ActivateDesire(22, &params);
 
         cAIPad* pAIPad = pPasser->m_pController;
         if (pAIPad != 0 && pPassTarget->m_pController == 0)

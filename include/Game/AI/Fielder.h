@@ -164,6 +164,7 @@ struct UnidentifiedFielderAction410
 };
 
 class FuzzyVariant;
+class UnidentifiedVariantCollection;
 class AvoidController;
 class cPN_SingleAxisBlender;
 class DesireSteering;
@@ -197,6 +198,11 @@ class cFielder : public cPlayer
     friend float fn_80030750(cFielder*);
 
 public:
+    bool fn_800392D8() const;
+    bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
+    const nlVector3& GetDesiredPosition();
+    const nlVector3& GetDesiredVelocity();
+
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -723,7 +729,6 @@ extern "C" void fn_800368E4(cFielder*);
 extern "C" bool fn_80036A58(cFielder*, unsigned short*);
 extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
 extern "C" bool fn_80036F88(cFielder* pFielder);
-extern "C" bool fn_800392D8(cFielder*);
 extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
 extern "C" float fn_800394A8(cFielder*, int);
 extern "C" float fn_80039574(cFielder*);
@@ -749,7 +754,6 @@ extern "C" void fn_8003E168(cFielder*, float);
 extern "C" void fn_8003E354(cFielder* pFielder);
 extern "C" void fn_8003EAC0(cFielder*, float);
 extern "C" void fn_8003F1E8(cFielder*);
-extern "C" const nlVector3& fn_80040318(cFielder*);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;

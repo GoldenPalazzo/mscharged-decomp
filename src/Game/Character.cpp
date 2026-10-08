@@ -1339,7 +1339,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && fn_800392D8(pFielder) && pFielder->m_eActionState != 28)
+        && pFielder->fn_800392D8() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
         unidentifiedSlide += pFielder->fn_8003E72C() ? lbl_806E0E40 : 0.0f;
