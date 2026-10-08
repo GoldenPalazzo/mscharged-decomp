@@ -1,4 +1,5 @@
 #include "NL/glx/glxSwap.h"
+#include <revolution/vi/vi_fwd.h>
 
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glDrawSyncLog.h"
@@ -18,12 +19,6 @@
 // address-named.
 extern "C"
 {
-    void VIFlush();
-    void VISetBlack(u8 black);
-    void VISetNextFrameBuffer(void* fb);
-    u32 VIGetRetraceCount();
-    void VISetPreRetraceCallback(void (*cb)(u32));
-    void VISetPostRetraceCallback(void (*cb)(u32));
     u32 OSGetTick();
     void OSReport(const char* format, ...);
 
@@ -39,7 +34,6 @@ extern "C"
     void GXCopyDisp(void* dest, u8 clear);
     void nlBreak__Fv();
 
-    void VIWaitForRetrace();
     // C stdio entry points retained in the MSL region.
     typedef struct _FILE FILE;
     FILE* fopen(const char* path, const char* mode);
@@ -93,8 +87,8 @@ static void HandleSoftReset();
 static void glx_ScreenCapture(bool isMovie);
 static void PutPixel(u8* dst, u32 argbColor);
 static void loading_indicator();
-static void vi_pre_cb(u32);
-static void vi_post_cb(u32);
+static void vi_pre_cb(unsigned long);
+static void vi_post_cb(unsigned long);
 static void draw_done_cb();
 static void AdvanceFrame();
 static void ReportGPStatus();
@@ -271,12 +265,12 @@ static void loading_indicator()
     }
 }
 
-static void vi_pre_cb(u32)
+static void vi_pre_cb(unsigned long)
 {
     bInRetrace = 1;
 }
 
-static void vi_post_cb(u32)
+static void vi_post_cb(unsigned long)
 {
     HandleSoftReset();
     if (glx_bLoadingIndicator != 0)

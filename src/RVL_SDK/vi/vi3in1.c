@@ -1,4 +1,5 @@
 #include <revolution/os.h>
+#include <revolution/vi/vi_fwd.h>
 
 #include <revolution/vi/vitypes.h>
 #include <revolution/vi/vi3in1.h>

@@ -1,4 +1,5 @@
 #include "NL/glx/glxGX.h"
+#include <revolution/gx/GXFrameBuf_fwd.h>
 
 #include "NL/gl/glPlat.h"
 
@@ -20,7 +21,6 @@ extern "C"
     void GXSetNumTexGens(u8 nTexGens);
     void GXSetCullMode(s32 mode);
     void GXSetCoPlanar(u8 enable);
-    void GXSetCopyFilter(u8 aa, const u8 sample_pattern[12][2], u8 vf, const u8 vfilter[7]);
     void GXSetChanAmbColor(s32 chan, GXColor amb_color);
     void GXSetChanMatColor(s32 chan, GXColor mat_color);
     void GXSetNumChans(u8 nChans);
