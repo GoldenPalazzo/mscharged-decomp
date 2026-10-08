@@ -312,6 +312,11 @@ public:
     FuzzyRuntimeBase* GetFuzzyRuntime() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
+    bool FreezeWithPeachPhoto(float duration);
+    bool CanBeFrozen() const;
+    bool CanBeCaughtInPhoto() const;
+    bool CanBeAffectedByPhoto() const;
+    bool IsDaisySuperPowerActive() const;
     unsigned int IsFrozen() const;
     unsigned int IsShattered() const;
     bool fn_8003881C() const;
@@ -787,7 +792,6 @@ private:
 // Shared fielder functions and data.
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_800318F8(cFielder*);
-extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;

@@ -1390,7 +1390,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pFielder->mUnidentified024.m_v3Position.x;
                     position.y = pFielder->mUnidentified024.m_v3Position.y;
                     if (region.ContainsPoint2D(position))
-                        fn_80031C3C(pFielder, lbl_806DBD88);
+                        pFielder->FreezeWithPeachPhoto(lbl_806DBD88);
                 }
             }
         }

@@ -6494,3 +6494,61 @@ UnidentifiedFuzzyVariantData::UnidentifiedFuzzyVariantData(int index, FuzzyVaria
     , mIndex(index)
 {
 }
+
+inline bool cFielder::IsDaisySuperPowerActive() const
+{
+    return mUnidentified024.m_eCharacterClass == (eCharacterClass)2 && fn_8003E6EC();
+}
+
+inline bool cFielder::CanBeCaughtInPhoto() const
+{
+    return mbTangible || IsCharacterSuperPowerActive(this, (eCharacterClass)8);
+}
+
+inline bool cFielder::CanBeFrozen() const
+{
+    bool frozen = IsFrozen();
+    bool canFreeze = false;
+    if (!frozen && !IsInvincible())
+        canFreeze = true;
+    return canFreeze;
+}
+
+inline bool cFielder::CanBeAffectedByPhoto() const
+{
+    bool canFreeze = CanBeFrozen();
+    bool susceptible = false;
+    if (canFreeze && GetCharacterClass() != (eCharacterClass)5)
+        susceptible = true;
+    bool tangible = false;
+    if (susceptible && CanBeCaughtInPhoto())
+        tangible = true;
+    return tangible;
+}
+
+bool cFielder::FreezeWithPeachPhoto(float duration)
+{
+    bool tangible = CanBeAffectedByPhoto();
+    if (GetCharacterClass() == (eCharacterClass)18)
+    {
+        if (GetJointPosition(m_nHeadJointIndex).z < 0.0f || m_eActionState == 34)
+            return false;
+    }
+    if (fn_8003EA6C())
+    {
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
+            RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        return false;
+    }
+    if (fn_8003E7F8() || fn_8003E84C() || fn_8003EA44() || IsDaisySuperPowerActive())
+        return false;
+    if (tangible)
+    {
+        bool controlled = GetGlobalPad() != 0;
+        if (controlled == true)
+            SwapController(false);
+        fn_80031A30(this, 2, duration);
+        return true;
+    }
+    return false;
+}
