@@ -759,7 +759,7 @@ extern "C" float fn_800D7988(int nAction, cFielder* pFielder)
         return 0.0f;
     }
 
-    Desire* pDesire = fn_8002E08C(pFielder, nAction);
+    Desire* pDesire = GetFielderDesire(pFielder, nAction);
     int bActive = 0;
     if ((pDesire != NULL) && pDesire->mActive)
     {
@@ -785,7 +785,7 @@ extern "C" float fn_800D79F4(int nAction, cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    Desire* pDesire = fn_8002E08C(pFielder, nAction);
+    Desire* pDesire = GetFielderDesire(pFielder, nAction);
     if (pDesire != NULL)
     {
         float fStartTime = pDesire->mLastActiveTime;
@@ -1629,7 +1629,7 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireGooey* pDesire = (DesireGooey*)fn_8002E08C(pFielder, 27);
+    DesireGooey* pDesire = (DesireGooey*)GetFielderDesire(pFielder, 27);
     if (pDesire != NULL && pDesire->IsActive())
     {
         fScore = pDesire->fn_800BD1F0();
@@ -1645,7 +1645,7 @@ extern "C" float fn_800DA130(cFielder* pFielder)
     }
 
     float fResult = 0.0f;
-    Desire* pDesire = fn_8002E08C(pFielder, 0x1E);
+    Desire* pDesire = GetFielderDesire(pFielder, 0x1E);
     if ((pDesire != NULL) && pDesire->mActive)
     {
         fResult = 1.0f;
@@ -2755,7 +2755,7 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
         return 0.0f;
     float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
         pTarget->mUnidentified024.m_v3Position), true);
-    float fRange = fn_80030750(pFielder);
+    float fRange = GetFielderHitReach(pFielder);
     return NormalizeVal(fDistance, 0.5f + fRange, 0.66f * fRange);
 }
 
@@ -3272,7 +3272,7 @@ extern "C" float fn_800DED80(cPlayer* pPlayer)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
         DesireRunToTarget* pDesire = pFielder->GetDesireState() == 13
-            ? (DesireRunToTarget*)fn_8002E08C(pFielder, 13) : NULL;
+            ? (DesireRunToTarget*)GetFielderDesire(pFielder, 13) : NULL;
         if ((pDesire != NULL && pDesire->GetTargetBall() != NULL)
             || pFielder->GetDesireState() == 7 || pFielder->GetDesireState() == 16
             || pFielder->m_eActionState == ACTION_SLIDE_ATTACK)
@@ -3322,7 +3322,7 @@ extern "C" float fn_800DF028(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
     if (pFielder->m_eActionState == ACTION_ONETIMER
         || pFielder->m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (pDesire != NULL && pDesire->IsActive() && pDesire->IsOneTouchShot()))

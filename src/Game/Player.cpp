@@ -660,7 +660,7 @@ void cPlayer::fn_80096CDC(cBall* pBall)
     if (m_pBall == NULL && pBall != NULL && m_eClassType == FIELDER)
     {
         DesireSteering* pDesire
-            = (DesireSteering*)fn_8002E08C((cFielder*)this, 34);
+            = (DesireSteering*)GetFielderDesire((cFielder*)this, 34);
         ResetSteeringHistory(pDesire);
     }
     m_pBall = pBall;
@@ -943,7 +943,7 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     bool bFindPosition, bool bPerfectPass, bool bParam4,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
-    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C((cFielder*)pTeammate, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire((cFielder*)pTeammate, 22);
     pDesire->ExecutePass(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
@@ -1221,7 +1221,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     if (pSelf->GetGlobalPad()->JustPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
-        if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
+        if ((IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
                 || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
             && !pCaptain->m_bSuperPowerTankOn)
         {
@@ -1243,7 +1243,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     else if (!pSelf->GetGlobalPad()->IsPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
-        if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
+        if (IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
             || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
         {
             bool bPressed = false;

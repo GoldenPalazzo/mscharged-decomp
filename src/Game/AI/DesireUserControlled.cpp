@@ -27,7 +27,7 @@ bool DesireUserControlled::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
 
-    DesireSteering* desire = (DesireSteering*)fn_8002E08C(
+    DesireSteering* desire = (DesireSteering*)GetFielderDesire(
         m_pFielder, 34);
     ResetSteeringTargets(desire);
     ResetSteeringHistory(desire);
@@ -84,7 +84,7 @@ void DesireUserControlled::Update(
             m_pFielder->TestLooseBallControls(false);
 
             if (g_pBall->m_pOwner == NULL
-                && (!fn_8003E948(m_pFielder)
+                && (!IsWaluigiSuperPowerActive(m_pFielder)
                     || !m_pFielder->m_bSuperPowerTankOn))
             {
                 m_pFielder->UpdateFacingToLooseBall();

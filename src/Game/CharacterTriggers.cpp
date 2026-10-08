@@ -215,7 +215,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xD1B12A6E:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800318F8((cFielder*)g_pCurrentlyUpdatingCharacter);
+                TryFielderQueuedPass((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
@@ -275,7 +275,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x5D68C1D2:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
                 if (IsDesireActive(pDesire))
                 {
                     ((DesireSuperPower*)pDesire)->EmitHeavenlyLight();
@@ -286,7 +286,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xCFEAC332:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
                 if (IsDesireActive(pDesire))
                 {
                     EmitBowserJrShriek((DesireSuperPower*)pDesire);
@@ -1046,7 +1046,7 @@ void ElectrocutionUpdateCallback(EmissionController& ec)
     UpdateEmitterFromCharacterUnculled(ec);
 
     cCharacter* pCharacter = (cCharacter*)ec.m_uUserData;
-    if (pCharacter->m_eClassType == FIELDER && fn_8003877C((cFielder*)pCharacter))
+    if (pCharacter->m_eClassType == FIELDER && IsFielderDazed((cFielder*)pCharacter))
     {
         return;
     }

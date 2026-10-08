@@ -1699,7 +1699,7 @@ extern "C" float CalcOpponentProximity(Goalie* pGoalie,
     for (int i = 0; i < 4; ++i)
     {
         cFielder* pFielder = pOtherTeam->GetFielder(i);
-        if (pFielder->IsFallenDown() || fn_8003877C(pFielder))
+        if (pFielder->IsFallenDown() || IsFielderDazed(pFielder))
             continue;
 
         if (v3TargetPosition.x
@@ -2040,7 +2040,7 @@ bool Goalie::CheckForDekeAttack()
             cFielder* pFielder = g_pBall->GetOwnerFielder();
             bool bUnidentifiedSecond = pFielder->UnidentifiedClass17Or2Or6();
             float fDistance = bUnidentifiedSecond ? gfDekeAttackRangeLong : gfDekeAttackRange;
-            if (!pFielder->IsFallenDown() && !fn_8003877C(pFielder)
+            if (!pFielder->IsFallenDown() && !IsFielderDazed(pFielder)
                 && nlVec3DistanceSquared2D(g_pBall->m_v3Position, mUnidentified024.m_v3Position)
                     < nlGetLengthSquared1D(fDistance))
             {
@@ -2529,8 +2529,8 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         cTeam* pOtherTeam = m_pTeam->GetOtherTeam();
         cFielder* pInterceptor = m_pTeam->GetBestBallInterceptor();
         cFielder* pOtherInterceptor = pOtherTeam->GetBestBallInterceptor();
-        bool bInterceptorDown = pInterceptor->IsFallenDown() || fn_8003877C(pInterceptor);
-        bool bOtherInterceptorDown = pOtherInterceptor->IsFallenDown() || fn_8003877C(pOtherInterceptor);
+        bool bInterceptorDown = pInterceptor->IsFallenDown() || IsFielderDazed(pInterceptor);
+        bool bOtherInterceptorDown = pOtherInterceptor->IsFallenDown() || IsFielderDazed(pOtherInterceptor);
         if (bInterceptorDown && bOtherInterceptorDown)
             return true;
         float fBallInTime = m_pTeam->mfBallInTimes[pInterceptor->mUnidentified1E4.m_ID];

@@ -515,7 +515,7 @@ void cFielder::asmRunning()
 
         case 9:
         {
-            if (fn_8003E8A0(this) && m_bSuperPowerTankOn)
+            if (IsBowserSuperPowerActive(this) && m_bSuperPowerTankOn)
             {
                 if (mUnidentified024.m_fDesiredSpeed
                     < GetJogSpeed(this->GetTweaks()) - 0.15f)
@@ -768,7 +768,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 9:
         {
-            if (fn_8003E8A0(this) && m_bSuperPowerTankOn)
+            if (IsBowserSuperPowerActive(this) && m_bSuperPowerTankOn)
             {
                 if (mUnidentified024.m_fDesiredSpeed
                     < GetJogSpeed(this->GetTweaks()) - 0.15f)
@@ -2055,7 +2055,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         float fEndTime
             = fSpeedScale * (fn_8002D050(this->GetTweaks()) / 30.0f);
         float fTimeRange = fEndTime - fStartTime;
-        float fMoveDistance = fn_80030750(this);
+        float fMoveDistance = GetFielderHitReach(this);
 
         if (pTarget == 0)
         {
@@ -2904,7 +2904,7 @@ void fn_80048870(cFielder* pFielder)
             if (pFielder != pOther && !pOther->IsShattered())
             {
                 pOther->ClearPowerupAnimState(false);
-                fn_80031A30(pOther, 3, 999999.9f);
+                SetFielderFrozenState(pOther, 3, 999999.9f);
             }
         }
     }
@@ -3910,7 +3910,7 @@ void cFielder::ActionRunning(float dt)
     }
     else
     {
-        if (fn_8003E948(this) && m_bSuperPowerTankOn)
+        if (IsWaluigiSuperPowerActive(this) && m_bSuperPowerTankOn)
         {
             if (m_eAnimID != 4)
             {
@@ -4719,7 +4719,7 @@ void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
 
         PlayRumbleAction(2, GetGlobalPad());
 
-        if (fn_8003E8A0(this))
+        if (IsBowserSuperPowerActive(this))
         {
             EndBowserSmoke(this);
         }

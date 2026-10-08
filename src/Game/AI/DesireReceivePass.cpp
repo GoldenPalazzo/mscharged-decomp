@@ -170,7 +170,7 @@ bool DesireReceivePass::Initialize(void* context)
 {
     Desire::Initialize(context);
 
-    DesireSteering* desire = (DesireSteering*)fn_8002E08C(
+    DesireSteering* desire = (DesireSteering*)GetFielderDesire(
         m_pFielder, 34);
     ResetSteeringTargets(desire);
 
@@ -326,7 +326,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         {
             fArrivalRadius = g_fReceiveArrivalRadiusLarge;
         }
-        DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
+        DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, 34);
         SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
             mEstimated.aFacingDirection, mEstimated.fAnimStartTime, fArrivalRadius);
         pSteering->SetAvoidanceMultiplier(InterpolateClamped(g_fMaxSteeringAvoidance, 0.0f, g_pBall->GetPassProgress()));
@@ -364,7 +364,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         }
         else
         {
-            DesireSteering* pSteering = (DesireSteering*)fn_8002E08C(m_pFielder, 34);
+            DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, 34);
             SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
                 mEstimated.aFacingDirection, mEstimated.fAnimStartTime, g_fReceiveArrivalRadius);
         }
@@ -703,7 +703,7 @@ void DesireReceivePass::Cleanup()
         m_pFielder->SetNoPickUpTime(0.0f);
     }
 
-    DesireSteering* desire = (DesireSteering*)fn_8002E08C(
+    DesireSteering* desire = (DesireSteering*)GetFielderDesire(
         m_pFielder, 34);
     ResetSteeringHistory(desire);
     ResetSteeringAvoidance(desire);

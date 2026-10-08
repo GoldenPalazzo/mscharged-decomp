@@ -1006,7 +1006,7 @@ void cTeam::ResetCharacters()
                 cFielder* pFielder = GetFielder(i);
                 if (!pFielder->IsShattered())
                 {
-                    fn_80031A30(pFielder, 4, 99999.0f);
+                    SetFielderFrozenState(pFielder, 4, 99999.0f);
                 }
             }
         }
@@ -1019,7 +1019,7 @@ void cTeam::ResetCharacters()
                     cFielder* pFielder = GetFielder(i);
                     if (!pFielder->IsShattered())
                     {
-                        fn_80031A30(pFielder, 4, 99999.0f);
+                        SetFielderFrozenState(pFielder, 4, 99999.0f);
                     }
                     nMissingSidekicks--;
                 }
@@ -1626,8 +1626,8 @@ bool cTeam::fn_800A6764() const
         |= m_ePowerupList[1].eType == nCaptainPowerup;
 
     if (pCaptain->IsSuperGrowActive()
-        || fn_8003E8A0(pCaptain)
-        || fn_8003E948(pCaptain)
+        || IsBowserSuperPowerActive(pCaptain)
+        || IsWaluigiSuperPowerActive(pCaptain)
         || pCaptain->IsWarioSuperPowerActive()
         || pCaptain->IsPeteySuperPowerActive())
     {
@@ -1670,8 +1670,8 @@ bool cTeam::TogglePowerup(bool bIsSilent)
 {
     bool result = false;
     if (mtToggleTimer.m_uPackedTime != 0
-        || fn_8003E8A0((cFielder*)m_pPlayers[0])
-        || fn_8003E948((cFielder*)m_pPlayers[0])
+        || IsBowserSuperPowerActive((cFielder*)m_pPlayers[0])
+        || IsWaluigiSuperPowerActive((cFielder*)m_pPlayers[0])
         || ((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
         || ((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {
@@ -1704,8 +1704,8 @@ bool cTeam::fn_800A6560()
 {
     bool result = false;
     if (mtToggleTimer.m_uPackedTime == 0
-        && !fn_8003E8A0((cFielder*)m_pPlayers[0])
-        && !fn_8003E948((cFielder*)m_pPlayers[0])
+        && !IsBowserSuperPowerActive((cFielder*)m_pPlayers[0])
+        && !IsWaluigiSuperPowerActive((cFielder*)m_pPlayers[0])
         && !((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
         && !((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {

@@ -192,10 +192,10 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->m_pBall == 0 || fielder->m_eActionState == 1
-                || (fn_8003E948(fielder) && fielder->m_bSuperPowerTankOn))
+                || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 actionState = fielder->m_eActionState;
-                bool superWall = fn_8003E948(fielder);
+                bool superWall = IsWaluigiSuperPowerActive(fielder);
                 DebugPrintf(
                     "bSidelineCollision action state %d superwal %d\n",
                     actionState,
@@ -301,7 +301,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     DebugPrintf("PhysChar Electro1200\n");
                     return NO_CONTACT;
                 }
-                if (fn_8003E948(ball->GetOwnerFielder())
+                if (IsWaluigiSuperPowerActive(ball->GetOwnerFielder())
                     && ball->GetOwnerFielder()->m_bSuperPowerTankOn)
                 {
                     DebugPrintf("PhysChar SuperWal\n");
@@ -316,7 +316,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 DebugPrintf("PhysChar IsInvincibleChars\n");
                 return ONE_WAY_CONTACT_THIS;
             }
-            if (fn_800344DC(fielder, &ball->m_v3Position))
+            if (IsFielderFrontInvincible(fielder, &ball->m_v3Position))
             {
                 DebugPrintf("PhysChar IsInvincibleCharsDirect\n");
                 return ONE_WAY_CONTACT_THIS;
@@ -406,16 +406,16 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             }
 
             if (fielder->IsInvincibleChars()
-                || fn_800344DC(fielder, &otherFielder->mUnidentified024.m_v3Position)
+                || IsFielderFrontInvincible(fielder, &otherFielder->mUnidentified024.m_v3Position)
                 || fielder->IsStuck()
-                || (fn_8003E948(fielder) && fielder->m_bSuperPowerTankOn))
+                || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 contactType = ONE_WAY_CONTACT_OTHER;
             }
             else
             {
                 if (otherFielder->IsInvincibleChars()
-                    || fn_800344DC(otherFielder, &fielder->mUnidentified024.m_v3Position)
+                    || IsFielderFrontInvincible(otherFielder, &fielder->mUnidentified024.m_v3Position)
                     || otherFielder->IsStuck())
                 {
                     contactType = ONE_WAY_CONTACT_THIS;

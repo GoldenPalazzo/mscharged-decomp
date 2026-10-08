@@ -318,7 +318,7 @@ void HUDPowerUpDisplay::DisplayPowerUps(float fDeltaT)
                 if (i == 0)
                 {
                     cFielder* pCaptain = g_pTeams[team]->GetCaptain();
-                    if (pCaptain && (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
+                    if (pCaptain && (IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
                                        || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive()))
                     {
                         m_pImagePowerUps[0][team][i]->m_bVisible = false;
@@ -660,7 +660,7 @@ void HUDCaptainMeter::Update(float fDeltaT)
     for (int i = 0; i < 2; i++)
     {
         cFielder* pCaptain = g_pTeams[i]->GetCaptain();
-        if (pCaptain && (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
+        if (pCaptain && (IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
                            || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive()))
         {
             m_pMeter[i]->m_bVisible = true;

@@ -126,7 +126,7 @@ void ResetSteeringTargets(DesireSteering* desire)
 void DesireSteering::Update(
     DesireUpdate*, float fDeltaT)
 {
-    fn_8003E948(m_pFielder);
+    IsWaluigiSuperPowerActive(m_pFielder);
     bool bUseAvoidance = !lbl_806E0C50
                       && (!lbl_806E0C51
                           || m_pFielder->m_pTeam->m_nSide != HOME)
@@ -211,7 +211,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
         if (bHasGlobalPad)
         {
-            if ((fn_8003E8A0(desire->m_pFielder)
+            if ((IsBowserSuperPowerActive(desire->m_pFielder)
                     && desire->m_pFielder->m_bSuperPowerTankOn)
                 || (desire->m_pFielder->IsPeteySuperPowerActive()
                     && desire->m_pFielder->m_bSuperPowerTankOn))
@@ -279,7 +279,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         }
     }
 
-    if (fn_8003E948(desire->m_pFielder)
+    if (IsWaluigiSuperPowerActive(desire->m_pFielder)
         && desire->m_pFielder->m_bSuperPowerTankOn)
     {
         nThingsToAvoid = AVOID_NOTHING;
@@ -295,7 +295,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
 void AddSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Position, float fUrgency, float fWeight)
 {
-    fn_8003E948(desire->m_pFielder);
+    IsWaluigiSuperPowerActive(desire->m_pFielder);
     if (desire->m_fTotalWeight == 0.0f)
     {
         desire->m_fUrgency = 0.0f;
@@ -326,7 +326,7 @@ void SetTimedSteeringTarget(DesireSteering* desire,
 
 const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
 {
-    DesireReceivePass* receivePass = (DesireReceivePass*)fn_8002E08C(
+    DesireReceivePass* receivePass = (DesireReceivePass*)GetFielderDesire(
         desire->m_pFielder, 22);
 
     if (g_pBall->UnidentifiedHasPassTarget()
@@ -677,11 +677,11 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
     bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
                      && !desire->m_pFielder->IsConfused()
                      && !HasGlobalPad(desire->m_pFielder)
-                     && !(fn_8003E948(desire->m_pFielder)
+                     && !(IsWaluigiSuperPowerActive(desire->m_pFielder)
                           && desire->m_pFielder->m_bSuperPowerTankOn)
                      && !desire->m_pFielder->IsYoshiSuperPowerActive()
-                     && !fn_8003E948(desire->m_pFielder)
-                     && !fn_8003E8A0(desire->m_pFielder)
+                     && !IsWaluigiSuperPowerActive(desire->m_pFielder)
+                     && !IsBowserSuperPowerActive(desire->m_pFielder)
                      && !desire->m_pFielder->IsPeachSuperPowerActive()
                      && !(bool)ReceivingPass(desire->m_pFielder)
                      && fn_800DED80(desire->m_pFielder) < 0.2f;

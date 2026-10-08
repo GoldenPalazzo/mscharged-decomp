@@ -1238,7 +1238,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
     if (GetStateMachineState(machine) != 12)
         return UnidentifiedVariant_80054AB8(gFollowPathFinishedResult, -1.0f, -1.0f);
     cFielder* fielder = (cFielder*)value.GetPlayer();
-    DesireSuperPower* desire = (DesireSuperPower*)fn_8002E08C(fielder, 23);
+    DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, 23);
     int index = GetStateMachineParameters(machine)->Get(0)->fn_800C2BD4();
     int count = GetStateMachineParameters(machine)->Get(1)->fn_800C2BD4();
     nlVector2& current = desire->mvPathPoints[index];
@@ -1284,7 +1284,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
             result.SetParameter(1, FuzzyVariant(count));
             result.SetParameter(13, FuzzyVariant(gFollowPathNextSpeed));
             result.SetParameter(10, FuzzyVariant((void*)FollowPathTransition));
-            if (fn_800D1C34(fielder) && GetStateMachineState(machine) == 12)
+            if (IsFielderSuperPowerTankOn(fielder) && GetStateMachineState(machine) == 12)
             {
                 unsigned short absolute = nlAbsAngle(nlAbsAngle(nlAngleDelta(GetCharacterFacing(fielder), angle)));
                 short folded = absolute % 0x4000;
@@ -1309,7 +1309,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
     if (machine->GetState() != 12)
         return UnidentifiedVariant_80054AB8(FT_INT, gChooseDirectionFinishedResult);
     UnidentifiedFielderRef fielder = { (cFielder*)value.mData.pointer };
-    fn_8002E08C(fielder.mFielder, 23);
+    GetFielderDesire(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
     float danger = fn_80041B0C(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),

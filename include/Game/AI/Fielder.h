@@ -87,11 +87,11 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
-extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
+void SetFielderFrozenState(cFielder* pFielder, int nParam, float fParam);
 class ChainChomp;
 class WindDebris;
 struct CollisionThwompPlayerData;
-extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
+bool IsFielderFrontInvincible(cFielder*, const nlVector3*);
 class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
@@ -183,9 +183,9 @@ class cFielder;
 class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
-extern "C" bool fn_800D1C34(const cFielder*);
+bool IsFielderSuperPowerTankOn(const cFielder*);
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
-extern "C" float fn_80030750(cFielder* pFielder);
+float GetFielderHitReach(cFielder* pFielder);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
@@ -224,9 +224,9 @@ class cFielder : public cPlayer
     friend class DesireSuperPower;
     friend class DesireUsePowerup;
     friend class DesireShrink;
-    friend bool fn_800D1C34(const cFielder*);
+    friend bool IsFielderSuperPowerTankOn(const cFielder*);
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
-    friend float fn_80030750(cFielder*);
+    friend float GetFielderHitReach(cFielder*);
 
 public:
     bool fn_800392D8() const;
@@ -813,12 +813,12 @@ private:
 
 // Shared fielder functions and data.
 class Desire;
-extern "C" Desire* fn_8002E08C(cFielder*, int);
+Desire* GetFielderDesire(cFielder*, int);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" bool fn_8003E8A0(const cFielder*);
-extern "C" bool fn_8003E948(const cFielder*);
-extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
-extern "C" void fn_800318F8(cFielder*);
+bool IsBowserSuperPowerActive(const cFielder*);
+bool IsWaluigiSuperPowerActive(const cFielder*);
+int GetFielderHitReaction(cFielder*, cFielder*, float);
+void TryFielderQueuedPass(cFielder*);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;
@@ -831,7 +831,7 @@ extern float lbl_806E3428;
 extern float lbl_806E342C;
 
 
-extern "C" bool fn_8003877C(const cFielder* pFielder);
+bool IsFielderDazed(const cFielder* pFielder);
 
 
 

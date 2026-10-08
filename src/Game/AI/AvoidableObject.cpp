@@ -166,7 +166,7 @@ float AvoidableFielder::GetRadius()
 float AvoidableFielder::GetAttackReach()
 {
     float fRadius;
-    if (fn_8003E8A0(m_pFielder))
+    if (IsBowserSuperPowerActive(m_pFielder))
     {
         fRadius = 11.0f;
     }
@@ -178,7 +178,7 @@ float AvoidableFielder::GetAttackReach()
     {
         float fTime = m_pFielder->mUnidentified024.m_fPlayerScale;
         float fValue = fn_8002BFA8(m_pFielder->GetTweaks(), fTime);
-        fRadius = fn_80030750(m_pFielder) - fValue;
+        fRadius = GetFielderHitReach(m_pFielder) - fValue;
     }
     if (m_pFielder->IsYoshiSuperPowerActive())
     {
@@ -258,7 +258,7 @@ float AvoidableFielder::GetAvoidanceStrength(
             = (AvoidablePolygon*)other;
         if (pPolygon->mPolygonType == 4)
         {
-            if (fn_8003E948(m_pFielder) && m_pFielder->m_pBall == 0
+            if (IsWaluigiSuperPowerActive(m_pFielder) && m_pFielder->m_pBall == 0
                 && fn_800DED80(m_pFielder) > 0.7f)
             {
                 fStrength = 0.0f;
@@ -301,12 +301,12 @@ float AvoidableFielder::GetAvoidanceStrength(
                 fStrength *= 2.0f;
             }
         }
-        if (fn_8003E8A0(m_pFielder) || m_pFielder->IsPeteySuperPowerActive()
+        if (IsBowserSuperPowerActive(m_pFielder) || m_pFielder->IsPeteySuperPowerActive()
             || m_pFielder->IsWarioSuperPowerActive())
         {
             cFielder* pTarget = 0;
             DesireRunInDirection* pDesire
-                = (DesireRunInDirection*)fn_8002E08C(m_pFielder, 12);
+                = (DesireRunInDirection*)GetFielderDesire(m_pFielder, 12);
             if (pDesire != 0 && pDesire->IsActive())
             {
                 pTarget = pDesire->GetTarget();
@@ -402,7 +402,7 @@ float AvoidableFielder::GetAvoidanceWeight(
     {
         cFielder* pOther
             = ((AvoidableFielder*)other)->m_pFielder;
-        if (fn_8003E8A0(pOther) || pOther->IsPeteySuperPowerActive())
+        if (IsBowserSuperPowerActive(pOther) || pOther->IsPeteySuperPowerActive())
         {
             fWeight *= 2.5f;
         }

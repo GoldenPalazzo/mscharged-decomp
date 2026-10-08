@@ -206,7 +206,7 @@ void FielderDesireMachine::Reset(bool deleting)
  */
 void FielderDesireMachine::Update(float deltaTime)
 {
-    Desire* frozen = fn_8002E08C(GetFielder(), 29);
+    Desire* frozen = GetFielderDesire(GetFielder(), 29);
     if (frozen->IsActive())
     {
         UnidentifiedVariant_80054AB8 result;

@@ -678,7 +678,7 @@ inline bool cFielder::ShouldSkipHardStopAnim()
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
     if (!skip && GetDesireState() == (eFielderDesireState)20)
     {
-        Desire* desire = fn_8002E08C(this, 20);
+        Desire* desire = GetFielderDesire(this, 20);
         if (desire->mAgeTimer.GetSeconds() < 0.05f)
             skip = true;
     }
@@ -873,7 +873,7 @@ eFielderDesireState cFielder::GetDesireState()
     return (eFielderDesireState)-1;
 }
 
-extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
+Desire* GetFielderDesire(cFielder* pFielder, int nAction)
 {
     shdStateMachine* pAction
         = GetScriptMachineState(pFielder->m_pAIContext->mScriptMachine, nAction);
@@ -906,7 +906,7 @@ void cFielder::EndAllDesires()
 
 AvoidController* cFielder::GetAvoidController()
 {
-    return ((DesireSteering*)fn_8002E08C(this, 34))->m_pAvoidance;
+    return ((DesireSteering*)GetFielderDesire(this, 34))->m_pAvoidance;
 }
 
 FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
@@ -969,7 +969,7 @@ void cFielder::EndFrozenOrDazed()
     {
         EndFrozenState(this, 2);
     }
-    else if (fn_8003877C(this))
+    else if (IsFielderDazed(this))
     {
         EndDaze();
     }
@@ -993,7 +993,7 @@ bool cFielder::EndSuperPower(int)
 {
     if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
-        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
         return true;
     }
     return false;
@@ -1009,7 +1009,7 @@ bool cFielder::EndBowserSuperPower(bool value)
     }
     if (active)
     {
-        fn_800C9D74((DesireSuperPower*)fn_8002E08C(this, 23), value);
+        fn_800C9D74((DesireSuperPower*)GetFielderDesire(this, 23), value);
         return true;
     }
     return false;
@@ -1073,7 +1073,7 @@ bool cFielder::EndWarioSuperPower(bool)
     }
     if (active)
     {
-        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
         return true;
     }
     return false;
@@ -1089,7 +1089,7 @@ bool cFielder::EndPeteySuperPower(bool)
     }
     if (active)
     {
-        RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
         return true;
     }
     return false;
@@ -1105,7 +1105,7 @@ int cFielder::GetPreviousDesireState() const
     return -1;
 }
 
-extern "C" int fn_8002E9FC(cFielder* pFielder,
+int GetFielderHitReaction(cFielder* pFielder,
     cFielder* pFielderCollidedWith, float attackIntensity)
 {
     float fUnidentified0 = pFielder->m_pTweaks->GetDefenseSize();
@@ -1130,7 +1130,7 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     if (pFielderCollidedWith->IsMushroomActive()
         || pFielderCollidedWith->IsInvincible()
         || pFielderCollidedWith->IsInvincibleChars()
-        || fn_800344DC(pFielderCollidedWith, &pFielder->GetPosition())
+        || IsFielderFrontInvincible(pFielderCollidedWith, &pFielder->GetPosition())
         || pFielderCollidedWith->IsSuperGrowActive())
     {
         nUnidentified = 2;
@@ -1156,7 +1156,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    bool bFrozen = fn_8003877C(pFielder) || pFielder->IsFrozen();
+    bool bFrozen = IsFielderDazed(pFielder) || pFielder->IsFrozen();
     if (bFrozen)
     {
         return false;
@@ -1207,7 +1207,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (fn_8003E948(pFielder) || fn_8003E8A0(pFielder) || pFielder->IsPeteySuperPowerActive())
+    if (IsWaluigiSuperPowerActive(pFielder) || IsBowserSuperPowerActive(pFielder) || pFielder->IsPeteySuperPowerActive())
     {
         if (pFielder->IsFallenDown())
         {
@@ -1231,7 +1231,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         case ACTION_SLIDE_ATTACK:
             return false;
         case ACTION_UNKNOWN_30:
-            if (fn_8003E948(pFielder))
+            if (IsWaluigiSuperPowerActive(pFielder))
             {
                 return false;
             }
@@ -1634,7 +1634,7 @@ bool cFielder::IsMarking(cFielder* pParam)
     return false;
 }
 
-extern "C" float fn_80030750(cFielder* pFielder)
+float GetFielderHitReach(cFielder* pFielder)
 {
     if (pFielder->m_fHitDistance < 0.0001f)
     {
@@ -1733,7 +1733,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
             float attackIntensity = GetCollisionHitIntensity(this, adjustedPosition,
                 pData->velocity1, pFielderCollidedWith);
-            int nUnidentified = fn_8002E9FC(this, pFielderCollidedWith, attackIntensity);
+            int nUnidentified = GetFielderHitReaction(this, pFielderCollidedWith, attackIntensity);
             bool canPickup = false;
             if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || IsSuperGrowActive()))
             {
@@ -1892,7 +1892,7 @@ bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, cons
 #include "Game/AI/FuzzyRuntimeCall.h"
 #include "Game/AI/FuzzyVariantCollection.inl"
 
-extern "C" void fn_800318F8(cFielder* pFielder)
+void TryFielderQueuedPass(cFielder* pFielder)
 {
     if (pFielder->m_pBall != 0 && pFielder->mUnidentified1E4.m_eLastPadAction == 0x1B)
     {
@@ -1919,7 +1919,7 @@ extern "C" void fn_800318F8(cFielder* pFielder)
     }
 }
 
-extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenTime)
+void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTime)
 {
     bool bHasEgg = false;
     if (pFielder->mUnidentified024.m_eCharacterClass == YOSHI
@@ -1991,7 +1991,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
     if (yoshiActive)
     {
         if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
-            RequestStateMachineDeactivation(fn_8002E08C(this, 23));
+            RequestStateMachineDeactivation(GetFielderDesire(this, 23));
         return false;
     }
     if (IsMarioSuperPowerActive() || IsLuigiSuperPowerActive() || IsDKSuperPowerActive() || IsDaisySuperPowerActive())
@@ -2001,7 +2001,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
         bool controlled = GetGlobalPad() != 0;
         if (controlled == true)
             SwapController(false);
-        fn_80031A30(this, 2, duration);
+        SetFielderFrozenState(this, 2, duration);
         return true;
     }
     return false;
@@ -2010,9 +2010,9 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
 bool cFielder::CollideWithFreezeCallback()
 {
     if (m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()
-        && mbTangible && !fn_8003877C(this) && !IsFrozen() && fn_800392D8())
+        && mbTangible && !IsFielderDazed(this) && !IsFrozen() && fn_800392D8())
     {
-        fn_80031A30(this, 1, gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
+        SetFielderFrozenState(this, 1, gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
         return true;
     }
     return false;
@@ -2454,7 +2454,7 @@ bool cFielder::fn_800344B0() const
     }
 }
 
-extern "C" bool fn_800344DC(cFielder* pFielder, const nlVector3* position)
+bool IsFielderFrontInvincible(cFielder* pFielder, const nlVector3* position)
 {
     bool bUnidentified = pFielder->UnidentifiedInvincibleStatus2();
 
@@ -2689,7 +2689,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
             {
-                RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
+                RequestStateMachineDeactivation(GetFielderDesire(this, 0x17));
             }
         }
         break;
@@ -2713,7 +2713,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
             {
-                RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
+                RequestStateMachineDeactivation(GetFielderDesire(this, 0x17));
             }
         }
         break;
@@ -2729,7 +2729,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case 0x1C:
         KillDaze(this);
-        if (fn_8003E8A0(this))
+        if (IsBowserSuperPowerActive(this))
         {
             EmitBowserSmoke(this);
         }
@@ -3213,7 +3213,7 @@ void cFielder::IncrementPowerupMeter(int nParam, float fAmount)
 
 bool cFielder::IsReceivePassHitRequested(unsigned short* direction)
 {
-    if (fn_8003E948(this) && m_bSuperPowerTankOn)
+    if (IsWaluigiSuperPowerActive(this) && m_bSuperPowerTankOn)
         return false;
     if (mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() > 0.0f
         && m_pController->DetectRightShake(direction))
@@ -3228,7 +3228,7 @@ bool cFielder::IsDekeRequested(unsigned short* direction)
 {
     if (mtPostDekeTimer.m_uPackedTime != 0)
         return false;
-    if (fn_8003E948(this) && m_bSuperPowerTankOn)
+    if (IsWaluigiSuperPowerActive(this) && m_bSuperPowerTankOn)
         return false;
     unsigned short padDirection = 0;
     if (GetDekePadDirection(&padDirection))
@@ -3998,7 +3998,7 @@ unsigned int cFielder::IsFrozen() const
     return ((DesireFrozen*)GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
 }
 
-extern "C" bool fn_8003877C(const cFielder* pFielder)
+bool IsFielderDazed(const cFielder* pFielder)
 {
     return ((DesireFrozen*)GetConcurrentState(pFielder->m_pAIContext->mScriptMachine, 0x1D))->IsUnidentifiedState(1);
 }
@@ -5270,7 +5270,7 @@ bool cFielder::IsLuigiSuperPowerActive() const
     return GetCharacterClass() == (eCharacterClass)4 && fn_8003E6EC();
 }
 
-extern "C" bool fn_8003E8A0(const cFielder* pFielder)
+bool IsBowserSuperPowerActive(const cFielder* pFielder)
 {
     bool active;
     GetCharacterSpecialActive(pFielder, (eCharacterClass)1, active);
@@ -5284,7 +5284,7 @@ bool cFielder::IsPeachSuperPowerActive() const
     return active;
 }
 
-extern "C" bool fn_8003E948(const cFielder* pFielder)
+bool IsWaluigiSuperPowerActive(const cFielder* pFielder)
 {
     bool active;
     GetCharacterSpecialActive(pFielder, WALUIGI, active);
@@ -5581,7 +5581,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 {
     m_pHeadTrack->m_fSmoothTime = lbl_806DB6E8;
 
-    if ((fn_8003E8A0(this) || IsPeteySuperPowerActive()) && m_bSuperPowerTankOn)
+    if ((IsBowserSuperPowerActive(this) || IsPeteySuperPowerActive()) && m_bSuperPowerTankOn)
     {
         if (lbl_806E0C58)
         {
@@ -6561,12 +6561,12 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     cache->ChecksumData(lbl_806DB868, &m_fNextGasTime, context);
     cache->WriteData(lbl_806DB868, &m_fNextGasTime, sizeof(m_fNextGasTime));
 
-    DesireSteering* steering = (DesireSteering*)fn_8002E08C(this, 34);
+    DesireSteering* steering = (DesireSteering*)GetFielderDesire(this, 34);
     fn_8000F324(steering->m_pAvoidance, context, cache);
 
     for (int i = 0; i < 36; i++)
     {
-        Desire* desire = fn_8002E08C(this, i);
+        Desire* desire = GetFielderDesire(this, i);
         if (desire != 0 && desire->IsActive())
         {
             UnidentifiedFielderDesireState state;

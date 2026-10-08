@@ -1756,7 +1756,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
                 else if (pObj->m_eType != POWER_UP_BOBOMB)
                 {
-                    bool bUnknown = fn_8003877C((cFielder*)pCharacter);
+                    bool bUnknown = IsFielderDazed((cFielder*)pCharacter);
                     if (pObj->m_eType != POWER_UP_FREEZE_SHELL)
                     {
                         if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
