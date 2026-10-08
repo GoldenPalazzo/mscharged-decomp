@@ -44,7 +44,7 @@ struct CharacterInfo
     /* 0x3C */ float unknown_0x3C;
     /* 0x40 */ float unknown_0x40;
     /* 0x44 */ float unknown_0x44;
-    /* 0x48 */ int unknown_0x48;
+    /* 0x48 */ int mPlayStyle;
     /* 0x4C */ int mColourMask;
     /* 0x50 */ int mColourRank;
     /* 0x54 */ int mPrimaryColour;
