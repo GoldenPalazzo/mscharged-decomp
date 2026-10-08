@@ -7,6 +7,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/DesireUpdate.inl"
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
@@ -18,9 +19,6 @@
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" DesireUpdate fn_80041B6C(
-    void*, const unsigned int&, cFielder*);
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
 static int sTransDesireUsePowerupContinue = 0;

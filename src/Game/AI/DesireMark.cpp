@@ -3,6 +3,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.inl"
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -18,7 +19,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
-extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
 
 static float sMarkLookAheadTime = 0.1f;
 float gMarkUrgency = 0.8f;

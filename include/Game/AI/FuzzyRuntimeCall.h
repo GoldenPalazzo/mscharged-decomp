@@ -65,8 +65,7 @@ extern "C" inline UnidentifiedVariant_80054AB8 fn_800C3448(
         2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
-extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B6C(
-    void*, const unsigned int&, cFielder*);
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 
 extern "C" inline UnidentifiedVariant_80054AB8 fn_80041AFC(
     InterpreterCore* runtime, const char* name, cFielder* fielder)
