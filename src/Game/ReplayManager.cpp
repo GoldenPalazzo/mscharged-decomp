@@ -165,16 +165,16 @@ void RenderSnapshot::Replay(T& frame)
             {
                 gbNetMeshReplayResync = false;
                 NetMesh::GetPositiveXNetMesh()->Update(g_fFixedUpdateTick,
-                    mBall.fn_801925BC(),
+                    mBall.GetPosition(),
                     gLastReplayBallPosition,
                     mPositiveGoalieNetCheck,
                     0);
                 NetMesh::GetNegativeXNetMesh()->Update(g_fFixedUpdateTick,
-                    mBall.fn_801925BC(),
+                    mBall.GetPosition(),
                     gLastReplayBallPosition,
                     mNegativeGoalieNetCheck,
                     0);
-                gLastReplayBallPosition = mBall.fn_801925BC();
+                gLastReplayBallPosition = mBall.GetPosition();
                 mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
                 mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
             }
