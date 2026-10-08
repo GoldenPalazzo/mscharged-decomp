@@ -71,7 +71,7 @@ public:
     void SendLocalMachineInfo(int aid);
     void MarkGameStarted();
     bool AllMachineInfoReceived();
-    NetworkDraftMachineInfo* GetLocalMachineInfo();
+    NetworkDraftMachineInfo* GetMachineInfoArray();
     NetworkDraftMachineInfo* GetMachineInfo(int index);
 
     /* 0x0008 */ bool mReceiverRegistered;

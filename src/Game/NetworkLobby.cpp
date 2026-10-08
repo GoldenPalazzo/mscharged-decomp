@@ -1048,7 +1048,7 @@ bool NetworkLobby::AllMachineInfoReceived()
     return received;
 }
 
-NetworkDraftMachineInfo* NetworkLobby::GetLocalMachineInfo()
+NetworkDraftMachineInfo* NetworkLobby::GetMachineInfoArray()
 {
     return mMachineInfo;
 }
