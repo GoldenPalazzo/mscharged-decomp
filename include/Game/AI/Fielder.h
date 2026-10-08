@@ -256,6 +256,8 @@ public:
     void SetSuperPowerTweaks();
     void SetRunningAnimState(float blendTime);
     void SetRunningWBAnimState(float blendTime);
+    float GetShotProbability(float fValue);
+    void CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballState);
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -760,6 +762,8 @@ public:
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 private:
+    float CalculateShotProbability(float fValue);
+    float EvaluateShotProbability(float fValue);
     void SetRunLeanSAB(const int* anims, int count, int primary);
     bool CheckReceivePassState();
     bool IsAvailableToReceivePass();
@@ -771,8 +775,6 @@ extern "C" bool fn_8003C180(cFielder*);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_80031C3C(cFielder*, float);
-extern "C" float fn_80034F98(cFielder*, float);
-extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_80039F24(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" void fn_8003A5C8(cFielder* pFielder);

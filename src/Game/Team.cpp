@@ -570,7 +570,7 @@ void cTeam::UpdateShotScore()
             mfShotScore = fScoreValue;
             mfAttackIndicatorProgress = nlMinEquals(
                 nlMaxEquals(
-                    fn_80034F98(g_pBall->GetOwnerFielder(),
+                    g_pBall->GetOwnerFielder()->GetShotProbability(
                         fScoreValue)
                         / 100.0f,
                     0.0f),
@@ -601,7 +601,7 @@ void cTeam::UpdateShotScore()
                 mfShotScore = fScoreValue;
                 mfAttackIndicatorProgress = nlMinEquals(
                     nlMaxEquals(
-                        fn_80034F98(g_pBall->GetPassTargetFielder(),
+                        g_pBall->GetPassTargetFielder()->GetShotProbability(
                             fScoreValue)
                             / 100.0f,
                         0.0f),

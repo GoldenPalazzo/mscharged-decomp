@@ -24,6 +24,7 @@
 
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/ShotMeter.h"
+#include "Game/AI/SkillTweaks.h"
 #include "Game/Ball.h"
 #include "Game/Render/BulletBill.h"
 #include "Game/CharacterTweaks.h"
@@ -2583,7 +2584,7 @@ void cFielder::DoRegularShooting(bool bParam)
     float fCharge = Interpolate(lbl_806DB790, lbl_806DB794,
         InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(m_pTweaks)));
     fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
-    fn_80035194(this, v3BallVelocity, v3Target, nBallState);
+    CalcRegularShot(v3BallVelocity, v3Target, nBallState);
 
     if (nBallState == 8)
     {
@@ -5757,4 +5758,105 @@ void cFielder::SetRunningWBAnimState(float blendTime)
         SetRunLeanSAB(runningAnims, 3, 1);
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementRunning(GetRunWBTurnSpeed(tweaks), GetRunWBTurnFalloff(tweaks), GetRunWBAccel(tweaks), GetRunWBDecel(tweaks));
+}
+
+float gChipShotMinVerticalSpeed = 22.5f;
+float gChipShotMaxVerticalSpeed = 22.5f;
+float gChipShotAirResistance = 0.15f;
+
+static inline bool IsShotValueBelowThreshold(float value, const TweakFloatBinding& threshold)
+{
+    return value < threshold.GetValue();
+}
+
+inline float cFielder::CalculateShotProbability(float fValue)
+{
+    if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1))
+    {
+        float upperValue = fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1.GetValue();
+        float upperChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance1.GetValue();
+        return InterpolateRangeClamped(fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance0,
+            upperChance, 0.0f, upperValue, fValue);
+    }
+    else if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2))
+    {
+        return InterpolateRangeClamped(
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance1,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance2,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2,
+            fValue);
+    }
+    else if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3))
+    {
+        return InterpolateRangeClamped(
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance2,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance3,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3,
+            fValue);
+    }
+    else
+    {
+        return InterpolateRangeClamped(
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance3,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance4,
+            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3,
+            1.0f,
+            fValue);
+    }
+}
+
+inline float cFielder::EvaluateShotProbability(float fValue)
+{
+    return CalculateShotProbability(fValue);
+}
+
+float cFielder::GetShotProbability(float fValue)
+{
+    return EvaluateShotProbability(fValue);
+}
+
+static inline float GetShotTargetDistance(const nlVector3& ballPosition, const nlVector3& target)
+{
+    nlVector3 delta;
+    nlVec3Sub(delta, ballPosition, target);
+    return nlSqrt(nlVec3LengthSquared(delta), true);
+}
+
+void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballState)
+{
+    float heightVariance, widthVariance;
+    float shotValue = m_pShotMeter->m_fScoreValue;
+    Goalie* goalie = m_pTeam->GetOtherTeam()->GetGoalie();
+    cBall* ball = g_pBall;
+    float shotTime;
+    DoFindBestShotTarget(target, shotTime, ballState);
+    float inverseTime = 1.0f / shotTime;
+    float distance = GetShotTargetDistance(ball->m_v3Position, target);
+    float speed = distance * inverseTime;
+    float accuracy;
+    if (ballState == 7)
+        accuracy = (1.1f - shotValue) * (1.5f * distance);
+    else
+        accuracy = distance * (1.0f - 0.3f * shotValue);
+    GameTweaks* tweaks = gGameTweaks.m_pGameTweaks;
+    widthVariance = accuracy * tweaks->fShotWidthVariance.GetValue();
+    heightVariance = accuracy * tweaks->fShotHeightVariance.GetValue();
+    target.y += 0.5f * widthVariance - nlRandomf(widthVariance);
+    target.z += nlRandomf(heightVariance);
+    if (ballState == 7)
+        g_pBall->m_pPhysicsBall->mfBallAirResistance = gChipShotAirResistance;
+    g_pBall->ShootAtFast(velocity, target, speed);
+    if (ballState == 7)
+    {
+        float maxHeightVelocity = Interpolate(gChipShotMinVerticalSpeed, gChipShotMaxVerticalSpeed, m_pTweaks->fShooting);
+        if (velocity.z > maxHeightVelocity)
+            velocity.z = maxHeightVelocity;
+    }
+    float probability = CalculateShotProbability(shotValue);
+    if (nlRandomf(100.0f) < probability)
+        goalie->mbShouldMiss = true;
+    else
+        goalie->mbShouldMiss = false;
 }
