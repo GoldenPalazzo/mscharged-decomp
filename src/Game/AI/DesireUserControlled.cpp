@@ -83,7 +83,7 @@ void DesireUserControlled::Update(
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
-            fn_8003DA94(m_pFielder, false);
+            m_pFielder->TestLooseBallControls(false);
 
             if (g_pBall->m_pOwner == NULL
                 && (!fn_8003E948(m_pFielder)

@@ -269,6 +269,7 @@ public:
     void SetHardStopAnimState();
     bool ShouldIClearBall();
     void TestAnimBallContact();
+    void TestLooseBallControls(bool forceContact);
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -787,7 +788,6 @@ extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern "C" void fn_8003DA94(cFielder*, bool);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;

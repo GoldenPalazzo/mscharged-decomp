@@ -15,6 +15,7 @@
 #include "Game/AI/FielderActions.h"
 #include "Game/AI/DesireSteering.h"
 #include "Game/AI/DesireReceivePass.h"
+#include "Game/AI/DesirePass.h"
 #include "Game/AI/DesireUsePowerup.h"
 #include "Game/AI/DesireSuperPower.h"
 #include "Game/AI/HeadTrack.h"
@@ -6323,6 +6324,67 @@ void cFielder::TestAnimBallContact()
                 break;
             }
             }
+        }
+    }
+}
+
+float gLooseBallContactBufferTime = 0.45f;
+
+void cFielder::TestLooseBallControls(bool forceContact)
+{
+    if (mUnidentified1E4.m_bCanTestController && GetGlobalPad() != 0)
+    {
+        unsigned short hitDirection = 0;
+        unsigned short dekeDirection = 0;
+        if (GetGlobalPad()->JustPressed(27, true))
+        {
+            if (CanContactLooseBall(false) || forceContact)
+            {
+                bool volley = IsActionModifierPressed();
+                cFielder* target = static_cast<cFielder*>(fn_80096F54(this, volley));
+                InitActionLooseBallPass(target, volley);
+                if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
+                    && m_pTeam->mfBallInTimes[mUnidentified1E4.m_ID] <= gLooseBallContactBufferTime)
+                {
+                    UnidentifiedVariantCollection parameters;
+                    parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
+                    parameters.Set(14, FuzzyVariant(g_pBall));
+                    parameters.Set(16, FuzzyVariant(volley));
+                    parameters.Set(0, FuzzyVariant((cPlayer*)target));
+                    parameters.Set(1, FuzzyVariant(false));
+                    parameters.Set(10, FuzzyVariant((void*)TransDesireLooseBallContact));
+                    mUnidentified428->mScriptMachine->ActivateState(13, &parameters, true);
+                    mUnidentified1E4.m_bCanTestController = false;
+                }
+            }
+        }
+        else if (GetGlobalPad()->JustPressed(28, true))
+        {
+            if (CanContactLooseBall(false) || forceContact)
+            {
+                bool modified = IsActionModifierPressed();
+                InitActionLooseBallShot(modified);
+                if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
+                    && m_pTeam->mfBallInTimes[mUnidentified1E4.m_ID] <= gLooseBallContactBufferTime)
+                {
+                    UnidentifiedVariantCollection parameters;
+                    parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
+                    parameters.Set(14, FuzzyVariant(g_pBall));
+                    parameters.Set(16, FuzzyVariant(modified));
+                    parameters.Set(1, FuzzyVariant(true));
+                    parameters.Set(10, FuzzyVariant((void*)TransDesireLooseBallContact));
+                    mUnidentified428->mScriptMachine->ActivateState(13, &parameters, true);
+                }
+            }
+        }
+        else if (IsReceivePassDekeRequested(&dekeDirection))
+            InitActionSlideAttack(0, -1.0f, dekeDirection);
+        else if (IsReceivePassHitRequested(&hitDirection))
+        {
+            unsigned short direction = GetActualFacing();
+            if (m_pController != 0 && m_pController->GetMovementStickMagnitude() > 0.001f)
+                direction = m_pController->GetMovementStickDirection();
+            InitActionHit(0, direction);
         }
     }
 }
