@@ -4331,6 +4331,11 @@ void FreePenaltyData(PenaltyData* data)
     g_PenaltyDataPool.Free(data);
 }
 
+bool ScriptMachine::IsIdle() const
+{
+    return mActiveState == 0;
+}
+
 bool FuzzyVariant::IsPointerType() const
 {
     return ((mType == FT_POINTER || mType == FT_STRING)
