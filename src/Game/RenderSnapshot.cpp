@@ -56,7 +56,7 @@ void RenderSnapshot::Initialize()
     int index = 0;
     for (DrawableFlyingCamera* camera = _2298; index < 10; ++camera)
     {
-        camera->mIndex = index++;
+        camera->mCameraIndex = index++;
     }
 
     mNumFlyingCameras = 0;
