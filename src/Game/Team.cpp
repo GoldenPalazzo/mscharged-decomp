@@ -1063,7 +1063,7 @@ void cTeam::UpdateControllers()
                     else if (!((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !fn_8003881C((cFielder*)m_pPlayers[j]))
+                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
                     {
                         nAvailableFielders++;
                     }
@@ -1090,7 +1090,7 @@ void cTeam::UpdateControllers()
                         && (((cFielder*)m_pPlayers[j])->IsFallenDown()
                             || ((cFielder*)m_pPlayers[j])->IsStuck()
                             || ((cFielder*)m_pPlayers[j])->IsShattered()
-                            || fn_8003881C((cFielder*)m_pPlayers[j])))
+                            || ((cFielder*)m_pPlayers[j])->fn_8003881C()))
                     {
                         m_pPlayers[j]->SwapController(false);
                         nAvailableFielders--;
@@ -1118,7 +1118,7 @@ void cTeam::UpdateControllers()
                         && !((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !fn_8003881C((cFielder*)m_pPlayers[j]))
+                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
                     {
                         bAssigned = true;
                         m_pPlayers[j]->SetAIPad(pAIPad);
