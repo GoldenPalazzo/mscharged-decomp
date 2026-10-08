@@ -21,6 +21,7 @@ void __VISetWSS(void);
 void __VISetClosedCaption(void);
 void __VISetMacrovision(void);
 void __VISetGamma(void);
+void VISetGamma(VIGamma gamma);
 void __VISetTrapFilter(void);
 void __VISetRGBOverDrive(void);
 void __VISetRGBModeImm(void);
