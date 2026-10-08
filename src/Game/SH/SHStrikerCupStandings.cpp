@@ -369,13 +369,13 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
             value = teamPosition + 1;
             break;
         case 1:
-            value = stats.unknown_0x10;
+            value = stats.mNumWins;
             break;
         case 2:
-            value = stats.unknown_0x12;
+            value = stats.mNumLosses;
             break;
         case 3:
-            value = stats.unknown_0x14;
+            value = stats.mNumOTLosses;
             break;
         case 4:
             value = stats.mPlayerTotalStats.mNumGoalsFor;
@@ -384,7 +384,7 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
             value = stats.mPlayerTotalStats.mNumGoalsAgainst;
             break;
         case 6:
-            value = stats.unknown_0x16;
+            value = stats.mNumPoints;
             break;
         }
 

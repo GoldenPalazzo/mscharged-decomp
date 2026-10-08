@@ -27,10 +27,10 @@ struct TeamStats
         mPlayerTotalStats.mRecordType.mTeamID = team;
         mPlayerTotalStats.mType = TYPE_TEAM;
         mTeamIndex = team;
-        unknown_0x10 = 0;
-        unknown_0x12 = 0;
-        unknown_0x14 = 0;
-        unknown_0x16 = 0;
+        mNumWins = 0;
+        mNumLosses = 0;
+        mNumOTLosses = 0;
+        mNumPoints = 0;
         mSidekicks.mValues[0] = (eSidekickID)0;
         mSidekicks.mValues[1] = (eSidekickID)0;
         mSidekicks.mValues[2] = (eSidekickID)0;
@@ -46,10 +46,10 @@ struct TeamStats
 
     /* 0x00 */ eTeamID mTeamIndex;
     /* 0x04 */ CupSidekicks mSidekicks;
-    /* 0x10 */ u16 unknown_0x10;
-    /* 0x12 */ u16 unknown_0x12;
-    /* 0x14 */ u16 unknown_0x14;
-    /* 0x16 */ u16 unknown_0x16;
+    /* 0x10 */ u16 mNumWins;
+    /* 0x12 */ u16 mNumLosses;
+    /* 0x14 */ u16 mNumOTLosses;
+    /* 0x16 */ u16 mNumPoints;
     /* 0x18 */ int mSkillLevel;
     /* 0x1C */ PlayerStats mPlayerTotalStats;
 };
@@ -98,7 +98,7 @@ public:
     void CompileEndOfGameStats();
     void SimulateGame();
     void AddStat(ePlayerStats stat, int team, int player, int value);
-    void fn_80101E0C(ePlayerStats stat, int team, int player, int amount);
+    void AddUserStatByPlayer(ePlayerStats stat, int team, int player, int amount);
     void AddUserStatByPad(ePlayerStats stat, int pad, int amount);
     void TrackWinner(int forfeitSide);
     void WriteStats(float gameTime, float gameDuration, const char* filename);

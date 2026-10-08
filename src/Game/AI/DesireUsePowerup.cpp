@@ -421,30 +421,30 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     if (g_pGame->IsGameplayOrOvertime())
     {
         StatsTracker::s_pInstance->TrackStat(
-            STATS_19, pDesire->m_pFielder->m_pTeam->m_nSide,
+            STATS_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
             pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         if (IsMushroomPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1A, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_MUSHROOMS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsStarOrChainChompPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1C, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_STARS_AND_CHAIN_CHOMPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsCaptainPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1D, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_CAPTAIN_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsDrawablePowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1B, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_DRAWABLE_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
     }
