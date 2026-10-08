@@ -1379,7 +1379,7 @@ bool cFielder::CanGetElectrocuted(
 
             if (bUnidentified && mUnidentified3DC)
             {
-                fn_80060608(g_pGame, this);
+                DeliverWaluigiWallEndEvent(g_pGame, this);
                 fn_8005001C(true);
                 return false;
             }
@@ -1788,7 +1788,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->pTarget = this;
             pAttackData->mUnidentified0C = nUnidentified;
             pAttackData->mUnidentified10 = false;
-            fn_8005ED64(g_pGame, pAttackData);
+            QueueAttackSuccessEvent(g_pGame, pAttackData);
             PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
         }
         else if (pFielderCollidedWith->fn_80038660() && m_eActionState != ACTION_HIT)
@@ -3723,7 +3723,7 @@ void cFielder::DoRegularShooting(bool bParam)
     {
         ShotAtGoalData* pShotData = g_ShotAtGoalDataPool.Allocate();
         pShotData->pShooter = this;
-        fn_8005EED0(g_pGame, pShotData);
+        QueueShotAtGoalEvent(g_pGame, pShotData);
         if (nBallState != 8)
         {
             ePlayerStats stat = STATS_00;
@@ -4968,7 +4968,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttackData->pTarget = pOpponent;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
-        fn_8005ED64(g_pGame, pAttackData);
+        QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (pOpponent->IsSuperGrowActive() && !IsSuperGrowActive()
         && !pOpponent->fn_80038918() && !bUnidentified && !fn_800344B0())
@@ -4984,7 +4984,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttackData->pTarget = this;
         pAttackData->mUnidentified0C = 2;
         pAttackData->mUnidentified10 = false;
-        fn_8005ED64(g_pGame, pAttackData);
+        QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (IsInvincibleChars() && !pOpponent->IsInvincibleChars())
     {

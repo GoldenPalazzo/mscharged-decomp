@@ -4574,7 +4574,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                     = bHasPad ? GetGlobalPad()->GetPadID() : -1;
                 pNode->pTarget = 0;
                 pNode->mUnidentified10 = true;
-                fn_8005ED64(g_pGame, pNode);
+                QueueAttackSuccessEvent(g_pGame, pNode);
 
                 if (m_pBall != 0)
                 {
@@ -4783,7 +4783,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
                 = bHasPad ? pAttacker->GetGlobalPad()->GetPadID() : -1;
             pNode->pTarget = 0;
             pNode->mUnidentified10 = true;
-            fn_8005ED64(g_pGame, pNode);
+            QueueAttackSuccessEvent(g_pGame, pNode);
 
             if (pAttacker->m_pBall != 0
                 && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))

@@ -870,7 +870,7 @@ void UnidentifiedDesire35::Update(
             = nFacingDelta < 0 ? -nFacingDelta : nFacingDelta;
         if ((unsigned short)nAbsFacingDelta > 0x2000)
         {
-            fn_80060608(g_pGame, m_pFielder);
+            DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
             if (m_pFielder->mUnidentified3E0 > 0.0f
                 && m_pFielder->mUnidentified3E0
                     < m_pFielder->mUnidentified3F8.mUnidentified04)
@@ -903,7 +903,7 @@ void UnidentifiedDesire35::Update(
 
 void UnidentifiedDesire35::Cleanup()
 {
-    fn_80060608(g_pGame, m_pFielder);
+    DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
 }
 
 #include "Game/AI/DesireSteeringDebug.inl"

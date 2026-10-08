@@ -2340,7 +2340,7 @@ void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
     pGame->mUnidentified49C.mAttackAttemptEvent.Queue(
         pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
-extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
+void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
@@ -2350,7 +2350,7 @@ extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
     pGame->mUnidentified49C.mAttackSuccessEvent.Queue(
         pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
-extern "C" void fn_8005EED0(cGame* pGame, ShotAtGoalData* pData)
+void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
@@ -2449,7 +2449,7 @@ extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
     }
     pGame->mUnidentified49C.mWaluigiWallStartEvent.Deliver(pFielder);
 }
-extern "C" void fn_80060608(cGame* pGame, cFielder* pFielder)
+void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == 4)
     {

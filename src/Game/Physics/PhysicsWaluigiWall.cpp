@@ -437,7 +437,7 @@ PhysicsWaluigiWall* WaluigiWallManager::CreateWall(cFielder* owner, float width,
             if (mCurrentWall != 0)
             {
                 mPreviousWall = mCurrentWall;
-                fn_80060608(g_pGame, mCurrentWall->mOwner);
+                DeliverWaluigiWallEndEvent(g_pGame, mCurrentWall->mOwner);
             }
             mCurrentWall = wall;
             mOwner = owner;
