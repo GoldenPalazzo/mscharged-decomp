@@ -15,7 +15,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
 
-extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" bool fn_8003E948(const cFielder*);
 
 

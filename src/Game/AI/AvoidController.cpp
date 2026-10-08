@@ -73,7 +73,6 @@ public:
     nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
 };
 
-extern "C" float fn_8002CE14(const PlayerTweaks*);
 bool lbl_806E0BB8;
 
 

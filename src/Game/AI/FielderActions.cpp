@@ -168,7 +168,6 @@ extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern bool lbl_806DB5A8;
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 
 
 

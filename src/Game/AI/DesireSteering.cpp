@@ -23,7 +23,6 @@
 #include <math.h>
 #include <stddef.h>
 
-extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);

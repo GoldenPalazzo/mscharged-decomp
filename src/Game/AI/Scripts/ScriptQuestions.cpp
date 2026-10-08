@@ -33,7 +33,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
 

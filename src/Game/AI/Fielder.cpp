@@ -676,7 +676,6 @@ static inline float GetShotTargetDistance(const nlVector3& ballPosition, const n
 
 #include "NL/nlBind_impl.h"
 
-extern "C" float fn_8002CE14(PlayerTweaks* tweaks);
 
 inline bool cFielder::ShouldSkipHardStopAnim()
 {

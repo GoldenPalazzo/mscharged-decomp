@@ -94,7 +94,6 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
 extern "C" void fn_80015B38(cBall*, bool);
 void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
-extern "C" float fn_8002CE14(PlayerTweaks*);
 static float sfReceivePassMaxDuration = 5.0f;
 unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
 bool g_bFindReceivePassPosition = true;
