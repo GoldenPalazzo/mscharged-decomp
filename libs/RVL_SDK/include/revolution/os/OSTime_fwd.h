@@ -49,8 +49,8 @@ OSTime OSCalendarTimeToTicks(const OSCalendarTime* calendar);
 #define OSMicrosecondsToTicks(usec) OS_USEC_TO_TICKS(usec)
 #define OSNanosecondsToTicks(nsec) OS_NSEC_TO_TICKS(nsec)
 
-#define OS_TICKS_DELTA(x, y) ((s32)(x) - (s32)(y))
-#define OSDiffTick(tick1, tick0) ((s32)(tick1) - (s32)(tick0))
+#define OS_TICKS_DELTA(x, y) ((signed long)(x) - (signed long)(y))
+#define OSDiffTick(tick1, tick0) ((signed long)(tick1) - (signed long)(tick0))
 
 
 #ifdef __cplusplus
