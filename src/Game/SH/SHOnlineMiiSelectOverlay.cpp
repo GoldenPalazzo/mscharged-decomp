@@ -31,7 +31,6 @@
 
 #include <string.h>
 #include "Game/FE/fePageControls.h"
-#include "Game/NetworkSession.h"
 #include "NL/nlstring_tmpl.h"
 
 SHOnlineMiiSelectOverlay::SHOnlineMiiSelectOverlay()

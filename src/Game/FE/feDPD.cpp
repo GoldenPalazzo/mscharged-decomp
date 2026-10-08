@@ -19,7 +19,6 @@
 #include "NL/nlPrint.h"
 #include "NL/plat/DPDData.h"
 #include "decomp.h"
-#include "Game/Render/RLViewLayers.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 TLComponentInstance* gFEPointerInstances[4];

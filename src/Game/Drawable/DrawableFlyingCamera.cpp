@@ -13,7 +13,7 @@
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of
-// a pointer, and owns a lowercase hash of the flying-camera model name. The
+// a pointer, and owns a lowercase hash of the flying-camera model name.
 // It uses the indexed render-object lookup.
 
 static float gShadowScaleHigh = 0.5f;
