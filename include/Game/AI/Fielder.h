@@ -227,6 +227,15 @@ public:
     bool IsReceivePassHitRequested(unsigned short* direction);
     void UpdateFacingToLooseBall();
 
+    float GetRunningSpeed();
+    void ClearInvincibility(bool force);
+    void SetMegaStrikeResult(float numBalls, float accuracy);
+    void EjectMonty(bool finished, unsigned short direction);
+    void EndMontyDeke();
+    float GetAirInterceptHeight(int type);
+    bool CalculateFormationPosition(nlVector3& position);
+    bool IsPeachSuperPowerActive() const;
+
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -737,7 +746,6 @@ public:
 
 // Shared fielder functions and data.
 extern "C" bool fn_8003C180(cFielder*);
-extern "C" void fn_8003C5D8(cFielder* pFielder, bool bParam, unsigned short aDirection);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" bool fn_8002F1E0(cFielder*);
 extern "C" bool fn_8002F310(cFielder* pFielder);
@@ -749,14 +757,12 @@ extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" float fn_80034F98(cFielder*, float);
 extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_800367B4(cFielder*);
-extern "C" float fn_800394A8(cFielder*, int);
 extern "C" void fn_80039F24(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" void fn_8003A5C8(cFielder* pFielder);
 extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern "C" void fn_8003C6E0(cFielder* pFielder);
 extern "C" void fn_8003C7B0(cFielder*);
 extern "C" void fn_8003DA94(cFielder*, bool);
 extern "C" void fn_8003E354(cFielder* pFielder);
@@ -771,7 +777,6 @@ extern float lbl_806E3424;
 extern float lbl_806E3428;
 extern float lbl_806E342C;
 
-extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 
 extern "C" bool fn_8003877C(const cFielder* pFielder);
 

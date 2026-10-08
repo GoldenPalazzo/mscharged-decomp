@@ -65,7 +65,6 @@ cPlayer* FindClosestTeamPlayer(
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
-extern "C" bool fn_8003E99C(const cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 
 float lbl_806DBD80 = 0.75f;
@@ -1225,7 +1224,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
+                || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
             && !pCaptain->mUnidentified3DC)
         {
             pCaptain->TurnOnSuperPowerTank();
@@ -1247,7 +1246,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-            || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
+            || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
         {
             bool bPressed = false;
             for (int i = 0; i < 4; i++)

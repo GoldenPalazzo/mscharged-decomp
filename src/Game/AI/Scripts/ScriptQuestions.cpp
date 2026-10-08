@@ -33,8 +33,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
@@ -579,7 +577,7 @@ static float InPassingLane(cFielder* pFielder, cPlayer* pPassTarget, float fPote
                 g_pBall->m_v3Position, g_pBall->m_v3PassIntercept, pFielder->mUnidentified024.m_v3Position);
             float fDistBall = nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3Between2), true);
             float fTime = fDistBall / fBallSpeed;
-            fTime *= fn_8002E1B0(pFielder);
+            fTime *= pFielder->GetRunningSpeed();
 
             float fDist3 = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, v3Between2), true);
             FuzzyTweaks* pFuzzyTweaks2 = g_pGame->m_pFuzzyTweaks;
@@ -1789,7 +1787,7 @@ extern "C" float fn_800DA518(cFielder* pFielder)
     if (InOffensiveZone(pFielder) > 0.5f)
     {
         nlVector3 v3FormationPos;
-        if (fn_800381B4(pFielder, &v3FormationPos))
+        if (pFielder->CalculateFormationPosition(v3FormationPos))
             v3FormationPos = pFielder->mUnidentified024.m_v3Position;
         SSearchCutAndBreak search(pFielder);
         nlVector3 v3BestPosition;
@@ -1806,7 +1804,7 @@ static float CloseToFormationPosition(cFielder* pFielder, const nlVector3& vPosi
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fCloseToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fCloseToFormationPositionDistanceMin;
@@ -1839,7 +1837,7 @@ float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fNearToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fNearToFormationPositionDistanceMin;
@@ -1854,7 +1852,7 @@ static float FarToFormationPosition(cFielder* pFielder, const nlVector3& vPositi
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fFarToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fFarToFormationPositionDistanceMin;

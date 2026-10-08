@@ -92,7 +92,6 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
 };
 
 extern "C" void fn_8003BA94(cFielder*, float);
-extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
     float*, unsigned short, const LooseBallContactAnimInfo*);
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
@@ -834,7 +833,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     {
         cBall* pBall = g_pBall;
         CalcInterceptXY(m_pFielder->GetPosition(),
-            fn_8002E1B0(m_pFielder), m_pFielder->mUnidentified320->GetRadius(),
+            m_pFielder->GetRunningSpeed(), m_pFielder->mUnidentified320->GetRadius(),
             pBall->GetPosition(), pBall->m_v3Velocity,
             nNumIntercepts, fInterceptTimes);
 

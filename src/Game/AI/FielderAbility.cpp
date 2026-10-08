@@ -102,7 +102,7 @@ void cFielder::ActionDKSuper(float fDeltaT)
 
 void cFielder::CleanUpPeachSuper()
 {
-    fn_80038158(this, 0);
+    ClearInvincibility(0);
 
     if (m_pCurrentAnimController->m_fTime
             * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
@@ -225,7 +225,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         {
             FixedUpdateTask::SetFrameLock(gPeachFlashFrameLockTime);
         }
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(gPeachCamerasAwayFrame))
     {

@@ -110,7 +110,7 @@ void DesireStar::Update(DesireUpdate* update, float fDeltaT)
 void DesireStar::Cleanup()
 {
     KillStar(m_pFielder);
-    fn_80038158(m_pFielder, true);
+    m_pFielder->ClearInvincibility(true);
 }
 
 /**

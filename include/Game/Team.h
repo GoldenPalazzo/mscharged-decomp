@@ -86,8 +86,7 @@ public:
     void ResetCharacters();
     void StopGameplayEffectsAndSounds();
     bool CalculateFormationPosition(nlVector3& v3DestPosition,
-        cFielder* pFielder, bool bInPosition,
-        float fBallPosFormationWeight);
+        cFielder* pFielder, bool bInPosition);
     void CalculateNewBallInterceptTimes();
     PowerUpTeamType GetPowerUpByIndex(int index) const;
     int SetCurrentPowerUp(

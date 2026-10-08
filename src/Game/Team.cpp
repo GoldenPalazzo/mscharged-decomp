@@ -107,12 +107,9 @@ unsigned long GetTeamCaptainChantCue(cTeam*);
 void UpdateTeamCaptainChant(cTeam*);
 void AssignTeamRoles(cTeam*, bool);
 extern "C" void fn_80015B38(cBall*, bool);
-extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
-extern "C" bool fn_8003E99C(const cFielder* pFielder);
 
-extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 
 static inline cAIPad* GetPlayerController(const cPlayer* player)
 {
@@ -418,7 +415,7 @@ void cTeam::AssignMarks(bool bForceReMark)
                                    || pMyFielder->IsShattered();
 
         nlVector3 v3UnidentifiedPosition;
-        fn_800381B4(pMyFielder, &v3UnidentifiedPosition);
+        pMyFielder->CalculateFormationPosition(v3UnidentifiedPosition);
 
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
@@ -698,7 +695,7 @@ void cTeam::CalculateNewBallInterceptTimes()
     {
         pPlayer = GetPlayer(i);
         float interceptTime = -1.0f;
-        float speed = fn_8002E1B0((cFielder*)pPlayer);
+        float speed = ((cFielder*)pPlayer)->GetRunningSpeed();
         float radius = pPlayer->mUnidentified320->GetRadius();
 
         if (Incapacitated(pPlayer))
@@ -721,12 +718,12 @@ void cTeam::CalculateNewBallInterceptTimes()
         {
             int nNumSolutions;
             float pSolutions[2];
-            float fContactHeight = fn_800394A8((cFielder*)pPlayer, 1);
+            float fContactHeight = ((cFielder*)pPlayer)->GetAirInterceptHeight(1);
             float fBallHeight = g_pBall->m_v3Position.z;
             if (fBallHeight > fContactHeight)
             {
                 float fOtherContactHeight
-                    = fn_800394A8((cFielder*)pPlayer, 0);
+                    = ((cFielder*)pPlayer)->GetAirInterceptHeight(0);
                 if (fBallHeight < fOtherContactHeight)
                 {
                     fOtherContactHeight = fContactHeight;
@@ -850,11 +847,10 @@ void cTeam::CalculateNewBallInterceptTimes()
  * Offset/Address/Size: 0x1CBC | 0x800A7A08 | size: 0x8
  */
 bool cTeam::CalculateFormationPosition(nlVector3& v3DestPosition,
-    cFielder* pFielder, bool bInPosition,
-    float fBallPosFormationWeight)
+    cFielder* pFielder, bool bInPosition)
 {
     return m_pFormationManager->CalculateFielderPosition(
-        v3DestPosition, pFielder, bInPosition, fBallPosFormationWeight);
+        v3DestPosition, pFielder, bInPosition);
 }
 
 /**
@@ -1634,7 +1630,7 @@ bool cTeam::fn_800A6764() const
     if (pCaptain->fn_8003E74C()
         || fn_8003E8A0(pCaptain)
         || fn_8003E948(pCaptain)
-        || fn_8003E99C(pCaptain)
+        || pCaptain->IsPeachSuperPowerActive()
         || pCaptain->fn_8003E9F0())
     {
         bCaptainPowerupActive = true;
@@ -1678,7 +1674,7 @@ bool cTeam::TogglePowerup(bool bIsSilent)
     if (mtToggleTimer.m_uPackedTime != 0
         || fn_8003E8A0((cFielder*)m_pPlayers[0])
         || fn_8003E948((cFielder*)m_pPlayers[0])
-        || fn_8003E99C((cFielder*)m_pPlayers[0])
+        || ((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
         || ((cFielder*)m_pPlayers[0])->fn_8003E9F0())
     {
         result = true;
@@ -1712,7 +1708,7 @@ bool cTeam::fn_800A6560()
     if (mtToggleTimer.m_uPackedTime == 0
         && !fn_8003E8A0((cFielder*)m_pPlayers[0])
         && !fn_8003E948((cFielder*)m_pPlayers[0])
-        && !fn_8003E99C((cFielder*)m_pPlayers[0])
+        && !((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
         && !((cFielder*)m_pPlayers[0])->fn_8003E9F0())
     {
         result = true;

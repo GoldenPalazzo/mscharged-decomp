@@ -166,7 +166,6 @@ static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
-extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
@@ -175,7 +174,6 @@ extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003E99C(const cFielder* pFielder);
 
 
 
@@ -1176,7 +1174,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     mUnidentified33A = false;
     mUnidentified33C = 2;
 
-    if (fn_8003E99C(this))
+    if (IsPeachSuperPowerActive())
     {
         if (mUnidentified3DC)
         {
@@ -2583,7 +2581,7 @@ bool cFielder::DoCommonInitActionLooseBall(
         true,
         true);
 
-    float fMaxCatchupSpeed = fn_8002E1B0(this);
+    float fMaxCatchupSpeed = GetRunningSpeed();
     float fMinBallZ = 100.0f;
     bool bBallState5 = g_pBall->meBallState == 5;
     bool bNoContactFound = true;
@@ -5106,7 +5104,7 @@ void cFielder::fn_8004EA9C()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
     }
 }
 
@@ -5133,12 +5131,12 @@ void cFielder::fn_8004EC40()
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
 
         if (m_pBulletBill->active)
         {
@@ -5249,7 +5247,7 @@ void cFielder::fn_8004F180()
 
     mUnidentified17C = true;
     fn_80039CF0(this, 0);
-    fn_80038158(this, 0);
+    ClearInvincibility(0);
     mUnidentified424 = false;
 }
 

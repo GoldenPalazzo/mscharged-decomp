@@ -17,7 +17,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
 extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
 
@@ -161,7 +160,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
         nlVec3ScaleAdd(v3MarkTarget, fMarkingDistance, v3Dir, v3MarkPosition);
         m_pFielder->AddDesiredPosition(v3MarkTarget, gMarkUrgency, fMarkFormationBalance);
         nlVector3 v3FormationPosition;
-        if (fn_800381B4(m_pFielder, &v3FormationPosition))
+        if (m_pFielder->CalculateFormationPosition(v3FormationPosition))
         {
             v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;
         }
@@ -328,7 +327,7 @@ void DesireDefendPos::Update(
     if (fFormationWeight > 0.0f)
     {
         nlVector3 v3FormationPosition;
-        bool bInPosition = fn_800381B4(m_pFielder, &v3FormationPosition);
+        bool bInPosition = m_pFielder->CalculateFormationPosition(v3FormationPosition);
         if (bInPosition)
         {
             v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;

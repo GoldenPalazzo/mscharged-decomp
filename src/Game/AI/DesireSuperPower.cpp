@@ -410,7 +410,7 @@ void DesireSuperPower::Cleanup()
         EndBowserSmoke(m_pFielder);
         break;
     case WALUIGI:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         {
             EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
                 "bowserjr_shriek_mouth");
@@ -421,16 +421,16 @@ void DesireSuperPower::Cleanup()
         }
         break;
     case DONKEYKONG:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         break;
     case WARIO:
         m_pFielder->mUnidentified181 = false;
         m_pFielder->mUnidentified182 = false;
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         break;
     case HAMMERBROS:
         KillDKSuperCharge(m_pFielder);
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         delete (AvoidablePoint*)mpDKShockAvoidable;
         mpDKShockAvoidable = 0;
         break;
@@ -451,7 +451,7 @@ void DesireSuperPower::Cleanup()
         SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         m_pFielder->mUnidentified404 = 0.0f;
         m_pFielder->mUnidentified408 = 0.0f;
         m_pFielder->ClearSuperPowerTank();
@@ -600,7 +600,7 @@ extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
  */
 void EmitBowserJrShriek(DesireSuperPower* self)
 {
-    fn_80038158(self->m_pFielder, 0);
+    self->m_pFielder->ClearInvincibility(0);
     nlVector3 vel;
     vel.z = 0.0f;
     nlPolarToCartesian(vel.x, vel.y,
@@ -722,13 +722,13 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
     }
     else if (m_pFielder->m_pCurrentAnimController->TestTrigger(0.04f + gDaisyFistSpawnTime))
     {
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
     }
 }
 
 void DesireSuperPower::EmitHeavenlyLight()
 {
-    fn_80038158(m_pFielder, 0);
+    m_pFielder->ClearInvincibility(0);
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y,
         m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);

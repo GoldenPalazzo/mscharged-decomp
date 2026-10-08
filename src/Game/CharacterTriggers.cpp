@@ -1876,7 +1876,7 @@ void BeginDeke(cFielder* pFielder)
 
 void EndDeke(cFielder* pFielder)
 {
-    fn_80038158(pFielder, 0);
+    pFielder->ClearInvincibility(0);
 
     if (pFielder->mUnidentified024.m_eCharacterClass == 3)
     {

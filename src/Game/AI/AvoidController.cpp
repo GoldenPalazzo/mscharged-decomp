@@ -73,7 +73,6 @@ public:
     nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
 };
 
-extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_8002CE14(const PlayerTweaks*);
 bool lbl_806E0BB8;
 
@@ -759,7 +758,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     }
 
     nlVec3Add(v3Repulsion, v3Repulsion, m_pFielder->GetDesiredVelocity());
-    float fDesiredSpeed = fn_8002E1B0(m_pFielder);
+    float fDesiredSpeed = m_pFielder->GetRunningSpeed();
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
     float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(fn_8002CE14(m_pFielder->GetTweaks()));
@@ -923,7 +922,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
         nlVec3Scale(context.mUnidentified000,
             nlRecipSqrt(nlVec3LengthSquared(context.mUnidentified000), true));
     }
-    context.mUnidentified00C = fn_8002E1B0(((AvoidableFielder*)mUnidentified004)->m_pFielder);
+    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
     nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
     nlVec3ScaleAdd(context.mUnidentified000, 0.9f * context.mUnidentified01C, context.mUnidentified044, context.mUnidentified000);
     context.UnidentifiedNormalize();
@@ -953,7 +952,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800121D0(
     else
         context.mUnidentified000 = context.mUnidentified044;
     context.mUnidentified00C = nlMaxEquals(context.mUnidentified01C,
-        fn_8002E1B0(((AvoidableFielder*)mUnidentified004)->m_pFielder));
+        ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed());
     return true;
 }
 
@@ -993,7 +992,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
         nlVec3Scale(context.mUnidentified000,
             nlRecipSqrt(nlVec3LengthSquared(context.mUnidentified000), true));
     }
-    context.mUnidentified00C = fn_8002E1B0(((AvoidableFielder*)mUnidentified004)->m_pFielder);
+    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
     nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
     nlVec3ScaleAdd(context.mUnidentified000, 0.9f * context.mUnidentified01C, context.mUnidentified044, context.mUnidentified000);
     context.UnidentifiedNormalize();
@@ -1029,7 +1028,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800127E0(
         }
     }
     context.mUnidentified014 = 1;
-    context.mUnidentified00C = fn_8002E1B0(((AvoidableFielder*)mUnidentified004)->m_pFielder);
+    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
     nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
     nlVec3ScaleAdd(context.mUnidentified000, -context.mUnidentified050, context.mUnidentified054, context.mUnidentified000);
     context.UnidentifiedNormalize();

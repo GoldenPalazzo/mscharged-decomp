@@ -5274,3 +5274,92 @@ void cFielder::UpdateFacingToLooseBall()
         }
     }
 }
+
+float cFielder::GetRunningSpeed()
+{
+    float speed;
+    if (g_pBall->GetOwnerFielder() == this)
+    {
+        speed = m_pTweaks->GetRunningSpeed();
+    }
+    else
+    {
+        speed = fn_8002C254(m_pTweaks);
+    }
+    return GetSpeedPowerupAdjusted(speed);
+}
+
+void cFielder::ClearInvincibility(bool force)
+{
+    if (!IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24) || force == true)
+    {
+        muInvincibleStatus = 0;
+    }
+}
+
+void cFielder::SetMegaStrikeResult(float numBalls, float accuracy)
+{
+    mUnidentified390 = numBalls;
+    mUnidentified478 = 2;
+    mUnidentified394 = accuracy;
+    mUnidentified398 = GetFixedUpdateTask()->mSimulationTime;
+}
+
+void cFielder::EjectMonty(bool finished, unsigned short direction)
+{
+    nlVector3 velocity;
+    nlSinCos(&velocity.y, &velocity.x, direction);
+    velocity.x *= 24.0f;
+    velocity.y *= 24.0f;
+    velocity.z = 10.0f;
+    SetVelocity(velocity);
+    SetAnimState(0x7c, true, 0.2f, false, false);
+    InitMovementCoast();
+    mUnidentified424 = finished;
+    SetTangible(true, false);
+    mUnidentified178 = 1.0f;
+}
+
+void cFielder::EndMontyDeke()
+{
+    SetAnimState(0x50, false, 0.0f, false, false);
+    m_pCurrentAnimController->SetTime(0.5f);
+    InitMovementFromAnim(0, v3Zero, 1.0f, false);
+    nlVector3 position = mUnidentified024.m_v3Position;
+    position.z = 0.0f;
+    SetPosition(position);
+    mUnidentified424 = true;
+    mUnidentified178 = 1.0f;
+    mUnidentified17C = true;
+    EmitMontyDekeExit(this);
+}
+
+float cFielder::GetAirInterceptHeight(int type)
+{
+    if (mfAirInterceptHeight[type] < 0.0f)
+    {
+        const LooseBallContactAnimInfo* anim = gOneTimerIdleVolleyContactAnims;
+        if (type == 0)
+            anim = gOneTimerLeadGroundContactAnims;
+        nlVector3 position;
+        const cSAnim* contactAnim = m_pAnimInventory->GetAnim(anim->nAnimID);
+        GetJointPositionFuture(&position, anim->nAnimID, m_nBallJointIndex,
+            contactAnim->GetNormalizedTime(anim->fAnimContactFrame),
+            true, true, false, true);
+        mfAirInterceptHeight[type] = position.z;
+    }
+    return mfAirInterceptHeight[type] * GetPlayerScale();
+}
+
+bool cFielder::CalculateFormationPosition(nlVector3& position)
+{
+    m_bInPosition = m_pTeam->CalculateFormationPosition(position, this, m_bInPosition);
+    return m_bInPosition;
+}
+
+bool cFielder::IsPeachSuperPowerActive() const
+{
+    bool active;
+    GetCharacterSpecialActive(this, PEACH, active);
+    return active;
+}
