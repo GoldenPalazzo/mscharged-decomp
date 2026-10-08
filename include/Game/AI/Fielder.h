@@ -179,7 +179,6 @@ class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
-class cFielder;
 class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
@@ -610,7 +609,6 @@ public:
     bool IsDefense() const;
     PlayerTweaks* GetNormalTweaks() const { return m_pNormalTweaks; }
 
-public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;
 
 private:
@@ -628,7 +626,6 @@ private:
 public:
     /* 0x33C */ int m_nDPadDownCounter;
 
-public:
     /* 0x340 */ float m_fElectrocutionTime;
     /* 0x344 */ float m_fElectrocutionLiftTime;
     /* 0x348 */ bool m_bGroundElectrocution;
@@ -646,7 +643,6 @@ private:
 public:
     /* 0x360 */ bool m_bHitReactFrameLock;
 
-public:
     /* 0x361 */ bool bYoshiInWindup;
     /* 0x362 */ bool bIsModified;
 
@@ -656,11 +652,8 @@ private:
 public:
     /* 0x364 */ ActLooseBallPass mActionLooseBallPassVars;
 
-public:
     /* 0x368 */ float m_fOneTimerAnimTime;
 
-private:
-public:
     /* 0x36C */ cPlayer* m_pPassTarget;
     /* 0x370 */ bool m_bAllowLeadPass;
     /* 0x371 */ bool m_bOneTouchPass;
@@ -672,7 +665,6 @@ public:
     /* 0x374 */ ActRunPassVars mActionRunPassVars;
     /* 0x37C */ ActRunningVars mActionRunningVars;
 
-public:
     /* 0x384 */ ActRunningWBVars mActionRunningWBVars;
 
 private:
@@ -711,17 +703,14 @@ public:
     /* 0x3D0 */ float m_fMegaStrikeSegment4Position;
     /* 0x3D4 */ float mUnidentified3D4;
 
-public:
     /* 0x3D8 */ s16 m_nStunnedAngularAcceleration;
     /* 0x3DA */ s16 m_nStunnedAngularVelocity;
 
-public:
     /* 0x3DC */ bool m_bSuperPowerTankOn;
 
 private:
     /* 0x3DD */ bool m_bSuperPowerTankShutdownPending;
 
-private:
     /* 0x3DE */ u8 mUnknown3DE[0x02];
 
 public:
@@ -743,10 +732,8 @@ private:
 public:
     /* 0x410 */ ActBooSkillshot mActionBooSkillshot;
 
-public:
     /* 0x420 */ BulletBillObject* m_pBulletBill;
 
-public:
     /* 0x424 */ bool m_bMontyDekeFinished;
 
 private:
@@ -770,7 +757,6 @@ private:
 public:
     /* 0x440 */ Timer mtPostDekeTimer;
 
-public:
     /* 0x448 */ int m_nPowerupAnimID;
 
 private:
@@ -799,7 +785,6 @@ private:
 public:
     /* 0x478 */ int m_nMegaStrikeResultState;
 
-public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 private:
     bool ShouldSkipHardStopAnim();
@@ -809,7 +794,6 @@ private:
     bool CheckReceivePassState();
     bool IsAvailableToReceivePass();
 }; // total size: 0x480
-
 
 // Shared fielder functions and data.
 class Desire;
@@ -824,16 +808,8 @@ extern bool gForceHomeUserControl;
 extern bool gForceAwayUserControl;
 extern unsigned char gEnableStandingWallElectrocution;
 extern unsigned char gForceHeavyHitReaction;
-extern float lbl_806E3418;
-extern float lbl_806E3420;
-extern float lbl_806E3424;
-extern float lbl_806E3428;
-extern float lbl_806E342C;
-
 
 bool IsFielderDazed(const cFielder* pFielder);
-
-
 
 ScriptMachine* GetFielderScriptMachine(cFielder* pFielder);
 

@@ -73,7 +73,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-
 float gHeadTrackingSmoothTime = 0.22f;
 float gImpactRumbleX = 0.035f;
 float gImpactRumbleY = 0.02f;
@@ -570,7 +569,6 @@ struct FielderDesireShdState
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
-
 static inline void EndFrozenState(cFielder* fielder, int state)
 {
     if (((DesireFrozen*)GetConcurrentState(
@@ -667,7 +665,6 @@ static inline float GetShotTargetDistance(const nlVector3& ballPosition, const n
 }
 
 #include "NL/nlBind_impl.h"
-
 
 inline bool cFielder::ShouldSkipHardStopAnim()
 {
