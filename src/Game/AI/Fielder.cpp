@@ -74,7 +74,7 @@
 #include "Game/Audio/RegistryPools.h"
 
 
-float lbl_806DB6E8 = 0.22f;
+float gHeadTrackingSmoothTime = 0.22f;
 float gImpactRumbleX = 0.035f;
 float gImpactRumbleY = 0.02f;
 float gImpactRumbleSpring = 2500.0f;
@@ -99,26 +99,26 @@ float gHardStopTerrainSpeedBoost = 0.58f;
 float gStartAnimPlaybackSpeed = 1.2f;
 float gStartTerrainSpeedBoost = 0.33f;
 float gSlideInterceptTimeScale = 0.33f;
-float lbl_806DB74C = 0.2f;
-float lbl_806DB750 = 5.0f;
-float lbl_806DB754 = 0.6f;
+float gSlideBallContactRadiusBuffer = 0.2f;
+float gGasConfusionDuration = 5.0f;
+float gKoopaBirdoSkillshotHeightFraction = 0.6f;
 float gWindDebrisKnockbackScale = 2.5f;
 float gWindDebrisKnockbackZ = 20.0f;
-float lbl_806DB760 = 0.2f;
-float lbl_806DB764 = 0.6f;
-float lbl_806DB768 = 0.1f;
-float lbl_806DB76C = 1.0f;
-float lbl_806DB770 = 0.6f;
-float lbl_806DB774 = 0.1f;
-float lbl_806DB778 = 0.2f;
-float lbl_806DB77C = 0.6f;
-float lbl_806DB780 = 1.0f;
-float lbl_806DB784 = 0.6f;
-float lbl_806DB788 = 4.5f;
+float gYoshiYolkGooDuration = 0.2f;
+float gYoshiYolkAnimSpeedScale = 0.6f;
+float gYoshiYolkMovementScale = 0.1f;
+float gMuckHoleGooDuration = 1.0f;
+float gMuckHoleAnimSpeedScale = 0.6f;
+float gMuckHoleMovementScale = 0.1f;
+float gSandGooDuration = 0.2f;
+float gSandRunningSpeedScale = 0.6f;
+float gSandAnimSpeedScale = 1.0f;
+float gSandMovementScale = 0.6f;
+float gFirePatchBurnDuration = 4.5f;
 float gThwompBallReleaseSpeed = 10.0f;
-float lbl_806DB790 = 1.1f;
-float lbl_806DB794 = 1.1f;
-float lbl_806DB798 = 1.0f;
+float gShotChargeMin = 1.1f;
+float gShotChargeMax = 1.1f;
+float gSuperPowerHeadTrackingHeight = 1.0f;
 bool gUseMovementStickForDeke = true;
 float gBaseDekeDistance = 2.5f;
 float gDekeChargeDistance = 8.5f;
@@ -126,54 +126,54 @@ float gDekeDirectionSpread = 1000.0f;
 float gBooDekeAlpha = 0.4f;
 float gBooDekeFadeTime = 2.5f;
 float gMontyReappearRadius = 2.25f;
-float lbl_806DB7B8 = 27.5f;
-float lbl_806DB7BC = 35.0f;
-float lbl_806DB7C0 = 25.0f;
-float lbl_806DB7C4 = 45.0f;
-float lbl_806DB7C8 = 0.2f;
-float lbl_806DB7CC = 1.2f;
-float lbl_806DB7D0 = 25.0f;
-float lbl_806DB7D4 = 5.0f;
-float lbl_806DB7D8 = 13.0f;
-float lbl_806DB7DC = 18.0f;
-float lbl_806DB7E0 = 1.33f;
-float lbl_806DB7E4 = 1.75f;
-float lbl_806DB7E8 = 12.5f;
-float lbl_806DB7EC = 23.5f;
-float lbl_806DB7F0 = 0.2f;
-float lbl_806DB7F4 = 0.33f;
+float gKoopaSkillshotSpeed = 27.5f;
+float gBirdoSkillshotSpeed = 35.0f;
+float gShotSpinMinSpeed = 25.0f;
+float gShotSpinMaxSpeed = 45.0f;
+float gShotSpinMinScale = 0.2f;
+float gShotSpinMaxScale = 1.2f;
+float gShotYSpinBase = 25.0f;
+float gShotYSpinRange = 5.0f;
+float gShotYSpinMinDistance = 13.0f;
+float gShotYSpinMaxDistance = 18.0f;
+float gClearMinFlightTime = 1.33f;
+float gClearMaxFlightTime = 1.75f;
+float gClearMinDistance = 12.5f;
+float gClearMaxDistance = 23.5f;
+float gClearPositionWeight = 0.2f;
+float gClearShotMeterWeight = 0.33f;
 float gPenaltyPossessionGraceTime = 0.66f;
-float lbl_806DB7FC = 0.2f;
-float lbl_806DB800 = -0.425f;
-float lbl_806DB804 = 0.425f;
-bool lbl_806DB808 = true;
-float lbl_806DB80C = 5.0f;
-float lbl_806DB810 = 0.9f;
+float gHitFrameLockMinIntensity = 0.2f;
+float gLightHitReactionThreshold = -0.425f;
+float gHeavyHitReactionThreshold = 0.425f;
+bool gHitFrameLockRequiresHeavyReaction = true;
+float gModifiedShotFarTargetOffset = 5.0f;
+float gModifiedShotMinTargetOffsetFraction = 0.9f;
 float gChipShotMinVerticalSpeed = 22.5f;
 float gChipShotMaxVerticalSpeed = 22.5f;
-float lbl_806DB81C = 8.3f;
-float lbl_806DB820 = 12.075f;
-float lbl_806DB824 = 8.875f;
-float lbl_806DB828 = 20.0f;
+float gModifiedShotNearSpeed = 8.3f;
+float gModifiedShotFarSpeed = 12.075f;
+float gModifiedShotNearDistance = 8.875f;
+float gModifiedShotFarDistance = 20.0f;
 float gChipShotAirResistance = 0.15f;
 bool gbUseDumpCharging = true;
-float lbl_806DB834 = 1.5f;
-float lbl_806DB838 = 1.5f;
+float gDumpChargeMin = 1.5f;
+float gDumpChargeMax = 1.5f;
 float gLooseBallContactBufferTime = 0.45f;
 static TweakBoolBinding sUseDumpChargingTweak(
     "gbUseDumpCharging", "Game/Gameplay/Charging/Dump", &gbUseDumpCharging, true);
 
-bool lbl_806E0C50;
-bool lbl_806E0C51;
-bool lbl_806E0C52;
-bool lbl_806E0C53;
+bool gForceUserControl;
+bool gForceHomeUserControl;
+bool gForceAwayUserControl;
+bool gDisableClearAngleLimits;
 float gWindDebrisKnockbackZRange;
-bool lbl_806E0C58;
-bool lbl_806E0C59;
+bool gUseBowserPeteyHeadTracking;
+bool gShrinkerIgnoreTeammates;
 float gIntangibleAlpha;
-bool lbl_806E0C60;
-unsigned char lbl_806E0C61;
-unsigned char lbl_806E0C62;
+bool gDisableElectrocution;
+unsigned char gEnableStandingWallElectrocution;
+unsigned char gForceHeavyHitReaction;
 
 static inline cFielder* GetAIOrderedFielder(cTeam* pTeam, s32 i)
 {
@@ -1111,7 +1111,7 @@ int GetFielderHitReaction(cFielder* pFielder,
     float fUnidentified0 = pFielder->m_pTweaks->GetDefenseSize();
     float fUnidentified1 = pFielderCollidedWith->m_pTweaks->GetDefenseSize();
     int nUnidentified = 1;
-    if (lbl_806E0C62 || GameInfoManager::Instance()->IsRule0x8Equal1())
+    if (gForceHeavyHitReaction || GameInfoManager::Instance()->IsRule0x8Equal1())
         return 2;
 
     if (fUnidentified1 < 0.0f && fUnidentified0 >= 0.0f)
@@ -1122,9 +1122,9 @@ int GetFielderHitReaction(cFielder* pFielder,
     attackIntensity -= 0.5f;
     float fUnidentified2 = fUnidentified1 - fUnidentified0;
     fUnidentified2 += attackIntensity;
-    if (fUnidentified2 <= lbl_806DB800)
+    if (fUnidentified2 <= gLightHitReactionThreshold)
         nUnidentified = 0;
-    else if (fUnidentified2 >= lbl_806DB804)
+    else if (fUnidentified2 >= gHeavyHitReactionThreshold)
         nUnidentified = 2;
 
     if (pFielderCollidedWith->IsMushroomActive()
@@ -1289,7 +1289,7 @@ bool cFielder::CanBeHitBySkillshot()
 
 bool cFielder::CanGetElectrocuted() const
 {
-    if (lbl_806E0C60 || GameInfoManager::Instance()->IsRule0x4Equal2())
+    if (gDisableElectrocution || GameInfoManager::Instance()->IsRule0x4Equal2())
         return false;
     if (IsInFallAction())
         return false;
@@ -1387,7 +1387,7 @@ bool cFielder::CanGetElectrocuted(
                 }
             }
 
-            if (lbl_806E0C61 != 0
+            if (gEnableStandingWallElectrocution != 0
                 || GameInfoManager::Instance()->IsRule0x4Equal3())
             {
                 if (m_eActionState != (eFielderActionState)2)
@@ -1735,9 +1735,9 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 pData->velocity1, pFielderCollidedWith);
             int nUnidentified = GetFielderHitReaction(this, pFielderCollidedWith, attackIntensity);
             bool canPickup = false;
-            if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || IsSuperGrowActive()))
+            if (m_pBall != 0 && (attackIntensity >= gHitFrameLockMinIntensity || IsSuperGrowActive()))
             {
-                if (lbl_806DB808)
+                if (gHitFrameLockRequiresHeavyReaction)
                 {
                     if (nUnidentified == 2 || IsSuperGrowActive())
                         canPickup = true;
@@ -2233,7 +2233,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
         {
             if (m_eActionState == ACTION_UNKNOWN_34)
             {
-                fn_80097358(this, lbl_806DB788);
+                fn_80097358(this, gFirePatchBurnDuration);
                 return;
             }
             if (m_pBall != 0)
@@ -2241,7 +2241,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 ReleaseBall(0);
                 ShootBallDueToContact(eventData->mUnidentified10->m_Velocity);
             }
-            fn_8004E11C(lbl_806DB788);
+            fn_8004E11C(gFirePatchBurnDuration);
             PlayRumbleAction(2, GetGlobalPad());
         }
     }
@@ -2251,7 +2251,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             && !IsStuck() && !IsInvincible())
         {
             UnidentifiedVariantCollection params;
-            params.Set(7, FuzzyVariant(lbl_806DB750));
+            params.Set(7, FuzzyVariant(gGasConfusionDuration));
             ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1E, &params,
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E));
         }
@@ -2280,23 +2280,23 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             if (type == 5)
             {
                 params.Set(0, FuzzyVariant(info->mFriction));
-                params.Set(1, FuzzyVariant(lbl_806DB760));
-                params.Set(2, FuzzyVariant(lbl_806DB764));
-                params.Set(3, FuzzyVariant(lbl_806DB768));
+                params.Set(1, FuzzyVariant(gYoshiYolkGooDuration));
+                params.Set(2, FuzzyVariant(gYoshiYolkAnimSpeedScale));
+                params.Set(3, FuzzyVariant(gYoshiYolkMovementScale));
             }
             else if (type == 4)
             {
                 params.Set(0, FuzzyVariant(info->mFriction));
-                params.Set(1, FuzzyVariant(lbl_806DB76C));
-                params.Set(2, FuzzyVariant(lbl_806DB770));
-                params.Set(3, FuzzyVariant(lbl_806DB774));
+                params.Set(1, FuzzyVariant(gMuckHoleGooDuration));
+                params.Set(2, FuzzyVariant(gMuckHoleAnimSpeedScale));
+                params.Set(3, FuzzyVariant(gMuckHoleMovementScale));
             }
             else if (type == 11)
             {
-                params.Set(0, FuzzyVariant(lbl_806DB77C));
-                params.Set(1, FuzzyVariant(lbl_806DB778));
-                params.Set(2, FuzzyVariant(lbl_806DB780));
-                params.Set(3, FuzzyVariant(lbl_806DB784));
+                params.Set(0, FuzzyVariant(gSandRunningSpeedScale));
+                params.Set(1, FuzzyVariant(gSandGooDuration));
+                params.Set(2, FuzzyVariant(gSandAnimSpeedScale));
+                params.Set(3, FuzzyVariant(gSandMovementScale));
             }
             if (type == 4)
             {
@@ -2337,7 +2337,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             && !IsInFallAction() && !IsInvincible())
         {
             cPlayer* pOwner = eventData->mUnidentified10->m_pOwner;
-            if (lbl_806E0C59 && IsOnSameTeam(pOwner))
+            if (gShrinkerIgnoreTeammates && IsOnSameTeam(pOwner))
             {
                 return;
             }
@@ -2898,16 +2898,16 @@ void cFielder::DoClearBall()
     nlVector3 v3Target;
     nlVector3 v3ClearBallVelocity;
     float fAbsPosition = fabsf(mUnidentified024.m_v3Position.x);
-    float fPositionValue = lbl_806DB7F0 * InterpolateRangeClamped(0.0f, 1.0f,
+    float fPositionValue = gClearPositionWeight * InterpolateRangeClamped(0.0f, 1.0f,
         cField::GetGoalLineX(1U), 0.0f, fAbsPosition);
-    float fBallChargeValue = (1.0f - lbl_806DB7F0) * fn_800156A8(g_pBall);
-    float fDesiredTime = Interpolate(lbl_806DB7E0, lbl_806DB7E4,
+    float fBallChargeValue = (1.0f - gClearPositionWeight) * fn_800156A8(g_pBall);
+    float fDesiredTime = Interpolate(gClearMinFlightTime, gClearMaxFlightTime,
         fBallChargeValue + fPositionValue);
     ShotMeter* pShotMeter = m_pShotMeter;
     float fShotMeterSpeed = pShotMeter->m_fSpeedValue;
-    float fShotMeterValue = lbl_806DB7F4 * fShotMeterSpeed;
-    float fPlayerValue = (1.0f - lbl_806DB7F4) * fn_8002BE38(m_pTweaks);
-    float fClearDistance = Interpolate(lbl_806DB7E8, lbl_806DB7EC,
+    float fShotMeterValue = gClearShotMeterWeight * fShotMeterSpeed;
+    float fPlayerValue = (1.0f - gClearShotMeterWeight) * fn_8002BE38(m_pTweaks);
+    float fClearDistance = Interpolate(gClearMinDistance, gClearMaxDistance,
         fShotMeterValue + fPlayerValue);
 
     aClearingAngle = mUnidentified024.m_aActualFacingDirection;
@@ -2930,7 +2930,7 @@ void cFielder::DoClearBall()
         }
     }
 
-    if (!lbl_806E0C53)
+    if (!gDisableClearAngleLimits)
     {
         nlVector3 v3Top;
         nlVector3 v3Bottom;
@@ -3003,7 +3003,7 @@ void cFielder::DoClearBall()
     }
     if (gbUseDumpCharging && m_eClassType == FIELDER)
     {
-        float fCharge = Interpolate(lbl_806DB834, lbl_806DB838,
+        float fCharge = Interpolate(gDumpChargeMin, gDumpChargeMax,
             InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(m_pTweaks)));
         fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     }
@@ -3014,8 +3014,8 @@ void cFielder::DoClearBall()
 
 float cFielder::GetModifiedShotTargetDistance(float shotDistance)
 {
-    return InterpolateRangeClamped(lbl_806DB80C, 0.36f,
-        lbl_806DB828, lbl_806DB824, shotDistance);
+    return InterpolateRangeClamped(gModifiedShotFarTargetOffset, 0.36f,
+        gModifiedShotFarDistance, gModifiedShotNearDistance, shotDistance);
 }
 
 bool cFielder::IsActionModifierPressed()
@@ -3380,17 +3380,17 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     {
         if (mUnidentified024.m_eCharacterClass == 14)
         {
-            fShotSpeed = lbl_806DB7B8;
+            fShotSpeed = gKoopaSkillshotSpeed;
         }
         else if (mUnidentified024.m_eCharacterClass == 12)
         {
-            fShotSpeed = lbl_806DB7BC;
+            fShotSpeed = gBirdoSkillshotSpeed;
         }
     }
     else if (nParam == 7)
     {
-        fShotSpeed = InterpolateRangeClamped(lbl_806DB81C, lbl_806DB820,
-            lbl_806DB824, lbl_806DB828, fShotDist);
+        fShotSpeed = InterpolateRangeClamped(gModifiedShotNearSpeed, gModifiedShotFarSpeed,
+            gModifiedShotNearDistance, gModifiedShotFarDistance, fShotDist);
     }
     else
     {
@@ -3520,7 +3520,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
 
         if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
         {
-            v3PositionOut.z = cNet::GetNetHeight() * lbl_806DB754;
+            v3PositionOut.z = cNet::GetNetHeight() * gKoopaBirdoSkillshotHeightFraction;
             v3PositionOut.y = 0.0f;
         }
         else if (bIsModified)
@@ -3535,8 +3535,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
                 nlVec3Scale(v3Direction, v3Direction,
                     nlRecipSqrt(nlVec3LengthSquared(v3Direction), true));
                 float fDistance = GetModifiedShotTargetDistance(fShotDist);
-                float fOffset = fDistance * lbl_806DB810
-                    + nlRandomf(fDistance * (1.0f - lbl_806DB810));
+                float fOffset = fDistance * gModifiedShotMinTargetOffsetFraction
+                    + nlRandomf(fDistance * (1.0f - gModifiedShotMinTargetOffsetFraction));
                 nlVec3Scale(v3Direction, v3Direction, fOffset);
                 nlVec3Add(v3PositionOut, v3PositionOut, v3Direction);
             }
@@ -3578,7 +3578,7 @@ void cFielder::DoRegularShooting(bool bParam)
         nBallState = 7;
     }
 
-    float fCharge = Interpolate(lbl_806DB790, lbl_806DB794,
+    float fCharge = Interpolate(gShotChargeMin, gShotChargeMax,
         InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(m_pTweaks)));
     fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     CalcRegularShot(v3BallVelocity, v3Target, nBallState);
@@ -3618,8 +3618,8 @@ void cFielder::DoRegularShooting(bool bParam)
     }
     else
     {
-        float fSpinScale = InterpolateRangeClamped(lbl_806DB7C8, lbl_806DB7CC,
-            lbl_806DB7C0, lbl_806DB7C4, nlVec3Length(v3BallVelocity));
+        float fSpinScale = InterpolateRangeClamped(gShotSpinMinScale, gShotSpinMaxScale,
+            gShotSpinMinSpeed, gShotSpinMaxSpeed, nlVec3Length(v3BallVelocity));
         spinType = SPINTYPE_PARAMETER;
         float fXSpin = 8.0f * fSpinScale;
         float fZSpin = 15.0f * fSpinScale;
@@ -3630,15 +3630,15 @@ void cFielder::DoRegularShooting(bool bParam)
         if (!m_pTeam->GetOtherTeam()->GetGoalie()->mbShouldMiss
             && m_pTweaks->fShooting > 0.25f && m_pTweaks->fShooting < 0.75f)
         {
-            float fMinDistanceSq = lbl_806DB7D8 * lbl_806DB7D8;
+            float fMinDistanceSq = gShotYSpinMinDistance * gShotYSpinMinDistance;
             float fDistanceSq = nlVec3DistanceSquared2D(
                 mUnidentified024.m_v3Position, m_pTeam->GetOtherNet()->m_v3NetLocation);
             if (fDistanceSq > fMinDistanceSq)
             {
                 float fDistanceValue = InterpolateRangeClamped(0.2f, 1.0f,
-                    lbl_806DB7D8, lbl_806DB7DC, nlSqrt(fDistanceSq, true));
+                    gShotYSpinMinDistance, gShotYSpinMaxDistance, nlSqrt(fDistanceSq, true));
                 v3AngVel.y = -fSpinScale * fDistanceValue
-                    * (lbl_806DB7D0 + nlRandomf(lbl_806DB7D4));
+                    * (gShotYSpinBase + nlRandomf(gShotYSpinRange));
             }
         }
         v3AngVel.z = fZSpin + nlRandomf(fZSpin);
@@ -4288,7 +4288,7 @@ void cFielder::BeginDekeIntangibility()
                 if (fabsf(destination.y) < 0.5f * cNet::GetNetWidth())
                 {
                     destination.x = AIsgn(destination.x) * cField::GetGoalLineX(1U);
-                    if (lbl_806E0C60 || GameInfoManager::Instance()->IsRule0x4Equal2()
+                    if (gDisableElectrocution || GameInfoManager::Instance()->IsRule0x4Equal2()
                         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
                     {
                         if (destination.y < 0.0f)
@@ -4909,7 +4909,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
             float fPlayerScale = mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
                 + fn_8002BFA8(GetTweaks(), fPlayerScale);
-            fUnidentified += lbl_806DB74C;
+            fUnidentified += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;
@@ -4922,7 +4922,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
             float fPlayerScale = pOpponent->mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
                 + fn_8002BFA8(pOpponent->GetTweaks(), fPlayerScale);
-            fUnidentified += lbl_806DB74C;
+            fUnidentified += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(pOpponent->mUnidentified024.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;
@@ -5579,11 +5579,11 @@ void cFielder::UpdateActionState(float dt)
 
 void cFielder::UpdateHeadTracking(float fDeltaT)
 {
-    m_pHeadTrack->m_fSmoothTime = lbl_806DB6E8;
+    m_pHeadTrack->m_fSmoothTime = gHeadTrackingSmoothTime;
 
     if ((IsBowserSuperPowerActive(this) || IsPeteySuperPowerActive()) && m_bSuperPowerTankOn)
     {
-        if (lbl_806E0C58)
+        if (gUseBowserPeteyHeadTracking)
         {
             cPlayer* pUnidentified = g_pBall->m_pOwner;
             if (pUnidentified != 0)
@@ -5617,7 +5617,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
             {
                 v3Unidentified = pUnidentified->mUnidentified024.m_v3Position;
             }
-            v3Unidentified.z = lbl_806DB798;
+            v3Unidentified.z = gSuperPowerHeadTrackingHeight;
             m_pHeadTrack->m_v3OOI = v3Unidentified;
             m_pHeadTrack->m_bTrackOOI = true;
         }
@@ -6114,26 +6114,26 @@ void cFielder::SetMegaStrikeResult(float numBalls, float accuracy)
     m_fMegaStrikeReceivedTimestamp = GetFixedUpdateTask()->mSimulationTime;
 }
 
-u16 lbl_806DB842 = 0xFFFF;
-u16 lbl_806DB844 = 0xFFFF;
-u16 lbl_806DB846 = 0xFFFF;
-u16 lbl_806DB848 = 0xFFFF;
-u16 lbl_806DB84A = 0xFFFF;
-u16 lbl_806DB84C = 0xFFFF;
-u16 lbl_806DB84E = 0xFFFF;
-u16 lbl_806DB850 = 0xFFFF;
-u16 lbl_806DB852 = 0xFFFF;
-u16 lbl_806DB854 = 0xFFFF;
-u16 lbl_806DB856 = 0xFFFF;
-u16 lbl_806DB858 = 0xFFFF;
-u16 lbl_806DB85A = 0xFFFF;
-u16 lbl_806DB85C = 0xFFFF;
-u16 lbl_806DB85E = 0xFFFF;
-u16 lbl_806DB860 = 0xFFFF;
-u16 lbl_806DB862 = 0xFFFF;
-u16 lbl_806DB864 = 0xFFFF;
-u16 lbl_806DB866 = 0xFFFF;
-u16 lbl_806DB868 = 0xFFFF;
+u16 sFielderType = 0xFFFF;
+u16 sActCrowdVarsType = 0xFFFF;
+u16 sActDekeVarsType = 0xFFFF;
+u16 sActElectVarsType = 0xFFFF;
+u16 sActFallVarsType = 0xFFFF;
+u16 sActHitVarsType = 0xFFFF;
+u16 sActHitReactVarsType = 0xFFFF;
+u16 sActSuperVarsType = 0xFFFF;
+u16 sActShootPassCommonType = 0xFFFF;
+u16 sActLooseBallPassType = 0xFFFF;
+u16 sActOneTimerVarsType = 0xFFFF;
+u16 sActPassingVarsType = 0xFFFF;
+u16 sActRunPassVarsType = 0xFFFF;
+u16 sActRunningVarsType = 0xFFFF;
+u16 sActRunningWBVarsType = 0xFFFF;
+u16 sActSlideAttackType = 0xFFFF;
+u16 sActMegaStrikeMeterType = 0xFFFF;
+u16 sActStunnedType = 0xFFFF;
+u16 sActBowserSuperType = 0xFFFF;
+u16 sActWarioSuperType = 0xFFFF;
 
 inline void cFielder::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
 {
@@ -6386,12 +6386,12 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
 {
     cPlayer::SyncLog(context, cache);
 
-    if (lbl_806DB842 == 0xFFFF)
+    if (sFielderType == 0xFFFF)
     {
-        RegisterDebugFields(&lbl_806DB842, cache);
+        RegisterDebugFields(&sFielderType, cache);
     }
 
-    void* data = cache->WriteData(lbl_806DB842, &m_bHasBeenUpdated,
+    void* data = cache->WriteData(sFielderType, &m_bHasBeenUpdated,
         offsetof(cFielder, mUnidentified478) - offsetof(cFielder, m_bHasBeenUpdated));
     if (data != 0)
     {
@@ -6403,73 +6403,73 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
                 ? -1
                 : m_pMark[i]->mUnidentified120);
         }
-        cache->ChecksumData(lbl_806DB842, data, context);
+        cache->ChecksumData(sFielderType, data, context);
     }
 
-    if (lbl_806DB844 == 0xFFFF)
+    if (sActCrowdVarsType == 0xFFFF)
     {
-        RegisterActCrowdVarsFields(&lbl_806DB844, cache);
+        RegisterActCrowdVarsFields(&sActCrowdVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB844, &mActionCrowdVars, context);
-    cache->WriteData(lbl_806DB844, &mActionCrowdVars, sizeof(mActionCrowdVars));
+    cache->ChecksumData(sActCrowdVarsType, &mActionCrowdVars, context);
+    cache->WriteData(sActCrowdVarsType, &mActionCrowdVars, sizeof(mActionCrowdVars));
 
-    if (lbl_806DB846 == 0xFFFF)
+    if (sActDekeVarsType == 0xFFFF)
     {
-        RegisterActDekeVarsFields(&lbl_806DB846, cache);
+        RegisterActDekeVarsFields(&sActDekeVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB846, &m_aDekeDirection, context);
-    cache->WriteData(lbl_806DB846, &m_aDekeDirection,
+    cache->ChecksumData(sActDekeVarsType, &m_aDekeDirection, context);
+    cache->WriteData(sActDekeVarsType, &m_aDekeDirection,
         offsetof(cFielder, m_fElectrocutionTime) - offsetof(cFielder, m_aDekeDirection));
 
-    if (lbl_806DB848 == 0xFFFF)
+    if (sActElectVarsType == 0xFFFF)
     {
-        RegisterActElectVarsFields(&lbl_806DB848, cache);
+        RegisterActElectVarsFields(&sActElectVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB848, &m_fElectrocutionTime, context);
-    cache->WriteData(lbl_806DB848, &m_fElectrocutionTime,
+    cache->ChecksumData(sActElectVarsType, &m_fElectrocutionTime, context);
+    cache->WriteData(sActElectVarsType, &m_fElectrocutionTime,
         offsetof(cFielder, m_fFallingTime) - offsetof(cFielder, m_fElectrocutionTime));
 
-    if (lbl_806DB84A == 0xFFFF)
+    if (sActFallVarsType == 0xFFFF)
     {
-        RegisterActFallVarsFields(&lbl_806DB84A, cache);
+        RegisterActFallVarsFields(&sActFallVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB84A, &m_fFallingTime, context);
-    cache->WriteData(lbl_806DB84A, &m_fFallingTime,
+    cache->ChecksumData(sActFallVarsType, &m_fFallingTime, context);
+    cache->WriteData(sActFallVarsType, &m_fFallingTime,
         offsetof(cFielder, m_fHitDistance) - offsetof(cFielder, m_fFallingTime));
 
-    if (lbl_806DB84C == 0xFFFF)
+    if (sActHitVarsType == 0xFFFF)
     {
-        RegisterActHitVarsFields(&lbl_806DB84C, cache);
+        RegisterActHitVarsFields(&sActHitVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB84C, &m_fHitDistance, context);
-    cache->WriteData(lbl_806DB84C, &m_fHitDistance, sizeof(m_fHitDistance));
+    cache->ChecksumData(sActHitVarsType, &m_fHitDistance, context);
+    cache->WriteData(sActHitVarsType, &m_fHitDistance, sizeof(m_fHitDistance));
 
-    if (lbl_806DB84E == 0xFFFF)
+    if (sActHitReactVarsType == 0xFFFF)
     {
-        RegisterActHitReactVarsFields(&lbl_806DB84E, cache);
+        RegisterActHitReactVarsFields(&sActHitReactVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB84E, &m_bHitReactFrameLock, context);
-    cache->WriteData(lbl_806DB84E, &m_bHitReactFrameLock, sizeof(m_bHitReactFrameLock));
+    cache->ChecksumData(sActHitReactVarsType, &m_bHitReactFrameLock, context);
+    cache->WriteData(sActHitReactVarsType, &m_bHitReactFrameLock, sizeof(m_bHitReactFrameLock));
 
-    if (lbl_806DB850 == 0xFFFF)
+    if (sActSuperVarsType == 0xFFFF)
     {
-        RegisterActSuperVarsFields(&lbl_806DB850, cache);
+        RegisterActSuperVarsFields(&sActSuperVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB850, &bYoshiInWindup, context);
-    cache->WriteData(lbl_806DB850, &bYoshiInWindup, sizeof(bYoshiInWindup));
+    cache->ChecksumData(sActSuperVarsType, &bYoshiInWindup, context);
+    cache->WriteData(sActSuperVarsType, &bYoshiInWindup, sizeof(bYoshiInWindup));
 
-    if (lbl_806DB852 == 0xFFFF)
+    if (sActShootPassCommonType == 0xFFFF)
     {
-        RegisterActShootPassCommonFields(&lbl_806DB852, cache);
+        RegisterActShootPassCommonFields(&sActShootPassCommonType, cache);
     }
-    cache->ChecksumData(lbl_806DB852, &bIsModified, context);
-    cache->WriteData(lbl_806DB852, &bIsModified, sizeof(bIsModified));
+    cache->ChecksumData(sActShootPassCommonType, &bIsModified, context);
+    cache->WriteData(sActShootPassCommonType, &bIsModified, sizeof(bIsModified));
 
-    if (lbl_806DB854 == 0xFFFF)
+    if (sActLooseBallPassType == 0xFFFF)
     {
-        RegisterActLooseBallPassFields(&lbl_806DB854, cache);
+        RegisterActLooseBallPassFields(&sActLooseBallPassType, cache);
     }
-    data = cache->WriteData(lbl_806DB854,
+    data = cache->WriteData(sActLooseBallPassType,
         &mActionLooseBallPassVars, sizeof(mActionLooseBallPassVars));
     if (data != 0)
     {
@@ -6477,21 +6477,21 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         copy->passTarget = (cFielder*)(mActionLooseBallPassVars.passTarget == 0
             ? -1
             : mActionLooseBallPassVars.passTarget->mUnidentified120);
-        cache->ChecksumData(lbl_806DB854, data, context);
+        cache->ChecksumData(sActLooseBallPassType, data, context);
     }
 
-    if (lbl_806DB856 == 0xFFFF)
+    if (sActOneTimerVarsType == 0xFFFF)
     {
-        RegisterActOneTimerVarsFields(&lbl_806DB856, cache);
+        RegisterActOneTimerVarsFields(&sActOneTimerVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB856, &m_fOneTimerAnimTime, context);
-    cache->WriteData(lbl_806DB856, &m_fOneTimerAnimTime, sizeof(m_fOneTimerAnimTime));
+    cache->ChecksumData(sActOneTimerVarsType, &m_fOneTimerAnimTime, context);
+    cache->WriteData(sActOneTimerVarsType, &m_fOneTimerAnimTime, sizeof(m_fOneTimerAnimTime));
 
-    if (lbl_806DB858 == 0xFFFF)
+    if (sActPassingVarsType == 0xFFFF)
     {
-        RegisterActPassingVarsFields(&lbl_806DB858, cache);
+        RegisterActPassingVarsFields(&sActPassingVarsType, cache);
     }
-    data = cache->WriteData(lbl_806DB858, &m_pPassTarget,
+    data = cache->WriteData(sActPassingVarsType, &m_pPassTarget,
         offsetof(cFielder, mActionRunPassVars) - offsetof(cFielder, m_pPassTarget));
     if (data != 0)
     {
@@ -6499,67 +6499,67 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         copy->m_pPassTarget = (cPlayer*)(m_pPassTarget == 0
             ? -1
             : m_pPassTarget->mUnidentified120);
-        cache->ChecksumData(lbl_806DB858, data, context);
+        cache->ChecksumData(sActPassingVarsType, data, context);
     }
 
-    if (lbl_806DB85A == 0xFFFF)
+    if (sActRunPassVarsType == 0xFFFF)
     {
-        RegisterActRunPassVarsFields(&lbl_806DB85A, cache);
+        RegisterActRunPassVarsFields(&sActRunPassVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB85A, &mActionRunPassVars, context);
-    cache->WriteData(lbl_806DB85A, &mActionRunPassVars, sizeof(mActionRunPassVars));
+    cache->ChecksumData(sActRunPassVarsType, &mActionRunPassVars, context);
+    cache->WriteData(sActRunPassVarsType, &mActionRunPassVars, sizeof(mActionRunPassVars));
 
-    if (lbl_806DB85C == 0xFFFF)
+    if (sActRunningVarsType == 0xFFFF)
     {
-        RegisterActRunningVarsFields(&lbl_806DB85C, cache);
+        RegisterActRunningVarsFields(&sActRunningVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB85C, &mActionRunningVars, context);
-    cache->WriteData(lbl_806DB85C, &mActionRunningVars, sizeof(mActionRunningVars));
+    cache->ChecksumData(sActRunningVarsType, &mActionRunningVars, context);
+    cache->WriteData(sActRunningVarsType, &mActionRunningVars, sizeof(mActionRunningVars));
 
-    if (lbl_806DB85E == 0xFFFF)
+    if (sActRunningWBVarsType == 0xFFFF)
     {
-        RegisterActRunningWBVarsFields(&lbl_806DB85E, cache);
+        RegisterActRunningWBVarsFields(&sActRunningWBVarsType, cache);
     }
-    cache->ChecksumData(lbl_806DB85E, &mActionRunningWBVars, context);
-    cache->WriteData(lbl_806DB85E, &mActionRunningWBVars, sizeof(mActionRunningWBVars));
+    cache->ChecksumData(sActRunningWBVarsType, &mActionRunningWBVars, context);
+    cache->WriteData(sActRunningWBVarsType, &mActionRunningWBVars, sizeof(mActionRunningWBVars));
 
-    if (lbl_806DB860 == 0xFFFF)
+    if (sActSlideAttackType == 0xFFFF)
     {
-        RegisterActSlideAttackFields(&lbl_806DB860, cache);
+        RegisterActSlideAttackFields(&sActSlideAttackType, cache);
     }
-    cache->ChecksumData(lbl_806DB860, &m_eSlideAttackState, context);
-    cache->WriteData(lbl_806DB860, &m_eSlideAttackState,
+    cache->ChecksumData(sActSlideAttackType, &m_eSlideAttackState, context);
+    cache->WriteData(sActSlideAttackType, &m_eSlideAttackState,
         offsetof(cFielder, mUnidentified390) - offsetof(cFielder, m_eSlideAttackState));
 
-    if (lbl_806DB862 == 0xFFFF)
+    if (sActMegaStrikeMeterType == 0xFFFF)
     {
-        RegisterActMegaStrikeMeterFields(&lbl_806DB862, cache);
+        RegisterActMegaStrikeMeterFields(&sActMegaStrikeMeterType, cache);
     }
-    cache->ChecksumData(lbl_806DB862, &mUnidentified390, context);
-    cache->WriteData(lbl_806DB862, &mUnidentified390,
+    cache->ChecksumData(sActMegaStrikeMeterType, &mUnidentified390, context);
+    cache->WriteData(sActMegaStrikeMeterType, &mUnidentified390,
         offsetof(cFielder, mUnidentified39C) - offsetof(cFielder, mUnidentified390));
 
-    if (lbl_806DB864 == 0xFFFF)
+    if (sActStunnedType == 0xFFFF)
     {
-        RegisterActStunnedFields(&lbl_806DB864, cache);
+        RegisterActStunnedFields(&sActStunnedType, cache);
     }
-    cache->ChecksumData(lbl_806DB864, &m_nStunnedAngularAcceleration, context);
-    cache->WriteData(lbl_806DB864, &m_nStunnedAngularAcceleration,
+    cache->ChecksumData(sActStunnedType, &m_nStunnedAngularAcceleration, context);
+    cache->WriteData(sActStunnedType, &m_nStunnedAngularAcceleration,
         offsetof(cFielder, m_bSuperPowerTankOn) - offsetof(cFielder, m_nStunnedAngularAcceleration));
 
-    if (lbl_806DB866 == 0xFFFF)
+    if (sActBowserSuperType == 0xFFFF)
     {
-        RegisterActBowserSuperFields(&lbl_806DB866, cache);
+        RegisterActBowserSuperFields(&sActBowserSuperType, cache);
     }
-    cache->ChecksumData(lbl_806DB866, &mActionBowserSuper, context);
-    cache->WriteData(lbl_806DB866, &mActionBowserSuper, sizeof(mActionBowserSuper));
+    cache->ChecksumData(sActBowserSuperType, &mActionBowserSuper, context);
+    cache->WriteData(sActBowserSuperType, &mActionBowserSuper, sizeof(mActionBowserSuper));
 
-    if (lbl_806DB868 == 0xFFFF)
+    if (sActWarioSuperType == 0xFFFF)
     {
-        RegisterActWarioSuperFields(&lbl_806DB868, cache);
+        RegisterActWarioSuperFields(&sActWarioSuperType, cache);
     }
-    cache->ChecksumData(lbl_806DB868, &m_fNextGasTime, context);
-    cache->WriteData(lbl_806DB868, &m_fNextGasTime, sizeof(m_fNextGasTime));
+    cache->ChecksumData(sActWarioSuperType, &m_fNextGasTime, context);
+    cache->WriteData(sActWarioSuperType, &m_fNextGasTime, sizeof(m_fNextGasTime));
 
     DesireSteering* steering = (DesireSteering*)GetFielderDesire(this, 34);
     fn_8000F324(steering->m_pAvoidance, context, cache);

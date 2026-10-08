@@ -127,10 +127,10 @@ void DesireSteering::Update(
     DesireUpdate*, float fDeltaT)
 {
     IsWaluigiSuperPowerActive(m_pFielder);
-    bool bUseAvoidance = !lbl_806E0C50
-                      && (!lbl_806E0C51
+    bool bUseAvoidance = !gForceUserControl
+                      && (!gForceHomeUserControl
                           || m_pFielder->m_pTeam->m_nSide != HOME)
-                      && (!lbl_806E0C52
+                      && (!gForceAwayUserControl
                           || m_pFielder->m_pTeam->m_nSide != AWAY);
 
     if (m_fTotalWeight < 0.0f)
