@@ -1371,7 +1371,7 @@ bool cFielder::CanGetElectrocuted(
             if (bUnidentified && m_bSuperPowerTankOn)
             {
                 DeliverWaluigiWallEndEvent(g_pGame, this);
-                fn_8005001C(true);
+                TurnOffSuperPowerTank(true);
                 return false;
             }
 
@@ -1864,7 +1864,7 @@ bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, cons
         || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
     {
         if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !IsSuperGrowActive())
-            fn_8004D480(velocity);
+            InitActionKnockdownReact(velocity);
         else
         {
             InitActionShellReact(position, velocity);
@@ -2082,7 +2082,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
         else if (chain->meChainChompState != CHAIN_STATE_RECOVER)
             fn_80047240(chain->mpThrower, direction, 2, false, false);
         else
-            fn_8004D480(chain->mv3Velocity);
+            InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
             StatsTracker::Instance()->TrackStat((ePlayerStats)0x1E, m_pTeam->m_nSide,
                 mUnidentified1E4.m_ID, chain->mnThrowerPadID, 0, 0, 0);
@@ -2143,7 +2143,7 @@ void cFielder::CollideWithThwompCallback(CollisionThwompPlayerData* event)
                     InitActionShellReact(*event->thwomp->GetPosition(), v3Zero);
             }
             else
-                fn_8004D480(direction);
+                InitActionKnockdownReact(direction);
             PlayRumbleAction(3, GetGlobalPad());
         }
     }
@@ -4950,7 +4950,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     {
         pReactee = pOpponent;
         pAttacker = this;
-        pOpponent->fn_8004D480(v3Zero);
+        pOpponent->InitActionKnockdownReact(v3Zero);
 
         PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
         pAttackData->pAttacker = this;
@@ -4966,7 +4966,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     {
         pReactee = this;
         pAttacker = pOpponent;
-        fn_8004D480(v3Zero);
+        InitActionKnockdownReact(v3Zero);
 
         PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
         pAttackData->pAttacker = pOpponent;
@@ -5518,7 +5518,7 @@ void cFielder::UpdateActionState(float dt)
         ActionPostWhistle(dt);
         break;
     case 0x11:
-        ActionSquishReact(dt);
+        ActionReceivePass(dt);
         break;
     case ACTION_RUNNING:
         ActionRunning(dt);
@@ -5542,13 +5542,13 @@ void cFielder::UpdateActionState(float dt)
         ActionBombReact(dt);
         break;
     case 0x1B:
-        ActionShellReact(dt);
+        ActionBananaReact(dt);
         break;
     case 0x1A:
-        ActionSTSHitReact(dt);
+        ActionShellReact(dt);
         break;
     case 0x1C:
-        ActionBananaReact(dt);
+        ActionKnockdownReact(dt);
         break;
     case 0x1D:
         if (!g_pGame->IsGameplayOrOvertime() && ShouldStartCrossBlend(4))

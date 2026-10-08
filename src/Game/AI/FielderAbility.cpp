@@ -271,10 +271,10 @@ void cFielder::ClearSuperPowerTank()
 {
     m_fSuperPowerTankLevel = 0.0f;
     m_fSuperPowerTankCapacity = 0.0f;
-    fn_8005001C(true);
+    TurnOffSuperPowerTank(true);
 }
 
-void cFielder::fn_8005001C(bool bForce)
+void cFielder::TurnOffSuperPowerTank(bool bForce)
 {
     if (mUnidentified024.m_eCharacterClass == BOWSER)
     {

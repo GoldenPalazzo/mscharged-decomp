@@ -515,7 +515,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
         }
         else if (m_pFielder->m_bSuperPowerTankOn)
         {
-            m_pFielder->fn_8005001C(false);
+            m_pFielder->TurnOffSuperPowerTank(false);
         }
         *update = 0;
     }
@@ -531,10 +531,10 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
         {
             if (!fn_8002EDC8(m_pFielder, -1))
             {
-                m_pFielder->fn_8005001C(true);
+                m_pFielder->TurnOffSuperPowerTank(true);
                 return;
             }
-            m_pFielder->fn_800D0534(fDeltaT);
+            m_pFielder->DrainSuperPowerTank(fDeltaT);
             bool active = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
             if (active)
             {
@@ -955,7 +955,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
         }
         else if (m_pFielder->m_bSuperPowerTankOn)
         {
-            m_pFielder->fn_8005001C(false);
+            m_pFielder->TurnOffSuperPowerTank(false);
         }
         *update = 0;
     }
@@ -975,7 +975,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                 if (IsMuckBallReady() == true)
                 {
                     m_pFielder->mUnidentified404 = m_pFielder->mUnidentified40C;
-                    m_pFielder->fn_800D0534(1.0f / (float)gPeteyMuckBallCount);
+                    m_pFielder->DrainSuperPowerTank(1.0f / (float)gPeteyMuckBallCount);
                     nlVector3 pos;
                     nlVector3 direction;
                     const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
@@ -1114,7 +1114,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         nlSinCos(&direction.y, &direction.x, m_pFielder->mUnidentified024.m_aActualFacingDirection);
         if (m_pFielder->m_pBall == 0 && NearToBall(m_pFielder) >= 0.7f
             || IsWaluigiWallAhead(&direction, m_pFielder))
-            m_pFielder->fn_8005001C(true);
+            m_pFielder->TurnOffSuperPowerTank(true);
     }
     else if (!m_pFielder->m_bSuperPowerTankOn
         && (m_pFielder->GetDesireState() == 12 || m_pFielder->GetDesireState() == 13))
@@ -1190,7 +1190,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         }
         else if (m_pFielder->m_bSuperPowerTankOn)
         {
-            m_pFielder->fn_8005001C(true);
+            m_pFielder->TurnOffSuperPowerTank(true);
         }
         else if (m_pFielder->m_pBall != 0 && InDefensiveZone(m_pFielder) < 0.5f)
         {
@@ -1262,7 +1262,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
             }
             else
             {
-                fielder->fn_8005001C(false);
+                fielder->TurnOffSuperPowerTank(false);
                 result = 1;
             }
         }
@@ -1290,7 +1290,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
                 short folded = absolute % 0x4000;
                 bool okay = folded < 0x2000 || (unsigned int)nlAbsInt(folded - 0x4000) < 0x2000;
                 if (!okay)
-                    fielder->fn_8005001C(true);
+                    fielder->TurnOffSuperPowerTank(true);
             }
         }
     }
@@ -1331,7 +1331,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
         result.SetParameter(8, FuzzyVariant(gChooseDirectionWindupShotState));
         result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
         if (fielder.mFielder->m_bSuperPowerTankOn)
-            fielder.mFielder->fn_8005001C(true);
+            fielder.mFielder->TurnOffSuperPowerTank(true);
     }
     else if (fielder.mFielder->m_bSuperPowerTankOn && distanceTravelled >= 2.0f)
     {
@@ -1383,7 +1383,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 result.SetParameter(8, FuzzyVariant(gChooseDirectionBlockedWindupShotState));
                 result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
                 if (fielder.mFielder->m_bSuperPowerTankOn)
-                    fielder.mFielder->fn_8005001C(true);
+                    fielder.mFielder->TurnOffSuperPowerTank(true);
             }
             else
             {
@@ -1402,7 +1402,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 short folded = absolute % 0x4000;
                 bool okay = folded < 0x2000 || (unsigned int)nlAbsInt(folded - 0x4000) < 0x2000;
                 if (!okay)
-                    fielder.mFielder->fn_8005001C(true);
+                    fielder.mFielder->TurnOffSuperPowerTank(true);
             }
         }
     }
@@ -1516,7 +1516,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 m_pFielder->TurnOnSuperPowerTank();
         }
         else if (m_pFielder->m_bSuperPowerTankOn)
-            m_pFielder->fn_8005001C(false);
+            m_pFielder->TurnOffSuperPowerTank(false);
         *update = 0;
     }
     if (update->mData.i == 0)
@@ -1534,7 +1534,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
             {
                 if (!fn_8002EDC8(m_pFielder, -1))
                 {
-                    m_pFielder->fn_8005001C(true);
+                    m_pFielder->TurnOffSuperPowerTank(true);
                     return;
                 }
                 m_pFielder->m_fNextGasTime -= fDeltaT;
@@ -1545,7 +1545,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     m_pFielder->PlayImpactCameraRumble();
-                    m_pFielder->fn_800D0534(gWarioGasInterval);
+                    m_pFielder->DrainSuperPowerTank(gWarioGasInterval);
                     m_pFielder->m_fNextGasTime = gWarioGasInterval;
                     nlVector3 pos;
                     nlVector3 offset;

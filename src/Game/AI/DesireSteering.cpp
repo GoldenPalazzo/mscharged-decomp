@@ -834,7 +834,7 @@ void UnidentifiedDesire35::Update(
     }
     if (!fn_8002EDC8(m_pFielder, -1))
     {
-        m_pFielder->fn_8005001C(true);
+        m_pFielder->TurnOffSuperPowerTank(true);
         fn_80060804(g_pGame, m_pFielder);
         return;
     }
@@ -858,7 +858,7 @@ void UnidentifiedDesire35::Update(
     {
         if (m_pFielder->m_bSuperPowerTankShutdownPending)
         {
-            m_pFielder->fn_8005001C(true);
+            m_pFielder->TurnOffSuperPowerTank(true);
             return;
         }
 

@@ -96,7 +96,7 @@ class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
 class WaluigiWallManager;
-void fn_80048870(cFielder* pFielder);
+void FreezeEveryoneButCaptain(cFielder* pFielder);
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims();
 int GetNumOneTimerIdleGroundContactAnims();
 const LooseBallContactAnimInfo* GetOneTimerIdleVolleyContactAnims();
@@ -427,7 +427,7 @@ public:
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
-    void fn_800D0534(float amount)
+    void DrainSuperPowerTank(float amount)
     {
         m_fSuperPowerTankLevel -= amount;
     }
@@ -541,7 +541,7 @@ public:
     void fn_8004FF40();
     float GetSuperPowerTankFraction();
     void ClearSuperPowerTank();
-    void fn_8005001C(bool bForce);
+    void TurnOffSuperPowerTank(bool bForce);
     void InitSuperPowerTank(bool bTurnOn);
     bool TurnOnSuperPowerTank();
     void fn_80045AEC(PhysicsObject* pObject);
@@ -580,7 +580,7 @@ public:
     void fn_8004C02C(float fDeltaT);
     void fn_8004C88C(float fDeltaT);
     void fn_8004D238();
-    void fn_8004D480(const nlVector3& v3CollisionVelocity);
+    void InitActionKnockdownReact(const nlVector3& v3CollisionVelocity);
     void fn_8004E228();
     void fn_8004E8B8();
     void fn_8004EA9C();
@@ -596,10 +596,10 @@ public:
     void fn_8004E438();
     void ActionSlideAttackReact(float fDeltaT);
     void ActionBombReact(float fDeltaT);
-    void ActionSTSHitReact(float fDeltaT);
     void ActionShellReact(float fDeltaT);
     void ActionBananaReact(float fDeltaT);
-    void ActionSquishReact(float fDeltaT);
+    void ActionKnockdownReact(float fDeltaT);
+    void ActionReceivePass(float fDeltaT);
     void InitActionReceivePass(int animID, nlVector3& v3TargetPos,
         short sDirectionSeekSpeed, float fAdjustEndTime);
     void InitActionWait();

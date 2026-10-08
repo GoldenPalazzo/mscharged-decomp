@@ -1995,7 +1995,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                             }
                             else
                             {
-                                pFielder->fn_8004D480(pFielder->mUnidentified024.m_v3Velocity);
+                                pFielder->InitActionKnockdownReact(pFielder->mUnidentified024.m_v3Velocity);
                             }
                         }
                     }
@@ -2217,7 +2217,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     }
     if (pEventData->player->IsShrunk())
     {
-        pEventData->player->fn_8004D480(v3Zero);
+        pEventData->player->InitActionKnockdownReact(v3Zero);
         return;
     }
 
@@ -2259,7 +2259,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
     {
         if (pEventData->player->IsShrunk())
         {
-            pEventData->player->fn_8004D480(v3Zero);
+            pEventData->player->InitActionKnockdownReact(v3Zero);
         }
         else
         {
@@ -2546,7 +2546,7 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
         cFielder* pFielder = (cFielder*)pCharacter;
         if (!pFielder->IsFallenDown())
         {
-            pFielder->fn_8004D480(v3Zero);
+            pFielder->InitActionKnockdownReact(v3Zero);
         }
         PlaySound(pEventData->pFielder->m_uSoundSlotId, 0x52641B7BUL, NULL, NULL);
     }
@@ -2589,7 +2589,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
             }
             else
             {
-                pFielder->fn_8004D480(pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
+                pFielder->InitActionKnockdownReact(pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
             }
         }
     }

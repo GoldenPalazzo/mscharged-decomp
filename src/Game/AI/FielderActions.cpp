@@ -1170,14 +1170,14 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     {
         if (m_bSuperPowerTankOn)
         {
-            fn_8005001C(false);
+            TurnOffSuperPowerTank(false);
         }
     }
     else if (IsPeteySuperPowerActive())
     {
         if (m_bSuperPowerTankOn)
         {
-            fn_8005001C(false);
+            TurnOffSuperPowerTank(false);
         }
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
@@ -2891,7 +2891,7 @@ void cFielder::fn_800486DC(float fDeltaT)
     }
 }
 
-void fn_80048870(cFielder* pFielder)
+void FreezeEveryoneButCaptain(cFielder* pFielder)
 {
     lbl_806DB5A8 = false;
 
@@ -2999,7 +2999,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
     if (m_bSuperPowerTankOn)
     {
-        fn_8005001C(true);
+        TurnOffSuperPowerTank(true);
     }
 
     bool bDidWindup = false;
@@ -3281,7 +3281,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
                 (SceneList)0x64);
         pScene->mMegaStrikeStarted = true;
         SetAction((eFielderActionState)0xB);
-        fn_80048870(0);
+        FreezeEveryoneButCaptain(0);
 
         m_pTeam->GetGoalie()->fn_8008E2D0();
         m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008E2D0();
@@ -4683,7 +4683,7 @@ void cFielder::fn_8004D238()
     mUnidentified1E4.m_eLastPadAction = 0x32;
 }
 
-void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
+void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
 {
     EndFrozenOrDazed();
     fn_8009750C();
@@ -4816,14 +4816,6 @@ void cFielder::ActionBombReact(float fDeltaT)
     }
 }
 
-void cFielder::ActionSTSHitReact(float fDeltaT)
-{
-    if (ShouldStartCrossBlend(4))
-    {
-        EndAction();
-    }
-}
-
 void cFielder::ActionShellReact(float fDeltaT)
 {
     if (ShouldStartCrossBlend(4))
@@ -4833,6 +4825,14 @@ void cFielder::ActionShellReact(float fDeltaT)
 }
 
 void cFielder::ActionBananaReact(float fDeltaT)
+{
+    if (ShouldStartCrossBlend(4))
+    {
+        EndAction();
+    }
+}
+
+void cFielder::ActionKnockdownReact(float fDeltaT)
 {
     if (ShouldStartCrossBlend(4))
     {
@@ -4857,7 +4857,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
     ClearPowerupAnimState(false);
 }
 
-void cFielder::ActionSquishReact(float fDeltaT)
+void cFielder::ActionReceivePass(float fDeltaT)
 {
     if (ShouldStartCrossBlend(0x52))
     {

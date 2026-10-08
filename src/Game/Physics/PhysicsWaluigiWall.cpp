@@ -516,7 +516,7 @@ void WaluigiWallManager::Update(float dt)
                 if (wall->mEmitter != 0 && wall->mHealth < 0.2f)
                 {
                     if (wall->mOwner->m_bSuperPowerTankOn)
-                        wall->mOwner->fn_8005001C(true);
+                        wall->mOwner->TurnOffSuperPowerTank(true);
                     wall->mEmitter->m_uUserData = 0;
                     wall->mEmitter->m_TimeScale = 5.0f;
                     wall->mEmitter = 0;

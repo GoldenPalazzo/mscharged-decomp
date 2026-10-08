@@ -1261,7 +1261,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
                 }
             }
             if (!bPressed)
-                pCaptain->fn_8005001C(false);
+                pCaptain->TurnOffSuperPowerTank(false);
         }
     }
 }
