@@ -235,7 +235,7 @@ void NPCManager::CreateWindDebris()
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mWindDebris[i] = pObject;
-        pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::fn_801B4830);
+        pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::CollisionCallback);
     }
 }
 
@@ -692,7 +692,7 @@ void NPCManager::ResetNPCs()
     {
         if (mWindDebris[i] != 0)
         {
-            mWindDebris[i]->fn_801B4B9C();
+            mWindDebris[i]->Reset();
         }
     }
     for (i = 0; i < 8; ++i)

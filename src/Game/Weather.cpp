@@ -530,7 +530,7 @@ void Windy::OnGetReadyForKickoff()
 {
     for (int i = 0; i < 3; i++)
     {
-        gNPCManager->fn_801A9DE0(i)->fn_801B4B24(false);
+        gNPCManager->fn_801A9DE0(i)->Deactivate(false);
     }
 }
 
@@ -670,7 +670,7 @@ void Windy::Start()
                 npc->SetPosition(debrisPosition);
                 npc->mv3Velocity = debrisVelocity;
                 npc->maFacingDirection = aWindDirection;
-                npc->fn_801B4AD0();
+                npc->Activate();
             }
         }
     }
