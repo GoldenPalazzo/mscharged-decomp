@@ -270,6 +270,7 @@ public:
     bool ShouldIClearBall();
     void TestAnimBallContact();
     void TestLooseBallControls(bool forceContact);
+    float CalcSlideAttackBallIntercept(nlVector3& target, int direction);
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();

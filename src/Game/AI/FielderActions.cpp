@@ -168,8 +168,6 @@ extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern bool lbl_806DB5A8;
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" float fn_80038970(
-    cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 
@@ -4401,7 +4399,7 @@ void cFielder::InitActionSlideAttack(
         nlVector3 v3BallDelta;
         if (fTime < 0.0f)
         {
-            fTime = fn_80038970(this, &v3Target, nParam);
+            fTime = CalcSlideAttackBallIntercept(v3Target, nParam);
         }
         else
         {

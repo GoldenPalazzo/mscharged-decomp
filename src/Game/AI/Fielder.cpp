@@ -6388,3 +6388,89 @@ void cFielder::TestLooseBallControls(bool forceContact)
         }
     }
 }
+
+float gSlideInterceptTimeScale = 0.33f;
+
+static inline float GetSlideInterceptTimeLimit(PlayerTweaks* tweaks)
+{
+    return gSlideInterceptTimeScale * (GetSlideTime(tweaks) + GetSlideDecelTime(tweaks));
+}
+
+float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
+{
+    nlVector3 velocity = g_pBall->m_v3Velocity;
+    nlVector3 position = g_pBall->GetPosition();
+    int count;
+    float maxTime = GetSlideInterceptTimeLimit(m_pTweaks);
+    const cBall* ball = g_pBall;
+    if (ball->GetOwner() == 0 && ball->meBallState != 5)
+    {
+        if (ball->HasActivePassTarget())
+            maxTime = ball->m_tPassTargetTimer.GetSeconds();
+        nlVector3 interceptVelocity;
+        float interceptTime, closestDistance;
+        float speed = GetSlideAttackSpeed(direction);
+        if (FakeBallWorld::FindBallIntercept(GetPosition(), fn_8002BFA8(m_pTweaks, GetPlayerScale()), speed,
+                target, interceptVelocity, interceptTime, closestDistance, maxTime)
+            && target.z < 0.5f)
+            return interceptTime;
+        if (g_pBall->UnidentifiedHasPassTarget())
+        {
+            velocity = v3Zero;
+            position = g_pBall->m_v3PassIntercept;
+        }
+    }
+    else if (ball->meBallState == 5)
+    {
+        velocity = g_pBall->GetPassTargetFielder()->GetVelocity();
+        position = g_pBall->GetPassTargetFielder()->GetPosition();
+    }
+    else if (g_pBall->GetOwnerFielder() != 0
+        && (g_pBall->GetOwnerFielder()->m_eActionState == ACTION_SHOOT_TO_SCORE
+            || g_pBall->GetOwnerFielder()->m_eActionState == ACTION_SHOT
+            || g_pBall->GetOwnerFielder()->m_eActionState == (eFielderActionState)1))
+    {
+        velocity = v3Zero;
+        position = g_pBall->GetOwnerFielder()->GetPosition();
+    }
+    else if (g_pBall->GetOwnerFielder() != 0
+        && g_pBall->GetOwnerFielder()->m_eActionState == ACTION_SLIDE_ATTACK)
+    {
+        velocity = v3Zero;
+        position = g_pBall->GetOwnerFielder()->GetPosition();
+    }
+    else if (g_pBall->GetOwnerFielder() != 0
+        && g_pBall->GetOwnerFielder()->GetCharacterClass() == (eCharacterClass)12)
+    {
+        nlVector3 average;
+        nlVecLerp(average, g_pBall->GetPosition(), g_pBall->GetOwnerFielder()->GetPosition(), 0.5f);
+        position = average;
+    }
+    nlVector3 landingSpot;
+    float solutions[2];
+    float speed = GetSlideAttackSpeed(direction);
+    CalcInterceptXY(GetPosition(), speed, fn_8002BFA8(m_pTweaks, GetPlayerScale()), position, velocity, count, solutions);
+    float time;
+    if (count != 0)
+    {
+        if (count == 2)
+            time = solutions[0] < solutions[1] ? solutions[0] : solutions[1];
+        else
+            time = solutions[0];
+    }
+    else
+        time = -1.0f;
+    float landingTime = g_pBall->PredictLandingSpotAndTime(landingSpot, 0, 0, 0.0f);
+    if (time >= 0.0f && time <= maxTime && time <= landingTime)
+    {
+        target.x = velocity.x * time + position.x;
+        target.y = velocity.y * time + position.y;
+    }
+    else
+    {
+        target.x = velocity.x * maxTime + position.x;
+        target.y = velocity.y * maxTime + position.y;
+    }
+    target.z = 0.0f;
+    return time;
+}
