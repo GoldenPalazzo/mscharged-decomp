@@ -542,7 +542,7 @@ config.libs = [
             Object(Matching, "Game/AI/DesireSuperPower.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/DesireUsePowerup.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireUserControlled.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/AI/Fielder.cpp", extra_cflags=["-O3,p", "-ipa file"]),
+            Object(NonMatching, "Game/AI/Fielder.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/FielderAbility.cpp"),
             Object(Matching, "Game/AI/FielderActions.cpp", extra_cflags=["-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/FilteredRandom.cpp", cflags=cflags_game_deferred),

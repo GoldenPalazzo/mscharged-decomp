@@ -307,8 +307,8 @@ extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
 extern "C" int fn_8002E9FC(cFielder* pFielder,
     cFielder* pFielderCollidedWith, float attackIntensity)
 {
-    float fUnidentified0 = pFielder->m_pTweaks->mUnidentified064;
-    float fUnidentified1 = pFielderCollidedWith->m_pTweaks->mUnidentified064;
+    float fUnidentified0 = pFielder->m_pTweaks->GetDefenseSize();
+    float fUnidentified1 = pFielderCollidedWith->m_pTweaks->GetDefenseSize();
     int nUnidentified = 1;
     if (lbl_806E0C62 || GameInfoManager::Instance()->IsRule0x8Equal1())
         return 2;
@@ -685,9 +685,9 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
             }
 
             float fGroundContactFrame = GetOneTimerIdleGroundContactAnims()[0].fAnimContactFrame;
-            const cSAnim* pGroundAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleGroundContactAnims()[0].nAnimID];
+            const cSAnim* pGroundAnim = GetAnimInventory()->GetAnim(GetOneTimerIdleGroundContactAnims()[0].nAnimID);
             float fGroundContactTime = GetNormalizedContactTime(pGroundAnim, fGroundContactFrame);
-            const cSAnim* pVolleyAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleVolleyContactAnims()[0].nAnimID];
+            const cSAnim* pVolleyAnim = GetAnimInventory()->GetAnim(GetOneTimerIdleVolleyContactAnims()[0].nAnimID);
             float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, GetOneTimerIdleVolleyContactAnims()[0].fAnimContactFrame);
 
             for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
@@ -1167,13 +1167,13 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             u8 bAlsoHitting = IsHittingForCollision(this);
             if (bAlsoHitting)
             {
-                if (pFielderCollidedWith->m_pTweaks->mUnidentified064
-                    < m_pTweaks->mUnidentified064)
+                if (pFielderCollidedWith->GetTweaks()->GetDefenseSize()
+                    < GetTweaks()->GetDefenseSize())
                 {
                     hitteeIsHitter = 0;
                 }
-                else if (pFielderCollidedWith->m_pTweaks->mUnidentified064
-                    > m_pTweaks->mUnidentified064)
+                else if (pFielderCollidedWith->GetTweaks()->GetDefenseSize()
+                    > GetTweaks()->GetDefenseSize())
                 {
                     hitteeIsHitter = 1;
                 }
@@ -1181,7 +1181,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 {
                     float fNumKeys = pFielderCollidedWith->m_pCurrentAnimController
                         ->m_pSAnim->m_nNumKeys;
-                    float fHitTime = fn_8002D038(pFielderCollidedWith->m_pTweaks)
+                    float fHitTime = fn_8002D038(pFielderCollidedWith->GetTweaks())
                         / fNumKeys;
                     float fMyHitTime = fabsf(m_pCurrentAnimController->get_fTime() - fHitTime);
                     float fOtherHitTime = fabsf(pFielderCollidedWith->m_pCurrentAnimController->get_fTime() - fHitTime);
@@ -1265,13 +1265,13 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             u8 isThisSlideAttacking = fn_80038660();
             if (isThisSlideAttacking)
             {
-                if (m_pTweaks->mUnidentified064
-                    < pFielderCollidedWith->m_pTweaks->mUnidentified064)
+                if (GetTweaks()->GetDefenseSize()
+                    < pFielderCollidedWith->GetTweaks()->GetDefenseSize())
                 {
                     ResolveSlideAttack(pFielderCollidedWith, this);
                 }
-                else if (m_pTweaks->mUnidentified064
-                    > pFielderCollidedWith->m_pTweaks->mUnidentified064)
+                else if (GetTweaks()->GetDefenseSize()
+                    > pFielderCollidedWith->GetTweaks()->GetDefenseSize())
                 {
                     ResolveSlideAttack(this, pFielderCollidedWith);
                 }
@@ -1289,8 +1289,8 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 ResolveSlideAttack(pFielderCollidedWith, this);
             }
         }
-        else if (m_eActionState == ACTION_LOOSE_BALL_PASS
-            || m_eActionState == ACTION_LOOSE_BALL_SHOT)
+        else if (GetActionState() == ACTION_LOOSE_BALL_PASS
+            || GetActionState() == ACTION_LOOSE_BALL_SHOT)
         {
             nlVector3 v3Position = mUnidentified024.m_v3Position;
             float otherRadius, thisRadius;
@@ -1538,7 +1538,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 2)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && !IsInActionState(ACTION_UNKNOWN_34)
+            && !fn_800344B0() && GetActionState() != ACTION_UNKNOWN_34
             && !IsInvincible())
         {
             fn_80045AEC(eventData->mUnidentified10);
@@ -1723,7 +1723,7 @@ void cFielder::ClearPassTargetIfAmThePassTarget()
 
 bool cFielder::fn_800344B0() const
 {
-    switch (m_eActionState)
+    switch (GetActionState())
     {
     case 3:
     case 0x18:
@@ -1821,8 +1821,8 @@ bool cFielder::fn_80034894(cFielder* pOtherFielder) const
     case ACTION_LOOSE_BALL_PASS:
     case ACTION_LOOSE_BALL_SHOT:
     {
-        float fUnidentified0 = m_pTweaks->mUnidentified064;
-        float fUnidentified1 = pOtherFielder->m_pTweaks->mUnidentified064;
+        float fUnidentified0 = m_pTweaks->GetDefenseSize();
+        float fUnidentified1 = pOtherFielder->m_pTweaks->GetDefenseSize();
         if (fUnidentified1 > fUnidentified0)
             return false;
         if (fUnidentified0 > fUnidentified1)
@@ -2072,7 +2072,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
 void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
 {
-    if (m_eActionState == ACTION_SHOOT_TO_SCORE || m_eActionState == ACTION_SHOT)
+    if (GetActionState() == ACTION_SHOOT_TO_SCORE || GetActionState() == ACTION_SHOT)
     {
         g_pBall->ShootRelease(v3Zero, SPINTYPE_NONE);
         return;
@@ -2851,7 +2851,7 @@ bool cFielder::IsFallenDown() const
         return true;
     }
 
-    if (m_eActionState == (eFielderActionState)0x21)
+    if (GetActionState() == (eFielderActionState)0x21)
     {
         if (m_eAnimID != 0x81 || m_pCurrentAnimController->m_fTime < 0.3f)
         {
@@ -2860,8 +2860,8 @@ bool cFielder::IsFallenDown() const
         return false;
     }
 
-    if (m_eActionState == (eFielderActionState)0x22
-        || m_eActionState == (eFielderActionState)0x23)
+    if (GetActionState() == (eFielderActionState)0x22
+        || GetActionState() == (eFielderActionState)0x23)
     {
         return true;
     }
@@ -3085,10 +3085,10 @@ void cFielder::PrePhysicsUpdate()
     }
 
     if (!bActionActive
-        && (m_eActionState == ACTION_RECEIVE_PASS
-            || m_eActionState == ACTION_ONETIMER
-            || m_eActionState == ACTION_LOOSE_BALL_SHOT
-            || m_eActionState == ACTION_LOOSE_BALL_PASS))
+        && (GetActionState() == ACTION_RECEIVE_PASS
+            || GetActionState() == ACTION_ONETIMER
+            || GetActionState() == ACTION_LOOSE_BALL_SHOT
+            || GetActionState() == ACTION_LOOSE_BALL_PASS))
     {
         TestAnimBallContact();
     }
@@ -5220,7 +5220,7 @@ void cFielder::TestButtonsRunningWB(float deltaTime)
         mUnidentified374.mUnidentified00 = GetGlobalPad()->GetButtonStateTicks(23, true);
     else if (GetGlobalPad()->JustReleased(23, true))
     {
-        if (m_eAnimID == 24 || m_eAnimID == 25)
+        if (GetCurrentAnimID() == 24 || GetCurrentAnimID() == 25)
             mActionRunningWBVars.bCuePitch = true;
         else
             fn_8004B148();
