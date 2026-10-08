@@ -55,13 +55,13 @@ struct TeamStats
 };
 
 class BasicGameInfo;
-struct AttackStatsData;
+struct PlayerAttackData;
 struct GoalScoredStatsData;
 struct MegaStrikeEndData;
-struct PowerupStatsData;
+struct CollisionPowerupStatsData;
 struct ReceiveBallData;
 struct GoalieSaveData;
-struct PenaltyStatsData;
+struct PenaltyData;
 struct CollisionBallGoalpostData;
 
 class StatsTracker : public nlSingleton<StatsTracker>
@@ -75,14 +75,14 @@ public:
     void CreateEventHandler();
     void DestroyEventHandler();
 
-    static void OnPowerupStats(PowerupStatsData* data);
-    static void OnAttackSuccess(AttackStatsData* data);
-    static void OnAttackAttempt(AttackStatsData* data);
+    static void OnPowerupStats(CollisionPowerupStatsData* data);
+    static void OnAttackSuccess(PlayerAttackData* data);
+    static void OnAttackAttempt(PlayerAttackData* data);
     static void OnGoalScored(GoalScoredStatsData* data);
     static void OnMegastrikeEnd(MegaStrikeEndData* data);
     static void OnReceiveBall(ReceiveBallData* data);
     static void OnPassBall(PassBallData* data);
-    static void OnPenalty(PenaltyStatsData* data);
+    static void OnPenalty(PenaltyData* data);
     static void OnGoalieSave(GoalieSaveData* data);
     static void OnBallStateChange(int previousState, int currentState);
     static void OnCollisionBallGoalpost(CollisionBallGoalpostData* data);

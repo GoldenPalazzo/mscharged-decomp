@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "Game/AI/Fielder.h"
+#include "Game/AI/FielderActions.h"
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/BasicGameInfo.h"
@@ -25,30 +26,10 @@
 #include "NL/nlMemory.h"
 #include "NL/nlFunction.inl"
 
-struct PowerupStatsData
-{
-    /* 0x00 */ cPlayer* pPlayer;
-    /* 0x04 */ u8 unknown_0x04[8];
-    /* 0x0C */ int amount;
-};
-
-struct AttackStatsData
-{
-    /* 0x00 */ cPlayer* pPlayer;
-    /* 0x04 */ int amount;
-    /* 0x08 */ u8 unknown_0x08[8];
-    /* 0x10 */ bool track;
-};
-
 struct GoalScoredStatsData
 {
     /* 0x00 */ GoalScoredData data;
-    /* 0x20 */ int sideOfInterest;
-};
-
-struct PenaltyStatsData
-{
-    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x20 */ int nScorerPadID;
 };
 
 template <typename P1, typename P2>
@@ -323,15 +304,15 @@ void StatsTracker::ResetCurrentStats()
 
 void StatsTracker::CreateEventHandler()
 {
-    FindStatsEvent<PenaltyStatsData>("Penalty")->Add(Function<PenaltyStatsData*>(OnPenalty), 0, -1);
+    FindStatsEvent<PenaltyData>("Penalty")->Add(Function<PenaltyData*>(OnPenalty), 0, -1);
     FindStatsEvent<GoalieSaveData>("GoalieSave")->Add(Function<GoalieSaveData*>(OnGoalieSave), 0, -1);
     FindStatsEvent<PassBallData>("PassBall")->Add(Function<PassBallData*>(OnPassBall), 0, -1);
     FindStatsEvent<ReceiveBallData>("ReceiveBall")->Add(Function<ReceiveBallData*>(OnReceiveBall), 0, -1);
     FindStatsEvent<GoalScoredStatsData>("GoalScored")->Add(Function<GoalScoredStatsData*>(OnGoalScored), 0, -1);
     FindStatsEvent<MegaStrikeEndData>("MegastrikeEnd")->Add(Function<MegaStrikeEndData*>(OnMegastrikeEnd), 0, -1);
-    FindStatsEvent<AttackStatsData>("AttackSuccess")->Add(Function<AttackStatsData*>(OnAttackSuccess), 0, -1);
-    FindStatsEvent<AttackStatsData>("AttackAttempt")->Add(Function<AttackStatsData*>(OnAttackAttempt), 0, -1);
-    FindStatsEvent<PowerupStatsData>("PowerupStats")->Add(Function<PowerupStatsData*>(OnPowerupStats), 0, -1);
+    FindStatsEvent<PlayerAttackData>("AttackSuccess")->Add(Function<PlayerAttackData*>(OnAttackSuccess), 0, -1);
+    FindStatsEvent<PlayerAttackData>("AttackAttempt")->Add(Function<PlayerAttackData*>(OnAttackAttempt), 0, -1);
+    FindStatsEvent<CollisionPowerupStatsData>("PowerupStats")->Add(Function<CollisionPowerupStatsData*>(OnPowerupStats), 0, -1);
     FindStatsEvent2<int, int>("BallStateChange")->Add(Function2<void, int, int>(OnBallStateChange), 0, -1);
     FindStatsEvent<CollisionBallGoalpostData>("CollisionBallGoalpost")->Add(Function<CollisionBallGoalpostData*>(OnCollisionBallGoalpost), 0, -1);
 }
@@ -340,33 +321,33 @@ void StatsTracker::DestroyEventHandler()
 {
 }
 
-void StatsTracker::OnPowerupStats(PowerupStatsData* data)
+void StatsTracker::OnPowerupStats(CollisionPowerupStatsData* data)
 {
     if (data->pPlayer != 0)
     {
         Instance()->TrackStat(STATS_POWERUPS_HIT,
             data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
-            data->amount, 0, 0, 0);
+            data->nThrowerPadID, 0, 0, 0);
     }
 }
 
-void StatsTracker::OnAttackSuccess(AttackStatsData* data)
+void StatsTracker::OnAttackSuccess(PlayerAttackData* data)
 {
-    if (data->track && data->pPlayer != 0 && data->pPlayer->m_pBall != 0)
+    if (data->mUnidentified10 && data->pAttacker != 0 && data->pAttacker->m_pBall != 0)
     {
         Instance()->TrackStat(STATS_ATTACK_SUCCESSES,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
-            data->amount, 0, 0, 0);
+            data->pAttacker->m_pTeam->m_nSide, data->pAttacker->mUnidentified1E4.m_ID,
+            data->nAttackerPadID, 0, 0, 0);
     }
 }
 
-void StatsTracker::OnAttackAttempt(AttackStatsData* data)
+void StatsTracker::OnAttackAttempt(PlayerAttackData* data)
 {
-    if (data->track)
+    if (data->mUnidentified10)
     {
         Instance()->TrackStat(STATS_ATTACK_ATTEMPTS,
-            data->pPlayer->m_pTeam->m_nSide, data->pPlayer->mUnidentified1E4.m_ID,
-            data->amount, 0, 0, 0);
+            data->pAttacker->m_pTeam->m_nSide, data->pAttacker->mUnidentified1E4.m_ID,
+            data->nAttackerPadID, 0, 0, 0);
     }
 }
 
@@ -375,7 +356,7 @@ void StatsTracker::OnGoalScored(GoalScoredStatsData* data)
     s_pInstance->TrackStat(STATS_GOALS_FOR, data->data.uTeamIndex,
         data->data.pScorer != 0 ? data->data.pScorer->mUnidentified1E4.m_ID : -1,
         data->data.pAssister != 0 ? data->data.pAssister->mUnidentified1E4.m_ID : -1,
-        data->data.uGoalType, data->data.uNumGoalsScored, data->sideOfInterest);
+        data->data.uGoalType, data->data.uNumGoalsScored, data->nScorerPadID);
 
     bool scoreTied = g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore;
     if (g_pGame != 0)
@@ -480,10 +461,10 @@ void StatsTracker::OnPassBall(PassBallData* data)
     }
 }
 
-void StatsTracker::OnPenalty(PenaltyStatsData* data)
+void StatsTracker::OnPenalty(PenaltyData* data)
 {
-    s_pInstance->TrackStat(STATS_FOULS, data->pPlayer->m_pTeam->m_nSide,
-        data->pPlayer->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+    s_pInstance->TrackStat(STATS_FOULS, data->pFouler->m_pTeam->m_nSide,
+        data->pFouler->mUnidentified1E4.m_ID, 0, 0, 0, 0);
 }
 
 void StatsTracker::OnGoalieSave(GoalieSaveData* data)
