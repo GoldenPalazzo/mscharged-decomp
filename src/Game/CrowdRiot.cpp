@@ -22,7 +22,6 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
 #include "Game/Physics/PhysicsCharacter.h"
-#include "Game/Physics/PhysicsShell.h"
 #include "Game/Physics/PhysicsTriggerVolume.h"
 #include "NL/nlBind.h"
 #include "NL/nlMemory.h"
@@ -31,13 +30,22 @@
 #include <math.h>
 #include "NL/nlFunction.inl"
 
-extern "C" float lbl_806E0C40;
-extern "C" float lbl_806E0C44;
+struct Generators
+{
+    void RegisterDebugFields(u16* type, DebugWriteCache* cache);
+    /* 0x00 */ nlVector2 v2Location;
+    /* 0x08 */ bool bIsOn;
+    /* 0x0C */ float fTimeToExplode;
+}; // total size: 0x10
+
 float lbl_806E0C40;
 float lbl_806E0C44;
 
-extern "C" void fn_80029C80(
-    PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
+void fn_80029C80(PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
+void fn_800298D8(void*);
+void fn_800299C4(void*);
+void fn_80029AB0(void*);
+void fn_80029B9C(void*);
 
 static float sUnidentifiedFloat0 = 2.45f;
 static float sUnidentifiedFloat1 = 4.0f;
@@ -48,7 +56,6 @@ static float sUnidentifiedFloat5 = 3.0f;
 static unsigned short sCrowdRiotType = 0xFFFF;
 static unsigned short sGeneratorsType = 0xFFFF;
 
-extern "C" Generators lbl_8056B890[6];
 Generators lbl_8056B890[6];
 
 CrowdRiot::CrowdRiot(bool param1)
@@ -295,7 +302,7 @@ void CrowdRiot::fn_80029460(bool param1)
                     sUnidentifiedFloat0);
             mTriggerVolume = physicsObject;
             physicsObject->m_pTriggerCallbackFunc
-                = (void (*)(PhysicsObject*, PhysicsObject*, nlVector3&, void*))fn_80029C80;
+                = fn_80029C80;
             physicsObject->m_pCallbackParam = this;
             mTriggerVolume->SetPosition(
                 mv3Position, PhysicsObject::WORLD_COORDINATES);
@@ -360,10 +367,7 @@ void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
         MakeRandomDirection2D(velocity, 10.0f);
         velocity.z = 10.0f + nlRandomf(5.0f);
         ball->SetVelocity(velocity, SPINTYPE_NONE, 0);
-        u32 packedTime = ball->mtStuckInRiotTimer.m_uPackedTime;
-        bool wasRunning = packedTime != 0;
-        ball->mtStuckInRiotTimer.m_uPackedTime = 0;
-        ball->mtStuckInRiotTimer.m_uWasRunning = wasRunning;
+        ball->mtStuckInRiotTimer.UnidentifiedClear();
         ball->mbStuckInRiotDone = false;
     }
     else if (ball->mtStuckInRiotTimer.m_uPackedTime == 0)
