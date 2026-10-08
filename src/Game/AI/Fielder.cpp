@@ -498,7 +498,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
 
         if (bCondition6)
         {
-            bool bActionActive = pFielder->fn_80038918();
+            bool bActionActive = pFielder->IsFrozenStateActive();
             if (!bActionActive)
             {
                 bCanReceivePass = true;
@@ -527,7 +527,7 @@ static inline void UpdateClearingAngleForTeammate(cFielder* player, int index, f
 
 static inline bool CanStartHit(const cFielder* fielder)
 {
-    return fielder->GetCharacterClass() != YOSHI && !fielder->fn_80038918();
+    return fielder->GetCharacterClass() != YOSHI && !fielder->IsFrozenStateActive();
 }
 
 static inline bool IsInHitAction(const cFielder* fielder)
@@ -1291,7 +1291,7 @@ bool cFielder::CanGetElectrocuted() const
 {
     if (lbl_806E0C60 || GameInfoManager::Instance()->IsRule0x4Equal2())
         return false;
-    if (fn_800344B0())
+    if (IsInFallAction())
         return false;
     if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
         return false;
@@ -1782,11 +1782,11 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             QueueAttackSuccessEvent(g_pGame, pAttackData);
             PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
         }
-        else if (pFielderCollidedWith->fn_80038660() && m_eActionState != ACTION_HIT)
+        else if (pFielderCollidedWith->IsSlideAttacking() && m_eActionState != ACTION_HIT)
         {
             s16 nHitteeToHitterFacingDelta = pFielderCollidedWith->GetFacingDeltaToPosition(mUnidentified024.m_v3Position);
             s16 nHitterToHitteeFacingDelta = GetFacingDeltaToPosition(pFielderCollidedWith->mUnidentified024.m_v3Position);
-            u8 isThisSlideAttacking = fn_80038660();
+            u8 isThisSlideAttacking = IsSlideAttacking();
             if (isThisSlideAttacking)
             {
                 if (GetTweaks()->GetDefenseSize()
@@ -1849,7 +1849,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pFielderCollidedWith->SetPosition(v3Direction);
         }
     }
-    else if (pFielderCollidedWith->fn_80038660()
+    else if (pFielderCollidedWith->IsSlideAttacking()
         && !pFielderCollidedWith->IsFallenDown()
         && !pFielderCollidedWith->IsSuperGrowActive())
     {
@@ -2010,7 +2010,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
 bool cFielder::CollideWithFreezeCallback()
 {
     if (m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()
-        && mbTangible && !IsFielderDazed(this) && !IsFrozen() && fn_800392D8())
+        && mbTangible && !IsFielderDazed(this) && !IsFrozen() && CanReactToGroundEffects())
     {
         SetFielderFrozenState(this, 1, gGameTweaks.m_pGameTweaks->fFreezeShellFrozenTime);
         return true;
@@ -2031,7 +2031,7 @@ bool cFielder::CollideWithBananaCallback(const nlVector3& position)
 
 bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius)
 {
-    if (!UnidentifiedInvinciblePowerups() && mbTangible && fn_800392D8())
+    if (!UnidentifiedInvinciblePowerups() && mbTangible && CanReactToGroundEffects())
     {
         if (g_pGame->IsGameplayOrOvertime())
         {
@@ -2047,7 +2047,7 @@ bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius
 void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
 {
     if (m_eActionState != ACTION_POST_WHISTLE && !IsInvincible() && !IsInvincibleHammers()
-        && mbTangible && fn_800392D8())
+        && mbTangible && CanReactToGroundEffects())
     {
         AddRandomDirt();
         if (g_pBall->m_pOwner == this)
@@ -2089,7 +2089,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
     }
 }
 
-void cFielder::fn_8003295C(WindDebris* debris)
+void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
 {
     if (!IsInvincible() && !IsShattered() && mbTangible && m_eActionState != 0 && m_eActionState != 35)
     {
@@ -2116,7 +2116,7 @@ void cFielder::fn_8003295C(WindDebris* debris)
     }
 }
 
-void cFielder::fn_80032CB8(CollisionThwompPlayerData* event)
+void cFielder::CollideWithThwompCallback(CollisionThwompPlayerData* event)
 {
     if (event == 0 || event->thwomp == 0)
         return;
@@ -2259,7 +2259,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 2)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && GetActionState() != ACTION_UNKNOWN_34
+            && !IsInFallAction() && GetActionState() != ACTION_UNKNOWN_34
             && !IsInvincible())
         {
             fn_80045AEC(eventData->mUnidentified10);
@@ -2273,7 +2273,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 5 || type == 4 || type == 11)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && !IsInvincible())
+            && !IsInFallAction() && !IsInvincible())
         {
             PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
             UnidentifiedVariantCollection params;
@@ -2310,7 +2310,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 3)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && !IsInvincible())
+            && !IsInFallAction() && !IsInvincible())
         {
             AddRandomDirt();
             fn_8001F1C0(1);
@@ -2334,7 +2334,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 7)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && !IsInvincible())
+            && !IsInFallAction() && !IsInvincible())
         {
             cPlayer* pOwner = eventData->mUnidentified10->m_pOwner;
             if (lbl_806E0C59 && IsOnSameTeam(pOwner))
@@ -2385,7 +2385,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 8 || type == 9)
     {
-        if (!fn_800344B0() && !IsInvincible()
+        if (!IsInFallAction() && !IsInvincible()
             && m_eActionState != (eFielderActionState)0x18
             && m_eActionState != (eFielderActionState)0x23)
         {
@@ -2398,7 +2398,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 10)
     {
-        if (!fn_800344B0() && !IsStarActive()
+        if (!IsInFallAction() && !IsStarActive()
             && !IsYoshiSuperPowerActive() && !IsInvincible()
             && !IsCharacterInAir(eventData->mUnidentified10->GetRadius()))
         {
@@ -2442,7 +2442,7 @@ void cFielder::ClearPassTargetIfAmThePassTarget()
     }
 }
 
-bool cFielder::fn_800344B0() const
+bool cFielder::IsInFallAction() const
 {
     switch (GetActionState())
     {
@@ -2465,7 +2465,7 @@ bool IsFielderFrontInvincible(cFielder* pFielder, const nlVector3* position)
     return result;
 }
 
-bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
+bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
 {
     if (pOtherFielder->mUnidentified024.m_eCharacterClass == BOWSER
         && pOtherFielder->m_eActionState == 1)
@@ -2535,7 +2535,7 @@ bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
     return false;
 }
 
-bool cFielder::fn_80034894(cFielder* pOtherFielder) const
+bool cFielder::HasLooseBallContactPriority(cFielder* pOtherFielder) const
 {
     switch (m_eActionState)
     {
@@ -2588,7 +2588,7 @@ bool cFielder::IsRunning() const
     return bRunning;
 }
 
-bool cFielder::fn_8003499C() const
+bool cFielder::IsReceivingVolleyPass() const
 {
     bool result = false;
     int state;
@@ -2605,7 +2605,7 @@ bool cFielder::fn_8003499C() const
     if (state == 0x16)
     {
         result = ((DesireReceivePass*)
-            m_pAIContext->mScriptMachine->mActiveState)->fn_800C0E54();
+            m_pAIContext->mScriptMachine->mActiveState)->IsVolleyReceive();
     }
     return result;
 }
@@ -3812,7 +3812,7 @@ int GetNumOneTimerLeadGroundContactAnims()
     return sizeof(gOneTimerLeadGroundContactAnims) / sizeof(gOneTimerLeadGroundContactAnims[0]);
 }
 
-const LooseBallContactAnimInfo* cFielder::fn_80038230(
+const LooseBallContactAnimInfo* cFielder::FindLooseBallContactAnim(
     const LooseBallContactAnimInfo* pBallContactAnimInfo,
     int nNumContactAnims, unsigned short aFutureFacingDirection,
     const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
@@ -3850,7 +3850,7 @@ bool cFielder::IsFallenDown() const
         return true;
     }
 
-    if (fn_800344B0())
+    if (IsInFallAction())
     {
         return true;
     }
@@ -3966,9 +3966,9 @@ bool cFielder::IsHitting() const
     return HasHitWindowStarted(this, fAnimTime) && fAnimTime <= fn_8002D050(m_pTweaks);
 }
 
-bool cFielder::fn_80038660() const
+bool cFielder::IsSlideAttacking() const
 {
-    if (!fn_80038918() && m_eActionState == ACTION_SLIDE_ATTACK)
+    if (!IsFrozenStateActive() && m_eActionState == ACTION_SLIDE_ATTACK)
         return true;
     return false;
 }
@@ -4009,7 +4009,7 @@ unsigned int cFielder::IsShattered() const
         m_pAIContext->mScriptMachine, 29))->IsUnidentifiedState(4);
 }
 
-bool cFielder::fn_8003881C() const
+bool cFielder::IsMegaStrikeFrozen() const
 {
     return ((DesireFrozen*)GetConcurrentState(
         m_pAIContext->mScriptMachine, 29))->IsUnidentifiedState(3);
@@ -4023,7 +4023,7 @@ bool cFielder::IsStuck() const
                ->IsUnidentifiedState(2);
 }
 
-bool cFielder::fn_80038918() const
+bool cFielder::IsFrozenStateActive() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
         GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
@@ -4166,7 +4166,7 @@ bool cFielder::CanDoSidekickShootToScore()
     return enabled;
 }
 
-bool cFielder::fn_800392D8() const
+bool cFielder::CanReactToGroundEffects() const
 {
     switch (m_eActionState)
     {
@@ -4653,14 +4653,14 @@ void cFielder::SetStopAnimState()
     }
 }
 
-void cFielder::fn_8003B5FC()
+void cFielder::SetStrafeRightStopAnimState()
 {
     SetAnimState(36, true, 0.2f, false, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gStopAnimPlaybackSpeed;
 }
 
-void cFielder::fn_8003B664()
+void cFielder::SetStrafeLeftStopAnimState()
 {
     SetAnimState(35, true, 0.2f, false, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -4896,15 +4896,15 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         return;
     if (!pOpponent->mbTangible)
         return;
-    if (fn_80038918())
+    if (IsFrozenStateActive())
         return;
-    if (pOpponent->fn_80038918())
+    if (pOpponent->IsFrozenStateActive())
         return;
 
     bool bUnidentified = false;
     if (pOpponent->m_pBall != NULL)
     {
-        if (fn_80038660() && !IsSuperGrowActive())
+        if (IsSlideAttacking() && !IsSuperGrowActive())
         {
             float fPlayerScale = mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
@@ -4917,7 +4917,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     }
     else if (m_pBall != NULL)
     {
-        if (pOpponent->fn_80038660() && !pOpponent->IsSuperGrowActive())
+        if (pOpponent->IsSlideAttacking() && !pOpponent->IsSuperGrowActive())
         {
             float fPlayerScale = pOpponent->mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
@@ -4929,9 +4929,9 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         }
     }
 
-    if (fn_800345EC(pOpponent))
+    if (IsAboveFielder(pOpponent))
         return;
-    if (pOpponent->fn_800345EC(this))
+    if (pOpponent->IsAboveFielder(this))
         return;
 
     if (IsInvincible() && !pOpponent->IsInvincible())
@@ -4945,8 +4945,8 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttacker = pOpponent;
     }
     else if (IsSuperGrowActive() && !pOpponent->IsSuperGrowActive()
-        && !fn_80038918() && !bUnidentified
-        && !pOpponent->IsSuperGrowActive() && !pOpponent->fn_800344B0())
+        && !IsFrozenStateActive() && !bUnidentified
+        && !pOpponent->IsSuperGrowActive() && !pOpponent->IsInFallAction())
     {
         pReactee = pOpponent;
         pAttacker = this;
@@ -4962,7 +4962,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (pOpponent->IsSuperGrowActive() && !IsSuperGrowActive()
-        && !pOpponent->fn_80038918() && !bUnidentified && !fn_800344B0())
+        && !pOpponent->IsFrozenStateActive() && !bUnidentified && !IsInFallAction())
     {
         pReactee = this;
         pAttacker = pOpponent;
@@ -4995,7 +4995,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
 
     fn_800470B4(pReactee, pAttacker);
     g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
-    if (pAttacker->CanPickupBall(g_pBall, pAttacker->fn_80038660()))
+    if (pAttacker->CanPickupBall(g_pBall, pAttacker->IsSlideAttacking()))
         pAttacker->PickupBall(g_pBall);
 }
 

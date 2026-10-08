@@ -380,7 +380,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     {
         pMyFielder = GetFielder(i_fielder);
         pMyFielder->ClearMarks();
-        bool bUnidentified = pMyFielder->fn_800344B0()
+        bool bUnidentified = pMyFielder->IsInFallAction()
                           || pMyFielder->IsShattered()
                           || Incapacitated(pMyFielder);
         if (!bUnidentified)
@@ -409,7 +409,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        bool bUnidentifiedMyFielder = pMyFielder->fn_800344B0()
+        bool bUnidentifiedMyFielder = pMyFielder->IsInFallAction()
                                    || pMyFielder->IsShattered();
 
         nlVector3 v3UnidentifiedPosition;
@@ -418,7 +418,7 @@ void cTeam::AssignMarks(bool bForceReMark)
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
             pOppFielder = GetOtherTeam()->GetFielder(i_otherf);
-            bool bUnidentifiedOppFielder = pOppFielder->fn_800344B0()
+            bool bUnidentifiedOppFielder = pOppFielder->IsInFallAction()
                                         || pOppFielder->IsShattered();
 
             if (bUnidentifiedMyFielder && !bUnidentifiedOppFielder)
@@ -1057,7 +1057,7 @@ void cTeam::UpdateControllers()
                     else if (!((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
+                        && !((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen())
                     {
                         nAvailableFielders++;
                     }
@@ -1084,7 +1084,7 @@ void cTeam::UpdateControllers()
                         && (((cFielder*)m_pPlayers[j])->IsFallenDown()
                             || ((cFielder*)m_pPlayers[j])->IsStuck()
                             || ((cFielder*)m_pPlayers[j])->IsShattered()
-                            || ((cFielder*)m_pPlayers[j])->fn_8003881C()))
+                            || ((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen()))
                     {
                         m_pPlayers[j]->SwapController(false);
                         nAvailableFielders--;
@@ -1112,7 +1112,7 @@ void cTeam::UpdateControllers()
                         && !((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
+                        && !((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen())
                     {
                         bAssigned = true;
                         m_pPlayers[j]->SetAIPad(pAIPad);
@@ -1783,7 +1783,7 @@ float fn_800A6388(cTeam* team)
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        if (team->GetFielder(i)->fn_800344B0())
+        if (team->GetFielder(i)->IsInFallAction())
         {
             result += 1.0f;
         }

@@ -574,7 +574,7 @@ void cBall::CollideWithCharacterCallback(
 
         if (!pCharacterFielder->IsOnSameTeam(pOwnerFielder))
         {
-            if (pCharacterFielder->fn_80038660())
+            if (pCharacterFielder->IsSlideAttacking())
             {
                 nlVector3 v3ContactLocation
                     = pCharacter->mUnidentified024.m_v3Position;
@@ -601,7 +601,7 @@ void cBall::CollideWithCharacterCallback(
                     : nHitterContactLocationFacingDelta;
                 if (absFacingDelta < 0x2000)
                 {
-                    if (pOwnerFielder->fn_80038660())
+                    if (pOwnerFielder->IsSlideAttacking())
                     {
                         s16 nHitteeContactLocationFacingDelta
                             = pOwnerFielder->GetFacingDeltaToPosition(
@@ -681,7 +681,7 @@ void cBall::CollideWithCharacterCallback(
                     }
                 }
             }
-            else if (pOwnerFielder->fn_80038660()
+            else if (pOwnerFielder->IsSlideAttacking()
                 && !pCharacterFielder->IsHitting())
             {
                 pCharacterFielder->InitActionSlideAttackReact(
@@ -691,7 +691,7 @@ void cBall::CollideWithCharacterCallback(
         }
         else
         {
-            if (pOwnerFielder->fn_80038660()
+            if (pOwnerFielder->IsSlideAttacking()
                 && !pOwnerFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pOwnerFielder->IsStuck()
@@ -701,7 +701,7 @@ void cBall::CollideWithCharacterCallback(
                     pOwnerFielder->fn_8004D238();
                 }
             }
-            if (pCharacterFielder->fn_80038660()
+            if (pCharacterFielder->IsSlideAttacking()
                 && !pCharacterFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pCharacterFielder->IsStuck()

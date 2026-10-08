@@ -583,7 +583,7 @@ void cPlayer::PickupBall(cBall* pBall)
                                 closest = player;
                             }
                         }
-                        if (((cFielder*)player)->IsShattered() || ((cFielder*)player)->fn_800344B0())
+                        if (((cFielder*)player)->IsShattered() || ((cFielder*)player)->IsInFallAction())
                         {
                             closest = player;
                             break;
@@ -703,7 +703,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
     if (m_pController == NULL && pFielder->GetDesireState() == 20)
     {
         if (g_pGame->IsGameplayOrOvertime()
-            && (pFielder->fn_80038660()
+            && (pFielder->IsSlideAttacking()
                 || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
                 || pFielder->GetActionState() == ACTION_SHOT))
         {

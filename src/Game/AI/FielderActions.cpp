@@ -365,7 +365,7 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B664();
+                    SetStrafeLeftStopAnimState();
                 }
                 else
                 {
@@ -394,7 +394,7 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B5FC();
+                    SetStrafeRightStopAnimState();
                 }
                 else
                 {
@@ -1666,7 +1666,7 @@ void cFielder::fn_80045930()
 
 void cFielder::fn_80045AEC(PhysicsObject* pObject)
 {
-    if (!fn_800344B0())
+    if (!IsInFallAction())
     {
         if (m_pBall != 0)
         {
@@ -1810,7 +1810,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                     {
                         bool bOtherHasPad = pOther->GetGlobalPad() != 0;
                         if (bOtherHasPad
-                            && (pOther->fn_800344B0() || pOther->fn_80038918()))
+                            && (pOther->IsInFallAction() || pOther->IsFrozenStateActive()))
                         {
                             SetAIPad(pOther->m_pController);
                             mUnidentified1E4.m_bCanTestController = false;
@@ -1862,7 +1862,7 @@ void cFielder::fn_80045C74(float fDeltaT)
 
 void cFielder::fn_80046244()
 {
-    if (!fn_800344B0())
+    if (!IsInFallAction())
     {
         if (m_pBall != 0)
         {
@@ -1991,7 +1991,7 @@ void cFielder::fn_8004643C(float fDeltaT)
                     {
                         bool bOtherHasPad = pOther->GetGlobalPad() != 0;
                         if (bOtherHasPad
-                            && (pOther->fn_800344B0() || pOther->fn_80038918()))
+                            && (pOther->IsInFallAction() || pOther->IsFrozenStateActive()))
                         {
                             SetAIPad(pOther->m_pController);
                             mUnidentified1E4.m_bCanTestController = false;
@@ -2703,7 +2703,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     v3BallToSelf.z = mUnidentified024.m_v3Position.z - g_pBall->m_v3Position.z;
 
     const LooseBallContactAnimInfo* pBestBallContactAnimInfo
-        = fn_80038230(pAnimInfoList, nNumAnims, mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_v3Position, rv3OneTimerTarget, nlATan2f(v3BallToSelf.y, v3BallToSelf.x));
+        = FindLooseBallContactAnim(pAnimInfoList, nNumAnims, mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_v3Position, rv3OneTimerTarget, nlATan2f(v3BallToSelf.y, v3BallToSelf.x));
 
     v3ToTarget.y = rv3OneTimerTarget.y - mUnidentified024.m_v3Position.y;
     v3ToTarget.x = rv3OneTimerTarget.x - mUnidentified024.m_v3Position.x;
@@ -2920,7 +2920,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
         for (int j = 0; j < 4; j++)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
-            if (pCaptain != pFielder && pFielder->fn_8003881C()
+            if (pCaptain != pFielder && pFielder->IsMegaStrikeFrozen()
                 && g_pGame->m_uMegastrikeGoals == 0)
             {
                 RequestStateMachineDeactivation(GetConcurrentState(GetFielderScriptMachine(pFielder), 0x1D));

@@ -60,7 +60,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 {
     bool bBestBallInterceptor = m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder;
     cFielder* pMark = m_pFielder->GetMark();
-    if (pMark == 0 || pMark->fn_800344B0()
+    if (pMark == 0 || pMark->IsInFallAction()
         || m_pFielder == g_pBall->m_pOwner
         || (bBestBallInterceptor
             && m_pFielder->m_pTeam->mpCurrentSituation == SITUATION_LOOSE))

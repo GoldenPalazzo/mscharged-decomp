@@ -295,7 +295,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
             {
                 DebugPrintf("PhysChar Fallen down not on fire\n");
-                if (ball->GetOwnerFielder()->fn_800345EC(fielder)
+                if (ball->GetOwnerFielder()->IsAboveFielder(fielder)
                     || fielder->m_eAnimID == 0x76)
                 {
                     DebugPrintf("PhysChar Electro1200\n");
@@ -399,8 +399,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             cFielder* fielder = (cFielder*)thisPlayer;
             cFielder* otherFielder = (cFielder*)otherPlayer;
 
-            if (fielder->fn_800345EC(otherFielder)
-                || otherFielder->fn_800345EC(fielder))
+            if (fielder->IsAboveFielder(otherFielder)
+                || otherFielder->IsAboveFielder(fielder))
             {
                 return NO_CONTACT;
             }
@@ -420,16 +420,16 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
-                else if (fielder->fn_80034894(otherFielder))
+                else if (fielder->HasLooseBallContactPriority(otherFielder))
                 {
                     contactType = ONE_WAY_CONTACT_OTHER;
                 }
-                else if (otherFielder->fn_80034894(fielder))
+                else if (otherFielder->HasLooseBallContactPriority(fielder))
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
-                else if (fielder->fn_80038918()
-                         && otherFielder->fn_80038918())
+                else if (fielder->IsFrozenStateActive()
+                         && otherFielder->IsFrozenStateActive())
                 {
                     contactType = NO_CONTACT;
                 }

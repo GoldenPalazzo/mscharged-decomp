@@ -840,7 +840,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     if (pOwner != NULL)
     {
         fOwnerRadius = pOwner->mUnidentified320->GetRadius();
-        if (pOwner->fn_800345EC(pFielder))
+        if (pOwner->IsAboveFielder(pFielder))
             return 0.0f;
     }
     const nlVector3& vTarget = pOwner != NULL ? pOwner->mUnidentified024.m_v3Position
@@ -1546,7 +1546,7 @@ extern "C" float fn_800D9DD8(cPlayer* pPlayer)
         cFielder* pFielder = (cFielder*)pPlayer;
         nlVector3 v3Position = pFielder->mUnidentified024.m_v3Position;
         bool bOutOfBounds = cField::FixOutOfBoundsPosition(v3Position, -1.0f, true);
-        bool bIncapacitated = pFielder->fn_80038918() || pFielder->fn_800344B0()
+        bool bIncapacitated = pFielder->IsFrozenStateActive() || pFielder->IsInFallAction()
             || pFielder->m_eActionState == 35
             || pFielder->m_eActionState == ACTION_ELECTROCUTION || bOutOfBounds;
         fScore = bIncapacitated ? 1.0f : 0.0f;
@@ -1570,7 +1570,7 @@ float Incapacitated(cPlayer* pPlayer)
     else if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        fScore = (pFielder->fn_80038918() || pFielder->IsFallenDown()) ? 1.0f : 0.0f;
+        fScore = (pFielder->IsFrozenStateActive() || pFielder->IsFallenDown()) ? 1.0f : 0.0f;
     }
     return fScore;
 }
@@ -1613,7 +1613,7 @@ extern "C" float fn_800DA050(cFielder* pFielder)
     }
 
     int bFlag = 0;
-    if (pFielder->fn_800344B0() || pFielder->IsShattered())
+    if (pFielder->IsInFallAction() || pFielder->IsShattered())
     {
         bFlag = 1;
     }
@@ -2751,7 +2751,7 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
         return 0.0f;
     bool bHasGlobalPad = pFielder->GetGlobalPad() != NULL;
     if (!bHasGlobalPad && pTarget->m_eClassType == FIELDER
-        && ((cFielder*)pTarget)->fn_800345EC(pFielder))
+        && ((cFielder*)pTarget)->IsAboveFielder(pFielder))
         return 0.0f;
     float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
         pTarget->mUnidentified024.m_v3Position), true);
@@ -3340,7 +3340,7 @@ extern "C" float fn_800DF0B8(cFielder* pFielder)
     }
 
     float fResult = 0.0f;
-    if ((pFielder->m_eClassType == FIELDER) && pFielder->fn_8003499C())
+    if ((pFielder->m_eClassType == FIELDER) && pFielder->IsReceivingVolleyPass())
     {
         fResult = 1.0f;
     }
@@ -3356,7 +3356,7 @@ extern "C" float fn_800DF118(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (ReceivingPass(pFielder) && !pFielder->fn_8003499C())
+    if (ReceivingPass(pFielder) && !pFielder->IsReceivingVolleyPass())
     {
         fScore = 1.0f;
     }
@@ -3412,7 +3412,7 @@ extern "C" float fn_800DF390(cPlayer* pPlayer)
     }
 
     float fScore = 0.0f;
-    if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->fn_8003499C())
+    if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->IsReceivingVolleyPass())
     {
         float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
@@ -3431,7 +3431,7 @@ extern "C" float fn_800DF474(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (ReceivingPass(pFielder) && !pFielder->fn_8003499C())
+    if (ReceivingPass(pFielder) && !pFielder->IsReceivingVolleyPass())
     {
         float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
@@ -3949,7 +3949,7 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
             cPlayer* pOther = (cPlayer*)g_pCharacters[i];
             bool bUnavailable = false;
             if (pOther->m_eClassType == FIELDER)
-                bUnavailable = ((cFielder*)pOther)->fn_800344B0() || ((cFielder*)pOther)->IsShattered();
+                bUnavailable = ((cFielder*)pOther)->IsInFallAction() || ((cFielder*)pOther)->IsShattered();
             if (pOther == pPlayer || pOther->m_pBall != NULL
                 || pOther->m_eClassType == GOALIE || bUnavailable)
                 continue;

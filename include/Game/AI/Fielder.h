@@ -229,7 +229,7 @@ class cFielder : public cPlayer
     friend float GetFielderHitReach(cFielder*);
 
 public:
-    bool fn_800392D8() const;
+    bool CanReactToGroundEffects() const;
     bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
     const nlVector3& GetDesiredPosition();
     const nlVector3& GetDesiredVelocity();
@@ -319,8 +319,8 @@ public:
     void SetBackRunningStopStartAnimState();
     void SetBackRunningStopRecoverAnimState();
     void SetStopAnimState();
-    void fn_8003B5FC();
-    void fn_8003B664();
+    void SetStrafeRightStopAnimState();
+    void SetStrafeLeftStopAnimState();
     void SetIdleAnimState();
     void SetIdleWBAnimState();
     static void RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender* blender);
@@ -341,7 +341,7 @@ public:
     bool IsDaisySuperPowerActive() const;
     unsigned int IsFrozen() const;
     unsigned int IsShattered() const;
-    bool fn_8003881C() const;
+    bool IsMegaStrikeFrozen() const;
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         const int* nModelID, cSHierarchy* pHierarchy,
@@ -377,9 +377,9 @@ public:
     cFielder* DoFindBestHitTarget();
     void UpdateController(float fDeltaT);
     bool IsRunning() const;
-    bool fn_800345EC(cFielder* pOtherFielder) const;
-    bool fn_80034894(cFielder* pOtherFielder) const;
-    bool fn_800344B0() const;
+    bool IsAboveFielder(cFielder* pOtherFielder) const;
+    bool HasLooseBallContactPriority(cFielder* pOtherFielder) const;
+    bool IsInFallAction() const;
     bool IsRunningWithBall() const
     {
         bool bRunningWithBall = false;
@@ -409,8 +409,8 @@ public:
     bool CollideWithShellCallback(ePowerupSize eSize, bool bUnknown, const nlVector3& rv3Pos1, const nlVector3& rv3Pos2);
     bool CollideWithBobombCallback(const nlVector3& v3CollisionLocation, float fBombRadius);
     void CollideWithChainCallback(ChainChomp* pChainChomp);
-    void fn_8003295C(WindDebris* pDebris);
-    void fn_80032CB8(CollisionThwompPlayerData*);
+    void CollideWithWindDebrisCallback(WindDebris* pDebris);
+    void CollideWithThwompCallback(CollisionThwompPlayerData*);
     bool IsMarioSuperPowerActive() const;
     bool IsLuigiSuperPowerActive() const;
     bool IsPeteySuperPowerActive() const;
@@ -466,19 +466,19 @@ public:
         return result;
     }
     void TestCollisionForInvicibility(cFielder* pOpponent);
-    const LooseBallContactAnimInfo* fn_80038230(
+    const LooseBallContactAnimInfo* FindLooseBallContactAnim(
         const LooseBallContactAnimInfo* pBallContactAnimInfo,
         int nNumContactAnims, unsigned short aFutureFacingDirection,
         const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
         float fAngle);
     bool IsHitting() const;
-    bool fn_80038660() const;
-    bool fn_80038918() const;
+    bool IsSlideAttacking() const;
+    bool IsFrozenStateActive() const;
     float GetMegaStrikeMeterPosition();
     eFielderDesireState GetDesireState();
     void EndAllDesires();
     int GetPreviousDesireState() const;
-    bool fn_8003499C() const;
+    bool IsReceivingVolleyPass() const;
     bool fn_8003E6EC() const;
     bool IsStarActive() const;
     bool IsConfused() const;

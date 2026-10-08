@@ -364,7 +364,7 @@ float AvoidableFielder::GetAvoidanceWeight(
         {
             bIgnore = true;
         }
-        if (bIgnore || pOther->fn_800344B0() || pOther->IsShattered()
+        if (bIgnore || pOther->IsInFallAction() || pOther->IsShattered()
             || (!m_pFielder->IsOnSameTeam(pOther)
                 && (m_pFielder->IsMarioSuperPowerActive() || m_pFielder->IsLuigiSuperPowerActive())))
         {

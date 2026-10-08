@@ -1339,7 +1339,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && pFielder->fn_800392D8() && pFielder->m_eActionState != 28)
+        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
         unidentifiedSlide += pFielder->IsSlippery() ? lbl_806E0E40 : 0.0f;
@@ -1404,7 +1404,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
                 cField::FixOutOfBoundsPosition(
                     mUnidentified024.m_v3Position, fMinDistanceFromWall, false);
             }
-            else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine && !pFielder->fn_800344B0())
+            else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine && !pFielder->IsInFallAction())
             {
                 cField::FixOutOfBoundsX(
                     mUnidentified024.m_v3Position, false, fMinDistanceFromWall);
@@ -2509,7 +2509,7 @@ extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData)
     {
         if (!pEventData->pFielder->UnidentifiedInvinciblePowerups())
         {
-            pEventData->pFielder->fn_8003295C(pEventData->pDebris);
+            pEventData->pFielder->CollideWithWindDebrisCallback(pEventData->pDebris);
         }
     }
 }
@@ -2518,7 +2518,7 @@ extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData)
 {
     if (pEventData->target->m_eClassType == FIELDER)
     {
-        ((cFielder*)pEventData->target)->fn_80032CB8(pEventData);
+        ((cFielder*)pEventData->target)->CollideWithThwompCallback(pEventData);
     }
 }
 

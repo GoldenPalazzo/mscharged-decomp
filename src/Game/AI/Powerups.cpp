@@ -2637,7 +2637,7 @@ void RedShell::SeekTarget()
         return;
     }
 
-    if (!target->mbTangible || target->fn_800344B0())
+    if (!target->mbTangible || target->IsInFallAction())
     {
         m_pTarget = 0;
         return;

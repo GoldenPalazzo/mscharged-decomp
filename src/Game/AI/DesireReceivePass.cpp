@@ -415,7 +415,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                     m_pFielder->DoRegularPassing(mpOneTouchPassTarget,
                         mbOneTouchVolley, true, false, false, fMinPassSpeed, fMaxPassSpeed);
                 }
-                else if (fn_800C0E54())
+                else if (IsVolleyReceive())
                 {
                     if (fabsf(mEstimated.fReceivePassAnimTime
                             - m_pFielder->GetCurrentAnimController()->get_fTime()) <= 0.06666667f)
@@ -438,7 +438,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                 {
                     m_pFielder->InitActionShot(mbOneTouchVolley, true);
                 }
-                else if (fn_800C0E54())
+                else if (IsVolleyReceive())
                 {
                     if (fabsf(mEstimated.fReceivePassAnimTime
                             - m_pFielder->GetCurrentAnimController()->get_fTime()) <= 0.06666667f)
@@ -593,10 +593,10 @@ void DesireReceivePass::RequestOneTouchShot(bool bVolleyPass)
     }
 
     int eReceiveAnimType = meReceiveAnimType;
-    if (fn_800C0E54()
+    if (IsVolleyReceive()
         && (mbOneTouchVolley || bSpecialReceive))
     {
-        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, fn_800C0E54());
+        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, IsVolleyReceive());
         float fBallContactTime =
             mEstimated.fBallContactTime;
         mEstimated.fBallContactTime = -1.0f;
@@ -613,7 +613,7 @@ void DesireReceivePass::RequestOneTouchShot(bool bVolleyPass)
         return;
     }
 
-    eReceiveAnimType = AddVolleyReceiveFlag(8, fn_800C0E54());
+    eReceiveAnimType = AddVolleyReceiveFlag(8, IsVolleyReceive());
     meReceiveAnimType = eReceiveAnimType;
 }
 
@@ -655,10 +655,10 @@ void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarg
         mEstimated.bLocked = false;
     }
 
-    if (fn_800C0E54()
+    if (IsVolleyReceive()
         && (mbOneTouchVolley || bSpecialReceive))
     {
-        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, fn_800C0E54());
+        int eOneTouchReceiveAnimType = AddVolleyReceiveFlag(4, IsVolleyReceive());
         float fBallContactTime =
             mEstimated.fBallContactTime;
         mEstimated.fBallContactTime = -1.0f;
@@ -675,7 +675,7 @@ void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarg
         return;
     }
 
-    int eReceiveAnimType = AddVolleyReceiveFlag(2, fn_800C0E54());
+    int eReceiveAnimType = AddVolleyReceiveFlag(2, IsVolleyReceive());
     meReceiveAnimType = eReceiveAnimType;
 }
 
@@ -709,7 +709,7 @@ void DesireReceivePass::Cleanup()
     ResetSteeringAvoidance(desire);
 }
 
-bool DesireReceivePass::fn_800C0E54()
+bool DesireReceivePass::IsVolleyReceive()
 {
     return (meReceiveAnimType & 1) || (meReceiveAnimType & 0x10);
 }
@@ -966,7 +966,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
     g_pBall->SetPassTargetTimer(estimated.fBallContactTime);
     g_pBall->SetPassTarget(m_pFielder,
-        estimated.v3BallContactPos, fn_800C0E54());
+        estimated.v3BallContactPos, IsVolleyReceive());
 
     mEstimated = estimated;
     return true;
@@ -1011,7 +1011,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     {
         g_pBall->SetPassTargetTimer(mEstimated.fBallContactTime);
         g_pBall->SetPassTarget(m_pFielder,
-            mEstimated.v3BallContactPos, fn_800C0E54());
+            mEstimated.v3BallContactPos, IsVolleyReceive());
     }
     else
     {

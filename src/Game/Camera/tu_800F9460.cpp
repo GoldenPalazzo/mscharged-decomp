@@ -278,7 +278,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             if (goalLineX > 0.0f)
             {
                 if (fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
-                    && !fielder->fn_800344B0()
+                    && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
                 {
@@ -288,7 +288,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             if (goalLineX < 0.0f)
             {
                 if (fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x
-                    && !fielder->fn_800344B0()
+                    && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
                 {

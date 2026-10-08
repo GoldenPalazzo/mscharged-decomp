@@ -294,7 +294,7 @@ void FielderDesireMachine::SelectState()
             if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
                     || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
                 && !Incapacitated(outOfBoundsFielder)
-                && !outOfBoundsFielder->fn_800344B0()
+                && !outOfBoundsFielder->IsInFallAction()
                 && !outOfBoundsFielder->IsShattered())
             {
                 shouldRunToTarget = true;

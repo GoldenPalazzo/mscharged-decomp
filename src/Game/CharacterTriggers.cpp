@@ -383,7 +383,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
 
         case 0x00266A23:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
-                && !((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_800344B0())
+                && !((cFielder*)g_pCurrentlyUpdatingCharacter)->IsInFallAction())
             {
                 EmitDaze((cPlayer*)g_pCurrentlyUpdatingCharacter);
             }
@@ -1498,7 +1498,7 @@ void EmitSlideTackleTrail(cCharacter* pCharacter)
 
 void EmitHitTrail(cCharacter* pCharacter)
 {
-    if (pCharacter->m_eClassType == FIELDER && !((cFielder*)pCharacter)->fn_800344B0())
+    if (pCharacter->m_eClassType == FIELDER && !((cFielder*)pCharacter)->IsInFallAction())
     {
         const char* szEffectName = "hit_trail";
         EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
