@@ -2538,7 +2538,7 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         if (bInterceptorDown || fOtherBallInTime < 0.08f + fBallInTime)
         {
             float fGoalieTime = nlSqrt(CalculateDistanceSquared(mUnidentified024.m_v3Position,
-                pOtherTeam->UnidentifiedInterceptPosition(pOtherInterceptor->mUnidentified1E4.m_ID)), true) / 8.0f;
+                pOtherTeam->GetBallInterceptPosition(pOtherInterceptor->mUnidentified1E4.m_ID)), true) / 8.0f;
             if (fOtherBallInTime < 0.08f + fGoalieTime)
                 return false;
         }
