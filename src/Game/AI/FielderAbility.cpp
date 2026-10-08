@@ -293,7 +293,7 @@ void cFielder::fn_8005001C(bool bForce)
                 }
             }
             mUnidentified3E8.nextFireballTime = 0.0f;
-            fn_8002FE54(this);
+            SetNormalTweaks();
             StopSound(0x8A9FCF66, this);
         }
     }
@@ -315,7 +315,7 @@ void cFielder::fn_8005001C(bool bForce)
                         mUnidentified3E0 = mUnidentified3F8.mUnidentified04;
                     }
                 }
-                fn_8002FE54(this);
+                SetNormalTweaks();
                 if (IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
                 {
                     DeactivateConcurrentState(fn_8002E1A4(this), 0x23);
@@ -342,7 +342,7 @@ void cFielder::fn_8005001C(bool bForce)
         {
             mUnidentified3DC = false;
             mUnidentified408 = 0.0f;
-            fn_8002FE54(this);
+            SetNormalTweaks();
         }
     }
 }
@@ -405,7 +405,7 @@ bool cFielder::TurnOnSuperPowerTank()
         {
             mUnidentified3E8.fireballStageTime = 0.0f;
             mUnidentified3E8.fireballStageNum = 0;
-            fn_800301E8(this);
+            SetSuperPowerTweaks();
         }
     }
     else if (mUnidentified024.m_eCharacterClass == MARIO)
@@ -445,7 +445,7 @@ bool cFielder::TurnOnSuperPowerTank()
     else if (mUnidentified024.m_eCharacterClass == YOSHI)
     {
         mUnidentified408 = 0.0f;
-        fn_800301E8(this);
+        SetSuperPowerTweaks();
     }
 
     return true;

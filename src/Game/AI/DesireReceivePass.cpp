@@ -91,7 +91,6 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" void fn_8003BA94(cFielder*, float);
 extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
     float*, unsigned short, const LooseBallContactAnimInfo*);
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
@@ -221,7 +220,7 @@ bool DesireReceivePass::Initialize(void* context)
     {
         meDesireSubState = 0;
         m_pFielder->InitActionRunning();
-        fn_8003BA94(m_pFielder, 0.1f);
+        m_pFielder->SetRunningAnimState(0.1f);
     }
     else
     {

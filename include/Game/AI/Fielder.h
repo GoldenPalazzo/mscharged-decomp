@@ -252,6 +252,10 @@ public:
 
     void CollideWithShockwaveCallback(const nlVector3& position);
 
+    void SetNormalTweaks();
+    void SetSuperPowerTweaks();
+    void SetRunningAnimState(float blendTime);
+    void SetRunningWBAnimState(float blendTime);
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -756,6 +760,7 @@ public:
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 private:
+    void SetRunLeanSAB(const int* anims, int count, int primary);
     bool CheckReceivePassState();
     bool IsAvailableToReceivePass();
 }; // total size: 0x480
@@ -764,8 +769,6 @@ private:
 // Shared fielder functions and data.
 extern "C" bool fn_8003C180(cFielder*);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
-extern "C" void fn_8002FE54(cFielder* pFielder);
-extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" float fn_80034F98(cFielder*, float);
@@ -774,7 +777,6 @@ extern "C" void fn_80039F24(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" void fn_8003A5C8(cFielder* pFielder);
 extern "C" void fn_8003ADAC(cFielder* pFielder);
-extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void fn_8003DA94(cFielder*, bool);
 extern "C" void fn_8003E354(cFielder* pFielder);

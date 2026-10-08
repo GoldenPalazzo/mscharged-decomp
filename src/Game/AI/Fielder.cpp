@@ -57,6 +57,7 @@
 #include "Game/Weather.h"
 #include "Game/Terrain.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
+#include "Game/SAnim/pnBlender.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "math.h"
 #include <stddef.h>
@@ -5686,4 +5687,74 @@ void cFielder::fn_80032CB8(CollisionThwompPlayerData* event)
             PlayRumbleAction(3, GetGlobalPad());
         }
     }
+}
+
+void cFielder::SetNormalTweaks()
+{
+    m_pTweaks = mUnidentified32C;
+    if (m_eActionState == ACTION_RUNNING)
+        SetRunningAnimState(0.1f);
+    else if (m_eActionState == ACTION_RUNNING_WB)
+        SetRunningWBAnimState(0.1f);
+}
+
+void cFielder::SetSuperPowerTweaks()
+{
+    m_pTweaks = mUnidentified328;
+    if (m_eActionState == ACTION_RUNNING)
+        SetRunningAnimState(0.1f);
+    else if (m_eActionState == ACTION_RUNNING_WB)
+        SetRunningWBAnimState(0.1f);
+}
+
+inline void cFielder::SetRunLeanSAB(const int* anims, int count, int primary)
+{
+    cPN_SingleAxisBlender* blender = CreateSingleAxisBlender(anims, count, primary, RunningSABcallback, 0.1f, 0, 0.5f);
+    cPN_SAnimController* synchronized = (cPN_SAnimController*)blender->GetChild(primary);
+    synchronized->m_fSynchronizedWeight = 0.0f;
+    for (int i = 0; i < count; ++i)
+    {
+        if (i != primary)
+        {
+            cPN_SAnimController* next = (cPN_SAnimController*)blender->GetChild(i);
+            next->m_bIsSynchronized = true;
+            synchronized->m_pSynchronizedController = next;
+            synchronized = next;
+        }
+    }
+    *m_pAILayer = new cPN_Blender(*m_pAILayer, blender, 0.1f);
+}
+
+
+void cFielder::SetRunningAnimState(float blendTime)
+{
+    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aDesiredMovementDirection
+        = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    const int runningAnims[3] = { 7, 4, 8 };
+    const int superAnims[3] = { 10, 9, 11 };
+    if (fn_8003E74C()
+        || (GetCharacterClass() == DAISY && mUnidentified3DC)
+        || (GetCharacterClass() == PEACH && mUnidentified3DC)
+        || (GetCharacterClass() == YOSHI && mUnidentified3DC))
+        SetRunLeanSAB(superAnims, 3, 1);
+    else
+        SetRunLeanSAB(runningAnims, 3, 1);
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementRunning(fn_8002C0AC(tweaks), fn_8002CF10(tweaks), fn_8002C180(tweaks), fn_8002CF24(tweaks));
+}
+
+void cFielder::SetRunningWBAnimState(float blendTime)
+{
+    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aDesiredMovementDirection
+        = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    int runningAnims[3] = { 0x15, 0x14, 0x16 };
+    int superAnims[3] = { 10, 9, 11 };
+    if (fn_8003E74C()
+        || (GetCharacterClass() == DAISY && mUnidentified3DC)
+        || (GetCharacterClass() == YOSHI && mUnidentified3DC))
+        SetRunLeanSAB(superAnims, 3, 1);
+    else
+        SetRunLeanSAB(runningAnims, 3, 1);
+    PlayerTweaks* tweaks = m_pTweaks;
+    InitMovementRunning(GetRunWBTurnSpeed(tweaks), GetRunWBTurnFalloff(tweaks), GetRunWBAccel(tweaks), GetRunWBDecel(tweaks));
 }

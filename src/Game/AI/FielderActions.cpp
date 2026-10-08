@@ -164,7 +164,6 @@ extern const float lbl_806E35D4[1];
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
 extern "C" bool fn_8003E948(const cFielder* pFielder);
-extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
@@ -221,7 +220,7 @@ void cFielder::asmRunning()
                 else
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
             }
             break;
@@ -267,7 +266,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
             }
             break;
         }
@@ -331,7 +330,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                     break;
                 case 3:
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                     break;
                 }
             }
@@ -384,7 +383,7 @@ void cFielder::asmRunning()
                 mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
                 break;
             case 4:
                 SetRunBackwardsAnimState();
@@ -413,7 +412,7 @@ void cFielder::asmRunning()
                 mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
                 break;
             case 4:
                 SetRunBackwardsAnimState();
@@ -511,7 +510,7 @@ void cFielder::asmRunning()
                 }
                 else
                 {
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
             case 4:
@@ -578,7 +577,7 @@ void cFielder::asmRunning()
                 else if ((m_eAnimID != 9 && fn_8003E74C())
                          || (m_eAnimID == 9 && !fn_8003E74C()))
                 {
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
             case 1:
@@ -634,7 +633,7 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 else
                 {
@@ -706,7 +705,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 else
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
             }
             break;
@@ -759,7 +758,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
                 else
                 {
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
             }
             else if (mUnidentified024.m_fActualSpeed
@@ -833,7 +832,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if ((m_eAnimID != 9 && fn_8003E74C())
                 || (m_eAnimID == 9 && !fn_8003E74C()))
             {
-                fn_8003BE14(this, lbl_806E3538[0]);
+                SetRunningWBAnimState(lbl_806E3538[0]);
             }
             break;
         }
@@ -875,7 +874,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                          >= fn_8002CE14(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
                 else
                 {
@@ -3922,7 +3921,7 @@ void cFielder::ActionRunning(float dt)
         {
             if (m_eAnimID != 4)
             {
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
             }
         }
         else
