@@ -5642,7 +5642,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
     }
 }
 
-void cFielder::fn_8003295C(UnidentifiedNPC_801B43F8* debris)
+void cFielder::fn_8003295C(WindDebris* debris)
 {
     if (!IsInvincible() && !IsShattered() && mbTangible && m_eActionState != 0 && m_eActionState != 35)
     {

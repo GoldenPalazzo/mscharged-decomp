@@ -25,7 +25,7 @@ static RLView* sUnshadowedView;
 
 static inline void FreeCollisionWindDebrisPlayerData(CollisionWindDebrisPlayerData* pData);
 
-UnidentifiedNPC_801B43F8::UnidentifiedNPC_801B43F8(
+WindDebris::WindDebris(
     cSHierarchy& pHierarchy, int nModelID, unsigned long activationSoundCue,
     unsigned long impactSoundCue, PhysicsNPC& rPhysObj,
     cInventory<cSAnim>* pInventorySAnim, void* resource)
@@ -42,11 +42,11 @@ UnidentifiedNPC_801B43F8::UnidentifiedNPC_801B43F8(
     Deactivate(false);
 }
 
-UnidentifiedNPC_801B43F8::~UnidentifiedNPC_801B43F8()
+WindDebris::~WindDebris()
 {
 }
 
-void UnidentifiedNPC_801B43F8::Update(float fDeltaT)
+void WindDebris::Update(float fDeltaT)
 {
     if (mbIsVisible == true && !mbUpdateSuspended)
     {
@@ -86,12 +86,12 @@ void UnidentifiedNPC_801B43F8::Update(float fDeltaT)
     }
 }
 
-void UnidentifiedNPC_801B43F8::CollisionCallback(
+void WindDebris::CollisionCallback(
     PhysicsObject* pPhysObj, PhysicsObject* pObjA, const nlVector3& v3Pos)
 {
     cPlayer* pPlayer = 0;
-    UnidentifiedNPC_801B43F8* pDebris
-        = (UnidentifiedNPC_801B43F8*)((PhysicsNPC*)pPhysObj)->mpAINPC;
+    WindDebris* pDebris
+        = (WindDebris*)((PhysicsNPC*)pPhysObj)->mpAINPC;
     bool collisionDelayed = pDebris->mfCollisionDelay > 0.0f;
     if (collisionDelayed)
     {
@@ -139,7 +139,7 @@ void UnidentifiedNPC_801B43F8::CollisionCallback(
     }
 }
 
-void UnidentifiedNPC_801B43F8::Activate()
+void WindDebris::Activate()
 {
     mpPhysObj->EnableCollisions();
     mbIsVisible = true;
@@ -149,7 +149,7 @@ void UnidentifiedNPC_801B43F8::Activate()
     }
 }
 
-void UnidentifiedNPC_801B43F8::Deactivate(bool)
+void WindDebris::Deactivate(bool)
 {
     SetPosition(gWindDebrisHiddenPosition);
     maFacingDirection = 0;
@@ -158,20 +158,20 @@ void UnidentifiedNPC_801B43F8::Deactivate(bool)
     mbIsVisible = false;
 }
 
-void UnidentifiedNPC_801B43F8::Reset()
+void WindDebris::Reset()
 {
     Deactivate(false);
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4C14(float duration)
+void WindDebris::fn_801B4C14(float duration)
 {
 }
 
-void UnidentifiedNPC_801B43F8::Move(float fDeltaT)
+void WindDebris::Move(float fDeltaT)
 {
 }
 
-void UnidentifiedNPC_801B43F8::DrawShadow(
+void WindDebris::DrawShadow(
     const cPoseAccumulator& pa, const nlMatrix4& worldMatrix)
 {
     if (mbIsVisible == true)

@@ -645,7 +645,7 @@ void Windy::Start()
             float index = 2.0f * nlRandomf(1.0f);
             index += index < 0.0f ? -0.5f : 0.5f;
             eDebrisType = (int)index;
-            UnidentifiedNPC_801B43F8* npc = gNPCManager->fn_801A9DE0(eDebrisType);
+            WindDebris* npc = gNPCManager->fn_801A9DE0(eDebrisType);
             int i = 0;
             while ((npc->mbIsVisible == 1 || eDebrisType == eLastDebrisType) && i < 3 && i > -1)
             {

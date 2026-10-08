@@ -214,7 +214,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
     return pObject;
 }
 
-UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
+WindDebris* NPCManager::fn_801A9DE0(int nIndex)
 {
     return mWindDebris[nIndex];
 }
@@ -229,13 +229,13 @@ void NPCManager::CreateWindDebris()
 
         PhysicsNPC* pPhysics = new (8, false) PhysicsNPC(
             pConfig->mRadius);
-        UnidentifiedNPC_801B43F8* pObject = new (8, false) UnidentifiedNPC_801B43F8(
+        WindDebris* pObject = new (8, false) WindDebris(
             *pTemplate->hierarchy, pTemplate->modelID,
             pConfig->mCueId, pConfig->mUnidentified010,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mWindDebris[i] = pObject;
-        pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::CollisionCallback);
+        pPhysics->SetCallbackFunction(WindDebris::CollisionCallback);
     }
 }
 

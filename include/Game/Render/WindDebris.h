@@ -6,13 +6,13 @@
 template <class T>
 class cInventory;
 
-class UnidentifiedNPC_801B43F8 : public SkinAnimatedMovableNPC
+class WindDebris : public SkinAnimatedMovableNPC
 {
 public:
-    UnidentifiedNPC_801B43F8(cSHierarchy& pHierarchy, int nModelID,
+    WindDebris(cSHierarchy& pHierarchy, int nModelID,
         unsigned long activationSoundCue, unsigned long impactSoundCue,
         PhysicsNPC& rPhysObj, cInventory<cSAnim>* pInventorySAnim, void* resource);
-    virtual ~UnidentifiedNPC_801B43F8();
+    virtual ~WindDebris();
     virtual SkinAnimatedNPC_Type GetSkinAnimatedNPC_Type() const
     {
         return SkinAnimatedNPC_WIND_DEBRIS;

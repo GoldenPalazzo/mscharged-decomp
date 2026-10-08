@@ -1447,7 +1447,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             }
             for (unsigned int i = 0; i < 3; i++)
             {
-                UnidentifiedNPC_801B43F8* pNPC = gNPCManager->fn_801A9DE0(i);
+                WindDebris* pNPC = gNPCManager->fn_801A9DE0(i);
                 if (pNPC != NULL && pNPC->mbIsVisible)
                 {
                     nlVector2 position;
