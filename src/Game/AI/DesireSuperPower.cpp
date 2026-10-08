@@ -176,7 +176,7 @@ void DesireSuperPower::SetContext(
 {
     Desire::SetContext(context);
 
-    if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
+    if (m_pFielder->mUnidentified024.m_eCharacterClass == PETEY)
     {
         UnidentifiedFindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
         UnidentifiedFindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
@@ -194,7 +194,7 @@ bool DesireSuperPower::Initialize(void* context)
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
-    case DAISY:
+    case BOWSER:
     {
         mpTarget = 0;
         m_pFielder->EndFrozenOrDazed();
@@ -213,10 +213,10 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     }
-    case WALUIGI:
+    case BOWSERJR:
         result = InitializeBowserJr(this, context);
         break;
-    case DONKEYKONG:
+    case DAISY:
         m_pFielder->InitDesire(
             (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
         m_pFielder->SetAction((eFielderActionState)29);
@@ -227,10 +227,10 @@ bool DesireSuperPower::Initialize(void* context)
         mMaxDuration = gDaisySuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
-    case WARIO:
+    case DIDDYKONG:
         result = InitializeDiddy(this, context);
         break;
-    case HAMMERBROS:
+    case DONKEYKONG:
         mpDKShockAvoidable = new (nlMalloc(sizeof(AvoidablePoint), 8, false))
             AvoidablePoint(AVOID_BOWSER,
                 (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
@@ -239,28 +239,28 @@ bool DesireSuperPower::Initialize(void* context)
         mMaxDuration = gDKSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
-    case KOOPA:
-        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
-        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
-        EmitSuperGrow(m_pFielder);
-        mMaxDuration = gSuperGrowTimeLimit;
-        m_pFielder->PlayImpactCameraRumble();
-        result = true;
-        break;
-    case BIRDO:
-        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
-        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
-        EmitSuperGrow(m_pFielder);
-        mMaxDuration = gSuperGrowTimeLimit;
-        m_pFielder->PlayImpactCameraRumble();
-        result = true;
-        break;
     case LUIGI:
+        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
+        EmitSuperGrow(m_pFielder);
+        mMaxDuration = gSuperGrowTimeLimit;
+        m_pFielder->PlayImpactCameraRumble();
+        result = true;
+        break;
+    case MARIO:
+        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
+        EmitSuperGrow(m_pFielder);
+        mMaxDuration = gSuperGrowTimeLimit;
+        m_pFielder->PlayImpactCameraRumble();
+        result = true;
+        break;
+    case PEACH:
         m_pFielder->InitActionPeachSuper();
         mMaxDuration = gPeachSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
-    case YOSHI:
+    case PETEY:
     {
         mpTarget = 0;
         m_pFielder->EndFrozenOrDazed();
@@ -280,14 +280,14 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     }
-    case MARIO:
+    case WALUIGI:
         mpTarget = 0;
         mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         result = true;
         break;
-    case PEACH:
+    case WARIO:
     {
         mpTarget = 0;
         mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
@@ -304,7 +304,7 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     }
-    case TOAD:
+    case YOSHI:
         result = fn_800D0DB0(this, context);
         break;
     }
@@ -325,8 +325,8 @@ bool DesireSuperPower::Initialize(void* context)
         unsigned long sound = PowerupBase::GetSoundType(
             (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
             PowerupBase::PWRUP_SOUND_ACTIVATE);
-        if (m_pFielder->mUnidentified024.m_eCharacterClass == BIRDO
-            || m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA)
+        if (m_pFielder->mUnidentified024.m_eCharacterClass == MARIO
+            || m_pFielder->mUnidentified024.m_eCharacterClass == LUIGI)
         {
             PlayCaptainPowerupStream(18, sound, m_pFielder);
             u32 hash = nlStringLowerHash("MarioPowerup");
@@ -356,40 +356,40 @@ void DesireSuperPower::Update(
 
     switch (GetCharacterClass(m_pFielder))
     {
-    case DAISY:
+    case BOWSER:
         UpdateBowser(update, fDeltaT);
         break;
-    case WALUIGI:
+    case BOWSERJR:
         UpdateBowserJr(update, fDeltaT);
         break;
-    case DONKEYKONG:
+    case DAISY:
         UpdateDaisy(update, fDeltaT);
         break;
-    case WARIO:
+    case DIDDYKONG:
         UpdateDiddy(update, fDeltaT);
         break;
-    case HAMMERBROS:
+    case DONKEYKONG:
         UpdateDK(update, fDeltaT);
         break;
-    case KOOPA:
+    case LUIGI:
         UpdateLuigi(update, fDeltaT);
         break;
-    case BIRDO:
+    case MARIO:
         UpdateMario(update, fDeltaT);
         break;
-    case LUIGI:
+    case PEACH:
         UpdatePeach(update, fDeltaT);
         break;
-    case YOSHI:
+    case PETEY:
         UpdatePetey(update, fDeltaT);
         break;
-    case MARIO:
+    case WALUIGI:
         UpdateWaluigi(update, fDeltaT);
         break;
-    case PEACH:
+    case WARIO:
         UpdateWario(update, fDeltaT);
         break;
-    case TOAD:
+    case YOSHI:
         UpdateYoshi(update, fDeltaT);
         break;
     }
@@ -404,12 +404,12 @@ void DesireSuperPower::Cleanup()
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
-    case DAISY:
+    case BOWSER:
         m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         EndBowserSmoke(m_pFielder);
         break;
-    case WALUIGI:
+    case BOWSERJR:
         m_pFielder->ClearInvincibility(0);
         {
             EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
@@ -420,37 +420,37 @@ void DesireSuperPower::Cleanup()
             }
         }
         break;
-    case DONKEYKONG:
+    case DAISY:
         m_pFielder->ClearInvincibility(0);
         break;
-    case WARIO:
+    case DIDDYKONG:
         m_pFielder->mUnidentified181 = false;
         m_pFielder->mUnidentified182 = false;
         m_pFielder->ClearInvincibility(0);
         break;
-    case HAMMERBROS:
+    case DONKEYKONG:
         KillDKSuperCharge(m_pFielder);
         m_pFielder->ClearInvincibility(0);
         delete (AvoidablePoint*)mpDKShockAvoidable;
         mpDKShockAvoidable = 0;
         break;
-    case KOOPA:
-        m_pFielder->m_pTweaks
-            = m_pFielder->mUnidentified32C;
-        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
-        EmitSuperShrink(m_pFielder);
-        break;
-    case BIRDO:
-        m_pFielder->m_pTweaks
-            = m_pFielder->mUnidentified32C;
-        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
-        EmitSuperShrink(m_pFielder);
-        break;
     case LUIGI:
+        m_pFielder->m_pTweaks
+            = m_pFielder->mUnidentified32C;
+        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
+        EmitSuperShrink(m_pFielder);
+        break;
+    case MARIO:
+        m_pFielder->m_pTweaks
+            = m_pFielder->mUnidentified32C;
+        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
+        EmitSuperShrink(m_pFielder);
+        break;
+    case PEACH:
         m_pFielder->CleanUpPeachSuper();
         SetFlyingCameraTarget((cFielder*)0);
         break;
-    case YOSHI:
+    case PETEY:
         m_pFielder->ClearInvincibility(0);
         m_pFielder->mUnidentified404 = 0.0f;
         m_pFielder->mUnidentified408 = 0.0f;
@@ -462,7 +462,7 @@ void DesireSuperPower::Cleanup()
             m_pFielder->StartRunning();
         }
         break;
-    case MARIO:
+    case WALUIGI:
         if (m_pFielder->fn_8002E060() == 12)
         {
             m_pFielder->EndDesire();
@@ -470,7 +470,7 @@ void DesireSuperPower::Cleanup()
         m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         break;
-    case PEACH:
+    case WARIO:
         m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         if (m_pFielder->m_eAnimID == 104)
@@ -479,7 +479,7 @@ void DesireSuperPower::Cleanup()
             m_pFielder->StartRunning();
         }
         break;
-    case TOAD:
+    case YOSHI:
         m_pFielder->m_pTweaks
             = m_pFielder->mUnidentified32C;
         m_pFielder->RestoreTangibility(false);
@@ -493,8 +493,8 @@ void DesireSuperPower::Cleanup()
         (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
     StopCaptainPowerupStream(sound, m_pFielder);
-    if ((m_pFielder->mUnidentified024.m_eCharacterClass == BIRDO)
-        || (m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA))
+    if ((m_pFielder->mUnidentified024.m_eCharacterClass == MARIO)
+        || (m_pFielder->mUnidentified024.m_eCharacterClass == LUIGI))
     {
         ResumeSuddenDeathMusic();
         u32 hash = nlStringLowerHash("MarioPowerup");
@@ -1696,7 +1696,7 @@ void HandleMuckBallCollision(void* context)
         hit = true;
     }
     if (event->mUnidentified0C != 0
-        && event->mUnidentified0C->mUnidentified024.m_eCharacterClass != YOSHI)
+        && event->mUnidentified0C->mUnidentified024.m_eCharacterClass != PETEY)
     {
         hit = true;
     }

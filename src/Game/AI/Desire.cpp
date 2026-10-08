@@ -238,8 +238,8 @@ void DesireDeke::Update(DesireUpdate* update, float)
     unsigned short direction = m_pFielder->mUnidentified024.m_aActualFacingDirection;
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
-    case BIRDO:
-    case KOOPA:
+    case MARIO:
+    case LUIGI:
         avoidSideline = true;
         if (m_pFielder->fn_8003E6EC() && mUnidentifiedA4 != 0)
         {
@@ -252,7 +252,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         }
         // Without an explicit target, use the nearest opponent below.
 
-    case TOAD:
+    case YOSHI:
     case 14:
     case 16:
     case 19:
@@ -283,8 +283,8 @@ void DesireDeke::Update(DesireUpdate* update, float)
         break;
     }
 
-    case LUIGI:
-    case WARIO:
+    case PEACH:
+    case DIDDYKONG:
     case 15:
     {
         avoidSideline = true;
@@ -310,8 +310,8 @@ void DesireDeke::Update(DesireUpdate* update, float)
         break;
     }
 
-    case DONKEYKONG:
-    case MARIO:
+    case DAISY:
+    case WALUIGI:
     case 17:
     {
         float dekeDistance = m_pFielder->GetDekeDistance();
@@ -354,12 +354,12 @@ void DesireDeke::Update(DesireUpdate* update, float)
         break;
     }
 
-    case DAISY:
-    case HAMMERBROS:
-    case PEACH:
-    case WALUIGI:
-    case YOSHI:
-    case MYSTERY:
+    case BOWSER:
+    case DONKEYKONG:
+    case WARIO:
+    case BOWSERJR:
+    case PETEY:
+    case BIRDO:
     case 13:
     case 18:
     {

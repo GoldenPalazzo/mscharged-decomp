@@ -2579,9 +2579,9 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
                     pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
             }
             else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mPhysics->GetRadius())
-                || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == HAMMERBROS)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == PEACH)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WALUIGI)
+                || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG)
+                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WARIO)
+                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == BOWSERJR)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == 13))
             {
                 pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);

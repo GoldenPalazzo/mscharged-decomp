@@ -2142,7 +2142,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         pData->mUnidentified10 = false;
         QueueAttackAttemptEvent(g_pGame, pData);
 
-        if (mUnidentified024.m_eCharacterClass == TOAD)
+        if (mUnidentified024.m_eCharacterClass == YOSHI)
         {
             lbl_806E12C8
                 ->CreatePatch(6, this, mUnidentified024.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
@@ -2154,7 +2154,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
 void cFielder::ActionHit(float fDeltaT)
 {
-    if (mUnidentified024.m_eCharacterClass == TOAD)
+    if (mUnidentified024.m_eCharacterClass == YOSHI)
     {
         for (int i = 0; i < 0x3C; i++)
         {
@@ -2170,14 +2170,14 @@ void cFielder::ActionHit(float fDeltaT)
         }
     }
 
-    if (mUnidentified024.m_eCharacterClass == MYSTERY)
+    if (mUnidentified024.m_eCharacterClass == BIRDO)
     {
-        if (m_pTeam->GetCaptain()->mUnidentified024.m_eCharacterClass == MARIO
+        if (m_pTeam->GetCaptain()->mUnidentified024.m_eCharacterClass == WALUIGI
             || m_pTeam->GetOtherTeam()->GetCaptain()->mUnidentified024.m_eCharacterClass
-                   == MARIO)
+                   == WALUIGI)
         {
             cFielder* pCaptain = m_pTeam->GetCaptain();
-            if (pCaptain->mUnidentified024.m_eCharacterClass != MARIO)
+            if (pCaptain->mUnidentified024.m_eCharacterClass != WALUIGI)
             {
                 pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
             }
@@ -2276,7 +2276,7 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
         nReact = 2;
     }
 
-    if (pAttacker->mUnidentified024.m_eCharacterClass == MYSTERY
+    if (pAttacker->mUnidentified024.m_eCharacterClass == BIRDO
         && ((cFielder*)pAttacker)->m_eActionState == 1)
     {
         aAngle = pFielder->mUnidentified024.m_aActualFacingDirection;
@@ -3662,7 +3662,7 @@ bool cFielder::InitActionPass(
     signed short nFacingDelta = GetFacingDeltaToPosition(pPassTarget->mUnidentified024.m_v3Position);
     int index = (u16)(nFacingDelta + 0x2000) >> 14;
 
-    if (mUnidentified024.m_eCharacterClass == HAMMERBROS)
+    if (mUnidentified024.m_eCharacterClass == DONKEYKONG)
     {
         SetAnimState(PassingAnims[index], false, 0.05f, false, false);
     }

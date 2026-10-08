@@ -1366,7 +1366,7 @@ float GetBallChargeValue(cBall* pBall, int nParam)
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == MYSTERY)
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == BIRDO)
         {
             return 0.0f;
         }
@@ -1451,7 +1451,7 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
             - 0.5f * lbl_806DB52C;
         fTimeScale = lbl_806DB51C;
         break;
-    case MYSTERY:
+    case BIRDO:
         v3Position.x += nlRandomf(lbl_806DB530)
             - 0.5f * lbl_806DB530;
         v3Position.y += nlRandomf(lbl_806DB530)

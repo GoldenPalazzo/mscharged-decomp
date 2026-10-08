@@ -2155,14 +2155,14 @@ void Goalie::ActionMove(float deltaTime)
     {
         cFielder* pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
         PhysicsWaluigiWall* pWall = 0;
-        if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
+        if (pCaptain->mUnidentified024.m_eCharacterClass == WALUIGI)
         {
             pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
-            if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
+            if (pCaptain->mUnidentified024.m_eCharacterClass == WALUIGI)
             {
                 pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
             }

@@ -277,7 +277,7 @@ void cFielder::ClearSuperPowerTank()
 
 void cFielder::fn_8005001C(bool bForce)
 {
-    if (mUnidentified024.m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == BOWSER)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -297,7 +297,7 @@ void cFielder::fn_8005001C(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
     {
         if (mUnidentified3DC)
         {
@@ -328,7 +328,7 @@ void cFielder::fn_8005001C(bool bForce)
             }
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == WARIO)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -336,7 +336,7 @@ void cFielder::fn_8005001C(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == PETEY)
     {
         if (mUnidentified3DC || bForce)
         {
@@ -351,20 +351,20 @@ void cFielder::InitSuperPowerTank(bool bTurnOn)
 {
     switch (mUnidentified024.m_eCharacterClass)
     {
-    case DAISY:
+    case BOWSER:
         mUnidentified3E4 = gBowserTankCapacity;
         mUnidentified3E8.nextFireballTime = 0.0f;
         break;
-    case MARIO:
+    case WALUIGI:
         mUnidentified3E4 = gWaluigiTankCapacity;
         mUnidentified3F8.mUnidentified00
             = mUnidentified3F8.mUnidentified04 = gWaluigiWallMinSegmentTime;
         break;
-    case PEACH:
+    case WARIO:
         mUnidentified3E4 = gWarioTankCapacity;
         mUnidentified3F4 = 0.0f;
         break;
-    case YOSHI:
+    case PETEY:
         mUnidentified3E4 = 1.0f;
         break;
     }
@@ -386,7 +386,7 @@ bool cFielder::TurnOnSuperPowerTank()
 
     if (!mUnidentified3DC)
     {
-        if (mUnidentified024.m_eCharacterClass == YOSHI)
+        if (mUnidentified024.m_eCharacterClass == PETEY)
         {
             PlaySound(m_uSoundSlotId, 0x8A9FCF66, 0, 0);
         }
@@ -398,7 +398,7 @@ bool cFielder::TurnOnSuperPowerTank()
         mUnidentified3DD = false;
     }
 
-    if (mUnidentified024.m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == BOWSER)
     {
         bool bRunning = mUnidentified3E0 > 0.0f;
         if (bRunning)
@@ -408,7 +408,7 @@ bool cFielder::TurnOnSuperPowerTank()
             SetSuperPowerTweaks();
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
     {
         m_pTweaks = mUnidentified328;
         if (fn_8002E060() != (eFielderDesireState)0xC)
@@ -430,7 +430,7 @@ bool cFielder::TurnOnSuperPowerTank()
             ActivateConcurrentState(fn_8002E1A4(this), 0x23, 0, 0);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == WARIO)
     {
         if (m_eAnimID != 0x68 && IsRunning()
             && fn_8002E060() != (eFielderDesireState)0x16)
@@ -442,7 +442,7 @@ bool cFielder::TurnOnSuperPowerTank()
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == PETEY)
     {
         mUnidentified408 = 0.0f;
         SetSuperPowerTweaks();

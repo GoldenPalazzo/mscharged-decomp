@@ -299,7 +299,7 @@ inline bool cFielder::CheckReceivePassState()
     if (bCondition2)
     {
         bool active;
-        GetCharacterSpecialActive(this, TOAD, active);
+        GetCharacterSpecialActive(this, YOSHI, active);
         if (!active)
         {
             bCondition3 = true;
@@ -309,7 +309,7 @@ inline bool cFielder::CheckReceivePassState()
     if (bCondition3)
     {
         bool active;
-        GetCharacterSpecialActive(this, DONKEYKONG, active);
+        GetCharacterSpecialActive(this, DAISY, active);
         if (!active)
         {
             bCondition4 = true;
@@ -319,7 +319,7 @@ inline bool cFielder::CheckReceivePassState()
     if (bCondition4)
     {
         bool active;
-        GetCharacterSpecialActive(this, WALUIGI, active);
+        GetCharacterSpecialActive(this, BOWSERJR, active);
         if (!active)
         {
             bCondition5 = true;
@@ -329,7 +329,7 @@ inline bool cFielder::CheckReceivePassState()
     if (bCondition5)
     {
         bool active;
-        GetCharacterSpecialActive(this, LUIGI, active);
+        GetCharacterSpecialActive(this, PEACH, active);
         if (!active)
         {
             bCondition6 = true;
@@ -477,7 +477,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         if (bCondition3)
         {
             bool bExcluded
-                = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
+                = pFielder->mUnidentified024.m_eCharacterClass == DAISY
                && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
@@ -488,7 +488,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         if (bCondition4)
         {
             bool bExcluded
-                = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
+                = pFielder->mUnidentified024.m_eCharacterClass == BOWSERJR
                && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
@@ -536,7 +536,7 @@ static inline void UpdateClearingAngleForTeammate(cFielder* player, int index, f
 
 static inline bool CanStartHit(const cFielder* fielder)
 {
-    return fielder->GetCharacterClass() != TOAD && !fielder->fn_80038918();
+    return fielder->GetCharacterClass() != YOSHI && !fielder->fn_80038918();
 }
 
 static inline bool IsInHitAction(const cFielder* fielder)
@@ -1014,7 +1014,7 @@ bool cFielder::EndSuperPower(int)
 bool cFielder::EndDaisySuperPower(bool value)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == DAISY
+    if (mUnidentified024.m_eCharacterClass == BOWSER
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1030,7 +1030,7 @@ bool cFielder::EndDaisySuperPower(bool value)
 bool cFielder::EndBirdoSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == BIRDO
+    if (mUnidentified024.m_eCharacterClass == MARIO
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1046,7 +1046,7 @@ bool cFielder::EndBirdoSuperPower()
 bool cFielder::EndKoopaSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == KOOPA
+    if (mUnidentified024.m_eCharacterClass == LUIGI
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1062,7 +1062,7 @@ bool cFielder::EndKoopaSuperPower()
 bool cFielder::EndMarioSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == MARIO
+    if (mUnidentified024.m_eCharacterClass == WALUIGI
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1078,7 +1078,7 @@ bool cFielder::EndMarioSuperPower()
 bool cFielder::EndPeachSuperPower(bool)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == PEACH
+    if (mUnidentified024.m_eCharacterClass == WARIO
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1094,7 +1094,7 @@ bool cFielder::EndPeachSuperPower(bool)
 bool cFielder::EndYoshiSuperPower(bool)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == YOSHI
+    if (mUnidentified024.m_eCharacterClass == PETEY
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 23))
     {
         active = true;
@@ -1255,7 +1255,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
     if (pFielder->m_pTeam->fn_800A6764())
     {
         eCharacterClass eCaptainClass = pCaptain->mUnidentified024.m_eCharacterClass;
-        if (eCaptainClass == DAISY || eCaptainClass == YOSHI || eCaptainClass == MARIO)
+        if (eCaptainClass == BOWSER || eCaptainClass == PETEY || eCaptainClass == WALUIGI)
         {
             switch (pFielder->m_eActionState)
             {
@@ -1267,7 +1267,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
                 return false;
             }
 
-            if ((eCaptainClass == MARIO || eCaptainClass == DAISY || eCaptainClass == YOSHI)
+            if ((eCaptainClass == WALUIGI || eCaptainClass == BOWSER || eCaptainClass == PETEY)
                 && pFielder->IsFallenDown())
             {
                 return false;
@@ -1373,7 +1373,7 @@ bool cFielder::CanGetElectrocuted(
             || (float)fabs(jointPos.z) > netHeight)
         {
             bool bUnidentified = false;
-            if (mUnidentified024.m_eCharacterClass == MARIO
+            if (mUnidentified024.m_eCharacterClass == WALUIGI
                 && IsConcurrentStateActive(
                     mUnidentified428->mScriptMachine, 0x17))
             {
@@ -1387,8 +1387,8 @@ bool cFielder::CanGetElectrocuted(
                 return false;
             }
 
-            if ((mUnidentified024.m_eCharacterClass == MARIO
-                    || mUnidentified024.m_eCharacterClass == DONKEYKONG
+            if ((mUnidentified024.m_eCharacterClass == WALUIGI
+                    || mUnidentified024.m_eCharacterClass == DAISY
                     || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
                 && m_eActionState == (eFielderActionState)1)
             {
@@ -1653,7 +1653,7 @@ extern "C" float fn_80030750(cFielder* pFielder)
         cSAnim* pAnim = pFielder->m_pAnimInventory->GetAnim(0x67);
         nlVector3 v3Start;
         nlVector3 v3End;
-        if (pFielder->mUnidentified024.m_eCharacterClass != TOAD)
+        if (pFielder->mUnidentified024.m_eCharacterClass != YOSHI)
         {
             pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D020(pFielder->m_pTweaks)), &v3Start);
             pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D050(pFielder->m_pTweaks)), &v3End);
@@ -1934,7 +1934,7 @@ extern "C" void fn_800318F8(cFielder* pFielder)
 extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenTime)
 {
     bool bHasEgg = false;
-    if (pFielder->mUnidentified024.m_eCharacterClass == TOAD
+    if (pFielder->mUnidentified024.m_eCharacterClass == YOSHI
         && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17))
     {
         bHasEgg = true;
@@ -1948,7 +1948,7 @@ extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenT
     {
         pFielder->ReleaseBall(0);
         if ((pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xE
-                || pFielder->mUnidentified024.m_eCharacterClass == MYSTERY)
+                || pFielder->mUnidentified024.m_eCharacterClass == BIRDO)
             && pFielder->m_eActionState == (eFielderActionState)0x15)
         {
             if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
@@ -1961,7 +1961,7 @@ extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenT
             }
         }
 
-        if (pFielder->mUnidentified024.m_eCharacterClass == DAISY
+        if (pFielder->mUnidentified024.m_eCharacterClass == BOWSER
             && pFielder->m_eActionState == (eFielderActionState)1)
         {
             nlVector3 v3WarpPos = pFielder->mUnidentified024.m_v3Position;
@@ -2134,7 +2134,7 @@ void cFielder::fn_80032CB8(CollisionThwompPlayerData* event)
         return;
     if (!IsInvincible() && mbTangible)
     {
-        if (event->state == THWOMP_STATE_FALLING || (IsCharacterSuperPowerActive(this, MARIO) && mUnidentified3DC))
+        if (event->state == THWOMP_STATE_FALLING || (IsCharacterSuperPowerActive(this, WALUIGI) && mUnidentified3DC))
         {
             if (g_pBall->m_pOwner == this)
             {
@@ -2149,7 +2149,7 @@ void cFielder::fn_80032CB8(CollisionThwompPlayerData* event)
             nlVec3Set(direction, thwompPosition->x - mUnidentified024.m_v3Position.x,
                 thwompPosition->y - mUnidentified024.m_v3Position.y, 0.0f);
             nlVec3Scale(direction, direction, nlRecipSqrt(nlVec3LengthSquared(direction), false));
-            if (IsCharacterSuperPowerActive(this, MARIO) && mUnidentified3DC)
+            if (IsCharacterSuperPowerActive(this, WALUIGI) && mUnidentified3DC)
             {
                 if (!IsFallenDown())
                     InitActionShellReact(*event->thwomp->GetPosition(), v3Zero);
@@ -2479,25 +2479,25 @@ extern "C" bool fn_800344DC(cFielder* pFielder, const nlVector3* position)
 
 bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
 {
-    if (pOtherFielder->mUnidentified024.m_eCharacterClass == DAISY
+    if (pOtherFielder->mUnidentified024.m_eCharacterClass == BOWSER
         && pOtherFielder->m_eActionState == 1)
     {
         return IsCharacterInAir(pOtherFielder->mUnidentified024.m_fPlayerScale);
     }
-    if (mUnidentified024.m_eCharacterClass == DAISY && m_eActionState == 1)
+    if (mUnidentified024.m_eCharacterClass == BOWSER && m_eActionState == 1)
         return false;
-    if (mUnidentified024.m_eCharacterClass == TOAD && m_eActionState == 1)
+    if (mUnidentified024.m_eCharacterClass == YOSHI && m_eActionState == 1)
         return false;
-    if (mUnidentified024.m_eCharacterClass == WARIO && m_eActionState == 0x1E)
+    if (mUnidentified024.m_eCharacterClass == DIDDYKONG && m_eActionState == 0x1E)
         return false;
-    if (pOtherFielder->mUnidentified024.m_eCharacterClass == WALUIGI
+    if (pOtherFielder->mUnidentified024.m_eCharacterClass == BOWSERJR
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
         float fPlayerScale = pOtherFielder->mUnidentified024.m_fPlayerScale;
         fPlayerScale = 0.5f * fPlayerScale;
         return IsCharacterInAir(fPlayerScale);
     }
-    if (mUnidentified024.m_eCharacterClass == WALUIGI && m_eActionState == ACTION_SLIDE_ATTACK)
+    if (mUnidentified024.m_eCharacterClass == BOWSERJR && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
     if (pOtherFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
@@ -3960,7 +3960,7 @@ bool cFielder::IsFallenDown() const
         fGetUpFrame = 29.0f;
         break;
     case 0x68:
-        if (mUnidentified024.m_eCharacterClass == DAISY)
+        if (mUnidentified024.m_eCharacterClass == BOWSER)
         {
             fGetUpFrame = (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
         }
@@ -4134,7 +4134,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
     }
 
     bool bUnidentified = false;
-    if (mUnidentified024.m_eCharacterClass == TOAD
+    if (mUnidentified024.m_eCharacterClass == YOSHI
         && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
     {
         bUnidentified = true;
@@ -4748,9 +4748,9 @@ void cFielder::SetRunningAnimState(float blendTime)
     const int runningAnims[3] = { 7, 4, 8 };
     const int superAnims[3] = { 10, 9, 11 };
     if (fn_8003E74C()
-        || (GetCharacterClass() == DAISY && mUnidentified3DC)
-        || (GetCharacterClass() == PEACH && mUnidentified3DC)
-        || (GetCharacterClass() == YOSHI && mUnidentified3DC))
+        || (GetCharacterClass() == BOWSER && mUnidentified3DC)
+        || (GetCharacterClass() == WARIO && mUnidentified3DC)
+        || (GetCharacterClass() == PETEY && mUnidentified3DC))
         SetRunLeanSAB(superAnims, 3, 1);
     else
         SetRunLeanSAB(runningAnims, 3, 1);
@@ -4765,8 +4765,8 @@ void cFielder::SetRunningWBAnimState(float blendTime)
     int runningAnims[3] = { 0x15, 0x14, 0x16 };
     int superAnims[3] = { 10, 9, 11 };
     if (fn_8003E74C()
-        || (GetCharacterClass() == DAISY && mUnidentified3DC)
-        || (GetCharacterClass() == YOSHI && mUnidentified3DC))
+        || (GetCharacterClass() == BOWSER && mUnidentified3DC)
+        || (GetCharacterClass() == PETEY && mUnidentified3DC))
         SetRunLeanSAB(superAnims, 3, 1);
     else
         SetRunLeanSAB(runningAnims, 3, 1);
@@ -5292,35 +5292,35 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder)
 bool cFielder::fn_8003E8F4() const
 {
     bool active;
-    GetCharacterSpecialActive(this, LUIGI, active);
+    GetCharacterSpecialActive(this, PEACH, active);
     return active;
 }
 
 extern "C" bool fn_8003E948(const cFielder* pFielder)
 {
     bool active;
-    GetCharacterSpecialActive(pFielder, MARIO, active);
+    GetCharacterSpecialActive(pFielder, WALUIGI, active);
     return active;
 }
 
 bool cFielder::IsPeachSuperPowerActive() const
 {
     bool active;
-    GetCharacterSpecialActive(this, PEACH, active);
+    GetCharacterSpecialActive(this, WARIO, active);
     return active;
 }
 
 bool cFielder::fn_8003E9F0() const
 {
     bool active;
-    GetCharacterSpecialActive(this, YOSHI, active);
+    GetCharacterSpecialActive(this, PETEY, active);
     return active;
 }
 
 bool cFielder::fn_8003EA44() const
 {
     bool result = false;
-    if (GetCharacterClass() == HAMMERBROS
+    if (GetCharacterClass() == DONKEYKONG
         && m_eActionState == (eFielderActionState)0x1D)
     {
         result = true;
@@ -5331,7 +5331,7 @@ bool cFielder::fn_8003EA44() const
 bool cFielder::fn_8003EA6C() const
 {
     bool active;
-    GetCharacterSpecialActive(this, TOAD, active);
+    GetCharacterSpecialActive(this, YOSHI, active);
     return active;
 }
 

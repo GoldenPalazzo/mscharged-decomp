@@ -435,19 +435,19 @@ float AvoidableFielder::GetAvoidanceWeight(
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
         case 4:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == PETEY)
             {
                 fWeight = 0.0f;
             }
             break;
         case 0:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == PEACH)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
             {
                 fWeight = 0.0f;
             }
             break;
         case 2:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == DIDDYKONG)
             {
                 fWeight = 0.0f;
             }

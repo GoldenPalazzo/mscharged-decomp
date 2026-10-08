@@ -94,8 +94,8 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
     {
         switch (m_pFielder->mUnidentified024.m_eCharacterClass)
         {
-        case DONKEYKONG:
-        case MARIO:
+        case DAISY:
+        case WALUIGI:
         case (eCharacterClass)17:
         {
             float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);

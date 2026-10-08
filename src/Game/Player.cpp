@@ -446,7 +446,7 @@ void cPlayer::SetAnimID(int animID)
     cCharacter::SetAnimID(animID);
     eBallRotationMode ballRotationMode
         = (eBallRotationMode)m_pAnimInventory->GetBallRotationMode(animID);
-    if (mUnidentified024.m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != BIRDO)
     {
         mUnidentified1E4.m_eBallRotationMode = ballRotationMode;
         if (m_pBall != NULL)
@@ -988,7 +988,7 @@ void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
     {
         return;
     }
-    if (mUnidentified024.m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != BIRDO)
     {
         mUnidentified1E4.m_eBallRotationMode = BRM_MATCH_VELOCITY;
         if (m_pBall != NULL)
@@ -1062,25 +1062,25 @@ void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
     else
     {
         cc = self.mUnidentified024.m_eCharacterClass;
-        if (cc == PEACH)
+        if (cc == WARIO)
         {
             nHeadSpinMax = lbl_806E0D8C;
             nHeadTiltMax = lbl_806E0D88;
         }
-        else if (cc == MARIO)
+        else if (cc == WALUIGI)
         {
             nHeadSpinMax = lbl_806E0D84;
         }
-        else if (cc == DAISY)
+        else if (cc == BOWSER)
         {
             nHeadSpinMax = lbl_806E0D90;
         }
-        else if (cc == MYSTERY)
+        else if (cc == BIRDO)
         {
             nHeadTiltMax = lbl_806E0D7C;
             nHeadSpinMax = lbl_806E0D80;
         }
-        else if (cc == HAMMERBROS)
+        else if (cc == DONKEYKONG)
         {
             nHeadTiltMax = lbl_806E0D94;
             nHeadSpinMax = lbl_806E0D98;
