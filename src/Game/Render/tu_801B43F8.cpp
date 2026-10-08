@@ -17,15 +17,14 @@
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 #include "NL/nlFunction.inl"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 
 extern "C" const nlVector3 gWindDebrisZeroVelocity;
 extern "C" const nlVector3 gWindDebrisHiddenPosition;
 static RLView* lbl_806E16E8;
 
-static inline void fn_801B4F4C(CollisionWindDebrisPlayerData* pData)
-{
-    g_CollisionWindDebrisPlayerDataPool.Free(pData);
-}
+static inline void fn_801B4F4C(CollisionWindDebrisPlayerData* pData);
 
 UnidentifiedNPC_801B43F8::UnidentifiedNPC_801B43F8(
     cSHierarchy& pHierarchy, int nModelID, unsigned long param1,
@@ -182,4 +181,5 @@ void UnidentifiedNPC_801B43F8::DrawShadow(
     }
 }
 
+#include "Game/Render/tu_801B43F8.inl"
 #include "NL/nlBind_impl.h"

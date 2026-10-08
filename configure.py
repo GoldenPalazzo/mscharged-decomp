@@ -870,7 +870,7 @@ config.libs = [
             Object(Matching, "Game/Render/ThwompObject.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/TimedObject.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
             Object(Matching, "Game/Render/WarbleOwner.cpp"),
-            Object(NonMatching, "Game/Render/tu_801B43F8.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/Render/tu_801B43F8.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/WindDebrisConfig.cpp"),
             Object(Matching, "Game/Render/StadiumPhysicsObject.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/StadiumWorldObjects.cpp"),
