@@ -1,4 +1,6 @@
 #include "NL/glx/glxSwap.h"
+#include "NL/nlDebug.h"
+#include <stdio.h>
 #include <revolution/vi/vi_fwd.h>
 
 #include "NL/gl/glPlat.h"
@@ -32,13 +34,8 @@ extern "C"
     void GXPeekARGB(u16 x, u16 y, u32* colour);
     void (*GXSetDrawDoneCallback(void (*cb)()))();
     void GXCopyDisp(void* dest, u8 clear);
-    void nlBreak__Fv();
 
-    // C stdio entry points retained in the MSL region.
-    typedef struct _FILE FILE;
-    FILE* fopen(const char* path, const char* mode);
-    unsigned long fwrite(const void* buffer, unsigned long size, unsigned long count, FILE* file);
-    int fclose(FILE* file);
+
 }
 
 struct GXColor
@@ -159,7 +156,7 @@ void glxRequestScreenShot()
 static void glx_ScreenCapture(bool isMovie)
 {
     char filename[0x40];
-    void* file;
+    FILE* file;
     TargaHeader header;
     u32 argbColor;
     s32 pixelOffset;
@@ -212,9 +209,9 @@ static void glx_ScreenCapture(bool isMovie)
             }
         }
 
-        fwrite(&header, 1, sizeof(TargaHeader), (FILE*)file);
-        fwrite(imageData, 3, 0x46000, (FILE*)file);
-        fclose((FILE*)file);
+        fwrite(&header, 1, sizeof(TargaHeader), file);
+        fwrite(imageData, 3, 0x46000, file);
+        fclose(file);
         delete[] imageData;
     }
 }
@@ -404,7 +401,7 @@ static void WaitDrawDone()
                 gxInit();
                 return;
             }
-            nlBreak__Fv();
+            nlBreak();
         }
     }
 }
@@ -452,7 +449,7 @@ static void swap_Post()
     }
     else
     {
-        nlBreak__Fv();
+        nlBreak();
     }
 
     glxSwapBuffers();
