@@ -193,7 +193,7 @@ void DesireSteering::Update(
         fn_800C5DBC(this, fDeltaT);
     }
     fn_800C6FDC(this, fDeltaT);
-    fn_8003C7B0(m_pFielder);
+    m_pFielder->ShouldIWave();
 
     desiredVelocity.a = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
     desiredVelocity.r = m_pFielder->mUnidentified024.m_fDesiredSpeed;

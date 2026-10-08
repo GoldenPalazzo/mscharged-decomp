@@ -244,7 +244,7 @@ bool DesireSuperPower::Initialize(void* context)
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
-        fn_800367B4(m_pFielder);
+        m_pFielder->PlayImpactCameraRumble();
         result = true;
         break;
     case BIRDO:
@@ -252,7 +252,7 @@ bool DesireSuperPower::Initialize(void* context)
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
-        fn_800367B4(m_pFielder);
+        m_pFielder->PlayImpactCameraRumble();
         result = true;
         break;
     case LUIGI:
@@ -1545,7 +1545,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
-                    fn_800367B4(m_pFielder);
+                    m_pFielder->PlayImpactCameraRumble();
                     m_pFielder->fn_800D0534(gWarioGasInterval);
                     m_pFielder->mUnidentified3F4 = gWarioGasInterval;
                     nlVector3 pos;

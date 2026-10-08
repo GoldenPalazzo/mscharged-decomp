@@ -31,6 +31,7 @@
 #include "Game/DB/StatsTracker.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
@@ -467,7 +468,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
 bool cFielder::CanGetElectrocuted(
     const CollisionPlayerWallData* eventData)
 {
-    if (!fn_8002F310(this))
+    if (!CanGetElectrocuted())
     {
         return false;
     }
@@ -862,7 +863,7 @@ bool cFielder::fn_8003EA6C() const
     return active;
 }
 
-bool cFielder::CanReceivePass()
+inline bool cFielder::CheckReceivePassState()
 {
     bool bCanReceivePass = false;
     bool bCondition6 = false;
@@ -962,6 +963,16 @@ bool cFielder::CanReceivePass()
     }
 
     return bCanReceivePass;
+}
+
+inline bool cFielder::IsAvailableToReceivePass()
+{
+    return CheckReceivePassState();
+}
+
+bool cFielder::CanReceivePass()
+{
+    return IsAvailableToReceivePass();
 }
 
 void cFielder::Unknown8(unsigned short aParam, bool bParam)
@@ -5362,4 +5373,130 @@ bool cFielder::IsPeachSuperPowerActive() const
     bool active;
     GetCharacterSpecialActive(this, PEACH, active);
     return active;
+}
+
+bool lbl_806E0C60;
+float gImpactRumbleX = 0.035f;
+float gImpactRumbleY = 0.02f;
+float gImpactRumbleSpring = 2500.0f;
+float gImpactRumbleDamping = 5.0f;
+float gSuperImpactRumbleX = 0.2f;
+float gSuperImpactRumbleY = 0.225f;
+float gSuperImpactRumbleSpring = 4300.0f;
+float gSuperImpactRumbleDamping = 5.75f;
+float gHeavyImpactRumbleX = 0.065f;
+float gHeavyImpactRumbleY = 0.05f;
+float gHeavyImpactRumbleSpring = 3900.0f;
+float gHeavyImpactRumbleDamping = 6.3f;
+float gBulletImpactRumbleX = 0.25f;
+float gBulletImpactRumbleY = 0.175f;
+float gBulletImpactRumbleSpring = 4450.0f;
+float gBulletImpactRumbleDamping = 5.8f;
+
+bool cFielder::CanBeHitBySkillshot()
+{
+    bool result = true;
+    if (IsInvincible())
+        result = false;
+    else
+    {
+        switch (m_eActionState)
+        {
+        case 3:
+        case 24:
+            result = false;
+            break;
+        case ACTION_ELECTROCUTION:
+            if (m_eAnimID == 0x76)
+                result = false;
+            break;
+        }
+    }
+    return result;
+}
+
+bool cFielder::CanGetElectrocuted() const
+{
+    if (lbl_806E0C60 || GameInfoManager::Instance()->IsRule0x4Equal2())
+        return false;
+    if (fn_800344B0())
+        return false;
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+        return false;
+    if (fn_8003EA6C())
+        return false;
+    if (GameInfoManager::Instance()->GetStadium() == 11 && m_eActionState == 35)
+        return false;
+    if (GameInfoManager::Instance()->GetStadium() == 11)
+    {
+        float x = (float)fabs(mUnidentified024.m_v3Position.x);
+        if (x < cField::GetGoalLineX(1U) - 1.0f)
+            return false;
+    }
+    return true;
+}
+
+void cFielder::PlayImpactCameraRumble()
+{
+    if (fn_8003E74C())
+        FireCameraRumbleFilter(gSuperImpactRumbleX, gSuperImpactRumbleY, gSuperImpactRumbleSpring, gSuperImpactRumbleDamping);
+    else if (GetCharacterClass() == (eCharacterClass)7 || GetCharacterClass() == (eCharacterClass)13 || GetCharacterClass() == (eCharacterClass)9)
+        FireCameraRumbleFilter(gHeavyImpactRumbleX, gHeavyImpactRumbleY, gHeavyImpactRumbleSpring, gHeavyImpactRumbleDamping);
+    else if (GetCharacterClass() == (eCharacterClass)19)
+        FireCameraRumbleFilter(gBulletImpactRumbleX, gBulletImpactRumbleY, gBulletImpactRumbleSpring, gBulletImpactRumbleDamping);
+    else
+        FireCameraRumbleFilter(gImpactRumbleX, gImpactRumbleY, gImpactRumbleSpring, gImpactRumbleDamping);
+}
+
+void cFielder::ShouldIWave()
+{
+    if (IsCaptain() && m_pBall == 0 && IsAvailableToReceivePass() && m_nPowerupAnimID < 0 && !fn_800976C4())
+    {
+        if (g_pBall->GetOwnerFielder() != 0
+            && g_pBall->GetOwnerFielder()->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > 0.5f
+            && IsOnSameTeam(g_pBall->GetOwnerFielder())
+            && g_pBall->GetOwnerFielder()->DoCalcCanDoPerfectPass(this, mUnidentified024.m_v3Position))
+        {
+            SetPowerupAnimState(0x5D);
+            PlaySound(m_uSoundSlotId, 0x270203ED, 0, 0);
+        }
+    }
+}
+
+float CalcPenaltyWorth(ePenaltyType type)
+{
+    float minAmount = 0.0f;
+    float maxAmount = 0.0f;
+    switch (type)
+    {
+    case PEN_TYPE_HIT_WITH_BALL:
+    {
+        GameTweaks* tweaks = gGameTweaks.m_pGameTweaks;
+        minAmount = tweaks->fPowerupHitWithBallMinAmount;
+        maxAmount = tweaks->fPowerupHitWithBallMaxAmount;
+        break;
+    }
+    case PEN_TYPE_HIT_NO_BALL:
+    {
+        GameTweaks* tweaks = gGameTweaks.m_pGameTweaks;
+        minAmount = tweaks->fPowerupHitNoBallMinAmount;
+        maxAmount = tweaks->fPowerupHitNoBallMaxAmount;
+        break;
+    }
+    case PEN_TYPE_SLIDE_WITH_BALL:
+    {
+        GameTweaks* tweaks = gGameTweaks.m_pGameTweaks;
+        minAmount = tweaks->fPowerupSlideWithBallMinAmount;
+        maxAmount = tweaks->fPowerupSlideWithBallMaxAmount;
+        break;
+    }
+    case PEN_TYPE_SLIDE_NO_BALL:
+    {
+        GameTweaks* tweaks = gGameTweaks.m_pGameTweaks;
+        minAmount = tweaks->fPowerupSlideNoBallMinAmount;
+        maxAmount = tweaks->fPowerupSlideNoBallMaxAmount;
+        break;
+    }
+    }
+    return InterpolateRangeClamped(minAmount, maxAmount, 0.0f, 1.0f, nlRandomf(1.0f));
 }

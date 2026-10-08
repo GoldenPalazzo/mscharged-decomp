@@ -5,6 +5,15 @@
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FielderAbility.h"
 
+enum ePenaltyType
+{
+    PEN_TYPE_HIT_WITH_BALL = 0,
+    PEN_TYPE_HIT_NO_BALL = 1,
+    PEN_TYPE_SLIDE_WITH_BALL = 2,
+    PEN_TYPE_SLIDE_NO_BALL = 3,
+    NUM_PEN_TYPES = 4,
+};
+
 enum eTurboRequest
 {
     TR_FAR_DISTANCE = 0,
@@ -235,6 +244,11 @@ public:
     float GetAirInterceptHeight(int type);
     bool CalculateFormationPosition(nlVector3& position);
     bool IsPeachSuperPowerActive() const;
+
+    bool CanBeHitBySkillshot();
+    bool CanGetElectrocuted() const;
+    void PlayImpactCameraRumble();
+    void ShouldIWave();
 
     AvoidController* GetAvoidController();
     bool EndMushroom();
@@ -468,7 +482,7 @@ public:
     void fn_80049EA0(float fDeltaT);
     void InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam);
     void ActionOneTouchPassFromVolley(float fDeltaT);
-    bool fn_8004A330(cFielder* pOther);
+    bool DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& position);
     bool InitActionPass(
         cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass);
     void ActionPass(float fDeltaT);
@@ -741,14 +755,15 @@ public:
 
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
+private:
+    bool CheckReceivePassState();
+    bool IsAvailableToReceivePass();
 }; // total size: 0x480
 
 
 // Shared fielder functions and data.
 extern "C" bool fn_8003C180(cFielder*);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
-extern "C" bool fn_8002F1E0(cFielder*);
-extern "C" bool fn_8002F310(cFielder* pFielder);
 extern "C" void fn_8002FE54(cFielder* pFielder);
 extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" void fn_800318F8(cFielder*);
@@ -756,14 +771,12 @@ extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" void fn_80032534(cFielder*, const nlVector3&);
 extern "C" float fn_80034F98(cFielder*, float);
 extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
-extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_80039F24(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
 extern "C" void fn_8003A5C8(cFielder* pFielder);
 extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern "C" void fn_8003C7B0(cFielder*);
 extern "C" void fn_8003DA94(cFielder*, bool);
 extern "C" void fn_8003E354(cFielder* pFielder);
 extern bool lbl_806E0C50;

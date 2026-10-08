@@ -2211,7 +2211,7 @@ extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
 
 extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 {
-    if (!fn_8002F1E0(pEventData->player))
+    if (!pEventData->player->CanBeHitBySkillshot())
     {
         return;
     }
@@ -2255,7 +2255,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 
 extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 {
-    if (fn_8002F1E0(pEventData->player))
+    if (pEventData->player->CanBeHitBySkillshot())
     {
         if (pEventData->player->fn_8003E73C())
         {
@@ -2300,7 +2300,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 
 extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
 {
-    if (fn_8002F1E0(pEventData->pFielder))
+    if (pEventData->pFielder->CanBeHitBySkillshot())
     {
         cFielder* pFielder;
         cBall* pBall = pEventData->pBall;
@@ -2530,7 +2530,7 @@ extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
     event.fRadius = lbl_806DB5F4;
     event.pCharacter = pEventData->pFielder;
     fn_80060FF4(g_pGame, &event);
-    fn_800367B4(pEventData->pFielder);
+    pEventData->pFielder->PlayImpactCameraRumble();
 }
 
 extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData)

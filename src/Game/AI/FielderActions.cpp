@@ -3622,7 +3622,7 @@ void cFielder::ActionOneTouchPassFromVolley(float fDeltaT)
     }
 }
 
-bool cFielder::fn_8004A330(cFielder* pOther)
+bool cFielder::DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& position)
 {
     if (!fn_8003C180(pOther))
     {

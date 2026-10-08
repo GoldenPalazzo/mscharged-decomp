@@ -396,7 +396,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x1A8EBA53:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800367B4((cFielder*)g_pCurrentlyUpdatingCharacter);
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->PlayImpactCameraRumble();
             }
             break;
 
