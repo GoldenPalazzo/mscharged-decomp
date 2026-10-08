@@ -107,8 +107,6 @@ unsigned long GetTeamCaptainChantCue(cTeam*);
 void UpdateTeamCaptainChant(cTeam*);
 void AssignTeamRoles(cTeam*, bool);
 extern "C" void fn_80015B38(cBall*, bool);
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" bool fn_8003E948(const cFielder* pFielder);
 
 
 static inline cAIPad* GetPlayerController(const cPlayer* player)

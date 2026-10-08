@@ -15,7 +15,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
 
-extern "C" bool fn_8003E948(const cFielder*);
 
 
 static unsigned short sDesireUserControlledType = 0xFFFF;

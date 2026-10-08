@@ -52,7 +52,6 @@ float gDKSuperHitTiltScale = 0.4f;
 float gWaluigiTankOffCost;
 bool gPeachPhotoEmitEnabled;
 
-extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 
 
 void cFielder::InitActionDKSuper()

@@ -23,9 +23,6 @@
 #include "Game/Render/YoshiEggObject.h"
 
 
-extern "C" float fn_80030750(cFielder*);
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" bool fn_8003E948(const cFielder* pFielder);
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 static const nlVector2 sAvoidanceStrengthRange = { 0.5f, 1.0f };
 

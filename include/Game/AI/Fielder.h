@@ -812,9 +812,13 @@ private:
 
 
 // Shared fielder functions and data.
+class Desire;
+extern "C" Desire* fn_8002E08C(cFielder*, int);
+extern "C" bool fn_8002EDC8(cFielder*, int);
+extern "C" bool fn_8003E8A0(const cFielder*);
+extern "C" bool fn_8003E948(const cFielder*);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_800318F8(cFielder*);
-extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;

@@ -27,7 +27,6 @@
 
 
 #include <extras.h>
-extern "C" bool fn_8003E948(const cFielder*);
 
 
 static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];

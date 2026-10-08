@@ -20,8 +20,6 @@ class ScriptMachine;
 class FuzzyRuntimeBase;
 typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
-extern "C" Desire* fn_8002E08C(cFielder*, int);
-
 class Desire : public shdStateMachine
 {
 public:

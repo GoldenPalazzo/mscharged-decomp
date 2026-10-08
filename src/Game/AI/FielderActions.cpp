@@ -163,11 +163,9 @@ extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
-extern "C" bool fn_8003E948(const cFielder* pFielder);
 
 extern bool lbl_806DB5A8;
 
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 
 
 

@@ -45,7 +45,6 @@ static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/P
 static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCategory, &gConfidenceDistanceRange.y);
 static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
 static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
-extern "C" bool fn_8002EDC8(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 

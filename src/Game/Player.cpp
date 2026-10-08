@@ -63,8 +63,6 @@ cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 
-extern "C" bool fn_8003E8A0(const cFielder*);
-extern "C" bool fn_8003E948(const cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 
 float lbl_806DBD80 = 0.75f;

@@ -73,12 +73,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_800ED92C(unsigned long soundID);
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" bool fn_8003E948(const cFielder* pFielder);
-extern "C" void fn_80097358(cPlayer*, float);
-extern FuzzyVariant fvNotSet;
-void FreePenaltyData(PenaltyData* data);
 
 float lbl_806DB6E8 = 0.22f;
 float gImpactRumbleX = 0.035f;
@@ -576,8 +570,6 @@ struct UnidentifiedFielderDesireState
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
-extern "C" UnidentifiedVariant_80054AB8 fn_80041B6C(
-    void*, const unsigned int&, cFielder*);
 
 static inline void EndFrozenState(cFielder* fielder, int state)
 {

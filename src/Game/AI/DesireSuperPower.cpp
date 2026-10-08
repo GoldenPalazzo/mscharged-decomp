@@ -48,7 +48,6 @@
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 
-extern "C" bool fn_8002EDC8(cFielder*, int);
 int ChooseRunDirection(cFielder*, const unsigned short*, int,
     const nlVector2*, float*);
 // Shared position constants used by the super-power desires.
