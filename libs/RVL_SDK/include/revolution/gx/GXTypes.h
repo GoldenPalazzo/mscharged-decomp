@@ -158,19 +158,6 @@ typedef enum _GXBlendMode {
     GX_MAX_BLENDMODE
 } GXBlendMode;
 
-typedef enum _GXChannelID {
-    GX_COLOR0,
-    GX_COLOR1,
-    GX_ALPHA0,
-    GX_ALPHA1,
-    GX_COLOR0A0,
-    GX_COLOR1A1,
-    GX_COLOR_ZERO,
-    GX_ALPHA_BUMP,
-    GX_ALPHA_BUMPN,
-
-    GX_COLOR_NULL = 255
-} GXChannelID;
 
 typedef enum _GXCITexFmt {
     GX_TF_C4 = 8,
