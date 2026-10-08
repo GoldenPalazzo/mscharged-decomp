@@ -182,7 +182,7 @@ void SetDesiredFacingDirection(cPlayer* pPlayer)
         unsigned short aStickDirection = pPlayer->m_pController->GetMovementStickDirection();
         if (bMoving)
         {
-            pPlayer->Unknown8(aStickDirection, true);
+            pPlayer->SetDesiredFacingDirection(aStickDirection, true);
         }
         else
         {
@@ -1287,9 +1287,9 @@ inline bool cPlayer::UnidentifiedPowerupPredicate()
     return false;
 }
 
-void cPlayer::UnidentifiedVirtual1C()
+void cPlayer::ResetAnimState()
 {
-    cCharacter::UnidentifiedVirtual1C();
+    cCharacter::ResetAnimState();
     if (m_pPowerupLayer->GetChild(1) != NULL)
     {
         m_pPowerupLayer->BeginBlendOut(-1.0f);
@@ -1553,9 +1553,9 @@ void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_PLAYER_FIELD
 
-void cPlayer::Unknown12(RunningChecksum* pChecksum)
+void cPlayer::ChecksumState(RunningChecksum* pChecksum)
 {
-    cCharacter::Unknown12(pChecksum);
+    cCharacter::ChecksumState(pChecksum);
     pChecksum->ChecksumData(&mUnidentified1E4.m_v3AIPosition, sizeof(mUnidentified1E4.m_v3AIPosition));
     pChecksum->ChecksumData(&mUnidentified1E4.m_eBallRotationMode, sizeof(mUnidentified1E4.m_eBallRotationMode));
     pChecksum->ChecksumData(&mUnidentified1E4.m_BaseBallOrientation, sizeof(mUnidentified1E4.m_BaseBallOrientation));

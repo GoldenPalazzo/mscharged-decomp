@@ -62,7 +62,7 @@ void cFielder::InitActionDKSuper()
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitMovementDecelerateExponential(gDKSuperDeceleration);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
     EmitDKSuperCharge(this);
@@ -89,7 +89,7 @@ void cFielder::ActionDKSuper(float fDeltaT)
         mUnidentified024.m_fActualSpeed = 0.0f;
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
-        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
     }
 
@@ -140,7 +140,7 @@ void cFielder::InitActionPeachSuper()
     }
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 

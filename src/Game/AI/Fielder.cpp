@@ -1527,7 +1527,7 @@ bool cFielder::CanReceivePass()
     return IsAvailableToReceivePass();
 }
 
-void cFielder::Unknown8(unsigned short aParam, bool bParam)
+void cFielder::SetDesiredFacingDirection(unsigned short aParam, bool bParam)
 {
     if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E))
     {
@@ -1541,7 +1541,7 @@ void cFielder::Unknown8(unsigned short aParam, bool bParam)
         pAction->fn_800BED24(&aParam);
     }
 
-    cCharacter::Unknown8(aParam, bParam);
+    cCharacter::SetDesiredFacingDirection(aParam, bParam);
 }
 
 void cFielder::SetNormalTweaks()
@@ -3198,7 +3198,7 @@ void cFielder::UpdateFacingToLooseBall()
                 future.y - mUnidentified024.m_v3Position.y);
             unsigned short direction = nlATan2Angle(interceptDelta.y, interceptDelta.x);
             if (nlAbsAngle(direction - mUnidentified024.m_aDesiredFacingDirection) <= 0x4000)
-                cCharacter::Unknown8(direction, true);
+                cCharacter::SetDesiredFacingDirection(direction, true);
         }
     }
 }
@@ -4451,7 +4451,7 @@ void cFielder::CleanActionShot(eFielderActionState newAction)
     }
 }
 
-void cFielder::UnidentifiedVirtual1C()
+void cFielder::ResetAnimState()
 {
     fn_80097648(-1.0f);
     SetAnimState(0, false, 0.0f, false, false);
@@ -6590,9 +6590,9 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     }
 }
 
-void cFielder::Unknown12(RunningChecksum* pChecksum)
+void cFielder::ChecksumState(RunningChecksum* pChecksum)
 {
-    cPlayer::Unknown12(pChecksum);
+    cPlayer::ChecksumState(pChecksum);
     pChecksum->ChecksumData(&m_eActionState, sizeof(m_eActionState));
     pChecksum->ChecksumData(&m_eRole, sizeof(m_eRole));
 }

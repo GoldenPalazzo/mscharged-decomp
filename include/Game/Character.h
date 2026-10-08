@@ -171,15 +171,15 @@ public:
     virtual void PrePhysicsUpdate();
     virtual void Unknown7(float dt);
     virtual void PreUpdate(float dt);
-    virtual void UnidentifiedVirtual1C();
+    virtual void ResetAnimState();
     virtual void ResetEffects();
     virtual void SetAnimID(int animID);
-    virtual void Unknown8(unsigned short aDirection, bool bParam);
+    virtual void SetDesiredFacingDirection(unsigned short aDirection, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
     virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
     virtual void SyncLog(void* context, DebugWriteCache* cache);
-    virtual void Unknown12(RunningChecksum* pChecksum);
+    virtual void ChecksumState(RunningChecksum* pChecksum);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);

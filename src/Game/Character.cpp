@@ -864,7 +864,7 @@ void cCharacter::PrePhysicsUpdate()
 {
 }
 
-void cCharacter::UnidentifiedVirtual1C()
+void cCharacter::ResetAnimState()
 {
     SetAnimState(0, false, 0.0f, false, false);
     m_pCurrentAnimController->SetTime(0.0f);
@@ -1006,7 +1006,7 @@ bool cCharacter::ShouldStartCrossBlend(int nAnimID)
     return (1.0f - m_pCurrentAnimController->get_fTime()) * m_pCurrentAnimController->m_pSAnim->GetDuration() <= fCrossBlendTime;
 }
 
-void cCharacter::Unknown8(unsigned short aDirection, bool bParam)
+void cCharacter::SetDesiredFacingDirection(unsigned short aDirection, bool bParam)
 {
     mUnidentified024.m_aDesiredFacingDirection = aDirection;
     if (bParam)
@@ -1560,7 +1560,7 @@ void cCharacter::fn_8001F1D8()
 void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
     mUnidentified024.UnidentifiedReset();
-    UnidentifiedVirtual1C();
+    ResetAnimState();
     m_pHeadTrack->UnidentifiedReset();
     m_pPhysicsCharacter->Unknown0();
     SetPosition(v3Position);
@@ -1742,7 +1742,7 @@ void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_CHARACTER_FIELD
 
-void cCharacter::Unknown12(RunningChecksum* pChecksum)
+void cCharacter::ChecksumState(RunningChecksum* pChecksum)
 {
     pChecksum->ChecksumData(&mUnidentified024.m_eCharacterClass, sizeof(mUnidentified024.m_eCharacterClass));
     pChecksum->ChecksumData(&mUnidentified024.m_eMovementState, sizeof(mUnidentified024.m_eMovementState));

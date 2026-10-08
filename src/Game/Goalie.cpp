@@ -237,7 +237,7 @@ Goalie::Goalie(eCharacterClass gcc, const int* pTemplate,
     m_pHeadTrack->m_bTrackOOI = true;
 }
 
-void Goalie::UnidentifiedVirtual1C()
+void Goalie::ResetAnimState()
 {
     fn_80097648(-1.0f);
     SetAnimState(5, false, 0.0f, false, false);
@@ -4494,9 +4494,9 @@ void Goalie::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_GOALIE_FIELD
 
-void Goalie::Unknown12(RunningChecksum* pChecksum)
+void Goalie::ChecksumState(RunningChecksum* pChecksum)
 {
-    cPlayer::Unknown12(pChecksum);
+    cPlayer::ChecksumState(pChecksum);
     pChecksum->ChecksumData(
         &mGoalieActionState, sizeof(mGoalieActionState));
     pChecksum->ChecksumData(&mUrgency, sizeof(mUrgency));

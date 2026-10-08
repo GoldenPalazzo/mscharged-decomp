@@ -388,7 +388,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
         desire->m_ePositionSeekState = PSS_ARRIVED;
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
-            desire->m_pFielder->Unknown8(
+            desire->m_pFielder->SetDesiredFacingDirection(
                 (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
@@ -412,7 +412,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
         fDesiredSpeed = 0.0f;
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
-            desire->m_pFielder->Unknown8(
+            desire->m_pFielder->SetDesiredFacingDirection(
                 (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
@@ -425,7 +425,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
             desire->m_pFielder->mUnidentified024.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
         desire->m_pFielder->fn_8001DCE0(aDirection);
-        desire->m_pFielder->Unknown8(
+        desire->m_pFielder->SetDesiredFacingDirection(
             aDirection, false);
     }
 
@@ -473,7 +473,7 @@ void SeekSteeringTarget(DesireSteering* desire,
         nlVec3Sub(v3Direction, v3FixedPos,
             desire->m_pFielder->mUnidentified024.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
-        desire->m_pFielder->Unknown8(aDirection, false);
+        desire->m_pFielder->SetDesiredFacingDirection(aDirection, false);
         desire->m_pFielder->fn_8001DCE0(aDirection);
     }
 
@@ -743,7 +743,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         {
             aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         }
-        desire->m_pFielder->Unknown8((unsigned short)aFacingDirection, false);
+        desire->m_pFielder->SetDesiredFacingDirection((unsigned short)aFacingDirection, false);
     }
     else
     {

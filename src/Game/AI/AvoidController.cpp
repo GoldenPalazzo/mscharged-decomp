@@ -692,7 +692,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
             aDesiredMovementDir = nlVector3ToAngle(
                 *(const nlVector3*)&vNewDesiredVelDir);
             m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-            m_pFielder->Unknown8(aDesiredMovementDir, false);
+            m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
         }
     }
     if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
@@ -701,7 +701,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-        m_pFielder->Unknown8(aDesiredMovementDir, false);
+        m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
     }
     v3OutRepulsion = mUnidentified028;
     return bHitSideline;
@@ -766,7 +766,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
-        m_pFielder->Unknown8(nlVector3ToAngle(v3Repulsion), false);
+        m_pFielder->SetDesiredFacingDirection(nlVector3ToAngle(v3Repulsion), false);
     }
     else
         m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;

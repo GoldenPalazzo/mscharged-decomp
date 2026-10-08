@@ -182,7 +182,7 @@ void cTeam::ChecksumState(RunningChecksum* runningChecksum)
 
     for (int i = 0; i < 5; i++)
     {
-        m_pPlayers[i]->Unknown12(runningChecksum);
+        m_pPlayers[i]->ChecksumState(runningChecksum);
     }
 }
 

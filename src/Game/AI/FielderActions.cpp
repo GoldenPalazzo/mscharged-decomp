@@ -941,7 +941,7 @@ void cFielder::fn_80043C18(float fDeltaT)
             = 1.0f - this->GetTweaks()->mUnidentified064;
         int nSpinStep
             = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
-        Unknown8(
+        SetDesiredFacingDirection(
             mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
         SetFacingDirection(
@@ -995,7 +995,7 @@ void cFielder::fn_80043C18(float fDeltaT)
                 nlPolar polar;
                 nlCartesianToPolar(polar, mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
                 s16 sFacingDelta = polar.a - mUnidentified024.m_aActualFacingDirection;
-                Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+                SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
                 SetVelocity(v3Zero);
                 SetAnimState(0x7D, true, 0.2f, false, false);
                 InitMovementFromAnim(sFacingDelta, v3Zero, 0.15f, false);
@@ -1131,7 +1131,7 @@ void cFielder::fn_80044290(float fDeltaT)
                         - this->GetTweaks()->mUnidentified064;
             int nSpinStep
                 = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
-            Unknown8(
+            SetDesiredFacingDirection(
                 mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
             SetFacingDirection(
@@ -1250,7 +1250,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
 
     if (IsConfused())
     {
-        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
         SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
     }
 
@@ -1723,7 +1723,7 @@ void cFielder::fn_80045C74(float fDeltaT)
                                       * InterpolateRangeClamped(
                                           0.0f, 1.0f, 0.0f, lbl_806DB910, mUnidentified024.m_v3Velocity.z)
                                   + 1.0f));
-        Unknown8(mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
+        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
@@ -1770,7 +1770,7 @@ void cFielder::fn_80045C74(float fDeltaT)
         v3Delta.y = v3Zero.y - mUnidentified024.m_v3Position.y;
         v3Delta.x = v3Zero.x - mUnidentified024.m_v3Position.x;
         v3Delta.z = v3Zero.z - mUnidentified024.m_v3Position.z;
-        Unknown8(nlVector3ToAngle(v3Delta), false);
+        SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
 
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
@@ -1951,7 +1951,7 @@ void cFielder::fn_8004643C(float fDeltaT)
         v3Delta.y = v3Zero.y - mUnidentified024.m_v3Position.y;
         v3Delta.x = v3Zero.x - mUnidentified024.m_v3Position.x;
         v3Delta.z = v3Zero.z - mUnidentified024.m_v3Position.z;
-        Unknown8(nlVector3ToAngle(v3Delta), false);
+        SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
 
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
@@ -2109,7 +2109,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
             nlVector3 v3Delta;
             nlVec3Sub(v3Delta, interceptPos, mUnidentified024.m_v3Position);
-            Unknown8(nlVector3ToAngle(v3Delta), false);
+            SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
             SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
         }
         else if (IsConfused())
@@ -2118,7 +2118,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         }
         else
         {
-            Unknown8(aDirection, false);
+            SetDesiredFacingDirection(aDirection, false);
             SetFacingDirection(aDirection, true);
         }
 
@@ -2395,7 +2395,7 @@ void cFielder::fn_800474FC(float fDeltaT)
 
 void cFielder::InitActionIdleTurn(unsigned short desiredFacingDirection)
 {
-    Unknown8(desiredFacingDirection, false);
+    SetDesiredFacingDirection(desiredFacingDirection, false);
     SetAnimState(0, true, 0.2f, false, false);
     InitMovementNone(75000.0f, 4000.0f);
     SetAction(ACTION_IDLE_TURN);
@@ -2988,7 +2988,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         {
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
-            Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+            SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
             mActionRunningVars.bFirstCycleOfTurbo = false;
             mUnidentified024.m_fDesiredSpeed = mUnidentified024.m_fActualSpeed;
         }
@@ -3717,7 +3717,7 @@ void cFielder::InitActionPostWhistle()
     SetAction(ACTION_POST_WHISTLE);
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_fActualSpeed = 0.0f;
     SetVelocity(v3Zero);
 }
@@ -3888,7 +3888,7 @@ void cFielder::InitActionRunning()
     {
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
-        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
         mUnidentified024.m_fDesiredSpeed = mUnidentified024.m_fActualSpeed;
         mActionRunningVars.bFirstCycleOfTurbo = false;
     }
@@ -4201,7 +4201,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
         nlVector3 v3Delta;
         nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
-        Unknown8(nlVector3ToAngle(v3Delta), false);
+        SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
         return true;
     }
 }
@@ -4471,7 +4471,7 @@ void cFielder::InitActionSlideAttack(
 
                 nlPolar polar;
                 nlCartesianToPolar(polar, v3Velocity.x, v3Velocity.y);
-                Unknown8(polar.a, false);
+                SetDesiredFacingDirection(polar.a, false);
                 SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
             }
         }
@@ -4537,7 +4537,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
             nlPolar polar;
             nlCartesianToPolar(polar, v3NewVelocity.x, v3NewVelocity.y);
-            Unknown8(polar.a, false);
+            SetDesiredFacingDirection(polar.a, false);
             SetFacingDirection(polar.a, true);
             SetVelocity(v3NewVelocity);
         }
@@ -4870,7 +4870,7 @@ void cFielder::InitActionWait()
     SetAction(ACTION_WAIT);
     SetAnimState(0, true, 0.2f, false, false);
     InitMovementNone(0.0f, 0.0f);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
 }
 
 void cFielder::ActionWait(float fDeltaT)
@@ -4879,7 +4879,7 @@ void cFielder::ActionWait(float fDeltaT)
 
 void cFielder::fn_8004E11C(float fParam)
 {
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     fn_80097358(this, fParam);
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_UNKNOWN_31);
@@ -4950,7 +4950,7 @@ void cFielder::fn_8004E438()
     nlVector3 v3Delta;
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVec3Sub(v3Delta, v3NetPos, mUnidentified024.m_v3Position);
-    Unknown8(nlVector3ToAngle(v3Delta), false);
+    SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
     SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D)
