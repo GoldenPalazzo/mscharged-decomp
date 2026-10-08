@@ -1,7 +1,6 @@
 #include "Game/AI/Variant.inl"
 
 #include "NL/nlFormat.h"
-#include "runtime.h"
 
 Variant gvNotSet;
 
@@ -76,16 +75,16 @@ unsigned long Variant::GetHash() const
         hash = mData.u;
         break;
     case FT_FLOAT:
-        hash = __cvt_fp2unsigned((double)mData.f);
+        hash = (unsigned long)mData.f;
         break;
     case FT_POINTER:
         hash = (unsigned long)mData.pointer;
         break;
     case FT_VECTOR:
-        hash = __cvt_fp2unsigned((double)mData.vector.x)
-             * __cvt_fp2unsigned((double)mData.vector.y);
+        hash = (unsigned long)mData.vector.x
+             * (unsigned long)mData.vector.y;
         {
-            unsigned long zHash = __cvt_fp2unsigned((double)mData.vector.z);
+            unsigned long zHash = (unsigned long)mData.vector.z;
             zHash ^= hash;
             hash = zHash;
         }
