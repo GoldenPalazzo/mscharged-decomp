@@ -1,14 +1,13 @@
 #include <MetroTRK/dolphin_trk.h>
 #include <MetroTRK/__exception.h>
 #include <MetroTRK/dolphin_trk_glue.h>
+#include <MetroTRK/flush_cache.h>
 #include <MetroTRK/main_TRK.h>
 #include <MetroTRK/mem_TRK.h>
 #include <MetroTRK/mpc_7xx_603e.h>
 #include <MetroTRK/targimpl.h>
 #include <revolution/os/OSReset.h>
 #include <revolution/os/__ppc_eabi_init.h>
-
-extern void TRK_flush_cache(u32 address, u32 length);
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 
