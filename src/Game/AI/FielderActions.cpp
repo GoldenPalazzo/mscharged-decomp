@@ -537,7 +537,7 @@ void cFielder::asmRunning()
                 return;
             }
 
-            if (fn_8003E9F0() && mUnidentified3DC)
+            if (IsPeteySuperPowerActive() && mUnidentified3DC)
             {
                 return;
             }
@@ -571,8 +571,8 @@ void cFielder::asmRunning()
                         SetHardStopAnimState();
                     }
                 }
-                else if ((m_eAnimID != 9 && fn_8003E74C())
-                         || (m_eAnimID == 9 && !fn_8003E74C()))
+                else if ((m_eAnimID != 9 && IsSuperGrowActive())
+                         || (m_eAnimID == 9 && !IsSuperGrowActive()))
                 {
                     SetRunningAnimState(lbl_806E3538[0]);
                 }
@@ -790,7 +790,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 return;
             }
 
-            if (fn_8003E9F0() && mUnidentified3DC)
+            if (IsPeteySuperPowerActive() && mUnidentified3DC)
             {
                 return;
             }
@@ -826,8 +826,8 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            if ((m_eAnimID != 9 && fn_8003E74C())
-                || (m_eAnimID == 9 && !fn_8003E74C()))
+            if ((m_eAnimID != 9 && IsSuperGrowActive())
+                || (m_eAnimID == 9 && !IsSuperGrowActive()))
             {
                 SetRunningWBAnimState(lbl_806E3538[0]);
             }
@@ -1170,14 +1170,14 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     mUnidentified33A = false;
     mUnidentified33C = 2;
 
-    if (IsPeachSuperPowerActive())
+    if (IsWarioSuperPowerActive())
     {
         if (mUnidentified3DC)
         {
             fn_8005001C(false);
         }
     }
-    else if (fn_8003E9F0())
+    else if (IsPeteySuperPowerActive())
     {
         if (mUnidentified3DC)
         {
@@ -1252,7 +1252,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     }
 
-    if (fn_8003E70C())
+    if (IsConfused())
     {
         Unknown8(mUnidentified024.m_aActualFacingDirection, false);
         SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
@@ -1678,8 +1678,8 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
         }
 
-        EndBirdoSuperPower();
-        EndKoopaSuperPower();
+        EndMarioSuperPower();
+        EndLuigiSuperPower();
         EndFrozenOrDazed();
         EndStar();
         EndMushroom();
@@ -1875,8 +1875,8 @@ void cFielder::fn_80046244()
             SetBallFallState(g_pBall);
         }
 
-        EndBirdoSuperPower();
-        EndKoopaSuperPower();
+        EndMarioSuperPower();
+        EndLuigiSuperPower();
         EndFrozenOrDazed();
         EndStar();
         EndMushroom();
@@ -2066,7 +2066,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             pTarget = DoFindBestHitTarget();
         }
 
-        if (pTarget != 0 && !fn_8003E70C())
+        if (pTarget != 0 && !IsConfused())
         {
             float distance = fMoveDistance / fTimeRange;
 
@@ -2116,7 +2116,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             Unknown8(nlVector3ToAngle(v3Delta), false);
             SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
         }
-        else if (fn_8003E70C())
+        else if (IsConfused())
         {
             SetFacingDirection(mUnidentified024.m_aActualFacingDirection, true);
         }
@@ -4420,7 +4420,7 @@ void cFielder::InitActionSlideAttack(
         }
 
         float fSpeed = GetSlideAttackSpeed(nParam);
-        if (fn_8003E70C())
+        if (IsConfused())
         {
             nlPolarToCartesian(
                 v3Velocity.x, v3Velocity.y, mUnidentified024.m_aActualFacingDirection, fSpeed);
@@ -4504,7 +4504,7 @@ void cFielder::InitActionSlideAttack(
 
 void cFielder::fn_8004C88C(float fDeltaT)
 {
-    if (!bAttackSucceeded && mUnidentified388 == 0 && fn_8003E6FC())
+    if (!bAttackSucceeded && mUnidentified388 == 0 && IsStarActive())
     {
         float fCurrSpeed;
         nlVector3 v3NewVelocity;

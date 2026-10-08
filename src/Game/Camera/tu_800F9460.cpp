@@ -247,8 +247,8 @@ facingGoalKnown:
     else
         mCameraFlags &= ~1;
 
-    if (g_pTeams[0]->GetCaptain()->fn_8003E74C()
-        || g_pTeams[1]->GetCaptain()->fn_8003E74C())
+    if (g_pTeams[0]->GetCaptain()->IsSuperGrowActive()
+        || g_pTeams[1]->GetCaptain()->IsSuperGrowActive())
         mCameraFlags |= 0x20;
     else
         mCameraFlags &= ~0x20;

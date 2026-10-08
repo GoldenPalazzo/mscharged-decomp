@@ -217,7 +217,7 @@ u8 cPlayer::SwapController(bool bParam)
                     if (pSwapPlayer->m_pController != NULL || pSwapPlayer == this)
                         return 0;
                     if (!((cFielder*)pSwapPlayer)->CanReceivePass()
-                        && !((cFielder*)pSwapPlayer)->fn_8003EA6C())
+                        && !((cFielder*)pSwapPlayer)->IsYoshiSuperPowerActive())
                         return 0;
                 }
             }
@@ -1224,7 +1224,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
+                || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
             && !pCaptain->mUnidentified3DC)
         {
             pCaptain->TurnOnSuperPowerTank();
@@ -1246,7 +1246,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-            || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
+            || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
         {
             bool bPressed = false;
             for (int i = 0; i < 4; i++)

@@ -265,7 +265,7 @@ public:
     void EndMontyDeke();
     float GetAirInterceptHeight(int type);
     bool CalculateFormationPosition(nlVector3& position);
-    bool IsPeachSuperPowerActive() const;
+    bool IsWarioSuperPowerActive() const;
 
     bool CanBeHitBySkillshot();
     bool CanGetElectrocuted() const;
@@ -301,12 +301,12 @@ public:
     void EndConfusion();
     void EndDaze();
     bool EndSuperPower(int);
-    bool EndDaisySuperPower(bool);
-    bool EndBirdoSuperPower();
-    bool EndKoopaSuperPower();
+    bool EndBowserSuperPower(bool);
     bool EndMarioSuperPower();
-    bool EndPeachSuperPower(bool);
-    bool EndYoshiSuperPower(bool);
+    bool EndLuigiSuperPower();
+    bool EndWaluigiSuperPower();
+    bool EndWarioSuperPower(bool);
+    bool EndPeteySuperPower(bool);
 
     void SetHardStopRecoverAnimState();
     void SetHardStopTurnAnimState();
@@ -402,8 +402,8 @@ public:
     bool CanReceivePass();
     void SetSlideAttackSuccessFlag();
     void IncrementPowerupMeter(int nParam, float fAmount);
-    bool fn_8003E8F4() const;
-    bool fn_8003E74C() const;
+    bool IsPeachSuperPowerActive() const;
+    bool IsSuperGrowActive() const;
     bool CollideWithFreezeCallback();
     bool CollideWithBananaCallback(const nlVector3& rv3BananaPosition);
     bool CollideWithShellCallback(ePowerupSize eSize, bool bUnknown, const nlVector3& rv3Pos1, const nlVector3& rv3Pos2);
@@ -411,11 +411,11 @@ public:
     void CollideWithChainCallback(ChainChomp* pChainChomp);
     void fn_8003295C(WindDebris* pDebris);
     void fn_80032CB8(CollisionThwompPlayerData*);
-    bool fn_8003E7F8() const;
-    bool fn_8003E84C() const;
-    bool fn_8003E9F0() const;
-    bool fn_8003EA44() const;
-    bool fn_8003EA6C() const;
+    bool IsMarioSuperPowerActive() const;
+    bool IsLuigiSuperPowerActive() const;
+    bool IsPeteySuperPowerActive() const;
+    bool IsDKSuperPowerActive() const;
+    bool IsYoshiSuperPowerActive() const;
     cFielder* GetMark() const { return m_pMark[0]; }
     cFielder* GetMark(int index) const { return m_pMark[index]; }
     void fn_8003057C(int nParam);
@@ -480,11 +480,11 @@ public:
     int fn_8002E9D0() const;
     bool fn_8003499C() const;
     bool fn_8003E6EC() const;
-    bool fn_8003E6FC() const;
-    bool fn_8003E70C() const;
-    bool fn_8003E71C() const;
-    bool fn_8003E72C() const;
-    bool fn_8003E73C() const;
+    bool IsStarActive() const;
+    bool IsConfused() const;
+    bool IsMushroomActive() const;
+    bool IsSlippery() const;
+    bool IsShrunk() const;
     bool fn_800470B4(cFielder* pFielder, cPlayer* pAttacker);
     bool fn_80047240(cPlayer* pParam0, unsigned short aParam1,
         int nParam2, bool bParam3, bool bParam4);

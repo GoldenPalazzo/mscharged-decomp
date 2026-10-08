@@ -1342,7 +1342,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         && pFielder->fn_800392D8() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
-        unidentifiedSlide += pFielder->fn_8003E72C() ? lbl_806E0E40 : 0.0f;
+        unidentifiedSlide += pFielder->IsSlippery() ? lbl_806E0E40 : 0.0f;
         if (unidentifiedSlide > 1.0f)
         {
             unidentifiedSlide = 1.0f;
@@ -1919,7 +1919,7 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
         pUnidentified1 = pEventData->bulletBill->target;
         if (pUnidentified1 != pUnidentified0)
         {
-            if (pUnidentified0->fn_8003E74C() || pUnidentified0->fn_8003E6FC())
+            if (pUnidentified0->IsSuperGrowActive() || pUnidentified0->IsStarActive())
             {
                 CollisionBulletBillData data = { pEventData->player, pEventData->bulletBill };
                 g_pGame->fn_80060BFC(data);
@@ -1980,7 +1980,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                 {
                     cFielder* pFielder = pTeam->GetFielder(j);
                     if (!pFielder->IsInvincible() && pFielder->mbTangible
-                        && !pFielder->fn_8003E74C() && pEventData->pCharacter != pFielder)
+                        && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
                         nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
@@ -2018,7 +2018,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                 {
                     cFielder* pFielder = pTeam->GetFielder(j);
                     if (!pFielder->IsInvincible() && pFielder->mbTangible
-                        && !pFielder->fn_8003E74C() && pEventData->pCharacter != pFielder)
+                        && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
                         nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
@@ -2215,7 +2215,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     {
         return;
     }
-    if (pEventData->player->fn_8003E73C())
+    if (pEventData->player->IsShrunk())
     {
         pEventData->player->fn_8004D480(v3Zero);
         return;
@@ -2257,7 +2257,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 {
     if (pEventData->player->CanBeHitBySkillshot())
     {
-        if (pEventData->player->fn_8003E73C())
+        if (pEventData->player->IsShrunk())
         {
             pEventData->player->fn_8004D480(v3Zero);
         }
@@ -2458,7 +2458,7 @@ extern "C" void fn_80022824(cPlayer*)
             for (int j = 0; j < 4; j++)
             {
                 cFielder* pFielder = pTeam->GetFielder(j);
-                if (pFielder->fn_8003EA6C())
+                if (pFielder->IsYoshiSuperPowerActive())
                 {
                     pFielder->EndSuperPower(0);
                 }
@@ -2573,7 +2573,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         }
         else if (!pFielder->IsFallenDown())
         {
-            if (pFielder->fn_8003E74C())
+            if (pFielder->IsSuperGrowActive())
             {
                 pFielder->InitActionShellReact(pEventData->mUnidentified08->mPosition,
                     pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);

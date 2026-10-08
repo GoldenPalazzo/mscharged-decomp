@@ -130,7 +130,7 @@ inline bool AvoidController::UnidentifiedCanAvoid(int things)
     case AVOID_FIELDERS:
     {
         result = false;
-        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->fn_8003E74C();
+        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->IsSuperGrowActive();
         if (bCanAvoidFielder && !m_pFielder->IsInvincibleChars())
             result = true;
         break;

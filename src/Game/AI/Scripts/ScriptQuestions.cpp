@@ -856,7 +856,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         fDistance -= fRadius + fOwnerRadius;
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
-    if (pOwner != NULL && pOwner->fn_8003E74C() && !pFielder->fn_8003E74C())
+    if (pOwner != NULL && pOwner->IsSuperGrowActive() && !pFielder->IsSuperGrowActive())
         fScore = FacingAdjustedConfidence(fScore, pFielder, pOwner);
     return fScore;
 }
@@ -3250,7 +3250,7 @@ extern "C" float fn_800DED3C(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (pFielder->fn_8003E71C())
+    if (pFielder->IsMushroomActive())
     {
         return 1.0f;
     }

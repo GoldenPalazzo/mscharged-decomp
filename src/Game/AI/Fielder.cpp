@@ -289,7 +289,7 @@ inline bool cFielder::CheckReceivePassState()
 
     if (bCondition1)
     {
-        bool bExcluded = fn_8003EA44();
+        bool bExcluded = IsDKSuperPowerActive();
         if (!bExcluded)
         {
             bCondition2 = true;
@@ -458,7 +458,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
 
         if (bCondition1)
         {
-            bool bExcluded = pFielder->fn_8003EA44();
+            bool bExcluded = pFielder->IsDKSuperPowerActive();
             if (!bExcluded)
             {
                 bCondition2 = true;
@@ -467,7 +467,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
 
         if (bCondition2)
         {
-            bool bExcluded = pFielder->fn_8003EA6C();
+            bool bExcluded = pFielder->IsYoshiSuperPowerActive();
             if (!bExcluded)
             {
                 bCondition3 = true;
@@ -498,7 +498,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
 
         if (bCondition5)
         {
-            bool bExcluded = pFielder->fn_8003E8F4();
+            bool bExcluded = pFielder->IsPeachSuperPowerActive();
             if (!bExcluded)
             {
                 bCondition6 = true;
@@ -1011,7 +1011,7 @@ bool cFielder::EndSuperPower(int)
     return false;
 }
 
-bool cFielder::EndDaisySuperPower(bool value)
+bool cFielder::EndBowserSuperPower(bool value)
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == BOWSER
@@ -1027,7 +1027,7 @@ bool cFielder::EndDaisySuperPower(bool value)
     return false;
 }
 
-bool cFielder::EndBirdoSuperPower()
+bool cFielder::EndMarioSuperPower()
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == MARIO
@@ -1043,7 +1043,7 @@ bool cFielder::EndBirdoSuperPower()
     return false;
 }
 
-bool cFielder::EndKoopaSuperPower()
+bool cFielder::EndLuigiSuperPower()
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == LUIGI
@@ -1059,7 +1059,7 @@ bool cFielder::EndKoopaSuperPower()
     return false;
 }
 
-bool cFielder::EndMarioSuperPower()
+bool cFielder::EndWaluigiSuperPower()
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == WALUIGI
@@ -1075,7 +1075,7 @@ bool cFielder::EndMarioSuperPower()
     return false;
 }
 
-bool cFielder::EndPeachSuperPower(bool)
+bool cFielder::EndWarioSuperPower(bool)
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == WARIO
@@ -1091,7 +1091,7 @@ bool cFielder::EndPeachSuperPower(bool)
     return false;
 }
 
-bool cFielder::EndYoshiSuperPower(bool)
+bool cFielder::EndPeteySuperPower(bool)
 {
     bool active = false;
     if (mUnidentified024.m_eCharacterClass == PETEY
@@ -1139,11 +1139,11 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     else if (fUnidentified2 >= lbl_806DB804)
         nUnidentified = 2;
 
-    if (pFielderCollidedWith->fn_8003E71C()
+    if (pFielderCollidedWith->IsMushroomActive()
         || pFielderCollidedWith->IsInvincible()
         || pFielderCollidedWith->IsInvincibleChars()
         || fn_800344DC(pFielderCollidedWith, &pFielder->GetPosition())
-        || pFielderCollidedWith->fn_8003E74C())
+        || pFielderCollidedWith->IsSuperGrowActive())
     {
         nUnidentified = 2;
     }
@@ -1174,7 +1174,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->fn_8003EA6C())
+    if (pFielder->IsYoshiSuperPowerActive())
     {
         return false;
     }
@@ -1219,7 +1219,7 @@ extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (fn_8003E948(pFielder) || fn_8003E8A0(pFielder) || pFielder->fn_8003E9F0())
+    if (fn_8003E948(pFielder) || fn_8003E8A0(pFielder) || pFielder->IsPeteySuperPowerActive())
     {
         if (pFielder->IsFallenDown())
         {
@@ -1307,7 +1307,7 @@ bool cFielder::CanGetElectrocuted() const
         return false;
     if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
         return false;
-    if (fn_8003EA6C())
+    if (IsYoshiSuperPowerActive())
         return false;
     if (GameInfoManager::Instance()->GetStadium() == 11 && m_eActionState == 35)
         return false;
@@ -1747,11 +1747,11 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 pData->velocity1, pFielderCollidedWith);
             int nUnidentified = fn_8002E9FC(this, pFielderCollidedWith, attackIntensity);
             bool canPickup = false;
-            if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || fn_8003E74C()))
+            if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || IsSuperGrowActive()))
             {
                 if (lbl_806DB808)
                 {
-                    if (nUnidentified == 2 || fn_8003E74C())
+                    if (nUnidentified == 2 || IsSuperGrowActive())
                         canPickup = true;
                 }
                 else
@@ -1863,7 +1863,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     }
     else if (pFielderCollidedWith->fn_80038660()
         && !pFielderCollidedWith->IsFallenDown()
-        && !pFielderCollidedWith->fn_8003E74C())
+        && !pFielderCollidedWith->IsSuperGrowActive())
     {
         if (!pFielderCollidedWith->IsInvincibleChars())
             pFielderCollidedWith->fn_8004D238();
@@ -1875,7 +1875,7 @@ bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, cons
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
         || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !UnidentifiedInvinciblePowerups()))
     {
-        if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !fn_8003E74C())
+        if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !IsSuperGrowActive())
             fn_8004D480(velocity);
         else
         {
@@ -2006,7 +2006,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
             RequestStateMachineDeactivation(fn_8002E08C(this, 23));
         return false;
     }
-    if (fn_8003E7F8() || fn_8003E84C() || fn_8003EA44() || IsDaisySuperPowerActive())
+    if (IsMarioSuperPowerActive() || IsLuigiSuperPowerActive() || IsDKSuperPowerActive() || IsDaisySuperPowerActive())
         return false;
     if (tangible)
     {
@@ -2368,7 +2368,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
         cFielder* pOwner = (cFielder*)eventData->mUnidentified10->m_pOwner;
         if (pOwner != this && !IsFallenDown())
         {
-            if (fn_8003E74C() || IsInvincibleChars())
+            if (IsSuperGrowActive() || IsInvincibleChars())
             {
                 if (!pOwner->IsInvincibleChars())
                 {
@@ -2410,8 +2410,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 10)
     {
-        if (!fn_800344B0() && !fn_8003E6FC()
-            && !fn_8003EA6C() && !IsInvincible()
+        if (!fn_800344B0() && !IsStarActive()
+            && !IsYoshiSuperPowerActive() && !IsInvincible()
             && !IsCharacterInAir(eventData->mUnidentified10->GetRadius()))
         {
             PlayRumbleAction(3, GetGlobalPad());
@@ -2697,7 +2697,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     case ACTION_RUNNING:
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         m_tMoveToTurboTimer.UnidentifiedClear();
-        if (fn_8003EA6C())
+        if (IsYoshiSuperPowerActive())
         {
             if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
@@ -2721,7 +2721,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case ACTION_RUNNING_WB:
         mUnidentified1E4.m_eLastPadAction = 50;
-        if (fn_8003EA6C())
+        if (IsYoshiSuperPowerActive())
         {
             if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
@@ -3176,7 +3176,7 @@ void cFielder::DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type)
 
 void cFielder::PlayImpactCameraRumble()
 {
-    if (fn_8003E74C())
+    if (IsSuperGrowActive())
         FireCameraRumbleFilter(gSuperImpactRumbleX, gSuperImpactRumbleY, gSuperImpactRumbleSpring, gSuperImpactRumbleDamping);
     else if (GetCharacterClass() == (eCharacterClass)7 || GetCharacterClass() == (eCharacterClass)13 || GetCharacterClass() == (eCharacterClass)9)
         FireCameraRumbleFilter(gHeavyImpactRumbleX, gHeavyImpactRumbleY, gHeavyImpactRumbleSpring, gHeavyImpactRumbleDamping);
@@ -4747,7 +4747,7 @@ void cFielder::SetRunningAnimState(float blendTime)
         = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
     const int runningAnims[3] = { 7, 4, 8 };
     const int superAnims[3] = { 10, 9, 11 };
-    if (fn_8003E74C()
+    if (IsSuperGrowActive()
         || (GetCharacterClass() == BOWSER && mUnidentified3DC)
         || (GetCharacterClass() == WARIO && mUnidentified3DC)
         || (GetCharacterClass() == PETEY && mUnidentified3DC))
@@ -4764,7 +4764,7 @@ void cFielder::SetRunningWBAnimState(float blendTime)
         = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
     int runningAnims[3] = { 0x15, 0x14, 0x16 };
     int superAnims[3] = { 10, 9, 11 };
-    if (fn_8003E74C()
+    if (IsSuperGrowActive()
         || (GetCharacterClass() == BOWSER && mUnidentified3DC)
         || (GetCharacterClass() == PETEY && mUnidentified3DC))
         SetRunLeanSAB(superAnims, 3, 1);
@@ -4916,7 +4916,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     bool bUnidentified = false;
     if (pOpponent->m_pBall != NULL)
     {
-        if (fn_80038660() && !fn_8003E74C())
+        if (fn_80038660() && !IsSuperGrowActive())
         {
             float fPlayerScale = mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
@@ -4929,7 +4929,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
     }
     else if (m_pBall != NULL)
     {
-        if (pOpponent->fn_80038660() && !pOpponent->fn_8003E74C())
+        if (pOpponent->fn_80038660() && !pOpponent->IsSuperGrowActive())
         {
             float fPlayerScale = pOpponent->mUnidentified024.m_fPlayerScale;
             float fUnidentified = 0.18f
@@ -4956,9 +4956,9 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pReactee = this;
         pAttacker = pOpponent;
     }
-    else if (fn_8003E74C() && !pOpponent->fn_8003E74C()
+    else if (IsSuperGrowActive() && !pOpponent->IsSuperGrowActive()
         && !fn_80038918() && !bUnidentified
-        && !pOpponent->fn_8003E74C() && !pOpponent->fn_800344B0())
+        && !pOpponent->IsSuperGrowActive() && !pOpponent->fn_800344B0())
     {
         pReactee = pOpponent;
         pAttacker = this;
@@ -4973,7 +4973,7 @@ void cFielder::TestCollisionForInvicibility(cFielder* pOpponent)
         pAttackData->mUnidentified10 = false;
         fn_8005ED64(g_pGame, pAttackData);
     }
-    else if (pOpponent->fn_8003E74C() && !fn_8003E74C()
+    else if (pOpponent->IsSuperGrowActive() && !IsSuperGrowActive()
         && !pOpponent->fn_80038918() && !bUnidentified && !fn_800344B0())
     {
         pReactee = this;
@@ -5242,42 +5242,42 @@ bool cFielder::fn_8003E6EC() const
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17);
 }
 
-bool cFielder::fn_8003E6FC() const
+bool cFielder::IsStarActive() const
 {
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x18);
 }
 
-bool cFielder::fn_8003E70C() const
+bool cFielder::IsConfused() const
 {
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E);
 }
 
-bool cFielder::fn_8003E71C() const
+bool cFielder::IsMushroomActive() const
 {
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x19);
 }
 
-bool cFielder::fn_8003E72C() const
+bool cFielder::IsSlippery() const
 {
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1A);
 }
 
-bool cFielder::fn_8003E73C() const
+bool cFielder::IsShrunk() const
 {
     return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C);
 }
 
-bool cFielder::fn_8003E74C() const
+bool cFielder::IsSuperGrowActive() const
 {
-    return fn_8003E7F8() || fn_8003E84C();
+    return IsMarioSuperPowerActive() || IsLuigiSuperPowerActive();
 }
 
-bool cFielder::fn_8003E7F8() const
+bool cFielder::IsMarioSuperPowerActive() const
 {
     return GetCharacterClass() == (eCharacterClass)0 && fn_8003E6EC();
 }
 
-bool cFielder::fn_8003E84C() const
+bool cFielder::IsLuigiSuperPowerActive() const
 {
     return GetCharacterClass() == (eCharacterClass)4 && fn_8003E6EC();
 }
@@ -5289,7 +5289,7 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder)
     return active;
 }
 
-bool cFielder::fn_8003E8F4() const
+bool cFielder::IsPeachSuperPowerActive() const
 {
     bool active;
     GetCharacterSpecialActive(this, PEACH, active);
@@ -5303,21 +5303,21 @@ extern "C" bool fn_8003E948(const cFielder* pFielder)
     return active;
 }
 
-bool cFielder::IsPeachSuperPowerActive() const
+bool cFielder::IsWarioSuperPowerActive() const
 {
     bool active;
     GetCharacterSpecialActive(this, WARIO, active);
     return active;
 }
 
-bool cFielder::fn_8003E9F0() const
+bool cFielder::IsPeteySuperPowerActive() const
 {
     bool active;
     GetCharacterSpecialActive(this, PETEY, active);
     return active;
 }
 
-bool cFielder::fn_8003EA44() const
+bool cFielder::IsDKSuperPowerActive() const
 {
     bool result = false;
     if (GetCharacterClass() == DONKEYKONG
@@ -5328,7 +5328,7 @@ bool cFielder::fn_8003EA44() const
     return result;
 }
 
-bool cFielder::fn_8003EA6C() const
+bool cFielder::IsYoshiSuperPowerActive() const
 {
     bool active;
     GetCharacterSpecialActive(this, YOSHI, active);
@@ -5593,7 +5593,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 {
     m_pHeadTrack->m_fSmoothTime = lbl_806DB6E8;
 
-    if ((fn_8003E8A0(this) || fn_8003E9F0()) && mUnidentified3DC)
+    if ((fn_8003E8A0(this) || IsPeteySuperPowerActive()) && mUnidentified3DC)
     {
         if (lbl_806E0C58)
         {
@@ -5640,7 +5640,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         return;
     }
 
-    if (fn_8003E74C() && m_pBall == 0)
+    if (IsSuperGrowActive() && m_pBall == 0)
     {
         cPlayer* hitTarget;
         FindHeadTrackingHitTarget(this, hitTarget);

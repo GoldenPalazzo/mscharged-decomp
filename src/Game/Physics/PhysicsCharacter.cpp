@@ -585,7 +585,7 @@ void PhysicsCharacter::PostUpdate()
     }
 
     if (m_pAICharacter->m_eClassType == FIELDER
-        && ((cFielder*)m_pAICharacter)->fn_8003E74C())
+        && ((cFielder*)m_pAICharacter)->IsSuperGrowActive())
     {
         float goalLine = cField::GetGoalLineX(1U) - radius;
         position.x = Clamp(position.x, -goalLine, goalLine);

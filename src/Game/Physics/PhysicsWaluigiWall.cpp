@@ -380,7 +380,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
                 return ONE_WAY_CONTACT_OTHER;
             OnWaluigiWallAbort(player);
         }
-        else if (player->fn_8003E74C())
+        else if (player->IsSuperGrowActive())
             ApplyDamage(gWaluigiWallDamage_806DCB24);
         else if (player->m_eActionState == ACTION_HIT)
             ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->mUnidentified064));

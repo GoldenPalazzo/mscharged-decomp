@@ -218,7 +218,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         {
             if ((fn_8003E8A0(desire->m_pFielder)
                     && desire->m_pFielder->mUnidentified3DC)
-                || (desire->m_pFielder->fn_8003E9F0()
+                || (desire->m_pFielder->IsPeteySuperPowerActive()
                     && desire->m_pFielder->mUnidentified3DC))
             {
                 nThingsToAvoid = AVOID_NOTHING;
@@ -249,7 +249,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     }
 
     bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
-    if (!bHasGlobalPad && desire->m_pFielder->fn_8003EA6C())
+    if (!bHasGlobalPad && desire->m_pFielder->IsYoshiSuperPowerActive())
     {
         nThingsToAvoid &= ~(AVOID_FIELDERS | AVOID_POWERUPS);
     }
@@ -680,14 +680,14 @@ static float GetMarkFacingWeight(cFielder* TheFielder)
 extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
     bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
-                     && !desire->m_pFielder->fn_8003E70C()
+                     && !desire->m_pFielder->IsConfused()
                      && !HasGlobalPad(desire->m_pFielder)
                      && !(fn_8003E948(desire->m_pFielder)
                           && desire->m_pFielder->mUnidentified3DC)
-                     && !desire->m_pFielder->fn_8003EA6C()
+                     && !desire->m_pFielder->IsYoshiSuperPowerActive()
                      && !fn_8003E948(desire->m_pFielder)
                      && !fn_8003E8A0(desire->m_pFielder)
-                     && !desire->m_pFielder->fn_8003E8F4()
+                     && !desire->m_pFielder->IsPeachSuperPowerActive()
                      && !(bool)ReceivingPass(desire->m_pFielder)
                      && fn_800DED80(desire->m_pFielder) < 0.2f;
 

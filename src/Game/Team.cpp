@@ -1627,11 +1627,11 @@ bool cTeam::fn_800A6764() const
     bCaptainPowerupActive
         |= m_ePowerupList[1].eType == nCaptainPowerup;
 
-    if (pCaptain->fn_8003E74C()
+    if (pCaptain->IsSuperGrowActive()
         || fn_8003E8A0(pCaptain)
         || fn_8003E948(pCaptain)
-        || pCaptain->IsPeachSuperPowerActive()
-        || pCaptain->fn_8003E9F0())
+        || pCaptain->IsWarioSuperPowerActive()
+        || pCaptain->IsPeteySuperPowerActive())
     {
         bCaptainPowerupActive = true;
     }
@@ -1674,8 +1674,8 @@ bool cTeam::TogglePowerup(bool bIsSilent)
     if (mtToggleTimer.m_uPackedTime != 0
         || fn_8003E8A0((cFielder*)m_pPlayers[0])
         || fn_8003E948((cFielder*)m_pPlayers[0])
-        || ((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
-        || ((cFielder*)m_pPlayers[0])->fn_8003E9F0())
+        || ((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
+        || ((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {
         result = true;
     }
@@ -1708,8 +1708,8 @@ bool cTeam::fn_800A6560()
     if (mtToggleTimer.m_uPackedTime == 0
         && !fn_8003E8A0((cFielder*)m_pPlayers[0])
         && !fn_8003E948((cFielder*)m_pPlayers[0])
-        && !((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
-        && !((cFielder*)m_pPlayers[0])->fn_8003E9F0())
+        && !((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
+        && !((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {
         result = true;
     }

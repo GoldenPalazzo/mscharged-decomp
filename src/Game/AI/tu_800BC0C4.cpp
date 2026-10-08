@@ -121,7 +121,7 @@ bool DesireMushroom::Initialize(void* context)
     bool result = Desire::Initialize(context);
     mMaxDuration = GetMushroomEffectTime(m_pFielder->GetTweaks());
     m_pFielder->EndShrink();
-    if (!m_pFielder->fn_8003E74C())
+    if (!m_pFielder->IsSuperGrowActive())
     {
         m_pFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
     }
@@ -147,8 +147,8 @@ bool DesireMushroom::Reinitialize(void* context)
 void DesireMushroom::Cleanup()
 {
     KillMushroom(m_pFielder);
-    if (!m_pFielder->fn_8003E74C()
-        && !m_pFielder->fn_8003E73C())
+    if (!m_pFielder->IsSuperGrowActive()
+        && !m_pFielder->IsShrunk())
     {
         m_pFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
     }
@@ -296,12 +296,12 @@ bool DesireShrink::Initialize(void* context)
     mfSlowPercentage = 1.0f;
 
     m_pFielder->EndMushroom();
-    m_pFielder->EndBirdoSuperPower();
-    m_pFielder->EndPeachSuperPower(false);
-    m_pFielder->EndYoshiSuperPower(false);
-    m_pFielder->EndDaisySuperPower(false);
     m_pFielder->EndMarioSuperPower();
-    m_pFielder->EndKoopaSuperPower();
+    m_pFielder->EndWarioSuperPower(false);
+    m_pFielder->EndPeteySuperPower(false);
+    m_pFielder->EndBowserSuperPower(false);
+    m_pFielder->EndWaluigiSuperPower();
+    m_pFielder->EndLuigiSuperPower();
     m_pFielder->EndFrozenOrDazed();
     m_pFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
     m_pFielder->fn_8001EE74(
@@ -488,7 +488,7 @@ void DesireConfused::Update(
     {
         *update = 1;
     }
-    if (m_pFielder->fn_8003E6FC())
+    if (m_pFielder->IsStarActive())
     {
         *update = 1;
     }

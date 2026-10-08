@@ -723,7 +723,7 @@ bool DesireRunInDirection::Initialize(void* context)
 
 void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
 {
-    if (m_pFielder->fn_8003EA6C() && Incapacitated(m_pTarget))
+    if (m_pFielder->IsYoshiSuperPowerActive() && Incapacitated(m_pTarget))
     {
         *update = DESIRE_FINISHED;
         return;

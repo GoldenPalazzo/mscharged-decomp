@@ -731,7 +731,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
     float fHeight = 0.25f + GetJointPosition(m_nHeadJointIndex).z;
     if (!pFldr->mbTangible || pFldr->IsFrozen() || pFldr->IsCharacterInAir(fHeight)
-        || pFldr->IsInvincible() || pFldr->fn_8003E6FC())
+        || pFldr->IsInvincible() || pFldr->IsStarActive())
         return;
 
     switch (mGoalieActionState)
@@ -2299,7 +2299,7 @@ bool Goalie::FindApproachingMonty()
         return false;
     cFielder* pFielder = g_pBall->GetOwnerFielder();
     if (pFielder != 0 && (int)pFielder->mUnidentified024.m_eCharacterClass == 0x12
-        && !pFielder->fn_8003E6FC()
+        && !pFielder->IsStarActive()
         && (int)pFielder->m_eActionState == 0x20
         && pFielder->m_pCurrentAnimController->m_fTime < 0.55f)
     {
@@ -4022,7 +4022,7 @@ void Goalie::TacklePlayer(cPlayer* pPlayer)
 {
     cFielder* pFielder = static_cast<cFielder*>(pPlayer);
     if (pPlayer != 0 && pPlayer->m_eClassType == FIELDER
-        && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
+        && !pFielder->IsFallenDown() && !pFielder->IsStarActive())
     {
         PlaySound(9, 0x06024E5D, 0, 0);
 
@@ -4049,7 +4049,7 @@ void Goalie::TacklePlayer(cPlayer* pPlayer)
 
 void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
 {
-    if (pFielder != NULL && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
+    if (pFielder != NULL && !pFielder->IsFallenDown() && !pFielder->IsStarActive())
     {
         PlaySound(9, 0x06024E5D, NULL, NULL);
         unsigned short aDirection;
@@ -4140,7 +4140,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
 
 void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
 {
-    if (pTarget->IsFallenDown() || IsOnSameTeam(pTarget) || pTarget->fn_8003E6FC())
+    if (pTarget->IsFallenDown() || IsOnSameTeam(pTarget) || pTarget->IsStarActive())
         return;
 
     if (mPursueDekeState == 0)
@@ -4255,7 +4255,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     {
         return;
     }
-    if (pFielder->fn_8003E6FC())
+    if (pFielder->IsStarActive())
     {
         return;
     }

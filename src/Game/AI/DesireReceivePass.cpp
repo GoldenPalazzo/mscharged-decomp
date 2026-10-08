@@ -504,8 +504,8 @@ inline int DesireReceivePass::AddVolleyReceiveFlag(int animType, bool bFlag)
 inline bool DesireReceivePass::CanRequestOneTouch()
 {
     float fPassProgress = g_pBall->GetPassProgress();
-    bool bSpecialReceive = m_pFielder->fn_8003E7F8()
-        || m_pFielder->fn_8003E84C();
+    bool bSpecialReceive = m_pFielder->IsMarioSuperPowerActive()
+        || m_pFielder->IsLuigiSuperPowerActive();
     if ((bSpecialReceive && m_pFielder->m_pBall != 0)
         || (fPassProgress < g_fOneTouchMinPassProgress
             && mAgeTimer.GetSeconds() < g_fOneTouchMinDesireAge)
@@ -579,8 +579,8 @@ void DesireReceivePass::RequestOneTouchShot(bool bVolleyPass)
     mbOneTouchShot = true;
     mbOneTouchVolley = bVolleyPass;
     bool bSpecialReceive =
-        m_pFielder->fn_8003E7F8()
-        || m_pFielder->fn_8003E84C();
+        m_pFielder->IsMarioSuperPowerActive()
+        || m_pFielder->IsLuigiSuperPowerActive();
     if (meDesireSubState == 4 && !bSpecialReceive)
     {
         mbOneTouchShotLate = true;
@@ -643,8 +643,8 @@ void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarg
     mbOneTouchPass = true;
     mpOneTouchPassTarget = pPassTarget;
     bool bSpecialReceive =
-        m_pFielder->fn_8003E7F8()
-        || m_pFielder->fn_8003E84C();
+        m_pFielder->IsMarioSuperPowerActive()
+        || m_pFielder->IsLuigiSuperPowerActive();
     if (meDesireSubState == 4 && !bSpecialReceive)
     {
         return;
@@ -1354,8 +1354,8 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
     int eReceiveAnimType = 2;
     if (bVolleyPass)
     {
-        if (pPassTarget->fn_8003E7F8()
-            || pPassTarget->fn_8003E84C())
+        if (pPassTarget->IsMarioSuperPowerActive()
+            || pPassTarget->IsLuigiSuperPowerActive())
         {
             eReceiveAnimType = 16;
         }
@@ -1436,7 +1436,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         v3PassPosition.z = v3ContactOffsetWorld.z;
         g_pBall->ShootAtFast(
             v3BallVelocity, v3PassPosition, fPassTime);
-        if (!m_pFielder->fn_8003E74C()
+        if (!m_pFielder->IsSuperGrowActive()
             && v3BallVelocity.z > g_fMaxVolleyPassUpSpeed)
         {
             v3BallVelocity.z = g_fMaxVolleyPassUpSpeed;

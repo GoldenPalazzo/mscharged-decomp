@@ -1431,7 +1431,7 @@ void EmitLanding(cCharacter* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER)
     {
-        if (((cFielder*)pCharacter)->fn_8003E74C())
+        if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
             PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
 
@@ -1508,7 +1508,7 @@ void EmitHitTrail(cCharacter* pCharacter)
             pController->SetUpdateCallback(update2);
         }
 
-        if (((cFielder*)pCharacter)->fn_8003E74C())
+        if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
             PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
         }

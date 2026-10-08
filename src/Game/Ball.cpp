@@ -692,7 +692,7 @@ void cBall::CollideWithCharacterCallback(
         else
         {
             if (pOwnerFielder->fn_80038660()
-                && !pOwnerFielder->fn_8003E74C())
+                && !pOwnerFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pOwnerFielder->IsStuck()
                     && (pOwnerFielder->muInvincibleStatus & 1) != 0;
@@ -702,7 +702,7 @@ void cBall::CollideWithCharacterCallback(
                 }
             }
             if (pCharacterFielder->fn_80038660()
-                && !pCharacterFielder->fn_8003E74C())
+                && !pCharacterFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pCharacterFielder->IsStuck()
                     && (pCharacterFielder->muInvincibleStatus & 1) != 0;
