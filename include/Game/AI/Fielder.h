@@ -213,6 +213,13 @@ public:
     void TestButtonsToQueueActions(float deltaTime);
     bool TestQueuedActions();
 
+    void GetApproachPosition(nlVector3* position, const nlVector3* from, float predictionTime);
+    float GetDekeDistance();
+    void EmitMegaStrikeWindup();
+    void CleanActionShootToScore();
+    void CleanActionShot(eFielderActionState newAction);
+    void SetWindupWBAnimState();
+
     AvoidController* GetAvoidController();
     bool EndMushroom();
     bool EndShrink();
@@ -737,15 +744,9 @@ extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_800368E4(cFielder*);
 extern "C" bool fn_80036A58(cFielder*, unsigned short*);
-extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
 extern "C" float fn_800394A8(cFielder*, int);
-extern "C" float fn_80039574(cFielder*);
-extern "C" void fn_80039CA0(cFielder*);
 extern "C" void fn_80039F24(cFielder*);
-extern "C" void fn_8003A0E4(cFielder*);
-extern "C" void fn_8003A178(cFielder*);
 extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
-extern "C" void fn_8003A544(cFielder* pFielder);
 extern "C" void fn_8003A5C8(cFielder* pFielder);
 extern "C" void fn_8003ADAC(cFielder* pFielder);
 extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);

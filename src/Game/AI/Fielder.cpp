@@ -50,6 +50,7 @@
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Team.h"
+#include "Game/Weather.h"
 #include "Game/Terrain.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
 #include "Game/Task/FixedUpdateTask.h"
@@ -1964,7 +1965,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case ACTION_UNKNOWN_15:
-        fn_8003A178(this);
+        CleanActionShot(actionState);
         break;
 
     case ACTION_SLIDE_ATTACK:
@@ -5050,4 +5051,97 @@ bool cFielder::TestQueuedActions()
     else if (mUnidentified1E4.m_eLastPadAction == 29)
         result = fn_800447C0(mUnidentified338);
     return result;
+}
+
+float gBaseDekeDistance = 2.5f;
+float gDekeChargeDistance = 8.5f;
+
+void cFielder::GetApproachPosition(nlVector3* position, const nlVector3* from, float predictionTime)
+{
+    float radius = 1.0f + mUnidentified320->GetRadius();
+    nlVector3 center;
+    if (predictionTime > 0.0f)
+        nlVec3ScaleAdd(center, predictionTime, mUnidentified024.m_v3Velocity,
+            mUnidentified024.m_v3Position);
+    else
+        center = mUnidentified024.m_v3Position;
+    nlVec3Sub(*position, *from, center);
+    nlVec3Normalize(*position, *position);
+    nlVec3ScaleAdd(*position, radius, *position, center);
+}
+
+float cFielder::GetDekeDistance()
+{
+    float charge = GetBallChargeValue(g_pBall, 0);
+    float extraDistance = gDekeChargeDistance * (charge / 4.0f);
+    if (extraDistance > gDekeChargeDistance)
+        extraDistance = gDekeChargeDistance;
+    return gBaseDekeDistance + extraDistance;
+}
+
+void cFielder::EmitMegaStrikeWindup()
+{
+    KillWindups();
+    switch (mUnidentified024.m_eCharacterClass)
+    {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+        EmitWindupAtBall("ball_sts_windup");
+        break;
+    }
+}
+
+void cFielder::CleanActionShootToScore()
+{
+    if (!IsConcurrentStateActive(mUnidentified428->mScriptMachine, 24))
+        muInvincibleStatus = 0;
+    mUnidentified478 = 0;
+    if (m_pTeam->GetOtherTeam()->GetGoalie()->mGoalieActionState != GOALIEACTION_MEGA_STRIKE)
+        g_pGame->mpWeatherManager->Resume();
+    StopSound(0x05C8E379, this);
+    StopSound(0xBF541A4C, this);
+}
+
+void cFielder::CleanActionShot(eFielderActionState newAction)
+{
+    bIsModified = false;
+    m_pShotMeter->Abort();
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)16 && newAction != 33)
+        mUnidentified178 = 1.0f;
+    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)12 && g_pBall->meBallState != 8)
+    {
+        if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
+            gNPCManager->mpBirdoEgg->Hide(false);
+    }
+    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)14 && g_pBall->meBallState != 8)
+    {
+        if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
+            gNPCManager->mpKoopaShell->Deactivate(false);
+    }
+}
+
+void cFielder::SetWindupWBAnimState()
+{
+    if (GetFacingDeltaToPosition(m_pTeam->GetOtherNet()->m_v3NetLocation) < 0)
+        SetAnimState(0x53, true, 0.2f, false, false);
+    else
+        SetAnimState(0x52, true, 0.2f, false, false);
 }

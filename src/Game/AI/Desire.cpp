@@ -316,7 +316,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case MARIO:
     case 17:
     {
-        float dekeDistance = fn_80039574(m_pFielder);
+        float dekeDistance = m_pFielder->GetDekeDistance();
         cNet* net = m_pFielder->m_pTeam->GetOtherNet();
         cFielder* fielder = m_pFielder;
         nlVector3 goalieDelta;
@@ -898,7 +898,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
             }
             else
             {
-                fn_80039350(target, &position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
+                target->GetApproachPosition(&position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
             }
         }
         else
@@ -914,7 +914,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     }
     else if (g_pBall->GetOwnerFielder() != NULL)
     {
-        fn_80039350(g_pBall->GetOwnerFielder(), &position,
+        g_pBall->GetOwnerFielder()->GetApproachPosition(&position,
             &m_pFielder->mUnidentified024.m_v3Position, 0.25f);
     }
     else

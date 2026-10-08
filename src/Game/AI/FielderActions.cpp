@@ -4080,7 +4080,7 @@ void cFielder::fn_8004B658()
     {
         SetAction(ACTION_UNKNOWN_30);
         DoResetShotMeter(0.0f);
-        fn_8003A544(this);
+        SetWindupWBAnimState();
         InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         if (mUnidentified024.m_fActualSpeed > this->GetTweaks()->GetRunningSpeed())
