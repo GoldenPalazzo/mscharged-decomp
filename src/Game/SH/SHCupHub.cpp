@@ -417,13 +417,13 @@ void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
         BasicGameInfo* game = CupManager::s_pInstance->GetMatchupInfo(0, round, (u16)matchup);
         if (game->mFinalScore[0] != 0 || game->mFinalScore[1] != 0)
         {
-            GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push((SceneList)0x21, (ScreenMovement)0, false);
+            GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
             results->SetResultsData(game, this, 0);
             results->SetDisplayMode(0xD);
         }
         else
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, (ScreenMovement)0, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
         }
     }
